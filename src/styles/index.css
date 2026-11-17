@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens em RGB separado por espaço, para o Tailwind aplicar transparência.
+   Padrão = Coliseu (mármore escuro e ouro). Cada área redefine pelo data-area. */
+:root {
+  --bg: 14 12 10;
+  --surface: 28 24 20;
+  --line: 72 60 44;
+  --fg: 244 236 222;
+  --muted: 176 162 140;
+  --accent: 214 172 92;
+  --accent-2: 168 52 44;
+  color-scheme: dark;
+}
+
+[data-area='ludus'] {
+  --bg: 10 10 12;
+  --surface: 24 22 26;
+  --line: 66 54 40;
+  --accent: 196 140 64;
+  --accent-2: 120 90 60;
+}
+
+[data-area='arcade'] {
+  --bg: 8 6 20;
+  --surface: 20 16 44;
+  --line: 70 50 140;
+  --fg: 236 240 255;
+  --muted: 150 160 200;
+  --accent: 64 240 220;
+  --accent-2: 255 64 200;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-bg font-sans text-fg antialiased;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
