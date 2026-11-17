@@ -3,8 +3,8 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// GitHub Pages serve o site em /coliseu-das-ias/. Em outro host, defina COLISEU_BASE.
-const base = process.env.COLISEU_BASE ?? '/coliseu-das-ias/';
+// GitHub Pages serve o site em /Coliseu-das-IAs/. Em outro host, defina COLISEU_BASE.
+const base = process.env.COLISEU_BASE ?? '/Coliseu-das-IAs/';
 
 export default defineConfig({
   base,
