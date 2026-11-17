@@ -20,10 +20,18 @@
 | D5 | Ludus vira 4 treinos (um por equipamento, 3 níveis); os atributos dão bônus com os jurados no Arcade. |
 | D6 | Textos escritos de verdade, sem modelo de frase. |
 | D7 | Dois visuais: Coliseu em mármore e ouro; Arcade em neon. |
+| D8 | (17/11) **Primeiro refazer bem tudo que o jogo já tem**, com as melhorias aprovadas. Aprofundar Duelo e Tribunal depois. |
+| D9 | (17/11) Tribunal: lado sorteado, ponteiro por jurado, cartas mostram quem agradam e quem irritam, explicação por jurado, 4 cartas por tempo, **jurados que mudam** (5 de 8). Ficam para depois: testemunha. Rejeitados por enquanto: eventos do Pretor. |
+| D10 | (17/11) Duelo: 5 cartas, escolhe 2 quaisquer, fusão costurada, veredito explicado, rival melhor nas ligas altas, animação de choque, habilidade por IA, revanche com um toque. A roda de estilos, a abertura/fecho e o humor da plateia ficaram complexos: **voltam à mesa depois**. |
+| D11 | (17/11) Um nome de gladiador por IA nos dois modos. Habilidades: Claude acalma um jurado ou vira empate em vitória; ChatGPT troca uma carta; Gemini espia uma carta do rival. |
+| D12 | (17/11) Em aberto: Torneios, Truques (ex-Códex), 2 Jogadores, Dilema do Dia, Criador de Dilemas (aceito em princípio) e o teste de IA no navegador (Lucas não precisa fazer nada; viabilidade só testando no iPad). |
 
 ## Etapas
 0. **Base:** esqueleto do site, CI e publicação no GitHub Pages.
-1. **Arcade justo:** Tribunal e Duelo com regras novas e textos novos.
+1. **Arcade justo**, em três partes, cada uma publicada e testada:
+   - 1a. Personagens, ligas, troféus, Maestria, histórico e a tela do Arcade.
+   - 1b. Tribunal com as regras aprovadas e 10 dilemas escritos à mão.
+   - 1c. Duelo com as regras aprovadas.
 2. **Bonito:** neon, portões, transições, sons, reações ao toque.
 3. **Ludus novo.**
 4. **Mapa do Caminho de Troféus.**

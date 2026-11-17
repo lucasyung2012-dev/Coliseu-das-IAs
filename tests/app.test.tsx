@@ -15,12 +15,15 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /Coliseu/ })).toHaveAttribute('href', '/coliseu');
   });
 
-  it('abre a tela provisória do Arcade', () => {
+  it('abre o Arcade com os dois modos e o histórico vazio', () => {
     render(
       <MemoryRouter initialEntries={['/arena']}>
         <App />
       </MemoryRouter>,
     );
-    expect(screen.getByText(/chega na Etapa 1/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Imperium Arcade' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Duelo/ })).toHaveAttribute('href', '/arena/duelo');
+    expect(screen.getByRole('link', { name: /Tribunal/ })).toHaveAttribute('href', '/arena/tribunal');
+    expect(screen.getByText(/primeira glória/)).toBeInTheDocument();
   });
 });
