@@ -19,6 +19,8 @@ import {
   type EstadoTribunal,
 } from '@/game/tribunal/motor';
 import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
+import { PATENTES } from '@/game/ligas';
 import { PretorDestaque, VERDE, VERMELHO } from './visual';
 import { desbloquear, tocar } from '@/ui/som';
 import VereditoTribunal from './VereditoTribunal';
@@ -427,16 +429,30 @@ function CartaView(props: {
  * contra o rival (vermelho), com o gladiador, a IA, o lado e a opinião de cada um.
  */
 function FaixaCombatentes({ e, comTese = false }: { e: EstadoTribunal; comTese?: boolean }) {
+  // O rival luta na mesma liga do jogador.
+  const { liga } = useAparencia(e.ia);
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-stretch gap-2 sm:gap-3">
-      <Combatente id={e.ia} quem="voce" lado={e.dilema.lados[e.ladoJogador]} comTese={comTese} />
+      <Combatente id={e.ia} quem="voce" liga={liga} lado={e.dilema.lados[e.ladoJogador]} comTese={comTese} />
       <p className="self-center font-pixel text-sm text-[rgb(242_193_78)] sm:text-xl">VS</p>
-      <Combatente id={e.rival} quem="rival" lado={e.dilema.lados[ladoRival(e.ladoJogador)]} comTese={comTese} />
+      <Combatente id={e.rival} quem="rival" liga={liga} lado={e.dilema.lados[ladoRival(e.ladoJogador)]} comTese={comTese} />
     </div>
   );
 }
 
-function Combatente({ id, quem, lado, comTese }: { id: IaId; quem: 'voce' | 'rival'; lado: { nome: string; tese: string }; comTese: boolean }) {
+function Combatente({
+  id,
+  quem,
+  liga,
+  lado,
+  comTese,
+}: {
+  id: IaId;
+  quem: 'voce' | 'rival';
+  liga: number;
+  lado: { nome: string; tese: string };
+  comTese: boolean;
+}) {
   const p = PERSONAGENS[id];
   const cor = quem === 'voce' ? VERDE : VERMELHO;
   return (
@@ -445,7 +461,7 @@ function Combatente({ id, quem, lado, comTese }: { id: IaId; quem: 'voce' | 'riv
       style={{ boxShadow: `0 0 0 3px ${cor}, 0 0 22px -6px ${cor}` }}
     >
       <div className="w-9 shrink-0 sm:w-14">
-        <GladiadorPixel ia={id} espelhar={quem === 'rival'} />
+        {quem === 'voce' ? <GladiadorEnfeitado ia={id} parado /> : <GladiadorPixel ia={id} liga={liga} espelhar />}
       </div>
       <div className="min-w-0">
         <p className="font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>
@@ -454,7 +470,9 @@ function Combatente({ id, quem, lado, comTese }: { id: IaId; quem: 'voce' | 'riv
         <p className="mt-1 truncate text-sm font-semibold sm:text-base">
           <span style={{ color: corDe(id) }}>{p.emblema}</span> {p.ia}
         </p>
-        <p className="truncate text-[11px] text-muted sm:text-xs">{p.gladiador}</p>
+        <p className="truncate text-[11px] text-muted sm:text-xs">
+          {PATENTES[liga]} {p.gladiador}
+        </p>
         <p className="mt-1 inline-block px-1.5 py-0.5 font-pixel text-[7px] text-black sm:text-[9px]" style={{ background: cor }}>
           {lado.nome.toUpperCase()}
         </p>

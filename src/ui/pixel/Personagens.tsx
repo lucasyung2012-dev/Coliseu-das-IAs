@@ -1,5 +1,5 @@
 import Sprite from './Sprite';
-import { GLADIADORES, JURADOS_PIXEL, PRETOR, paletaBusto, paletaGladiador } from './sprites';
+import { gradeGladiador, JURADOS_PIXEL, PRETOR, paletaBusto, paletaGladiador, type Armadura } from './sprites';
 import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { JURADOS, type JuradoId } from '@/game/jurados';
 
@@ -9,9 +9,18 @@ interface Base {
   espelhar?: boolean;
 }
 
-export function GladiadorPixel({ ia, ...resto }: Base & { ia: IaId }) {
+// As grades mudam pouco (3 IAs × 5 ligas): guardadas depois de desenhadas.
+const cache = new Map<string, string[]>();
+function grade(ia: IaId, liga: number) {
+  const k = `${ia}-${liga}`;
+  if (!cache.has(k)) cache.set(k, gradeGladiador(ia, liga));
+  return cache.get(k)!;
+}
+
+/** Gladiador em pixel. `liga` (0 a 4) muda o equipamento; `armadura` vem da Maestria. */
+export function GladiadorPixel({ ia, armadura, liga = 0, ...resto }: Base & { ia: IaId; armadura?: Armadura; liga?: number }) {
   const p = PERSONAGENS[ia];
-  return <Sprite grade={GLADIADORES[ia]} paleta={paletaGladiador(p.cor)} titulo={`${p.gladiador} (${p.ia})`} {...resto} />;
+  return <Sprite grade={grade(ia, liga)} paleta={paletaGladiador(p.cor, armadura)} titulo={`${p.gladiador} (${p.ia})`} {...resto} />;
 }
 
 export function JuradoPixel({ jurado, ...resto }: Base & { jurado: JuradoId }) {

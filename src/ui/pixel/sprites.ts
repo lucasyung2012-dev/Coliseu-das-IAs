@@ -1,5 +1,5 @@
 import type { Paleta } from './Sprite';
-import { desenhar, xadrez } from './desenho';
+import { desenhar, xadrez, type Passo } from './desenho';
 import type { IaId } from '@/game/personagens';
 import type { JuradoId } from '@/game/jurados';
 
@@ -11,7 +11,7 @@ import type { JuradoId } from '@/game/jurados';
 // ---------- Gladiadores (22 × 26) ----------
 
 /** Cassius (Claude), o Estrategista: capacete de crista alta, escudo retangular grande e gládio. */
-const CASSIUS = desenhar(23, 26, [
+const PASSOS_CASSIUS: Passo[] = [
   ['C', 9, 1, 5, 1],
   ['C', 8, 2, 7, 1],
   ['C', 9, 3, 5, 1],
@@ -49,10 +49,10 @@ const CASSIUS = desenhar(23, 26, [
   ['W', 18, 12],
   ['W', 19, 11],
   ['W', 20, 10],
-]);
+];
 
 /** Octavius (ChatGPT), o Versátil: sem capacete, faixa na testa, tridente e rede. */
-const OCTAVIUS = desenhar(23, 26, [
+const PASSOS_OCTAVIUS: Passo[] = [
   ['H', 8, 3, 6, 2],
   ['H', 7, 4, 1, 3],
   ['H', 14, 4, 1, 3],
@@ -92,10 +92,10 @@ const OCTAVIUS = desenhar(23, 26, [
   ['W', 15, 1],
   ['W', 17, 0],
   ['W', 19, 1],
-]);
+];
 
 /** Helios (Gemini), o Observador: coroa de raios de sol, viseira brilhante, escudo com olho e lança. */
-const HELIOS = desenhar(23, 26, [
+const PASSOS_HELIOS: Passo[] = [
   // capa atrás do corpo
   ['D', 6, 11, 10, 10],
   // raios de sol
@@ -137,9 +137,26 @@ const HELIOS = desenhar(23, 26, [
   ['M', 17, 0, 1, 3],
   ['W', 17, 0],
   ['S', 16, 13, 2, 2],
-]);
+];
 
-export const GLADIADORES: Record<IaId, string[]> = { claude: CASSIUS, chatgpt: OCTAVIUS, gemini: HELIOS };
+const PASSOS_GLADIADOR: Record<IaId, Passo[]> = { claude: PASSOS_CASSIUS, chatgpt: PASSOS_OCTAVIUS, gemini: PASSOS_HELIOS };
+
+/**
+ * O gladiador evolui com a liga (índice 0 = Recrutas … 4 = Imperadores):
+ * Centurião ganha capa vermelha, Pretoriano ombreiras douradas e Imperador o
+ * manto roxo com faixa dourada na cabeça. Cada liga mantém o que veio antes.
+ */
+export function gradeGladiador(ia: IaId, liga = 0): string[] {
+  const atras: Passo[] = [];
+  const frente: Passo[] = [];
+  if (liga >= 4) atras.push(['P', 4, 10, 14, 13], ['G', 4, 22, 14, 1]);
+  else if (liga >= 2) atras.push(['V', 5, 10, 12, 11]);
+  if (liga >= 3) frente.push(['G', 6, 10, 3, 2], ['G', 13, 10, 3, 2]);
+  if (liga >= 4) frente.push(['G', 8, 4, 6, 1]);
+  return desenhar(23, 26, [...atras, ...PASSOS_GLADIADOR[ia], ...frente]);
+}
+
+export const GLADIADORES: Record<IaId, string[]> = { claude: gradeGladiador('claude'), chatgpt: gradeGladiador('chatgpt'), gemini: gradeGladiador('gemini') };
 
 // ---------- Jurados e Pretor (16 × 17, busto) ----------
 
@@ -360,6 +377,8 @@ const BASE: Paleta = {
   O: '#9fe8ff',
   R: '#f07a8a',
   N: '#d8cfb4',
+  V: '#b0202c',
+  P: '#6a2a8a',
 };
 
 /** "r g b" → "rgb(r g b)", com fator para escurecer. */
@@ -375,8 +394,13 @@ function escurecer(hex: string, fator = 0.7): string {
   return `rgb(${c.join(' ')})`;
 }
 
-export function paletaGladiador(corIa: string): Paleta {
-  return { ...BASE, C: rgb(corIa), D: rgb(corIa, 0.55), H: '#3a2414' };
+/** Armadura: a padrão (metal), a da cor da IA (Maestria 10) ou a dourada (Maestria 50). */
+export type Armadura = 'padrao' | 'cor' | 'ouro';
+
+export function paletaGladiador(corIa: string, armadura: Armadura = 'padrao'): Paleta {
+  const metal: Paleta =
+    armadura === 'ouro' ? { M: '#e8b84a', W: '#fff1b0' } : armadura === 'cor' ? { M: rgb(corIa, 0.85), W: rgb(corIa, 1.25) } : {};
+  return { ...BASE, C: rgb(corIa), D: rgb(corIa, 0.55), H: '#3a2414', ...metal };
 }
 
 export function paletaBusto(cores: { toga: string; cabelo: string; acessorio: string; objeto: string }): Paleta {

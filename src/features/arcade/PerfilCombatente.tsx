@@ -1,10 +1,11 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
-import { LIGAS, ligaDe, proximaLiga } from '@/game/ligas';
-import { nivelMaestria, totalPartidas, useProgresso, XP_POR_NIVEL, type PlacarModo } from '@/game/progresso';
-import { proximoTitulo, tituloDoNivel, TITULOS } from '@/game/maestria';
+import { indiceLiga, LIGAS, ligaDe, PATENTES, patenteDe, proximaLiga } from '@/game/ligas';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import { nivelMaestria, totalPartidas, useProgresso, XP_POR_NIVEL, type PlacarModo } from '@/game/progresso';
+import { proximoTitulo, RECOMPENSAS, tituloDoNivel, TITULOS } from '@/game/maestria';
+import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { tocar } from '@/ui/som';
 
 /** Perfil do combatente: troféus e liga, Maestria detalhada, estatísticas e últimas partidas. */
@@ -38,14 +39,15 @@ export default function PerfilCombatente() {
         <section className="pixel-box pixel-ia grid items-center gap-5 p-5 sm:grid-cols-[auto_1fr]" aria-label={`Perfil de ${pers.gladiador}`}>
           <div className="relative mx-auto w-40 sm:w-52">
             <div className="aura-pretor absolute inset-[-10%] rounded-full opacity-60" style={{ background: `radial-gradient(circle, rgb(${pers.cor} / 0.5), transparent 65%)` }} aria-hidden />
-            <div className="respirar relative">
-              <GladiadorPixel ia={id} />
+            <div className="relative">
+              <GladiadorEnfeitado ia={id} comMoldura />
             </div>
           </div>
           <div className="min-w-0">
             <p className="font-pixel text-[10px] text-[rgb(var(--ia))]">
               {pers.emblema} {pers.ia.toUpperCase()}
             </p>
+            <p className="mt-2 font-pixel text-xs text-[rgb(242_193_78)]">{patenteDe(trofeus).toUpperCase()}</p>
             <h1 className="mt-2 font-pixel text-3xl sm:text-4xl">{pers.gladiador.toUpperCase()}</h1>
             <p className="mt-1 text-sm text-muted">
               {pers.titulo} · {pers.lema}
@@ -163,6 +165,43 @@ export default function PerfilCombatente() {
             })}
           </ol>
           <p className="text-xs text-muted">Como ganhar XP: vitória +40, empate +20, derrota +20. Treino não dá XP.</p>
+        </Bloco>
+
+        <Bloco titulo="🎁 RECOMPENSAS DE MAESTRIA">
+          <p className="text-sm text-muted">Só visual: deixam o gladiador mais estiloso, nunca mais forte.</p>
+          <ol className="grid gap-1.5 sm:grid-cols-2" aria-label="Recompensas de Maestria">
+            {RECOMPENSAS.map((r) => {
+              const ganha = nivel >= r.nivel;
+              return (
+                <li key={r.nome} className={`pixel-box flex items-start gap-2 p-2 text-xs ${ganha ? '' : 'opacity-45'}`}>
+                  <span className="text-base">{ganha ? r.icone : '🔒'}</span>
+                  <span>
+                    <span className="font-pixel text-[8px] text-muted">NÍVEL {r.nivel}</span>
+                    <span className={`block font-semibold ${ganha ? 'text-[rgb(var(--ia))]' : ''}`}>{r.nome}</span>
+                    <span className="block text-muted">{r.descricao}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        </Bloco>
+
+        <Bloco titulo="🛡 EVOLUÇÃO PELOS TROFÉUS">
+          <p className="text-sm text-muted">A cada liga, {pers.gladiador} muda de patente, cresce e ganha equipamento novo.</p>
+          <ol className="grid grid-cols-5 items-end gap-1.5" aria-label="Evolução por liga">
+            {PATENTES.map((pat, i) => {
+              const chegou = indiceLiga(trofeus) >= i;
+              return (
+                <li key={pat} className={`flex flex-col items-center text-center ${chegou ? '' : 'opacity-40'}`}>
+                  <div style={{ width: `${56 + i * 9}%` }}>
+                    <GladiadorPixel ia={id} liga={i} />
+                  </div>
+                  <p className="mt-1 font-pixel text-[6px] sm:text-[8px]">{pat.toUpperCase()}</p>
+                  <p className="text-[10px] text-muted">{LIGAS[i]!.min}+</p>
+                </li>
+              );
+            })}
+          </ol>
         </Bloco>
 
         {/* Estatísticas */}

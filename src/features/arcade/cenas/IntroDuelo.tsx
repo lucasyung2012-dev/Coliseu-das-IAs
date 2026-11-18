@@ -1,6 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
+import { PATENTES } from '@/game/ligas';
+import { tituloDoNivel } from '@/game/maestria';
+import { nivelMaestria, useProgresso } from '@/game/progresso';
 import { useSequencia } from '@/ui/movimento';
 import { tocar } from '@/ui/som';
 import { useSonsDaFase } from '@/ui/BotaoSom';
@@ -16,6 +20,9 @@ const cor = (id: IaId) => `rgb(${PERSONAGENS[id].cor})`;
 export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; fim: ReactNode }) {
   const [fase, pular] = useSequencia(MARCOS);
   const roleta = useRoleta(ia, rival, fase === 0);
+  // O rival luta na mesma liga do jogador; o jogador entra com tudo o que conquistou.
+  const { liga, visual } = useAparencia(ia);
+  const titulo = tituloDoNivel(nivelMaestria(useProgresso().xp[ia])).nome;
   useSonsDaFase(fase, {
     1: 'portao',
     2: 'passos',
@@ -34,17 +41,22 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
 
         {fase >= 2 && (
           <>
+            {visual.entrada && fase === 2 && (
+              // Entrada especial (Maestria 30): um raio de luz cai sobre o seu gladiador.
+              <>
+                <div className="raio-entrada absolute bottom-[6%] left-[16%] top-0 w-[11%]" aria-hidden />
+                <Faiscas x={21} y={70} />
+              </>
+            )}
             <div className="entrar-esq absolute bottom-[6%] left-[12%] w-[19%]">
               <div className={fase >= 4 ? 'investida-esq' : ''}>
-                <div className="respirar">
-                  <GladiadorPixel ia={ia} />
-                </div>
+                <GladiadorEnfeitado ia={ia} />
               </div>
             </div>
             <div className="entrar-dir absolute bottom-[6%] right-[12%] w-[19%]">
               <div className={fase >= 4 ? 'investida-dir' : ''}>
                 <div className="respirar">
-                  <GladiadorPixel ia={rival} espelhar />
+                  <GladiadorPixel ia={rival} liga={liga} espelhar />
                 </div>
               </div>
             </div>
@@ -57,8 +69,8 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
             <div className="absolute left-1/2 top-[22%] -translate-x-1/2">
               <p className="pancada neon font-pixel text-3xl text-accent sm:text-6xl">VS</p>
             </div>
-            <NomePlaca lado="esq" id={ia} />
-            <NomePlaca lado="dir" id={rival} />
+            <NomePlaca lado="esq" id={ia} patente={PATENTES[liga]!} titulo={visual.titulo ? titulo : undefined} />
+            <NomePlaca lado="dir" id={rival} patente={PATENTES[liga]!} />
           </>
         )}
 
@@ -94,19 +106,21 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   );
 }
 
-function NomePlaca({ lado, id }: { lado: 'esq' | 'dir'; id: IaId }) {
+function NomePlaca({ lado, id, patente, titulo }: { lado: 'esq' | 'dir'; id: IaId; patente: string; titulo?: string }) {
   const p = PERSONAGENS[id];
   return (
     <div
       className={`pancada absolute top-[40%] ${lado === 'esq' ? 'left-[2%]' : 'right-[2%] text-right'} bg-black/75 px-2 py-1.5 sm:px-3 sm:py-2`}
       style={{ borderBottom: `4px solid ${cor(id)}` }}
     >
+      <p className="font-pixel text-[7px] text-[rgb(242_193_78)] sm:text-[10px]">{patente.toUpperCase()}</p>
       <p className="font-pixel text-[11px] sm:text-xl" style={{ color: cor(id), textShadow: `2px 2px 0 #000` }}>
         {p.gladiador.toUpperCase()}
       </p>
       <p className="mt-1 font-pixel text-[7px] text-fg sm:text-[10px]">
         {p.emblema} {p.ia.toUpperCase()}
       </p>
+      {titulo && <p className="mt-1 font-pixel text-[6px] text-accent sm:text-[9px]">★ {titulo.toUpperCase()}</p>}
     </div>
   );
 }

@@ -601,3 +601,57 @@
   box-shadow: 0 3px 0 rgb(90 52 20 / 0.5), inset 0 0 0 2px #5a3414;
   clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%);
 }
+
+/* ===== Recompensas de Maestria ===== */
+.moldura-bronze,
+.moldura-prata,
+.moldura-ouro {
+  border-radius: 10px;
+  border: 4px double var(--moldura);
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.5), 0 0 18px -4px var(--moldura);
+}
+.moldura-bronze { --moldura: #c07a3a; }
+.moldura-prata { --moldura: #d8dde8; }
+.moldura-ouro { --moldura: #f2c14e; box-shadow: 0 0 0 2px rgb(0 0 0 / 0.5), 0 0 26px 0 #f2c14e; }
+
+/* Aura de faíscas: dois anéis pontilhados dourados girando em sentidos opostos. */
+.aura-faiscas {
+  border: 3px dotted rgb(242 193 78 / 0.85);
+  animation: girar 6s linear infinite;
+}
+.aura-faiscas::after {
+  content: '';
+  position: absolute;
+  inset: 10%;
+  border-radius: 9999px;
+  border: 2px dotted rgb(255 240 180 / 0.7);
+  animation: girar 4s linear infinite reverse;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+/* Aura de raios: brilho elétrico que pisca. */
+.aura-raios {
+  background: radial-gradient(circle, rgb(120 200 255 / 0.35), transparent 65%);
+  box-shadow: 0 0 22px 4px rgb(140 210 255 / 0.6), inset 0 0 18px rgb(200 240 255 / 0.6);
+  animation: raios 0.9s steps(3) infinite;
+}
+@keyframes raios {
+  0% { opacity: 1; transform: scale(1); }
+  33% { opacity: 0.4; transform: scale(1.05) rotate(4deg); }
+  66% { opacity: 0.9; transform: scale(0.97) rotate(-3deg); }
+}
+
+/* Entrada especial (Maestria 30): raio de luz descendo sobre o gladiador. */
+.raio-entrada {
+  background: linear-gradient(rgb(255 255 255 / 0), rgb(255 250 210 / 0.9) 60%, rgb(255 255 255 / 0));
+  animation: raio-entrada 900ms ease-out both;
+}
+@keyframes raio-entrada {
+  0% { transform: scaleY(0); opacity: 1; transform-origin: top; }
+  40% { transform: scaleY(1); opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Pose de vitória (Maestria 20): pulos de alegria. */
+.pulos-vitoria { animation: pulos-vitoria 0.7s steps(4) infinite; }
+@keyframes pulos-vitoria { 50% { transform: translateY(-18%); } }

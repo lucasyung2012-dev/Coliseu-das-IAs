@@ -61,3 +61,10 @@ export function variacaoTrofeus(modo: Modo, trofeus: number, venceu: boolean): n
   // Com 0 troféus a perda é 0 (e não -0, que apareceria como "-0" na tela).
   return trofeus > 0 ? -Math.min(perda, trofeus) : 0;
 }
+
+/** Patente do gladiador em cada liga: vai na frente do nome ("Centurião Cassius"). */
+export const PATENTES = ['Recruta', 'Gladiador', 'Centurião', 'Pretoriano', 'Imperador'];
+
+export function patenteDe(trofeus: number): string {
+  return PATENTES[indiceLiga(trofeus)]!;
+}

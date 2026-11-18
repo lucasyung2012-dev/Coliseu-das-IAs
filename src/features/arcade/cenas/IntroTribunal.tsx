@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { JURADOS, type JuradoId } from '@/game/jurados';
 import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
+import { PATENTES } from '@/game/ligas';
 import Sprite from '@/ui/pixel/Sprite';
 import { MARTELO, PALETA_MARTELO } from '@/ui/pixel/sprites';
 import { useSequencia } from '@/ui/movimento';
@@ -22,6 +24,7 @@ const cor = (id: IaId) => `rgb(${PERSONAGENS[id].cor})`;
 
 export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; rival: IaId; jurados: JuradoId[]; fim: ReactNode }) {
   const [fase, pular] = useSequencia(MARCOS);
+  const { liga } = useAparencia(ia);
   useSonsDaFase(fase, {
     1: 'portao',
     2: 'pretor',
@@ -62,8 +65,8 @@ export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; r
 
         {fase >= 4 && (
           <>
-            <Tribuna lado="esq" id={ia} />
-            <Tribuna lado="dir" id={rival} />
+            <Tribuna lado="esq" id={ia} liga={liga} />
+            <Tribuna lado="dir" id={rival} liga={liga} />
           </>
         )}
 
@@ -102,16 +105,17 @@ export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; r
 }
 
 /** Combatente atrás da sua tribuna, num canto da frente do tribunal. */
-function Tribuna({ lado, id }: { lado: 'esq' | 'dir'; id: IaId }) {
+function Tribuna({ lado, id, liga }: { lado: 'esq' | 'dir'; id: IaId; liga: number }) {
   const pos = lado === 'esq' ? 'left-[1%]' : 'right-[1%]';
   return (
     <div className={`subir absolute bottom-0 ${pos} w-[16%]`}>
       <div className="mx-auto w-[80%] translate-y-[18%]">
-        <GladiadorPixel ia={id} espelhar={lado === 'dir'} />
+        {lado === 'esq' ? <GladiadorEnfeitado ia={id} parado /> : <GladiadorPixel ia={id} liga={liga} espelhar />}
       </div>
       <div className="relative flex h-[5vw] max-h-14 items-center justify-center bg-[#6b3f22]" style={{ borderTop: `4px solid ${cor(id)}` }}>
         <p className="font-pixel text-[8px] sm:text-sm" style={{ color: cor(id), textShadow: '2px 2px 0 #000' }}>
           {PERSONAGENS[id].gladiador.toUpperCase()}
+          <span className="block text-[5px] text-[rgb(242_193_78)] sm:text-[8px]">{PATENTES[liga]!.toUpperCase()}</span>
         </p>
       </div>
     </div>

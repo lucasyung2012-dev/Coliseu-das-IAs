@@ -1,9 +1,10 @@
 import { useCallback, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
-import { ligaDe, proximaLiga, variacaoTrofeus } from '@/game/ligas';
+import { indiceLiga, ligaDe, patenteDe, proximaLiga, variacaoTrofeus } from '@/game/ligas';
 import { escolherIa, nivelMaestria, useProgresso, XP_POR_NIVEL, type Partida } from '@/game/progresso';
 import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { CenaColiseu, CenaTribunal } from './cenas/Cenarios';
 import { tituloDoNivel } from '@/game/maestria';
 import Sprite from '@/ui/pixel/Sprite';
@@ -116,19 +117,18 @@ export default function ArcadeHub() {
                 onAnimationEnd={() => setTroca((t) => ({ ...t, anterior: null }))}
                 aria-hidden
               >
-                <GladiadorPixel ia={troca.anterior} />
+                <GladiadorEnfeitado ia={troca.anterior} parado />
               </div>
             )}
             <div key={`chega-${troca.n}`} className="chegar-troca">
-              <div className="respirar">
-                <GladiadorPixel ia={ia} />
-              </div>
+              <GladiadorEnfeitado ia={ia} comMoldura />
             </div>
           </div>
           <div key={`info-${troca.n}`} className="min-w-0">
             <p className="font-pixel text-[10px] text-[rgb(var(--ia))]">
               {pers.emblema} {pers.ia.toUpperCase()}
             </p>
+            <p className="mt-2 font-pixel text-[10px] text-[rgb(242_193_78)]">{patenteDe(trofeus).toUpperCase()}</p>
             <h2 className="nome-troca mt-2 font-pixel text-2xl text-fg sm:text-3xl">{pers.gladiador.toUpperCase()}</h2>
             <p className="mt-1 text-sm text-muted">
               {pers.titulo} · {pers.lema}
@@ -185,7 +185,7 @@ export default function ArcadeHub() {
                   }`}
                 >
                   <div key={ativo ? `ativo-${troca.n}` : 'parado'} className={`w-10 sm:w-14 ${ativo && troca.n > 0 ? 'pulo' : ''}`}>
-                    <GladiadorPixel ia={id} />
+                    <GladiadorPixel ia={id} liga={indiceLiga(p.trofeus[id])} />
                   </div>
                   <span className="font-pixel text-[9px] sm:text-[10px]">{PERSONAGENS[id].ia}</span>
                   <span className="text-[11px] tabular-nums text-muted">🏆 {p.trofeus[id]}</span>

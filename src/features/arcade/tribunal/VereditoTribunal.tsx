@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { PERSONAGENS } from '@/game/personagens';
 import { JURADOS } from '@/game/jurados';
-import { registrarPartida, type Partida } from '@/game/progresso';
+import { nivelMaestria, obterProgresso, registrarPartida, type Partida } from '@/game/progresso';
+import { FALAS_VITORIA, recompensasNovas, visualDoNivel } from '@/game/maestria';
+import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { FALAS_PRETOR } from '@/game/tribunal/temas';
 import { cartaDecisiva, veredito, type EstadoTribunal, type Voto } from '@/game/tribunal/motor';
 import { JuradoPixel } from '@/ui/pixel/Personagens';
@@ -115,6 +117,7 @@ export default function VereditoTribunal({
               {treino ? 'MODO TREINO · NÃO VALE TROFÉUS' : <>🏆 {partida.trofeus > 0 ? `+${partida.trofeus}` : partida.trofeus} · ⭐ +{partida.xp} XP</>}
             </p>
           )}
+          {partida && <Conquistas e={e} partida={partida} venceu={v.resultado === 'vitoria'} />}
 
           <ul className="mt-2 w-full max-w-xl space-y-1.5 text-left text-sm">
             {e.jurados.map((j) => (
@@ -167,4 +170,40 @@ function porque(e: EstadoTribunal, j: Parameters<typeof cartaDecisiva>[1], voto:
   const carta = cartaDecisiva(e, j, voto);
   const quem = voto === 'jogador' ? voce : rival;
   return carta ? `votou em ${quem}, convencido por "${carta.titulo}".` : `votou em ${quem}.`;
+}
+
+/**
+ * O que a partida rendeu de Maestria: na vitória, a pose e a fala (se já
+ * liberadas); e, se o nível subiu, o aviso com as recompensas novas.
+ */
+function Conquistas({ e, partida, venceu }: { e: EstadoTribunal; partida: Partida; venceu: boolean }) {
+  const xpDepois = obterProgresso().xp[e.ia];
+  const antes = nivelMaestria(xpDepois - partida.xp);
+  const depois = nivelMaestria(xpDepois);
+  const visual = visualDoNivel(depois);
+  const novas = recompensasNovas(antes, depois);
+  return (
+    <>
+      {venceu && (visual.pose || visual.fala) && (
+        <div className="flex items-end gap-3">
+          {visual.pose && (
+            <div className="pulos-vitoria w-16 sm:w-20">
+              <GladiadorEnfeitado ia={e.ia} parado />
+            </div>
+          )}
+          {visual.fala && <p className="mb-2 max-w-[14rem] rounded bg-black/60 px-3 py-2 text-left text-sm italic">"{FALAS_VITORIA[e.ia]}"</p>}
+        </div>
+      )}
+      {depois > antes && (
+        <div className="surgir pixel-box w-full max-w-md p-3" style={{ boxShadow: '0 0 0 3px rgb(242 193 78), 0 0 24px -4px rgb(242 193 78)' }}>
+          <p className="font-pixel text-[10px] text-[rgb(242_193_78)]">⭐ MAESTRIA {depois}!</p>
+          {novas.map((r) => (
+            <p key={r.nome} className="mt-1 text-sm">
+              {r.icone} <strong>{r.nome}</strong>: <span className="text-muted">{r.descricao}</span>
+            </p>
+          ))}
+        </div>
+      )}
+    </>
+  );
 }

@@ -181,6 +181,8 @@ describe('perfil do combatente', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'HELIOS' })).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Títulos de Maestria' }).children).toHaveLength(8);
     expect(screen.getByRole('list', { name: 'Ligas' }).children).toHaveLength(5);
+    expect(screen.getByRole('list', { name: 'Recompensas de Maestria' }).children).toHaveLength(12);
+    expect(screen.getByRole('list', { name: 'Evolução por liga' }).children).toHaveLength(5);
     expect(screen.getByRole('region', { name: 'ESTATÍSTICAS' })).toBeInTheDocument();
   });
 

@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { useProgresso } from '@/game/progresso';
 import { caminhoSvg, ligasCruzadas, PARADAS, posicaoNoMapa } from '@/game/mapa';
-import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { tocar } from '@/ui/som';
 import { Faiscas } from './cenas/Palco';
@@ -37,6 +37,7 @@ export default function MapaTrofeus() {
   const [mostrado, setMostrado] = useState(() => (prefereMenosMovimento() ? trofeus : lerVisto(id, trofeus)));
   const [festa, setFesta] = useState<string | null>(null);
   const avatar = useRef<HTMLDivElement>(null);
+  const { visual } = useAparencia(id);
 
   // Caminhada: anima os troféus mostrados do valor visto até o atual.
   useEffect(() => {
@@ -171,9 +172,15 @@ export default function MapaTrofeus() {
               aria-label={`${pers.gladiador} está com ${trofeus} troféus`}
               role="img"
             >
-              <div className="respirar drop-shadow-[0_4px_0_rgba(60,30,10,0.5)]">
-                <GladiadorPixel ia={id} />
+              <div className="drop-shadow-[0_4px_0_rgba(60,30,10,0.5)]">
+                <GladiadorEnfeitado ia={id} />
               </div>
+              {visual.coroa && (
+                // Estandarte imperial (Maestria 100) ao lado do gladiador.
+                <div className="bandeira absolute -right-[30%] top-0 h-[70%] w-[30%] border-l-2 border-[#5a3414]" aria-hidden>
+                  <div className="h-1/2 w-full bg-[#6a2a8a] shadow-[inset_0_-3px_0_#f2c14e]" />
+                </div>
+              )}
               {festa && <Faiscas x={50} y={30} />}
             </div>
           </div>
