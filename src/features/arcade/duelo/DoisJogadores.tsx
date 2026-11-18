@@ -44,7 +44,7 @@ export default function DoisJogadores() {
           <>
             <header className="text-center">
               <h1 className="neon font-pixel text-lg text-accent sm:text-2xl">👥 DUELO DE 2 JOGADORES</h1>
-              <p className="mt-2 text-sm text-muted">No mesmo aparelho: o Jogador 1 joga do lado esquerdo e o Jogador 2 do lado direito. Partida amistosa, não vale troféus.</p>
+              <p className="mt-2 text-sm text-muted">Frente a frente: deitem o iPad na mesa entre vocês. O Jogador 1 fica do lado de baixo; o painel do Jogador 2 aparece em cima, de cabeça para baixo, virado para ele. Partida amistosa, não vale troféus.</p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <section aria-label="Jogador 1" className="pixel-box flex items-center gap-4 p-4" style={{ boxShadow: `0 0 0 3px rgb(${p1.cor})` }}>

@@ -279,7 +279,8 @@ export default function PartidaDuelo({
     const l = e[lado];
     const c = cores[lado];
     const pronto = l.gladiadorProntoEm <= e.tempo;
-    const espelhado = lado === 'rival';
+    // No frente a frente o painel do Jogador 2 é girado inteiro, então nada precisa ser espelhado.
+    const espelhado = false;
     const manga = l.monte[0];
     const anfora = (
       <Anfora
@@ -401,6 +402,10 @@ export default function PartidaDuelo({
       <div className="flex justify-end">
         <BotaoComoJogar onClick={tutorial.abrir} />
       </div>
+
+      {/* 2 jogadores frente a frente: o iPad fica na mesa entre os dois e o painel do
+          Jogador 2 fica no topo, de cabeça para baixo, virado para quem senta do outro lado. */}
+      {doisJogadores && <div className="rotate-180">{controles('rival')}</div>}
 
       {/* Placar: a vida das duas Tribunas, a rodada e o relógio */}
       <div className="pixel-box grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2">
@@ -557,15 +562,8 @@ export default function PartidaDuelo({
         )}
       </div>
 
-      {doisJogadores ? (
-        // Duas pessoas no mesmo aparelho: Jogador 1 à esquerda, Jogador 2 à direita.
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
-          {controles('eu')}
-          {controles('rival')}
-        </div>
-      ) : (
-        controles('eu')
-      )}
+      {/* O Jogador 1 joga do lado de baixo (o Jogador 2, no modo frente a frente, fica em cima). */}
+      {controles('eu')}
       <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💧)</p>
     </div>
   );
