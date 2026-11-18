@@ -7,6 +7,7 @@ import { marcarPartidaAberta, registrarAbandono, registrarPartida, useProgresso 
 import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import {
   baralhoDaIa,
+  baralhoInicial,
   CARGA_MS,
   CARTAS,
   custoAgora,
@@ -91,7 +92,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
   const ladoRival: LadoId = config.lado === 'favor' ? 'contra' : 'favor';
   const cores = useMemo<Record<Lado, Cores>>(() => ({ eu: coresDaIa(ia), rival: coresDaIa(rival) }), [ia, rival]);
   // Meu baralho salvo contra o baralho do estilo que a IA rival sorteou.
-  const [baralhos] = useState(() => ({ eu: validarBaralho(p.baralhoDuelo), rival: baralhoDaIa(rival) }));
+  const [baralhos] = useState(() => ({ eu: validarBaralho(p.baralhoDuelo, baralhoInicial(ia)), rival: baralhoDaIa(rival) }));
   const [e, setE] = useState<EstadoDuelo>(() =>
     novoDuelo({
       frasesEu: embaralhar(dilema.lados[config.lado].tempos.flat().map((c) => c.titulo)),
@@ -262,7 +263,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
       </div>
 
       {/* A arena, mais comprida */}
-      <div className="pixel-box relative aspect-[2/1] w-full overflow-hidden sm:aspect-[21/9]">
+      <div className="pixel-box relative aspect-[16/9] w-full overflow-hidden sm:aspect-[2/1]">
         <CenaColiseu corA={cores.eu.cor} corB={cores.rival.cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} />
 
         <p className="absolute inset-x-0 top-[3%] z-10 truncate px-3 text-center text-[9px] text-white/80 [text-shadow:1px_1px_0_#000] sm:text-xs">
@@ -425,6 +426,15 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           ))}
         </section>
         <div className="flex flex-col items-center justify-around gap-2">
+          {/* A próxima carta que vai entrar na mão (no lugar da que você jogar) */}
+          {eu.monte[0] && (
+            <div className="flex flex-col items-center gap-0.5" aria-label={`Próxima carta: ${CARTAS[eu.monte[0].tipo].nome}`}>
+              <span className="font-pixel text-[6px] text-muted sm:text-[8px]">PRÓXIMA</span>
+              <span className="w-12 opacity-85 sm:w-16">
+                <CartaVisual tipo={eu.monte[0].tipo} paleta={cores.eu.paleta} corNome={cores.eu.cor} tamanho="mini" />
+              </span>
+            </div>
+          )}
           <BotaoRedondo
             rotulo="GOLPE"
             icone="🗡️"
@@ -846,9 +856,9 @@ function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
       if (tipo === 'pergunta')
         return (
           <>
-            <div className="onda-area pointer-events-none absolute bottom-[2%] z-20 aspect-[2/1] w-[18%] -translate-x-1/2 rounded-[50%] border-4" style={{ left: `${alvo}%`, borderColor: OURO }} aria-hidden />
+            <div className="onda-area pointer-events-none absolute bottom-[2%] z-20 aspect-[2/1] w-[18%] -translate-x-1/2 rounded-[50%] border-4" style={{ left: `${alvo}%`, borderColor: '#b07cff' }} aria-hidden />
             <div className="pancada pointer-events-none absolute bottom-[28%] z-20 w-[3.5%] -translate-x-1/2" style={{ left: `${alvo}%` }} aria-hidden>
-              <Sprite grade={EFEITOS.pergunta} paleta={paleta} />
+              <Sprite grade={EFEITOS.pergunta} paleta={{ ...paleta, G: '#b07cff' }} />
             </div>
           </>
         );

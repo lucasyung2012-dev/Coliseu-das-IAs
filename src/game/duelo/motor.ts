@@ -163,11 +163,11 @@ export const HABILIDADES: Record<IaId, { nome: string; icone: string; efeito: st
 export const BARALHO_PADRAO: TipoCarta[] = ['frase', 'exemplos', 'analogia', 'tese', 'fato', 'muralha', 'refutacao', 'aplauso'];
 
 /** Confere um baralho salvo: 8 cartas que existem, sem repetir. Senão, o padrão. */
-export function validarBaralho(bruto: unknown): TipoCarta[] {
-  if (!Array.isArray(bruto)) return [...BARALHO_PADRAO];
+export function validarBaralho(bruto: unknown, inicial: TipoCarta[] = BARALHO_PADRAO): TipoCarta[] {
+  if (!Array.isArray(bruto)) return [...inicial];
   const ok = bruto.filter((c): c is TipoCarta => typeof c === 'string' && c in CARTAS);
   const unicas = [...new Set(ok)];
-  return unicas.length === TAMANHO_BARALHO ? unicas : [...BARALHO_PADRAO];
+  return unicas.length === TAMANHO_BARALHO ? unicas : [...inicial];
 }
 
 export type EstiloIa = 'pressa' | 'muralha' | 'artilharia' | 'equilibrado';
@@ -384,9 +384,9 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, carga =
   const custo = custoAgora(s0[lado], carta.tipo);
   const bonus = info.carrega && s0[lado].folego - custo >= CUSTO_CARGA ? bonusDaCarga(carga) : 0;
   let s = comLutador(s0, lado, (l) => {
-    const mao = l.mao.filter((c) => c.id !== carta.id);
+    // A carta nova entra no MESMO lugar da que foi jogada (pedido do Lucas).
     const [proxima, ...resto] = l.monte;
-    if (proxima) mao.push(proxima);
+    const mao = proxima ? l.mao.map((c) => (c.id === carta.id ? proxima : c)) : l.mao.filter((c) => c.id !== carta.id);
     return { ...l, mao, monte: [...resto, carta], folego: l.folego - custo - (bonus > 0 ? CUSTO_CARGA : 0), gratis: false, fala: { texto: carta.frase, ate: agora + 1800 } };
   });
   if (bonus > 0) s = avisar(s, '💪 CARREGADO! +1', lado, 900);
@@ -693,4 +693,9 @@ export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
 
 export function resultadoFinal(s: EstadoDuelo): 'vitoria' | 'derrota' | 'empate' {
   return s.tribunas.eu > s.tribunas.rival ? 'vitoria' : s.tribunas.rival > s.tribunas.eu ? 'derrota' : 'empate';
+}
+
+/** Baralho inicial de cada IA: o do estilo que ela gosta (Claude = Muralha, ChatGPT = Pressa, Gemini = Artilharia). */
+export function baralhoInicial(ia: IaId): TipoCarta[] {
+  return [...ESTILOS[ESTILO_PREFERIDO[ia]].cartas];
 }

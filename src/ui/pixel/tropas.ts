@@ -88,25 +88,86 @@ const CAVALEIRO: Passo[] = [
   ['B', 11, 11, 1, 3],
 ];
 
-/** Piada: bobo da corte, com chapéu de guizos. */
+/** Exemplos: aprendiz sem capacete, com uma tabuleta de cera (o exemplo escrito). */
+const APRENDIZ: Passo[] = [
+  ['B', 3, 0, 4, 2], // cabelo
+  ['B', 2, 1],
+  ['S', 3, 2, 4, 3], // rosto
+  ['K', 6, 3],
+  ['N', 2, 5, 5, 1], // gola
+  ['C', 2, 6, 5, 3], // túnica curta
+  ['B', 2, 8, 5, 1], // cinto de corda
+  ['S', 6, 6, 1, 2], // braço
+  ['B', 7, 3, 3, 6], // tabuleta (moldura de madeira)
+  ['E', 8, 4, 1, 4], // cera
+  ['K', 8, 5],
+  ['K', 8, 7],
+  ['S', 3, 9, 1, 3],
+  ['S', 5, 9, 1, 3],
+  ['B', 2, 12, 2, 1],
+  ['B', 5, 12, 2, 1],
+];
+
+/** Piada: bobo da corte caprichado, chapéu de 3 pontas com guizos, roupa xadrez, gola e bastão. */
 const BOBO: Passo[] = [
-  ['C', 2, 0, 2, 2],
-  ['D', 6, 0, 2, 2],
-  ['G', 2, 0],
-  ['G', 7, 0],
-  ['C', 3, 2, 4, 1],
-  ['S', 3, 3, 4, 3],
-  ['K', 4, 4],
-  ['K', 6, 4],
-  ['C', 3, 6, 2, 4],
-  ['D', 5, 6, 2, 4],
-  ['G', 3, 6, 4, 1], // gola
-  ['B', 8, 6, 1, 5], // bastão
-  ['G', 8, 5],
-  ['C', 3, 10, 1, 3],
-  ['D', 6, 10, 1, 3],
-  ['B', 2, 13, 2, 1],
-  ['B', 6, 13, 2, 1],
+  ['G', 1, 0], // guizos
+  ['G', 6, 0],
+  ['G', 11, 0],
+  ['C', 1, 1, 2, 1], // pontas do chapéu
+  ['D', 5, 1, 3, 1],
+  ['C', 10, 1, 2, 1],
+  ['C', 2, 2, 3, 1],
+  ['D', 5, 2, 3, 1],
+  ['C', 8, 2, 3, 1],
+  ['G', 3, 3, 7, 1], // faixa do chapéu
+  ['S', 4, 4, 5, 3], // rosto
+  ['K', 5, 5],
+  ['K', 7, 5],
+  ['D', 5, 6, 3, 1], // sorriso
+  ['W', 3, 7, 7, 1], // gola de babados
+  ['C', 4, 8, 5, 4], // roupa xadrez
+  ['D', 5, 8],
+  ['D', 7, 8],
+  ['D', 4, 9],
+  ['D', 6, 9],
+  ['D', 8, 9],
+  ['D', 5, 10],
+  ['D', 7, 10],
+  ['D', 4, 11],
+  ['D', 6, 11],
+  ['D', 8, 11],
+  ['S', 9, 9], // mão
+  ['B', 10, 6, 1, 6], // bastão
+  ['G', 10, 4, 1, 2], // cabecinha do bastão
+  ['C', 9, 5],
+  ['C', 11, 5],
+  ['D', 4, 12, 2, 3], // pernas de cores diferentes
+  ['C', 7, 12, 2, 3],
+  ['C', 3, 15, 3, 1], // sapatos de bico
+  ['D', 7, 15, 3, 1],
+];
+
+/** Contra-argumento: hoplita com elmo de crista, grande escudo redondo de bronze e lança. */
+const HOPLITA: Passo[] = [
+  ['B', 13, 0, 1, 13], // lança
+  ['M', 13, 0],
+  ['C', 2, 0, 6, 1], // crista
+  ['C', 3, 1, 4, 1],
+  ['G', 3, 2, 4, 3], // elmo
+  ['K', 5, 3, 2, 1], // fresta dos olhos
+  ['S', 4, 4, 2, 1],
+  ['D', 3, 5, 4, 5], // couraça
+  ['C', 3, 10, 4, 2], // saiote
+  ['S', 3, 12, 1, 3],
+  ['S', 6, 12, 1, 3],
+  ['G', 3, 13, 1, 2], // caneleiras
+  ['G', 6, 13, 1, 2],
+  ['G', 8, 3, 4, 1], // escudo redondo
+  ['G', 7, 4, 6, 7],
+  ['G', 8, 11, 4, 1],
+  ['B', 7, 4, 1, 7], // sombra da borda
+  ['C', 9, 6, 2, 3], // emblema do lado
+  ['W', 9, 4],
 ];
 
 /** Discurso épico: elefante de guerra com manta. */
@@ -190,21 +251,6 @@ const BARRICADA: Passo[] = [
   ['C', 4, 7, 2, 2],
 ];
 
-/** Contra-argumento: escudeiro com escudo redondo. */
-const ESCUDEIRO: Passo[] = [
-  ['M', 3, 0, 4, 3],
-  ['C', 4, 0, 2, 1],
-  ['S', 3, 3, 4, 2],
-  ['K', 6, 3],
-  ['C', 2, 5, 5, 4],
-  ['S', 3, 9, 1, 3],
-  ['S', 5, 9, 1, 3],
-  ['B', 2, 12, 2, 1],
-  ['B', 5, 12, 2, 1],
-  ['D', 7, 3, 5, 8], // escudo redondo
-  ['C', 8, 4, 3, 6],
-  ['G', 9, 6, 1, 2],
-];
 
 /**
  * A Tribuna (a tribuna dos oradores do Fórum romano), mais detalhada: balaustrada
@@ -278,9 +324,9 @@ export const PALETA_EFEITOS = { W: '#ffffff', G: '#f2c14e', Y: '#ffe066', R: '#f
 
 export const TROPAS: Record<TipoTropa, string[]> = {
   legionario: desenhar(14, 15, LEGIONARIO),
-  exemplo: desenhar(14, 15, LEGIONARIO),
+  exemplo: desenhar(13, 15, APRENDIZ),
   cavaleiro: desenhar(17, 16, CAVALEIRO),
-  bobo: desenhar(12, 16, BOBO),
+  bobo: desenhar(14, 18, BOBO),
   centuriao: desenhar(15, 17, CENTURIAO),
   elefante: desenhar(25, 18, ELEFANTE),
   senador: desenhar(12, 16, SENADOR),
@@ -288,7 +334,7 @@ export const TROPAS: Record<TipoTropa, string[]> = {
   balista: desenhar(17, 12, BALISTA),
   catapulta: desenhar(16, 15, CATAPULTA),
   barricada: desenhar(12, 15, BARRICADA),
-  escudeiro: desenhar(14, 15, ESCUDEIRO),
+  escudeiro: desenhar(16, 17, HOPLITA),
 };
 
 /** Largura de cada tropa na arena (% da largura): o elefante é o maior. */

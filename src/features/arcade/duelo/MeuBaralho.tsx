@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PERSONAGENS } from '@/game/personagens';
 import { escolherBaralho, useProgresso } from '@/game/progresso';
-import { BARALHO_PADRAO, CARTAS, PAPEIS, TAMANHO_BARALHO, TODAS_AS_CARTAS, validarBaralho, type Papel, type TipoCarta } from '@/game/duelo/motor';
+import { baralhoInicial, CARTAS, ESTILO_PREFERIDO, ESTILOS, PAPEIS, TAMANHO_BARALHO, TODAS_AS_CARTAS, validarBaralho, type Papel, type TipoCarta } from '@/game/duelo/motor';
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { paletaTropa } from '@/ui/pixel/tropas';
 import { desbloquear, tocar } from '@/ui/som';
@@ -28,7 +28,9 @@ export default function SalaDoDuelo() {
   const navegar = useNavigate();
   const ia = PERSONAGENS[p.iaAtual];
   const { forte, paleta } = coresDe(ia.cor);
-  const salvo = validarBaralho(p.baralhoDuelo);
+  const inicial = baralhoInicial(p.iaAtual);
+  const estilo = ESTILOS[ESTILO_PREFERIDO[p.iaAtual]].nome;
+  const salvo = validarBaralho(p.baralhoDuelo, inicial);
   const [escolhidas, setEscolhidas] = useState<TipoCarta[]>(salvo);
   const [ordem, setOrdem] = useState<Ordem>('classe');
   const [mensagem, setMensagem] = useState('');
@@ -76,7 +78,10 @@ export default function SalaDoDuelo() {
         </div>
         <header className="text-center">
           <h1 className="neon font-pixel text-xl text-accent sm:text-3xl">⚔ SALA DO DUELO</h1>
-          <p className="mt-2 text-sm text-muted">Monte o seu baralho e escolha como jogar.</p>
+          <p className="mt-2 text-sm text-muted">
+            Monte o seu baralho e escolha como jogar. <span style={{ color: forte }}>{ia.ia}</span> gosta de jogar com{' '}
+            <strong className="text-[rgb(242_193_78)]">{estilo}</strong>: o baralho inicial dele é desse estilo.
+          </p>
         </header>
 
         <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
@@ -113,11 +118,11 @@ export default function SalaDoDuelo() {
                   type="button"
                   onClick={() => {
                     tocar('clique');
-                    setEscolhidas([...BARALHO_PADRAO]);
+                    setEscolhidas([...inicial]);
                   }}
                   className="font-pixel text-[8px] text-muted hover:text-accent"
                 >
-                  ↺ BARALHO INICIAL
+                  ↺ BARALHO INICIAL DO {ia.ia.toUpperCase()} ({estilo.toUpperCase()})
                 </button>
               </div>
             </section>

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { CARTAS, PAPEIS, type Papel, type TipoCarta } from '@/game/duelo/motor';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
-import { TROPAS } from '@/ui/pixel/tropas';
+import { EFEITOS, PALETA_EFEITOS, TROPAS } from '@/ui/pixel/tropas';
 
 /** Cor da moldura de cada classe de carta. */
 export const PAPEL_COR: Record<Papel, string> = {
@@ -12,7 +12,15 @@ export const PAPEL_COR: Record<Papel, string> = {
   feitico: '#f2c14e',
 };
 
-/** O desenho da carta: a tropa em pixel, ou o ícone grande nos feitiços. */
+/** Cada feitiço tem a sua cor (antes Refutação e Pergunta se confundiam). */
+export const COR_FEITICO: Partial<Record<TipoCarta, string>> = { refutacao: '#ff3b4a', pergunta: '#b07cff', pausa: '#6fd6ff', aplauso: '#f2c14e' };
+
+/** Cor da moldura de uma carta: a da classe, ou a do próprio feitiço. */
+export const corDaCarta = (tipo: TipoCarta) => COR_FEITICO[tipo] ?? PAPEL_COR[CARTAS[tipo].papel];
+
+type Feitico = 'refutacao' | 'pergunta' | 'pausa' | 'aplauso';
+
+/** O desenho da carta: a tropa em pixel, ou o desenho em pixel do feitiço (na cor dele). */
 export function Arte({ tipo, paleta, pequena = false, grande = false }: { tipo: TipoCarta; paleta: Paleta; pequena?: boolean; grande?: boolean }) {
   const tropa = CARTAS[tipo].tropa;
   const altura = pequena ? 'h-9 sm:h-10' : grande ? 'h-16 sm:h-24' : 'h-14 sm:h-16';
@@ -25,7 +33,9 @@ export function Arte({ tipo, paleta, pequena = false, grande = false }: { tipo: 
           <Sprite grade={TROPAS[tropa]} paleta={paleta} />
         </span>
       ) : (
-        <span className={pequena ? 'text-2xl' : grande ? 'text-5xl sm:text-6xl' : 'text-4xl sm:text-5xl'}>{CARTAS[tipo].icone}</span>
+        <span className={pequena ? 'w-5' : grande ? 'w-9 sm:w-12' : 'w-8 sm:w-10'} style={{ filter: `drop-shadow(0 0 6px ${corDaCarta(tipo)})` }}>
+          <Sprite grade={EFEITOS[tipo as Feitico]} paleta={{ ...PALETA_EFEITOS, G: corDaCarta(tipo) }} />
+        </span>
       )}
     </span>
   );
@@ -54,7 +64,7 @@ export function CartaVisual({
   rodape?: ReactNode;
 }) {
   const info = CARTAS[tipo];
-  const moldura = PAPEL_COR[info.papel];
+  const moldura = corDaCarta(tipo);
   const mini = tamanho === 'mini';
   const fol = custo ?? info.custo;
   return (

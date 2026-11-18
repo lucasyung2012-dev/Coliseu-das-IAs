@@ -1,8 +1,10 @@
 import {
   BARALHO_PADRAO,
   baralhoDaIa,
+  baralhoInicial,
   bonusDaCarga,
   DURACOES_MS,
+  ESTILOS,
   FOLEGO_POR_SEGUNDO,
   golpeDoGladiador,
   INTERVALO_MS,
@@ -221,5 +223,21 @@ describe('duelo v7: gladiador, habilidades e Tribuna', () => {
     s = passo({ ...s, tempo: PRORROGACAO_MS - TICK, proximoRival: SEM_RIVAL }, ctx);
     expect(s.fase).toBe('fim');
     expect(resultadoFinal(s)).toBe('empate');
+  });
+});
+
+describe('duelo v9: mão e baralho inicial', () => {
+  it('a carta nova entra no mesmo lugar da que foi jogada', () => {
+    let s = base();
+    const antes = s.eu.mao.map((c) => c.id);
+    const proxima = s.eu.monte[0]!.id;
+    s = jogarCarta({ ...s, eu: { ...s.eu, folego: 10 } }, 'eu', antes[1]!);
+    expect(s.eu.mao.map((c) => c.id)).toEqual([antes[0], proxima, antes[2], antes[3]]);
+  });
+
+  it('cada IA começa com o baralho do estilo dela', () => {
+    expect(baralhoInicial('claude')).toEqual(ESTILOS.muralha.cartas);
+    expect(baralhoInicial('chatgpt')).toEqual(ESTILOS.pressa.cartas);
+    expect(validarBaralho(undefined, baralhoInicial('gemini'))).toEqual(ESTILOS.artilharia.cartas);
   });
 });
