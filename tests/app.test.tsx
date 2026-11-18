@@ -190,3 +190,12 @@ describe('perfil do combatente', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Imperium Arcade' })).toBeInTheDocument();
   });
 });
+
+describe('mapa de troféus na tela', () => {
+  it('abre pelo perfil e mostra o gladiador no mapa', () => {
+    abrir('/arena/mapa/chatgpt');
+    expect(screen.getByRole('heading', { name: /MAPA DE TROFÉUS/ })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Octavius está com \d+ troféus/ })).toBeInTheDocument();
+    expect(screen.getByText(/IMPERADORES · 7000/)).toBeInTheDocument();
+  });
+});

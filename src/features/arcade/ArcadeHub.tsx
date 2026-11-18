@@ -137,6 +137,9 @@ export default function ArcadeHub() {
             <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <span className="font-pixel text-lg tabular-nums">🏆 {trofeus}</span>
               <span className="pixel-box px-2 py-1 font-pixel text-[9px] text-accent">{ligaDe(trofeus).nome.toUpperCase()}</span>
+              <Link to={`/arena/mapa/${ia}`} onClick={() => tocar('selecionar')} className="font-pixel text-[9px] text-[rgb(242_193_78)] hover:underline">
+                🗺 MAPA
+              </Link>
             </div>
             <Barra valor={prox ? prox.progresso : 1} rotulo="Progresso até a próxima liga" />
             <p className="mt-1 text-xs text-muted">{prox ? `Faltam ${prox.faltam} troféus para ${prox.liga.nome}` : 'Liga máxima: Imperadores'}</p>
@@ -146,12 +149,7 @@ export default function ArcadeHub() {
             </p>
             <Barra valor={xpNivel / XP_POR_NIVEL} rotulo="Progresso de Maestria" fina />
 
-            <p className="mt-4 text-sm">
-              <span className="font-pixel text-[10px] text-[rgb(var(--ia))]">★ {pers.habilidade.nome.toUpperCase()}</span>
-              <span className="mt-1 block text-muted">
-                Duelo: {pers.habilidade.duelo} Tribunal: {pers.habilidade.tribunal}
-              </span>
-            </p>
+            <p className="mt-4 font-pixel text-[10px] text-[rgb(var(--ia))]">★ HABILIDADE: {pers.habilidade.nome.toUpperCase()}</p>
             <Link
               to={`/arena/perfil/${ia}`}
               onClick={() => {

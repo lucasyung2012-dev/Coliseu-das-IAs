@@ -18,6 +18,11 @@ export const TOTAL_TEMPOS = 3;
 /** Chance de o rival jogar a melhor carta, por liga (Recrutas → Imperadores). */
 export const ACERTO_RIVAL = [0.4, 0.55, 0.7, 0.8, 0.9];
 
+/** Valendo troféus: a liga dá a base e cada nível de Maestria soma 0,3 ponto (até +10). */
+export function acertoValendo(trofeus: number, maestria: number): number {
+  return Math.min(0.95, ACERTO_RIVAL[indiceLiga(trofeus)]! + Math.min(0.1, (maestria - 1) * 0.003));
+}
+
 const limitar = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 const limitarPonteiro = (v: number) => limitar(v, PONTEIRO_MIN, PONTEIRO_MAX);
 
@@ -40,23 +45,17 @@ export interface Efeito {
 const VALOR: Record<Reacao, number> = { ama: 2, gosta: 1, naoGosta: -1 };
 
 /**
- * Soma os temas da carta pela tabela de gostos (limite +3 e −2), aplica a
- * resistência (Cético −1, Empático e Artista +1, só em ganhos) e o peso do
- * 3º tempo (1,5×). `tempo` começa em 0.
+ * Soma os temas da carta pela tabela de gostos e aplica o peso do 3º tempo
+ * (1,5×), sempre com limite de −3 a +3 por jurado. `tempo` começa em 0.
+ * A resistência por jurado (Cético mais difícil, Empático mais fácil) saiu em
+ * 18/11/2026 para equilibrar: ela deixava as cartas de Pessoas fortes demais.
  */
 export function efeitoNoJurado(carta: Carta, jurado: JuradoId, tempo: number): Efeito {
   const g = GOSTOS[jurado];
   const reacoes: Reacao[] = carta.temas.flatMap((t): Reacao[] => (t === g.ama ? ['ama'] : t === g.gosta ? ['gosta'] : t === g.naoGosta ? ['naoGosta'] : []));
-  let valor = limitar(
-    reacoes.reduce((s, r) => s + VALOR[r], 0),
-    -2,
-    3,
-  );
-  if (valor > 0) {
-    if (jurado === 'cetico') valor = Math.max(1, valor - 1);
-    else if (jurado === 'empatico' || jurado === 'artista') valor += 1;
-  }
+  let valor = reacoes.reduce((s, r) => s + VALOR[r], 0);
   if (tempo === TOTAL_TEMPOS - 1) valor = Math.sign(valor) * Math.round(Math.abs(valor) * 1.5);
+  valor = limitar(valor, PONTEIRO_MIN, PONTEIRO_MAX);
   // A frase do jurado acompanha o sinal do efeito: a reação mais forte daquele lado.
   const reacao = valor > 0 ? (reacoes.includes('ama') ? 'ama' : 'gosta') : valor < 0 ? 'naoGosta' : null;
   return { valor, reacao };
@@ -116,6 +115,8 @@ export interface Inicio {
   trofeus: number;
   /** Modo Treino: chance de o rival acertar, pela dificuldade escolhida (no lugar da liga). */
   acerto?: number;
+  /** Nível de Maestria da IA do jogador: quanto maior, mais esperto o rival (só valendo troféus). */
+  maestria?: number;
   dilema?: Dilema;
   lado?: LadoId;
 }
@@ -129,7 +130,7 @@ export function novaPartida(ini: Inicio, aleatorio: Aleatorio = Math.random): Es
     ia: ini.ia,
     rival: ini.rival,
     jurados: ini.jurados,
-    acertoRival: ini.acerto ?? ACERTO_RIVAL[indiceLiga(ini.trofeus)]!,
+    acertoRival: ini.acerto ?? acertoValendo(ini.trofeus, ini.maestria ?? 1),
     tempo: 0,
     ponteiros: Object.fromEntries(ini.jurados.map((j) => [j, 0])),
     mao: [],

@@ -51,14 +51,47 @@ export default function PerfilCombatente() {
               {pers.titulo} · {pers.lema}
             </p>
             <p className="mt-3 inline-block bg-[rgb(var(--ia))] px-2 py-1 font-pixel text-[9px] text-black">★ {titulo.nome.toUpperCase()}</p>
-            <p className="mt-3 text-sm">
-              <span className="font-pixel text-[10px] text-[rgb(var(--ia))]">{pers.habilidade.nome.toUpperCase()}:</span>{' '}
-              <span className="text-muted">
-                no Duelo, {pers.habilidade.duelo.toLowerCase()} No Tribunal, {pers.habilidade.tribunal.toLowerCase()}
-              </span>
-            </p>
+            <p className="mt-3 text-sm italic">"{pers.ficha.frase}"</p>
           </div>
         </section>
+
+        <Bloco titulo="📖 QUEM É {NOME}" nome={pers.gladiador.toUpperCase()}>
+          <p className="text-sm leading-relaxed">{pers.ficha.historia}</p>
+          <p className="text-sm">
+            <strong className="text-[rgb(var(--ia))]">Estilo de luta:</strong> {pers.ficha.estilo}
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="pixel-box p-3 text-sm">
+              <p className="font-pixel text-[9px] text-accent">PONTOS FORTES</p>
+              <ul className="mt-2 space-y-1">
+                {pers.ficha.fortes.map((f) => (
+                  <li key={f}>✓ {f}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="pixel-box p-3 text-sm">
+              <p className="font-pixel text-[9px] text-accent-2">PONTOS FRACOS</p>
+              <ul className="mt-2 space-y-1">
+                {pers.ficha.fracos.map((f) => (
+                  <li key={f}>✗ {f}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </Bloco>
+
+        <Bloco titulo={`★ HABILIDADE: ${pers.habilidade.nome.toUpperCase()}`}>
+          <p className="text-sm">Uma vez por partida, na hora que você escolher.</p>
+          <p className="text-sm">
+            <strong>⚖ No Tribunal:</strong> {pers.habilidade.tribunal}
+          </p>
+          <p className="text-sm">
+            <strong>⚔ No Duelo:</strong> {pers.habilidade.duelo}
+          </p>
+          <p className="pixel-box p-3 text-sm" style={{ borderLeft: '4px solid rgb(var(--ia))' }}>
+            💡 <strong>Dica:</strong> {pers.habilidade.dica}
+          </p>
+        </Bloco>
 
         {/* Troféus e liga */}
         <Bloco titulo="🏆 TROFÉUS E LIGA">
@@ -86,7 +119,13 @@ export default function PerfilCombatente() {
               );
             })}
           </ol>
-          <p className="text-xs text-muted">A trilha de troféus completa, em forma de mapa, chega numa próxima etapa.</p>
+          <Link
+            to={`/arena/mapa/${id}`}
+            onClick={() => tocar('selecionar')}
+            className="pixel-box pixel-hover self-start px-3 py-2 font-pixel text-[10px] text-[rgb(242_193_78)]"
+          >
+            🗺 ABRIR O MAPA DE TROFÉUS
+          </Link>
         </Bloco>
 
         {/* Maestria */}

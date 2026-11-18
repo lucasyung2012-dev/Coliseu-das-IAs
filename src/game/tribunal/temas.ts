@@ -19,16 +19,18 @@ export interface Gostos {
   naoGosta: Tema;
 }
 
-// A tabela que decide tudo (ESPEC-1B-TRIBUNAL.md, seção 5): ama +2, gosta +1, não gosta −1.
+// A tabela que decide tudo: ama +2, gosta +1, não gosta −1. Equilibrada em 18/11/2026:
+// cada tema tem exatamente 1 jurado que ama, 1 que gosta e 1 que não gosta, então
+// nenhuma carta é "grátis" e a melhor jogada depende de quem está no júri.
 export const GOSTOS: Record<JuradoId, Gostos> = {
-  logico: { ama: 'logica', gosta: 'prova', naoGosta: 'imagem' },
+  logico: { ama: 'logica', gosta: 'viabilidade', naoGosta: 'imagem' },
   cetico: { ama: 'prova', gosta: 'logica', naoGosta: 'inovacao' },
   empatico: { ama: 'pessoas', gosta: 'imagem', naoGosta: 'custo' },
-  tradicionalista: { ama: 'tradicao', gosta: 'viabilidade', naoGosta: 'inovacao' },
+  tradicionalista: { ama: 'tradicao', gosta: 'pessoas', naoGosta: 'prova' },
   estrategista: { ama: 'viabilidade', gosta: 'custo', naoGosta: 'tradicao' },
-  cientista: { ama: 'inovacao', gosta: 'prova', naoGosta: 'tradicao' },
-  comerciante: { ama: 'custo', gosta: 'viabilidade', naoGosta: 'imagem' },
-  artista: { ama: 'imagem', gosta: 'inovacao', naoGosta: 'custo' },
+  cientista: { ama: 'inovacao', gosta: 'prova', naoGosta: 'viabilidade' },
+  comerciante: { ama: 'custo', gosta: 'tradicao', naoGosta: 'pessoas' },
+  artista: { ama: 'imagem', gosta: 'inovacao', naoGosta: 'logica' },
 };
 
 export type Reacao = 'ama' | 'gosta' | 'naoGosta';
@@ -37,7 +39,7 @@ export type Reacao = 'ama' | 'gosta' | 'naoGosta';
 export const REACOES: Record<JuradoId, Record<Reacao, string[]>> = {
   logico: {
     ama: ['Raciocínio limpo. Cada passo leva ao próximo.', 'Isso fecha do começo ao fim.'],
-    gosta: ['Bom ter um dado para apoiar o raciocínio.', 'Prova ajuda a pensar.'],
+    gosta: ['Se funciona na prática, faz sentido.', 'Um plano que dá para fazer: lógico.'],
     naoGosta: ['Bonito, mas cadê o argumento?', 'Imagem não é raciocínio.'],
   },
   cetico: {
@@ -52,8 +54,8 @@ export const REACOES: Record<JuradoId, Record<Reacao, string[]>> = {
   },
   tradicionalista: {
     ama: ['Assim se fez por gerações. Respeito isso.', 'Valorizar o que já funcionou é sabedoria.'],
-    gosta: ['Prático e pé no chão.', 'Dá para fazer sem bagunçar tudo.'],
-    naoGosta: ['Mudar só por mudar? Não me convence.', 'Novidade demais me preocupa.'],
+    gosta: ['Pensar na comunidade é o que sempre nos guiou.', 'As famílias vêm primeiro, como sempre.'],
+    naoGosta: ['Estudo novo toda semana... prefiro o que já é sabido.', 'Número muda; costume fica.'],
   },
   estrategista: {
     ama: ['Dá para fazer. Isso é o que conta.', 'Plano claro, fácil de executar.'],
@@ -63,17 +65,17 @@ export const REACOES: Record<JuradoId, Record<Reacao, string[]>> = {
   cientista: {
     ama: ['Uma ideia nova! Quero testar.', 'Isso nunca foi tentado. Fascinante!'],
     gosta: ['Dados! Adoro dados.', 'Bom, isso dá para medir.'],
-    naoGosta: ['Tradição não é experimento.', 'Ser antigo não quer dizer que funciona.'],
+    naoGosta: ['Fazer correndo, sem testar antes? Não.', 'Prático demais: cadê o experimento?'],
   },
   comerciante: {
     ama: ['Agora falou a minha língua: quanto custa.', 'Barato e rende. Fechado!'],
-    gosta: ['Se dá para fazer logo, eu gosto.', 'Prático. Tempo é dinheiro.'],
-    naoGosta: ['Discurso bonito não paga a conta.', 'Muita poesia, pouca conta.'],
+    gosta: ['Cliente fiel é o que sempre funcionou.', 'O jeito antigo dá lucro até hoje.'],
+    naoGosta: ['Sentimento não fecha a conta.', 'Bonito, mas quem paga?'],
   },
   artista: {
     ama: ['Que cena! Consegui ver tudo.', 'Essa imagem fica na cabeça.'],
     gosta: ['Algo novo, que ousadia!', 'Gosto de ideia diferente.'],
-    naoGosta: ['Reduzir tudo a dinheiro? Que tristeza.', 'Custo, custo... e a beleza?'],
+    naoGosta: ['Frio demais, parece uma planilha.', 'Tanta lógica e nenhuma emoção.'],
   },
 };
 

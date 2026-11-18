@@ -35,6 +35,8 @@ Você defende um lado de um dilema contra uma IA rival, em 3 tempos. Cada carta 
 - Embaixo da carta: **👍 nos jurados que ela agrada** e **👎 nos que ela irrita**, só entre os 5 que estão na sessão.
 
 ## 5. Como cada jurado reage (a tabela que decide tudo)
+
+> **Mudou em 18/11/2026 (equilíbrio, pedido do Lucas):** a tabela abaixo foi trocada por uma em que cada tema tem exatamente 1 jurado que ama, 1 que gosta e 1 que não gosta (ver `src/game/tribunal/temas.ts`); a resistência por jurado saiu; o 3º tempo continua 1,5×, mas com limite de ±3; toda carta tem 2 temas; as cartas mostram só 👍/👎, sem números; e o rival fica um pouco mais esperto a cada nível de Maestria.
 Cada jurado **ama** um tema (+2), **gosta** de outro (+1) e **não gosta** de um terceiro (−1). Os outros temas não mexem nele.
 
 | Jurado | Ama (+2) | Gosta (+1) | Não gosta (−1) |

@@ -11,7 +11,7 @@ import {
   veredito,
   type EstadoTribunal,
 } from '@/game/tribunal/motor';
-import { TEMAS } from '@/game/tribunal/temas';
+import { GOSTOS, TEMAS } from '@/game/tribunal/temas';
 
 const carta = (temas: Carta['temas']): Carta => ({ id: 't', titulo: 'T', texto: 'T', temas });
 /** Sorteio fixo: sempre o primeiro da lista e o rival sempre acerta. */
@@ -20,21 +20,30 @@ const fixo = () => 0;
 describe('efeito de uma carta no jurado', () => {
   it('ama +2, gosta +1, não gosta −1, e soma os dois temas', () => {
     expect(efeitoNoJurado(carta(['logica']), 'logico', 0)).toEqual({ valor: 2, reacao: 'ama' });
-    expect(efeitoNoJurado(carta(['prova']), 'logico', 0)).toEqual({ valor: 1, reacao: 'gosta' });
+    expect(efeitoNoJurado(carta(['viabilidade']), 'logico', 0)).toEqual({ valor: 1, reacao: 'gosta' });
     expect(efeitoNoJurado(carta(['imagem']), 'logico', 0)).toEqual({ valor: -1, reacao: 'naoGosta' });
-    expect(efeitoNoJurado(carta(['logica', 'prova']), 'logico', 0).valor).toBe(3);
+    expect(efeitoNoJurado(carta(['logica', 'viabilidade']), 'logico', 0).valor).toBe(3);
     expect(efeitoNoJurado(carta(['custo']), 'logico', 0)).toEqual({ valor: 0, reacao: null });
   });
 
-  it('aplica a resistência: Cético ganha menos, Empático e Artista ganham mais', () => {
-    expect(efeitoNoJurado(carta(['prova']), 'cetico', 0).valor).toBe(1);
-    expect(efeitoNoJurado(carta(['pessoas']), 'empatico', 0).valor).toBe(3);
-    expect(efeitoNoJurado(carta(['inovacao']), 'cetico', 0).valor).toBe(-1);
+  it('todos os jurados contam igual (sem resistência diferente)', () => {
+    expect(efeitoNoJurado(carta(['prova']), 'cetico', 0).valor).toBe(2);
+    expect(efeitoNoJurado(carta(['pessoas']), 'empatico', 0).valor).toBe(2);
   });
 
-  it('o 3º tempo vale 1,5×', () => {
+  it('o 3º tempo vale 1,5×, com limite de ±3', () => {
     expect(efeitoNoJurado(carta(['logica']), 'logico', 2).valor).toBe(3);
     expect(efeitoNoJurado(carta(['imagem']), 'logico', 2).valor).toBe(-2);
+    expect(efeitoNoJurado(carta(['logica', 'viabilidade']), 'logico', 2).valor).toBe(3);
+  });
+
+  it('a tabela é equilibrada: cada tema tem 1 jurado que ama, 1 que gosta e 1 que não gosta', () => {
+    for (const tema of Object.keys(TEMAS)) {
+      const g = Object.values(GOSTOS);
+      expect(g.filter((x) => x.ama === tema)).toHaveLength(1);
+      expect(g.filter((x) => x.gosta === tema)).toHaveLength(1);
+      expect(g.filter((x) => x.naoGosta === tema)).toHaveLength(1);
+    }
   });
 });
 
@@ -48,6 +57,8 @@ describe('conteúdo', () => {
           expect(t).toHaveLength(6);
           for (const c of t) {
             ids.add(c.id);
+            expect(c.temas).toHaveLength(2);
+            expect(c.temas[0]).not.toBe(c.temas[1]);
             for (const tema of c.temas) expect(TEMAS[tema]).toBeDefined();
           }
         }
