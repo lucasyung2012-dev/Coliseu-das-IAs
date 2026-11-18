@@ -315,8 +315,8 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           <AberturaDebate
             etapa={abertura}
             pergunta={dilema.pergunta}
-            voce={{ nome: voce.gladiador, ia: voce.nome, cor: cores.eu.cor, lado: dilema.lados[config.lado].nome, tese: dilema.lados[config.lado].tese }}
-            dele={{ nome: dele.gladiador, ia: dele.nome, cor: cores.rival.cor, lado: dilema.lados[ladoRival].nome, tese: dilema.lados[ladoRival].tese }}
+            voce={{ nome: voce.gladiador, ia: voce.ia, cor: cores.eu.cor, lado: dilema.lados[config.lado].nome, tese: dilema.lados[config.lado].tese }}
+            dele={{ nome: dele.gladiador, ia: dele.ia, cor: cores.rival.cor, lado: dilema.lados[ladoRival].nome, tese: dilema.lados[ladoRival].tese }}
             onPular={() => setAbertura(null)}
           />
         )}
