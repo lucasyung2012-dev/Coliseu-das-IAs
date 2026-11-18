@@ -322,7 +322,7 @@ export default function PartidaDuelo({
         {l.mao.map((carta, i) => {
           const voando = saindo[`${lado}-${i}`];
           return (
-            <div key={`vaga-${i}`} className="relative">
+            <div key={`vaga-${i}`} className="relative h-full min-w-0">
               {/* A carta jogada voando da mão para a arena */}
               {voando && (
                 <div key={voando.id} className="voar-para-arena pointer-events-none absolute inset-0 z-30" aria-hidden>
@@ -782,7 +782,7 @@ function CartaNaMao(props: {
       onContextMenu={(ev) => ev.preventDefault()}
       aria-label={`${info.nome}, ${info.forca ? `força ${info.forca}, ` : ''}custa ${custo}`}
       title={info.dica}
-      className="relative select-none transition [-webkit-touch-callout:none] enabled:hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-40"
+      className="relative block h-full w-full select-none transition-transform duration-200 ease-out [-webkit-touch-callout:none] enabled:hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-40"
     >
       <CartaVisual
         tipo={carta.tipo}
