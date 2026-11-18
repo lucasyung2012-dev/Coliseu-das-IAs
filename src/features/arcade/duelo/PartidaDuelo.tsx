@@ -136,6 +136,9 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
   return (
     <div className="flex flex-col gap-3">
       {tutorial.aberto && <ComoJogar titulo="DUELO" slides={TUTORIAL_DUELO} onFechar={tutorial.fechar} />}
+      <div className="flex justify-end">
+        <BotaoComoJogar onClick={tutorial.abrir} />
+      </div>
 
       {/* Placar: quem é quem, rodadas, relógio e a plateia */}
       <div className="pixel-box flex flex-col gap-1 px-3 py-2">

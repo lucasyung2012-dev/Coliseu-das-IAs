@@ -9,6 +9,7 @@ export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-8">
       <header className="animate-fade-up text-center">
+        <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={96} height={96} className="mx-auto mb-4 h-20 w-20 [image-rendering:pixelated] sm:h-24 sm:w-24" style={{ boxShadow: "0 0 0 4px rgb(242 193 78), 0 0 30px -4px rgb(242 193 78)" }} />
         <p className="text-xs uppercase tracking-[0.3em] text-muted">A arena das grandes ideias</p>
         <h1 className="mt-3 font-display text-4xl text-accent sm:text-6xl">Coliseu das IAs</h1>
         <p className="mt-4 text-muted">Claude, ChatGPT e Gemini entram na arena. Você decide quem convence.</p>
