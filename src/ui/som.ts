@@ -318,3 +318,48 @@ export function useVolume(): number {
     () => volume,
   );
 }
+
+/** Baixa e decodifica um áudio (as falas gravadas do Pretor). Sem áudio ou sem o arquivo: null. */
+export async function carregarAudio(url: string): Promise<AudioBuffer | null> {
+  const c = contexto();
+  if (!c || typeof fetch === 'undefined') return null;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    const dados = await r.arrayBuffer();
+    return await new Promise<AudioBuffer>((ok, erro) => {
+      void c.decodeAudioData(dados, ok, erro);
+    });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Toca um áudio carregado no volume do jogo (a voz sai mais alta que os efeitos).
+ * Devolve null se o áudio ainda não foi liberado por um toque.
+ */
+export function tocarAudio(buf: AudioBuffer): { fim: Promise<void>; parar: () => void } | null {
+  const c = contexto();
+  if (!c || desligado || c.state !== 'running') return null;
+  const g = c.createGain();
+  g.gain.value = volume;
+  g.connect(c.destination);
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  src.connect(g);
+  const fim = new Promise<void>((ok) => {
+    src.onended = () => ok();
+  });
+  src.start();
+  return {
+    fim,
+    parar: () => {
+      try {
+        src.stop();
+      } catch {
+        /* já tinha parado */
+      }
+    },
+  };
+}

@@ -10,7 +10,7 @@ import { JuradoPixel } from '@/ui/pixel/Personagens';
 import { PretorDestaque, VERDE, VERMELHO } from './visual';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear, tocar } from '@/ui/som';
-import { calar, falar, vozDisponivel } from '@/ui/voz';
+import { anunciar, calar, FALA_SILENCIO, falaDoVoto, falasDoResultado, precarregar, vozPossivel } from '@/ui/voz';
 import { Faiscas } from '../cenas/Palco';
 
 const PAUSA_VOTO = 700;
@@ -57,9 +57,14 @@ export default function VereditoTribunal({
 
   // A voz do Pretor: abre o veredito, conta voto a voto e anuncia quem venceu.
   // Com voz, a contagem vai mais devagar para dar tempo de ele falar.
-  const [comVoz] = useState(() => vozDisponivel() && !prefereMenosMovimento());
+  const [comVoz] = useState(() => vozPossivel() && !prefereMenosMovimento());
   useEffect(() => {
-    if (comVoz) falar('Silêncio no tribunal! O júri vai votar.');
+    if (comVoz) {
+      const vencedor = v.resultado === 'vitoria' ? e.ia : v.resultado === 'derrota' ? e.rival : null;
+      const votos = e.jurados.map((j) => falaDoVoto(j, v.votos[j] === 'jogador' ? e.ia : v.votos[j] === 'rival' ? e.rival : null));
+      precarregar([FALA_SILENCIO, ...votos, ...falasDoResultado(v.jogador, v.rival, vencedor)]);
+      anunciar([FALA_SILENCIO]);
+    }
     return () => calar();
   }, []);
 
@@ -75,31 +80,20 @@ export default function VereditoTribunal({
     return () => window.clearTimeout(id);
   }, [revelados, fim]);
 
-  // Cada voto revelado, o Pretor lê em voz alta.
+  // Cada voto revelado, o Pretor lê em voz alta (com o nome da IA).
   useEffect(() => {
     if (!comVoz || revelados === 0) return;
     const j = e.jurados[revelados - 1]!;
     const voto = v.votos[j];
-    const quem = voto === 'jogador' ? voce.gladiador : voto === 'rival' ? dele.gladiador : null;
-    falar(quem ? `O ${JURADOS[j].nome} vota em ${quem}.` : `O ${JURADOS[j].nome} não escolhe ninguém.`);
+    anunciar([falaDoVoto(j, voto === 'jogador' ? e.ia : voto === 'rival' ? e.rival : null)], { fila: true });
   }, [revelados]);
 
   useEffect(() => {
     if (!fim) return;
     tocar(v.resultado === 'vitoria' ? 'vitoria' : v.resultado === 'derrota' ? 'derrota' : 'clique');
     if (!comVoz) return;
-    const placar = `Por ${v.jogador} votos a ${v.rival}`;
-    const id = window.setTimeout(
-      () =>
-        falar(
-          v.resultado === 'empate'
-            ? `${placar}, o tribunal declara: empate!`
-            : `${placar}, o tribunal declara a vitória de ${v.resultado === 'vitoria' ? voce.gladiador : dele.gladiador}!`,
-          { fila: true },
-        ),
-      600,
-    );
-    return () => window.clearTimeout(id);
+    const vencedor = v.resultado === 'vitoria' ? e.ia : v.resultado === 'derrota' ? e.rival : null;
+    anunciar(falasDoResultado(v.jogador, v.rival, vencedor), { fila: true });
   }, [fim]);
   const titulo = v.resultado === 'vitoria' ? 'VITÓRIA!' : v.resultado === 'derrota' ? 'DERROTA' : 'EMPATE';
 
