@@ -114,9 +114,9 @@ export default function ComoJogar({ titulo, slides, onFechar }: { titulo: string
 
 export const TUTORIAL_DUELO: Slide[] = [
   { icone: '🏰', titulo: 'DERRUBE A TORRE', texto: 'Cada gladiador fica em cima da sua torre. Toda tropa sua que chega na torre do rival tira dela a força que tem. Derrubou a torre: vitória na hora! Se ninguém derrubar, ganha quem tiver mais vida no fim da 3ª rodada.' },
-  { icone: '⚔️', titulo: 'CARTAS VIRAM TROPAS', texto: 'Legionário: rápido, força 2. Centurião: lento, força 4. Arqueiro: atira de longe, mas é frágil. Quando duas tropas se encontram, elas lutam e a que sobrar segue em frente.' },
+  { icone: '⚔️', titulo: 'CARTAS VIRAM TROPAS', texto: '⚔️ Frase rápida (legionário): barata e veloz, força 2. 🛡️ Tese (centurião): cara e lenta, força 4. 🏹 Fato (arqueiro): atira de longe, mas cai com um golpe. Quando duas tropas se encontram, elas lutam e a que sobrar segue em frente.' },
   { icone: '💪', titulo: 'SEGURE PARA CARREGAR', texto: 'Tocou rápido: tropa normal. Segure a carta até a barrinha encher: a tropa sai com +1 de força e brilhando, mas custa +1 de fôlego. E o rival não espera!' },
-  { icone: '🗡️', titulo: 'SEU GLADIADOR', texto: 'Lá de cima da torre, ele bate sozinho em toda tropa inimiga que entra na área ALCANCE (tira 1 de força). Toque nele para um golpe extra; depois ele precisa de 8 s para recarregar.' },
+  { icone: '🗡️', titulo: 'SEU GLADIADOR', texto: 'Lá de cima da torre, ele bate sozinho em toda tropa inimiga que entra no círculo de luz do chão (tira 1 de força). Toque nele para um golpe extra; depois ele precisa de 8 s para recarregar.' },
   { icone: '⭐', titulo: 'HABILIDADE', texto: 'Cada tropa que acerta a torre do rival enche a habilidade da sua IA. Claude: 🛡️ Escudo (bloqueia 2 golpes na torre). ChatGPT: 🃏 Carta grátis. Gemini: ⚡ Raio (tira 3 da tropa mais perto).' },
   { icone: '⚡', titulo: 'VIRADA E PRORROGAÇÃO', texto: 'Na 3ª rodada, quem tem menos vida recupera fôlego mais rápido. Se as torres empatarem na vida, vem a prorrogação: 20 s com fôlego em dobro!' },
 ];

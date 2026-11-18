@@ -701,3 +701,14 @@
 .carga-enchendo { animation-name: carga-enchendo; animation-timing-function: linear; animation-fill-mode: forwards; background: rgb(var(--accent)); }
 @keyframes carga-enchendo { from { width: 0; } 99% { background: rgb(var(--accent)); } to { width: 100%; background: #f2c14e; } }
 .menos-movimento .marchar, .menos-movimento .lutando { animation: none; }
+
+/* ===== Duelo v6: plateia viva, ola, alcance e abertura ===== */
+.torcedor { animation: torcer 1.2s steps(2) infinite; }
+@keyframes torcer { 50% { transform: translateY(-1px); } }
+.ola .torcedor { animation: ola 0.8s ease-out 1 both; animation-delay: calc(var(--x) * 6ms); }
+@keyframes ola { 35% { transform: translateY(-3px); } }
+.alcance-luz { animation: alcance-luz 2.4s ease-in-out infinite; }
+@keyframes alcance-luz { 50% { opacity: 0.55; } }
+.contagem { animation: contagem 0.9s ease-out both; }
+@keyframes contagem { from { transform: scale(2.4); opacity: 0; } 30% { opacity: 1; } to { transform: scale(1); opacity: 1; } }
+.menos-movimento .torcedor, .menos-movimento .ola .torcedor, .menos-movimento .alcance-luz { animation: none; }

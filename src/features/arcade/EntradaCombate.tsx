@@ -82,7 +82,7 @@ export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' })
   return (
     <main data-area="arcade" className="fundo-arcade relative min-h-screen text-fg">
       <div className="crt-overlay" />
-      <div className="relative mx-auto flex max-w-4xl flex-col gap-5 px-4 pb-16 pt-6 sm:px-8">
+      <div className={`relative mx-auto flex ${modo === 'duelo' && jogando ? 'max-w-6xl' : 'max-w-4xl'} flex-col gap-5 px-4 pb-16 pt-6 sm:px-8`}>
         <div className="flex items-center justify-between">
           <Link to="/arena" className="font-pixel text-[10px] text-muted hover:text-accent">
             ◀ ARCADE

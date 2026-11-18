@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 // Cenários em pixel art desenhados em 160 × 90 e ampliados sem suavizar (crispEdges),
 // para ficarem com cara de fliperama em qualquer tamanho de tela.
 
@@ -12,7 +14,7 @@ function aleatorioFixo(semente: number) {
 
 const CORES_PLATEIA = ['#ff5ab8', '#4ef0dc', '#f2c14e', '#9f7bff', '#ff8a4a', '#e8e8f0'];
 
-function Plateia({ y0, y1 }: { y0: number; y1: number }) {
+function Plateia({ y0, y1, viva = false }: { y0: number; y1: number; viva?: boolean }) {
   const r = aleatorioFixo(y0 * 31 + 7);
   const pontos: { x: number; y: number; c: string }[] = [];
   for (let y = y0; y < y1; y += 2) {
@@ -23,14 +25,27 @@ function Plateia({ y0, y1 }: { y0: number; y1: number }) {
   return (
     <>
       {pontos.map((p) => (
-        <rect key={`${p.x}-${p.y}`} x={p.x} y={p.y} width={1} height={1} fill={p.c} opacity={0.75} />
+        <rect
+          key={`${p.x}-${p.y}`}
+          x={p.x}
+          y={p.y}
+          width={1}
+          height={1}
+          fill={p.c}
+          opacity={0.75}
+          className={viva ? 'torcedor' : undefined}
+          style={viva ? ({ animationDelay: `${(p.x * 37 + p.y * 11) % 1200}ms`, '--x': p.x } as CSSProperties) : undefined}
+        />
       ))}
     </>
   );
 }
 
 /** Coliseu à noite com neon: plateia, dois andares de arcos, estandartes e arena de areia. */
-export function CenaColiseu({ corA, corB }: { corA: string; corB: string }) {
+/**
+ * `viva`: a plateia se mexe (no Duelo). `festa`: faz a ola (quando uma torre é atingida).
+ */
+export function CenaColiseu({ corA, corB, viva = false, festa = false }: { corA: string; corB: string; viva?: boolean; festa?: boolean }) {
   const arcos = Array.from({ length: 16 }, (_, i) => i * 10 + 2);
   return (
     <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
@@ -43,7 +58,9 @@ export function CenaColiseu({ corA, corB }: { corA: string; corB: string }) {
       ))}
       {/* arquibancada com plateia */}
       <rect y={14} width={160} height={14} fill="#1c1030" />
-      <Plateia y0={15} y1={27} />
+      <g className={festa ? 'ola' : undefined}>
+        <Plateia y0={15} y1={27} viva={viva} />
+      </g>
       <rect y={27} width={160} height={1} fill="#4ef0dc" />
       {/* muralha com dois andares de arcos */}
       <rect y={28} width={160} height={34} fill="#5a4060" />

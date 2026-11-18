@@ -62,13 +62,13 @@ export interface InfoCarta {
 
 /** Pergunta capciosa e Apelo à plateia saíram: o Lucas achou que eram "roubadas". */
 export const CARTAS: Record<TipoCarta, InfoCarta> = {
-  argumento: { nome: 'Argumento', icone: '⚔️', custo: 2, forca: 2, tropa: 'legionario', dica: 'Legionário rápido.' },
-  forte: { nome: 'Argumento forte', icone: '🛡️', custo: 4, forca: 4, tropa: 'centuriao', dica: 'Centurião lento e resistente.' },
-  dado: { nome: 'Dado irrefutável', icone: '🏹', custo: 4, forca: 1, tropa: 'arqueiro', dica: 'Arqueiro: atira de longe, mas é frágil.', rara: true },
+  argumento: { nome: 'Frase rápida', icone: '⚔️', custo: 2, forca: 2, tropa: 'legionario', dica: 'Legionário: barato e o mais rápido, mas fraco.' },
+  forte: { nome: 'Tese', icone: '🛡️', custo: 4, forca: 4, tropa: 'centuriao', dica: 'Centurião: caro e lento, mas aguenta muito.' },
+  dado: { nome: 'Fato', icone: '🏹', custo: 4, forca: 1, tropa: 'arqueiro', dica: 'Arqueiro: atira de longe, mas cai com um golpe.', rara: true },
 };
 
 /** Velocidade de cada tropa (% da largura por segundo). */
-const VELOCIDADE: Record<TipoTropa, number> = { legionario: 12, centuriao: 7, arqueiro: 9 };
+const VELOCIDADE: Record<TipoTropa, number> = { legionario: 14, centuriao: 6, arqueiro: 9 };
 /** Arqueiro: atira a cada 2 s em quem estiver até 25% à frente; no máximo 2 em campo. */
 const TIRO_MS = 2000;
 const ALCANCE_TIRO = 25;
@@ -365,7 +365,7 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
     }
     s = { ...s, torres: { ...s.torres, [alvo]: Math.max(0, s.torres[alvo] - t.forca) } as EstadoDuelo['torres'] };
     s = comLutador(s, t.de, (l) => ({ ...l, carga: Math.min(SUPER_MAX, l.carga + 1) }));
-    s = efeito(s, 'torre', alvo, PONTA[alvo], 500);
+    s = efeito(s, 'torre', alvo, PONTA[alvo], 1800);
   }
   return s;
 }
