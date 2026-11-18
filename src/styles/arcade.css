@@ -11,6 +11,38 @@
     radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.55) 100%);
 }
 
+/* Botão do Arcade na tela inicial: moldura de máquina de fliperama em neon. */
+.maquina-arcade {
+  box-shadow:
+    0 -4px 0 0 rgb(var(--accent-2)),
+    0 4px 0 0 rgb(var(--accent-2)),
+    -4px 0 0 0 rgb(var(--accent)),
+    4px 0 0 0 rgb(var(--accent)),
+    0 0 40px -6px rgb(var(--accent-2) / 0.6);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(var(--accent-2) / 0.3), transparent 65%),
+    radial-gradient(ellipse at 50% 120%, rgb(var(--accent) / 0.25), transparent 60%),
+    rgb(var(--bg));
+  transition: transform 200ms, box-shadow 200ms;
+}
+.maquina-arcade:hover,
+.maquina-arcade:focus-visible {
+  transform: translateY(-3px);
+  box-shadow:
+    0 -4px 0 0 rgb(var(--accent-2)),
+    0 4px 0 0 rgb(var(--accent-2)),
+    -4px 0 0 0 rgb(var(--accent)),
+    4px 0 0 0 rgb(var(--accent)),
+    0 0 60px -2px rgb(var(--accent-2) / 0.8);
+}
+/* Linhas de TV só dentro da "tela" do botão. */
+.tela-crt {
+  background:
+    repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.25) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 60%, rgb(0 0 0 / 0.5) 100%);
+  z-index: 1;
+}
+
 /* Fundo do Arcade: brilho magenta no alto e grade de pixels bem apagada. */
 .fundo-arcade {
   background:
@@ -193,4 +225,38 @@
 }
 
 .letreiro { animation: letreiro 2s steps(2) infinite; }
+
+/* ===== Troca de personagem no Arcade ===== */
+/* O que sai corre para a esquerda e some; o novo chega da direita com um brilho. */
+.sair-troca { animation: sair-troca 320ms steps(4) both; }
+@keyframes sair-troca {
+  to { transform: translateX(-70%); opacity: 0; filter: brightness(2.5); }
+}
+.chegar-troca { animation: chegar-troca 480ms steps(6) both; }
+@keyframes chegar-troca {
+  0% { transform: translateX(70%); opacity: 0; filter: brightness(3); }
+  70% { transform: translateX(-6%); opacity: 1; filter: brightness(1.6); }
+  100% { transform: none; filter: none; }
+}
+/* Nome entra com "falha" de TV, letra pixelada tremendo. */
+.nome-troca { animation: nome-troca 420ms steps(1) both; }
+@keyframes nome-troca {
+  0% { opacity: 0; transform: translateX(8px); }
+  20% { opacity: 1; transform: translateX(-4px); text-shadow: 3px 0 rgb(var(--accent-2)), -3px 0 rgb(var(--accent)); }
+  45% { opacity: 0.4; transform: translateX(3px); }
+  70% { opacity: 1; transform: none; text-shadow: 2px 0 rgb(var(--accent-2)); }
+  100% { opacity: 1; transform: none; text-shadow: none; }
+}
+/* Botão da IA escolhida dá um pulinho. */
+.pulo { animation: pulo 300ms steps(3) both; }
+@keyframes pulo {
+  50% { transform: translateY(-8px) scale(1.06); }
+  100% { transform: none; }
+}
+/* Anel de luz que se espalha do pé do personagem quando ele chega. */
+.onda { animation: onda 600ms ease-out both; }
+@keyframes onda {
+  from { transform: scale(0.3); opacity: 0.9; }
+  to { transform: scale(1.6); opacity: 0; }
+}
 @keyframes letreiro { 50% { filter: brightness(1.4); } }

@@ -86,13 +86,15 @@ function NomePlaca({ lado, id }: { lado: 'esq' | 'dir'; id: IaId }) {
   const p = PERSONAGENS[id];
   return (
     <div
-      className={`pancada absolute top-[44%] ${lado === 'esq' ? 'left-[3%]' : 'right-[3%] text-right'} bg-black/70 px-2 py-1`}
-      style={{ borderBottom: `3px solid ${cor(id)}` }}
+      className={`pancada absolute top-[40%] ${lado === 'esq' ? 'left-[2%]' : 'right-[2%] text-right'} bg-black/75 px-2 py-1.5 sm:px-3 sm:py-2`}
+      style={{ borderBottom: `4px solid ${cor(id)}` }}
     >
-      <p className="font-pixel text-[8px] sm:text-sm" style={{ color: cor(id) }}>
+      <p className="font-pixel text-[11px] sm:text-xl" style={{ color: cor(id), textShadow: `2px 2px 0 #000` }}>
         {p.gladiador.toUpperCase()}
       </p>
-      <p className="hidden text-xs text-muted sm:block">{p.ia}</p>
+      <p className="mt-1 font-pixel text-[7px] text-fg sm:text-[10px]">
+        {p.emblema} {p.ia.toUpperCase()}
+      </p>
     </div>
   );
 }

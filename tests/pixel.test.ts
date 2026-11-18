@@ -1,16 +1,28 @@
-import { GLADIADOR, LOUROS, MARTELO, gradeBusto, type Acessorio } from '@/ui/pixel/sprites';
+import { GLADIADORES, JURADOS_PIXEL, LOUROS, MARTELO, PRETOR } from '@/ui/pixel/sprites';
+import { desenhar } from '@/ui/pixel/desenho';
 import { sortearJurados, TODOS_JURADOS } from '@/game/jurados';
 import { sortearRival } from '@/game/personagens';
 
 const larguraUnica = (grade: string[]) => new Set(grade.map((l) => l.length)).size === 1;
 
+describe('pincel de pixel', () => {
+  it('pinta o retângulo e traça o contorno em volta', () => {
+    expect(desenhar(4, 4, [['C', 1, 1]], 0)).toEqual(['.K..', 'KCK.', '.K..', '....']);
+  });
+});
+
 describe('desenhos em pixel', () => {
   it('têm todas as linhas com a mesma largura', () => {
-    expect(larguraUnica(GLADIADOR)).toBe(true);
-    expect(larguraUnica(LOUROS)).toBe(true);
-    expect(larguraUnica(MARTELO)).toBe(true);
-    const acessorios: Acessorio[] = ['nenhum', 'oculos', 'louros', 'boina', 'chapeu', 'protetor'];
-    for (const a of acessorios) expect(larguraUnica(gradeBusto(a))).toBe(true);
+    for (const g of [LOUROS, MARTELO, PRETOR, ...Object.values(GLADIADORES), ...Object.values(JURADOS_PIXEL)]) {
+      expect(larguraUnica(g)).toBe(true);
+    }
+  });
+
+  it('cada gladiador e cada jurado tem um desenho próprio', () => {
+    const gladiadores = Object.values(GLADIADORES).map((g) => g.join('\n'));
+    expect(new Set(gladiadores).size).toBe(3);
+    const jurados = Object.values(JURADOS_PIXEL).map((g) => g.join('\n'));
+    expect(new Set(jurados).size).toBe(8);
   });
 });
 

@@ -73,11 +73,14 @@ export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; r
       {fase >= 3 && (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-5" aria-label="Jurados desta sessão">
           {jurados.map((j, i) => (
-            <li key={j} className="surgir pixel-box p-2 text-center" style={{ animationDelay: `${i * 260}ms` }}>
-              <p className="font-pixel text-[9px]" style={{ color: JURADOS[j].toga }}>
+            <li key={j} className="surgir pixel-box flex flex-col items-center p-2 text-center" style={{ animationDelay: `${i * 260}ms` }}>
+              <div className="w-10">
+                <JuradoPixel jurado={j} />
+              </div>
+              <p className="mt-1 font-pixel text-[9px]" style={{ color: JURADOS[j].toga }}>
                 {JURADOS[j].nome.toUpperCase()}
               </p>
-              <p className="mt-1 text-[11px] text-muted">{JURADOS[j].sensibilidade}</p>
+              <p className="mt-1 text-[11px] text-muted">{JURADOS[j].jeito}</p>
             </li>
           ))}
         </ul>
@@ -96,8 +99,8 @@ function Tribuna({ lado, id }: { lado: 'esq' | 'dir'; id: IaId }) {
       <div className="mx-auto w-[80%] translate-y-[18%]">
         <GladiadorPixel ia={id} espelhar={lado === 'dir'} />
       </div>
-      <div className="relative h-[3.2vw] max-h-10 bg-[#6b3f22]" style={{ borderTop: `3px solid ${cor(id)}` }}>
-        <p className="absolute inset-0 flex items-center justify-center font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[9px]">
+      <div className="relative flex h-[5vw] max-h-14 items-center justify-center bg-[#6b3f22]" style={{ borderTop: `4px solid ${cor(id)}` }}>
+        <p className="font-pixel text-[8px] sm:text-sm" style={{ color: cor(id), textShadow: '2px 2px 0 #000' }}>
           {PERSONAGENS[id].gladiador.toUpperCase()}
         </p>
       </div>

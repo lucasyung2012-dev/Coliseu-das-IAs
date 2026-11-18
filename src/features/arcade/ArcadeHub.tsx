@@ -35,6 +35,14 @@ export default function ArcadeHub() {
     setBoot(false);
   }, []);
 
+  // Troca de personagem: o anterior sai correndo enquanto o novo chega.
+  const [troca, setTroca] = useState<{ n: number; anterior: IaId | null }>({ n: 0, anterior: null });
+  const trocarPara = (id: IaId) => {
+    if (id === p.iaAtual) return;
+    setTroca((t) => ({ n: t.n + 1, anterior: p.iaAtual }));
+    escolherIa(id);
+  };
+
   const ia = p.iaAtual;
   const pers = PERSONAGENS[ia];
   const trofeus = p.trofeus[ia];
@@ -68,17 +76,28 @@ export default function ArcadeHub() {
         >
           <div className="relative mx-auto w-36 sm:w-48">
             <div className="absolute inset-x-2 -bottom-1 h-4 rounded-[50%] bg-[rgb(var(--ia)/0.45)] blur-md" aria-hidden />
-            <div key={ia} className="surgir">
+            <div key={`onda-${troca.n}`} className="onda absolute inset-x-0 bottom-0 h-6 rounded-[50%] border-4 border-[rgb(var(--ia))]" aria-hidden />
+            {troca.anterior && (
+              <div
+                key={`sai-${troca.n}`}
+                className="sair-troca absolute inset-0"
+                onAnimationEnd={() => setTroca((t) => ({ ...t, anterior: null }))}
+                aria-hidden
+              >
+                <GladiadorPixel ia={troca.anterior} />
+              </div>
+            )}
+            <div key={`chega-${troca.n}`} className="chegar-troca">
               <div className="respirar">
                 <GladiadorPixel ia={ia} />
               </div>
             </div>
           </div>
-          <div className="min-w-0">
+          <div key={`info-${troca.n}`} className="min-w-0">
             <p className="font-pixel text-[10px] text-[rgb(var(--ia))]">
               {pers.emblema} {pers.ia.toUpperCase()}
             </p>
-            <h2 className="mt-2 font-pixel text-2xl text-fg sm:text-3xl">{pers.gladiador.toUpperCase()}</h2>
+            <h2 className="nome-troca mt-2 font-pixel text-2xl text-fg sm:text-3xl">{pers.gladiador.toUpperCase()}</h2>
             <p className="mt-1 text-sm text-muted">
               {pers.titulo} · {pers.lema}
             </p>
@@ -119,13 +138,13 @@ export default function ArcadeHub() {
                   role="radio"
                   aria-checked={ativo}
                   aria-label={`${PERSONAGENS[id].ia}: ${PERSONAGENS[id].gladiador}`}
-                  onClick={() => escolherIa(id)}
+                  onClick={() => trocarPara(id)}
                   style={varIa(id)}
                   className={`pixel-box flex flex-col items-center gap-2 p-3 transition hover:-translate-y-0.5 ${
                     ativo ? 'pixel-ia' : 'opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <div className="w-10 sm:w-14">
+                  <div key={ativo ? `ativo-${troca.n}` : 'parado'} className={`w-10 sm:w-14 ${ativo && troca.n > 0 ? 'pulo' : ''}`}>
                     <GladiadorPixel ia={id} />
                   </div>
                   <span className="font-pixel text-[9px] sm:text-[10px]">{PERSONAGENS[id].ia}</span>
