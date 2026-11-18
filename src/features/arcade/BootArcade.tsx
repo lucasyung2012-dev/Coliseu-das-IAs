@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import Sprite from '@/ui/pixel/Sprite';
 import { LOUROS, PALETA_OURO } from '@/ui/pixel/sprites';
-import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear, tocar } from '@/ui/som';
 
@@ -106,8 +105,8 @@ export default function BootArcade({ onFim }: { onFim: () => void }) {
       )}
 
       {fase === 'sala' && (
-        <p className="piscar pointer-events-none absolute inset-x-0 top-[6vh] text-center font-pixel text-[10px] text-[rgb(242_193_78)] sm:text-sm">
-          TOQUE NA FENDA PARA INSERIR A MOEDA
+        <p className="dica-moeda pointer-events-none absolute inset-x-0 top-[3vh] px-16 text-center font-pixel text-[9px] leading-relaxed text-[rgb(242_193_78)] sm:text-xs">
+          TOQUE NA FENDA DA MOEDA ▼
         </p>
       )}
 
@@ -125,44 +124,77 @@ export default function BootArcade({ onFim }: { onFim: () => void }) {
   );
 }
 
-/** Fundo: parede com letreiros de neon, outras máquinas nos cantos e piso quadriculado. */
+/**
+ * Fundo: um fliperama antigo e meio esquecido. Luz fraca de uma luminária com
+ * poeira no ar, placas de neon com letras queimadas, máquinas velhas apagadas
+ * (uma só com chiado na tela) e o carpete colorido gasto.
+ */
 function SalaDeFliperama({ ligada }: { ligada: boolean }) {
   return (
     <div className="sala-fliperama absolute inset-0" aria-hidden>
-      <p className="neon-placa absolute left-[6%] top-[8%] -rotate-6 font-pixel text-lg text-[#ff4fc8] sm:text-3xl">ARCADE</p>
-      <p className="neon-placa neon-placa-2 absolute right-[6%] top-[12%] rotate-3 font-pixel text-[10px] text-[#4ef0dc] sm:text-base">
-        HIGH SCORE
+      <div className="parede-velha absolute inset-x-0 top-0 h-[68%]" />
+
+      <p className="absolute left-[5%] top-[9%] -rotate-3 font-pixel text-lg text-[#ff4fc8] sm:text-3xl">
+        <span className="neon-velho">ARC</span>
+        <span className="neon-queimado">A</span>
+        <span className="neon-velho">DE</span>
       </p>
-      <div className="absolute left-1/2 top-[3%] flex -translate-x-1/2 gap-1 opacity-80">
-        <div className="w-8 sm:w-12">
-          <Sprite grade={LOUROS} paleta={PALETA_OURO} />
-        </div>
-        <div className="w-8 sm:w-12">
-          <Sprite grade={LOUROS} paleta={PALETA_OURO} espelhar />
-        </div>
+      <p className="absolute right-[5%] top-[13%] rotate-2 font-pixel text-[10px] text-[#4ef0dc] sm:text-base">
+        <span className="neon-velho neon-velho-2">HIGH</span> <span className="neon-queimado">SCORE</span>
+      </p>
+      <div className="cartaz-velho absolute left-[7%] top-[24%] hidden w-[16%] max-w-[120px] p-2 text-center sm:block">
+        <p className="font-pixel text-[8px] text-[#c9a46a]">TORNEIO</p>
+        <p className="mt-1 font-pixel text-[11px] text-[#e0b070]">MCMLXXXVI</p>
       </div>
-      {/* máquinas vizinhas, apagadas e cortadas pelas bordas */}
-      <MaquinaVizinha className="left-[-6%] sm:left-[4%]" cor="#ff4fc8" />
-      <MaquinaVizinha className="right-[-6%] sm:right-[4%]" cor="#4ef0dc" />
-      <div className="piso-neon absolute inset-x-0 bottom-0 h-[34%]" />
+
+      {/* luminária pendurada */}
+      <div className="absolute left-1/2 top-0 h-[7%] w-[2px] -translate-x-1/2 bg-[#2a2236]" />
+      <div className="absolute left-1/2 top-[7%] h-3 w-14 -translate-x-1/2 rounded-b-full bg-[#3a3048]" />
+      <div className="cone-luz absolute left-1/2 top-[8%] h-[92%] w-[80%] -translate-x-1/2" />
+      {POEIRA.map(([x, y, d], i) => (
+        <span key={i} className="poeira absolute h-[2px] w-[2px] bg-[#fff3d0]" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` }} />
+      ))}
+
+      <MaquinaVelha className="bottom-[9%] left-[-5%] h-[50%]" tela="estatica" />
+      <MaquinaVelha className="bottom-[17%] left-[13%] hidden h-[37%] sm:block" tela="apagada" />
+      <MaquinaVelha className="bottom-[9%] right-[-5%] h-[50%]" tela="apagada" />
+      <MaquinaVelha className="bottom-[17%] right-[13%] hidden h-[37%] sm:block" tela="fraca" />
+
+      <div className="carpete absolute inset-x-0 bottom-0 h-[34%]" />
+      <div className="vinheta-pesada absolute inset-0" />
       <div
         className={`absolute inset-0 transition-opacity duration-700 ${ligada ? 'opacity-100' : 'opacity-0'}`}
-        style={{ background: 'radial-gradient(ellipse at 50% 55%, rgb(78 240 220 / 0.22), transparent 55%)' }}
+        style={{ background: 'radial-gradient(ellipse at 50% 55%, rgb(78 240 220 / 0.25), transparent 50%)' }}
       />
     </div>
   );
 }
 
-function MaquinaVizinha({ className, cor }: { className: string; cor: string }) {
+// Grãos de poeira dentro do cone de luz: [x%, y%, atraso em s].
+const POEIRA: [number, number, number][] = [
+  [44, 20, 0],
+  [52, 28, 1.2],
+  [48, 40, 2.1],
+  [57, 46, 0.6],
+  [40, 52, 1.7],
+  [61, 33, 2.8],
+  [46, 62, 0.3],
+  [55, 70, 1.4],
+  [38, 74, 2.4],
+  [63, 58, 3.1],
+];
+
+function MaquinaVelha({ className, tela }: { className: string; tela: 'estatica' | 'apagada' | 'fraca' }) {
   return (
-    <div className={`absolute bottom-[10%] h-[52%] w-[22%] max-w-[180px] rounded-t-lg bg-[#140c26] opacity-60 ${className}`}>
-      <div className="mx-[10%] mt-[12%] h-[34%] rounded-sm" style={{ background: cor, opacity: 0.35, animation: 'letreiro 1.4s steps(2) infinite' }} />
-      <div className="mx-[18%] mt-[10%] h-[4%] rounded" style={{ background: cor, opacity: 0.5 }} />
+    <div className={`maquina-velha absolute w-[19%] max-w-[150px] ${className}`}>
+      <div className="mx-[8%] mt-[6%] h-[10%] bg-[#1a1226]" />
+      <div className={`mx-[10%] mt-[8%] h-[32%] rounded-sm ${tela === 'estatica' ? 'tela-estatica' : tela === 'fraca' ? 'tela-fraca' : 'tela-apagada'}`} />
+      <div className="mx-[6%] mt-[10%] h-[8%] bg-[#1c1430]" />
     </div>
   );
 }
 
-/** A máquina de fliperama em 3D: letreiro, tela, painel com controle e botões, porta da moeda. */
+/** A máquina de fliperama, de frente: letreiro, tela, painel com controle e botões, porta da moeda. */
 function Maquina({
   telaRef,
   fase,
@@ -177,8 +209,7 @@ function Maquina({
   return (
     <div className="maquina-palco">
       <div className="maquina-3d">
-        <div className="maquina-lateral" />
-        <div className="maquina-frente">
+        <div className={`maquina-frente ${ligada ? 'ligada' : ''}`}>
           {/* letreiro */}
           <div className={`maquina-letreiro ${ligada ? 'aceso' : ''}`}>
             <span className="font-pixel">IMPERIUM ARCADE</span>
@@ -187,19 +218,17 @@ function Maquina({
           <div className="maquina-moldura">
             <div ref={telaRef} className={`maquina-tela ${ligada ? 'ligada' : ''}`}>
               {ligada && (
-                <div className={`flex h-full flex-col items-center justify-center gap-[6%] ${fase === 'ligando' ? 'crt-linha' : ''}`}>
-                  <div className="flex w-[70%] items-end justify-center gap-[6%]">
-                    <div className="w-1/4">
-                      <GladiadorPixel ia="claude" />
-                    </div>
-                    <div className="w-1/4">
-                      <GladiadorPixel ia="chatgpt" />
-                    </div>
-                    <div className="w-1/4">
-                      <GladiadorPixel ia="gemini" espelhar />
-                    </div>
+                // Ao ligar: o logo do jogo e a barra de carregar; depois vem o zoom.
+                <div className={`flex h-full flex-col items-center justify-center gap-[8%] px-[8%] ${fase === 'ligando' ? 'crt-linha' : ''}`}>
+                  <p className="neon text-center font-pixel text-[8px] leading-snug text-accent sm:text-xs">
+                    IMPERIUM
+                    <br />
+                    ARCADE
+                  </p>
+                  <div className="h-[8%] w-[80%] border-2 border-accent p-[2px]">
+                    <div className="barra-carregar h-full bg-accent" />
                   </div>
-                  <span className="font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">CRÉDITO 01</span>
+                  <span className="font-pixel text-[5px] text-[rgb(242_193_78)] sm:text-[7px]">CARREGANDO · CRÉDITO 01</span>
                 </div>
               )}
             </div>
