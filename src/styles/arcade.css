@@ -806,3 +806,43 @@
   to { transform: none; opacity: 1; }
 }
 .menos-movimento .voar-para-arena, .menos-movimento .entrar-da-manga { animation-duration: 1ms; animation-delay: 0s; }
+
+/* Abertura do app: estrelas piscando, letras caindo como pedras, gladiadores entrando */
+.abertura-estrela {
+  animation: abertura-brilho 1.6s steps(2) infinite;
+}
+@keyframes abertura-brilho {
+  50% {
+    opacity: 0.25;
+  }
+}
+.abertura-pedra {
+  animation: abertura-pedra 520ms cubic-bezier(0.5, 0, 0.9, 0.6) both;
+}
+@keyframes abertura-pedra {
+  0% {
+    transform: translateY(-120vh) rotate(-12deg);
+  }
+  80% {
+    transform: translateY(0) rotate(0);
+  }
+  88% {
+    transform: translateY(-8%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.abertura-entrar {
+  animation: abertura-entrar 900ms steps(6) both;
+}
+@keyframes abertura-entrar {
+  from {
+    transform: translateY(60%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

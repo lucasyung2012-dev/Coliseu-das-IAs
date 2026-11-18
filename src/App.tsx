@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Home from './features/home/Home';
 import EmConstrucao from './features/home/EmConstrucao';
@@ -11,8 +11,10 @@ import MapaTrofeus from './features/arcade/MapaTrofeus';
 import SalaDoDuelo from './features/arcade/duelo/MeuBaralho';
 import DoisJogadores from './features/arcade/duelo/DoisJogadores';
 import { registrarAbandono } from './game/progresso';
+import AberturaApp, { precisaAbertura } from './features/abertura/AberturaApp';
 
 export default function App() {
+  const [abertura, setAbertura] = useState(precisaAbertura);
   // Fechou o app ou recarregou no meio de uma partida? Ela vale como derrota.
   useEffect(() => {
     registrarAbandono();
@@ -37,6 +39,7 @@ export default function App() {
         <Route path="*" element={<Home />} />
       </Routes>
       <BotaoSom />
+      {abertura && <AberturaApp onFim={() => setAbertura(false)} />}
     </>
   );
 }
