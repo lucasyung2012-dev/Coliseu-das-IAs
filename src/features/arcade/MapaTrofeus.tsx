@@ -7,6 +7,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { tocar } from '@/ui/som';
 import { Faiscas } from './cenas/Palco';
+import { Animados, Bandeira, Marco, Terreno } from './mapa/MapaArte';
 
 const L = 360;
 const A = 900;
@@ -79,6 +80,9 @@ export default function MapaTrofeus() {
   if (!valido) return <Navigate to="/arena" replace />;
   const pers = PERSONAGENS[id];
   const pos = posicaoNoMapa(mostrado);
+  // Trecho já percorrido: as paradas alcançadas mais o ponto onde o gladiador está.
+  const alcancadas = PARADAS.filter((pa) => mostrado >= pa.trofeus);
+  const percorrido = alcancadas.length && mostrado > 0 ? caminhoSvg([...alcancadas, pos]) : null;
 
   return (
     <main data-area="arcade" className="fundo-arcade relative min-h-screen text-fg">
@@ -88,33 +92,60 @@ export default function MapaTrofeus() {
         </Link>
 
         <div className="pergaminho relative overflow-hidden px-3 pb-4 pt-5 sm:px-6">
-          <h1 className="text-center font-pixel text-lg text-[#5a3414] sm:text-2xl">🗺 MAPA DE TROFÉUS</h1>
-          <p className="mt-1 text-center font-pixel text-[9px] text-[#7a4a22]">
-            A JORNADA DE {pers.gladiador.toUpperCase()} · 🏆 {trofeus}
-          </p>
+          {/* Título numa faixa de pergaminho, como nos mapas antigos */}
+          <div className="faixa-mapa relative mx-auto w-fit px-8 py-2 text-center">
+            <h1 className="font-pixel text-base text-[#5a3414] sm:text-xl">🗺 MAPA DE TROFÉUS</h1>
+            <p className="mt-1 font-pixel text-[8px] text-[#7a4a22] sm:text-[9px]">
+              A JORNADA DE {pers.gladiador.toUpperCase()} · 🏆 {trofeus}
+            </p>
+          </div>
 
           <div className="relative mx-auto mt-3 w-full" style={{ aspectRatio: `${L} / ${A}` }}>
             <svg viewBox={`0 0 ${L} ${A}`} className="absolute inset-0 h-full w-full" aria-hidden>
-              <Decoracao />
-              {/* caminho percorrido (cheio) e o que falta (tracejado) */}
-              <path d={caminhoSvg()} fill="none" stroke="#7a4a22" strokeWidth={5} strokeDasharray="2 12" strokeLinecap="round" opacity={0.75} />
+              <defs>
+                <filter id="brilho-ouro" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="b" />
+                  <feMerge>
+                    <feMergeNode in="b" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <Terreno />
+              {/* o caminho inteiro tracejado; o já percorrido brilha em dourado por cima */}
+              <path d={caminhoSvg()} fill="none" stroke="#7a4a22" strokeWidth={5} strokeDasharray="2 12" strokeLinecap="round" opacity={0.8} />
+              {percorrido && (
+                <path d={percorrido} fill="none" stroke="#f2c14e" strokeWidth={6} strokeLinecap="round" filter="url(#brilho-ouro)" />
+              )}
+              <Animados />
               {PARADAS.map((pa) => {
                 const alcancada = mostrado >= pa.trofeus;
-                return pa.liga ? (
+                if (!pa.liga) {
+                  return (
+                    <g key={pa.trofeus}>
+                      <circle cx={pa.x} cy={pa.y} r={8} fill={alcancada ? '#f2c14e' : '#e8d3a8'} stroke="#5a3414" strokeWidth={2} />
+                      {alcancada && <circle cx={pa.x - 2} cy={pa.y - 2} r={2.5} fill="#fff6d0" />}
+                    </g>
+                  );
+                }
+                // O desenho da liga fica do lado oposto ao nome.
+                const ladoDoMarco = pa.x > L / 2 ? 1 : -1;
+                return (
                   <g key={pa.trofeus}>
-                    <circle cx={pa.x} cy={pa.y} r={20} fill={alcancada ? '#f2c14e' : '#e8d3a8'} stroke="#5a3414" strokeWidth={3} />
-                    <text x={pa.x} y={pa.y + 7} textAnchor="middle" fontSize={20}>
-                      {alcancada ? '🏛️' : '🔒'}
+                    <Marco liga={pa.liga} x={pa.x + ladoDoMarco * 62} y={pa.y - 4} alcancado={alcancada} />
+                    <circle cx={pa.x} cy={pa.y} r={19} fill={alcancada ? '#f2c14e' : '#d9c49a'} stroke="#5a3414" strokeWidth={3} filter={alcancada ? 'url(#brilho-ouro)' : undefined} />
+                    <circle cx={pa.x} cy={pa.y} r={13} fill="none" stroke="#5a3414" strokeWidth={1.5} strokeDasharray="3 3" />
+                    <text x={pa.x} y={pa.y + 6} textAnchor="middle" fontSize={16}>
+                      {alcancada ? '🏆' : '🔒'}
                     </text>
+                    {alcancada && <Bandeira x={pa.x + 14} y={pa.y - 14} />}
                   </g>
-                ) : (
-                  <circle key={pa.trofeus} cx={pa.x} cy={pa.y} r={7} fill={alcancada ? '#c0283c' : '#e8d3a8'} stroke="#5a3414" strokeWidth={2} />
                 );
               })}
               {/* o X do tesouro, no fim do caminho */}
-              <g stroke="#c0283c" strokeWidth={6} strokeLinecap="round">
-                <line x1={PARADAS[PARADAS.length - 1]!.x - 34} y1={22} x2={PARADAS[PARADAS.length - 1]!.x - 14} y2={42} />
-                <line x1={PARADAS[PARADAS.length - 1]!.x - 14} y1={22} x2={PARADAS[PARADAS.length - 1]!.x - 34} y2={42} />
+              <g className="brilho-x" stroke="#c0283c" strokeWidth={6} strokeLinecap="round">
+                <line x1={PARADAS[PARADAS.length - 1]!.x + 30} y1={12} x2={PARADAS[PARADAS.length - 1]!.x + 50} y2={32} />
+                <line x1={PARADAS[PARADAS.length - 1]!.x + 50} y1={12} x2={PARADAS[PARADAS.length - 1]!.x + 30} y2={32} />
               </g>
             </svg>
 
@@ -163,48 +194,3 @@ export default function MapaTrofeus() {
   );
 }
 
-/** Enfeites do mapa: montanhas, árvores, mar com ondas, rosa dos ventos. Tinta marrom, estilo mapa antigo. */
-function Decoracao() {
-  const tinta = '#7a4a22';
-  return (
-    <g opacity={0.55} stroke={tinta} fill="none" strokeWidth={2}>
-      {/* montanhas */}
-      {[
-        [30, 620],
-        [62, 600],
-        [300, 380],
-        [330, 400],
-      ].map(([x, y]) => (
-        <path key={`m${x}`} d={`M ${x! - 18} ${y! + 14} L ${x} ${y! - 14} L ${x! + 18} ${y! + 14}`} />
-      ))}
-      {/* árvores */}
-      {[
-        [250, 760],
-        [270, 780],
-        [40, 300],
-        [60, 280],
-        [320, 180],
-      ].map(([x, y]) => (
-        <g key={`a${x}${y}`}>
-          <circle cx={x} cy={y} r={8} />
-          <line x1={x} y1={y! + 8} x2={x} y2={y! + 18} />
-        </g>
-      ))}
-      {/* mar com ondas */}
-      {[490, 510, 530].map((y) => (
-        <path key={`o${y}`} d={`M 20 ${y} q 8 -8 16 0 t 16 0 t 16 0`} />
-      ))}
-      {/* rosa dos ventos */}
-      <g transform="translate(310 850)">
-        <circle r={22} />
-        <path d="M 0 -30 L 6 0 L 0 30 L -6 0 Z" fill={tinta} />
-        <path d="M -30 0 L 0 -6 L 30 0 L 0 6 Z" />
-        <text y={-34} textAnchor="middle" fontSize={12} fill={tinta} stroke="none">
-          N
-        </text>
-      </g>
-      {/* navio pequeno */}
-      <path d="M 40 560 l 30 0 l -6 10 l -18 0 z M 55 560 l 0 -20 l 12 14 z" />
-    </g>
-  );
-}

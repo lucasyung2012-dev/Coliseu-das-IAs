@@ -581,3 +581,23 @@
     0 10px 30px -10px rgb(0 0 0 / 0.8);
   border-radius: 6px 14px 8px 12px;
 }
+
+/* Enfeites animados do Mapa de troféus */
+.onda-mar { stroke-dasharray: 6 4; animation: onda-mar 2.4s linear infinite; }
+@keyframes onda-mar { to { stroke-dashoffset: -20; } }
+.nuvem { animation: nuvem 40s linear infinite; }
+@keyframes nuvem { from { transform: translateX(-60px); } to { transform: translateX(420px); } }
+.barco { animation: barco 3s ease-in-out infinite; transform-origin: 28px 535px; }
+@keyframes barco { 50% { transform: translateY(3px) rotate(-4deg); } }
+.passaro { animation: passaro 1.2s steps(2) infinite; }
+@keyframes passaro { 50% { transform: translateY(-2px); } }
+.bandeira { transform-box: fill-box; transform-origin: left center; animation: bandeira 0.9s ease-in-out infinite; }
+@keyframes bandeira { 50% { transform: skewY(-12deg) scaleX(0.85); } }
+.brilho-x { animation: brilho-x 1.6s ease-in-out infinite; }
+@keyframes brilho-x { 50% { opacity: 0.45; } }
+/* Faixa do título, com as pontas recortadas como uma fita */
+.faixa-mapa {
+  background: linear-gradient(#f6e6bf, #e3c58c);
+  box-shadow: 0 3px 0 rgb(90 52 20 / 0.5), inset 0 0 0 2px #5a3414;
+  clip-path: polygon(0 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%);
+}
