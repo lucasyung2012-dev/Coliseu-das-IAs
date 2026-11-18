@@ -3,6 +3,7 @@ import {
   golpeFinal,
   INTERVALO_MS,
   jogarCarta,
+  maoInicial,
   montarMonte,
   novoDuelo,
   passo,
@@ -42,6 +43,14 @@ describe('duelo v2: motor', () => {
     const conta = (t: TipoCarta) => monte.filter((c) => c.tipo === t).length;
     expect([conta('argumento'), conta('forte'), conta('escudo'), conta('replica')]).toEqual([6, 3, 4, 3]);
     expect([conta('capciosa'), conta('dado'), conta('apelo')]).toEqual([1, 1, 1]);
+  });
+
+  it('a mão inicial sempre tem pelo menos 2 ataques', () => {
+    const defesas = (['escudo', 'escudo', 'replica', 'replica', 'argumento', 'forte'] as TipoCarta[]).map((tipo, i) => ({ id: String(i), tipo, frase: '' }));
+    const { mao, monte } = maoInicial(defesas);
+    expect(mao.filter((c) => c.tipo === 'argumento' || c.tipo === 'forte')).toHaveLength(2);
+    expect(mao).toHaveLength(4);
+    expect(monte).toHaveLength(2);
   });
 
   it('argumento que acerta puxa a plateia e dá aplauso; gasta fôlego', () => {

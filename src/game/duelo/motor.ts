@@ -163,12 +163,30 @@ export function montarMonte(frases: string[], prefixo: string, aleatorio: Aleato
   );
 }
 
-function lutador(monte: CartaDuelo[]): Lutador {
+const ehAtaque = (c: CartaDuelo) => c.tipo === 'argumento' || c.tipo === 'forte' || c.tipo === 'dado';
+
+/** Mão inicial com pelo menos 2 cartas de ataque (nada de começar só com defesas). */
+export function maoInicial(monte: CartaDuelo[]): { mao: CartaDuelo[]; monte: CartaDuelo[] } {
+  const mao = monte.slice(0, TAMANHO_MAO);
+  let resto = monte.slice(TAMANHO_MAO);
+  while (mao.filter(ehAtaque).length < 2) {
+    const i = resto.findIndex(ehAtaque);
+    const j = mao.findIndex((c) => !ehAtaque(c));
+    if (i < 0 || j < 0) break;
+    const sai = mao[j]!;
+    mao[j] = resto[i]!;
+    resto = [...resto.slice(0, i), ...resto.slice(i + 1), sai];
+  }
+  return { mao, monte: resto };
+}
+
+function lutador(monteCompleto: CartaDuelo[]): Lutador {
+  const { mao, monte } = maoInicial(monteCompleto);
   return {
     folego: FOLEGO_INICIAL,
     aplausos: 0,
-    mao: monte.slice(0, TAMANHO_MAO),
-    monte: monte.slice(TAMANHO_MAO),
+    mao,
+    monte,
     escudo: null,
     esquiva: null,
     esquivaProntaEm: 0,
@@ -211,11 +229,16 @@ function efeito(s: EstadoDuelo, tipo: EfeitoVisual['tipo'], lado: Lado, ms = 110
 const comLutador = (s: EstadoDuelo, lado: Lado, f: (l: Lutador) => Lutador): EstadoDuelo =>
   lado === 'eu' ? { ...s, eu: f(s.eu) } : { ...s, rival: f(s.rival) };
 
-/** Tira a carta da mão e compra a próxima; a jogada volta para o fundo do monte. */
+/**
+ * Tira a carta da mão e compra a próxima; a jogada volta para o fundo do monte.
+ * Se a mão ficaria sem nenhum ataque, compra o próximo ataque do monte.
+ */
 function gastar(l: Lutador, carta: CartaDuelo): Lutador {
   const mao = l.mao.filter((c) => c.id !== carta.id);
-  const [proxima, ...resto] = l.monte;
+  const i = mao.some(ehAtaque) ? 0 : Math.max(0, l.monte.findIndex(ehAtaque));
+  const proxima = l.monte[i];
   if (proxima) mao.push(proxima);
+  const resto = l.monte.filter((_, n) => n !== i);
   return { ...l, mao, monte: [...resto, carta], folego: l.folego - CARTAS[carta.tipo].custo };
 }
 
@@ -459,7 +482,7 @@ export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
     const venceu: Lado | null = s.plateia > 0 ? 'eu' : s.plateia < 0 ? 'rival' : null;
     const rodadas = { eu: s.rodadas.eu + (venceu === 'eu' ? 1 : 0), rival: s.rodadas.rival + (venceu === 'rival' ? 1 : 0) };
     const acabou = rodadas.eu >= 2 || rodadas.rival >= 2 || s.rodada >= 3;
-    s = { ...s, rodadas, projeteis: [], fase: acabou ? 'fim' : 'intervalo', fimIntervalo: tempo + INTERVALO_MS };
+    s = { ...s, rodadas, projeteis: [], evento: null, fase: acabou ? 'fim' : 'intervalo', fimIntervalo: tempo + INTERVALO_MS };
     s = aviso(s, venceu ? (venceu === 'eu' ? `RODADA ${s.rodada}: SUA!` : `RODADA ${s.rodada}: DO RIVAL`) : `RODADA ${s.rodada}: EMPATE`, venceu, INTERVALO_MS);
   }
   return s;
