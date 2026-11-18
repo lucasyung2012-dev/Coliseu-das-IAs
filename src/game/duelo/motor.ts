@@ -93,7 +93,7 @@ export interface InfoCarta {
 
 export const CARTAS: Record<TipoCarta, InfoCarta> = {
   frase: { nome: 'Frase rápida', icone: '⚔️', custo: 2, papel: 'leve', forca: 2, tropa: 'legionario', jeito: 'Pressiona', dica: 'Rápida e barata: chega primeiro e obriga o rival a responder.', carrega: true },
-  exemplos: { nome: 'Exemplos', icone: '👥', custo: 2, papel: 'leve', forca: 1, tropa: 'exemplo', jeito: 'Distrai', dica: 'Dois pequenos de uma vez: o rival perde tempo batendo um de cada vez.' },
+  exemplos: { nome: 'Exemplos', icone: '👥', custo: 2, papel: 'leve', forca: 1, tropa: 'exemplo', jeito: 'Distrai', dica: 'Dois aprendizes de uma vez: o rival perde tempo batendo um de cada vez.' },
   analogia: { nome: 'Analogia', icone: '🐎', custo: 3, papel: 'leve', forca: 2, tropa: 'cavaleiro', jeito: 'Pula', dica: 'Cavaleiro: o mais rápido. Salta por cima da primeira tropa inimiga.', carrega: true },
   piada: { nome: 'Piada', icone: '🃏', custo: 1, papel: 'leve', forca: 1, tropa: 'bobo', jeito: 'Faz rir', dica: 'Baratíssima. Quem luta com ela fica 1 s parado de tanto rir.' },
   tese: { nome: 'Tese', icone: '🛡️', custo: 4, papel: 'pesada', forca: 4, tropa: 'centuriao', jeito: 'Firme', dica: 'Centurião lento e resistente. Flechas tiram metade da força dele.', carrega: true },
@@ -103,7 +103,7 @@ export const CARTAS: Record<TipoCarta, InfoCarta> = {
   estatistica: { nome: 'Estatística', icone: '📊', custo: 5, papel: 'longe', forca: 2, tropa: 'balista', jeito: 'Posto fixo', dica: 'Balista parada no seu lado: atira longe 4 vezes (ou 10 s) e some. Máx. 1.' },
   prova: { nome: 'Prova', icone: '🎯', custo: 6, papel: 'longe', forca: 2, tropa: 'catapulta', jeito: 'Cerco', dica: 'Catapulta: ignora as tropas e só ataca a Tribuna, de longe.' },
   muralha: { nome: 'Muralha de lógica', icone: '🧱', custo: 3, papel: 'defesa', forca: 5, tropa: 'barricada', jeito: 'Segura', dica: 'Barricada na frente da sua Tribuna: não ataca, só segura. Some em 12 s.' },
-  contra: { nome: 'Contra-argumento', icone: '🔄', custo: 3, papel: 'defesa', forca: 3, tropa: 'escudeiro', jeito: 'Devolve', dica: 'Escudeiro parado na frente da Tribuna: cada golpe que leva, devolve 1.' },
+  contra: { nome: 'Contra-argumento', icone: '🔄', custo: 3, papel: 'defesa', forca: 3, tropa: 'escudeiro', jeito: 'Devolve', dica: 'Hoplita parado na frente da Tribuna: cada golpe que leva, devolve 1.' },
   refutacao: { nome: 'Refutação', icone: '❗', custo: 3, papel: 'feitico', forca: 0, jeito: 'Precisa', dica: 'Tira 2 de força da tropa inimiga mais perto da sua Tribuna.' },
   pergunta: { nome: 'Pergunta retórica', icone: '❓', custo: 4, papel: 'feitico', forca: 0, jeito: 'Em área', dica: 'Tira 1 de força de todas as tropas inimigas no grupo mais perto.' },
   pausa: { nome: 'Pausa dramática', icone: '⏸️', custo: 2, papel: 'feitico', forca: 0, jeito: 'Congela', dica: 'As tropas inimigas ficam paradas por 2 s.' },
