@@ -1,76 +1,46 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PERSONAGENS, type IaId } from '@/game/personagens';
-import { JURADOS, sortearJurados } from '@/game/jurados';
 import { ACERTO_RIVAL } from '@/game/tribunal/motor';
 import { indiceLiga } from '@/game/ligas';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
 import { useProgresso } from '@/game/progresso';
-import { DILEMAS, type Carta, type LadoId } from '@/game/tribunal/dilemas';
-import { GOSTOS, TEMAS } from '@/game/tribunal/temas';
+import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import {
   APLAUSOS_MAX,
-  choque,
-  CUSTO,
-  DURACAO,
+  CARTAS,
+  esquivar,
+  EVENTOS,
   FOLEGO_MAX,
-  FOLEGO_POR_SEGUNDO,
-  forca,
-  jogadaDoRival,
+  golpeFinal,
+  GOLPES_FINAIS,
+  jogarCarta,
   LIMITE,
-  placar,
-  puxar,
-  resultado,
-  TAMANHO_MAO,
-  VOO_MS,
+  novoDuelo,
+  passo,
+  podeJogar,
+  progresso,
+  resultadoFinal,
+  RODADA_MS,
+  TICK,
+  type Altura,
+  type CartaDuelo,
+  type EstadoDuelo,
   type Lado,
-  type Setor,
+  type Lutador,
+  type Projetil,
 } from '@/game/duelo/motor';
 import { CenaColiseu } from '../cenas/Cenarios';
 import { Faiscas, Palco } from '../cenas/Palco';
-import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import { GladiadorPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { VERDE, VERMELHO } from '../tribunal/visual';
+import ComoJogar, { BotaoComoJogar, TUTORIAL_DUELO, useTutorial } from '../ComoJogar';
 
-// Onde cada setor fica no palco (% do palco) e de onde saem os argumentos.
-const SETOR_X = [17, 50, 83];
-const ALVO_Y = 30;
-const ORIGEM: Record<Lado, { x: number; y: number }> = { eu: { x: 22, y: 72 }, rival: { x: 78, y: 72 } };
-const TICK = 100;
-
-interface Projetil {
-  id: number;
-  lado: Lado;
-  carta: Carta;
-  setor: number;
-  lancadoEm: number;
-}
-
-interface Efeito {
-  id: number;
-  tipo: 'rosas' | 'tomates' | 'choque' | 'epico';
-  lado: Lado;
-  setor?: number;
-  ate: number;
-}
-
-interface Estado {
-  tempo: number;
-  fim: boolean;
-  setores: Setor[];
-  folego: number;
-  folegoRival: number;
-  aplausos: number;
-  aplausosRival: number;
-  mao: Carta[];
-  monte: Carta[];
-  maoRival: Carta[];
-  monteRival: Carta[];
-  projeteis: Projetil[];
-  efeitos: Efeito[];
-  proximoRival: number;
-  seq: number;
-}
+// Geometria do palco (em %): onde ficam os gladiadores e as duas alturas dos golpes.
+const ALTURA_Y: Record<Altura, number> = { alto: 50, baixo: 79 };
+const SAIDA: Record<Lado, number> = { eu: 22, rival: 78 };
+const ESCUDO_X: Record<Lado, number> = { eu: 25, rival: 75 };
 
 function embaralhar<T>(lista: T[]): T[] {
   const a = [...lista];
@@ -81,345 +51,424 @@ function embaralhar<T>(lista: T[]): T[] {
   return a;
 }
 
-function inicio(ladoJogador: LadoId, dilemaIdx: number): Estado {
-  const d = DILEMAS[dilemaIdx]!;
-  const meu = embaralhar(d.lados[ladoJogador].tempos.flat());
-  const dele = embaralhar(d.lados[ladoJogador === 'favor' ? 'contra' : 'favor'].tempos.flat());
-  return {
-    tempo: 0,
-    fim: false,
-    setores: sortearJurados(3).map((lider) => ({ lider, valor: 0 })),
-    folego: 6,
-    folegoRival: 6,
-    aplausos: 0,
-    aplausosRival: 0,
-    mao: meu.slice(0, TAMANHO_MAO),
-    monte: meu.slice(TAMANHO_MAO),
-    maoRival: dele.slice(0, TAMANHO_MAO),
-    monteRival: dele.slice(TAMANHO_MAO),
-    projeteis: [],
-    efeitos: [],
-    proximoRival: 2500,
-    seq: 0,
-  };
-}
-
-/** Tira a carta da mão, puxa outra do monte (a jogada volta para o fundo) e cria o projétil. */
-function lancar(e: Estado, lado: Lado, carta: Carta, setor: number): Estado {
-  const meu = lado === 'eu';
-  const mao = meu ? e.mao : e.maoRival;
-  const monte = meu ? e.monte : e.monteRival;
-  const novaMao = mao.filter((c) => c.id !== carta.id);
-  const [proxima, ...resto] = monte;
-  if (proxima) novaMao.push(proxima);
-  const projetil: Projetil = { id: e.seq + 1, lado, carta, setor, lancadoEm: e.tempo };
-  return {
-    ...e,
-    seq: e.seq + 1,
-    projeteis: [...e.projeteis, projetil],
-    ...(meu
-      ? { mao: novaMao, monte: [...resto, carta], folego: e.folego - CUSTO }
-      : { maoRival: novaMao, monteRival: [...resto, carta], folegoRival: e.folegoRival - CUSTO }),
-  };
-}
-
-function discursoEpico(e: Estado, lado: Lado): Estado {
-  return {
-    ...e,
-    seq: e.seq + 1,
-    setores: e.setores.map((s) => ({ ...s, valor: puxar(s.valor, 3, lado) })),
-    efeitos: [...e.efeitos, { id: e.seq + 1, tipo: 'epico', lado, ate: e.tempo + 1500 }],
-    ...(lado === 'eu' ? { aplausos: 0 } : { aplausosRival: 0 }),
-  };
-}
-
-/** Um passo do relógio: fôlego, choques no ar, chegadas, jogada do rival e fim. */
-function passo(e: Estado, acerto: number, sons: (s: Parameters<typeof tocar>[0]) => void): Estado {
-  if (e.fim) return e;
-  const tempo = e.tempo + TICK;
-  let s: Estado = {
-    ...e,
-    tempo,
-    folego: Math.min(FOLEGO_MAX, e.folego + (FOLEGO_POR_SEGUNDO * TICK) / 1000),
-    folegoRival: Math.min(FOLEGO_MAX, e.folegoRival + (FOLEGO_POR_SEGUNDO * TICK) / 1000),
-    efeitos: e.efeitos.filter((x) => x.ate > tempo),
-  };
-  const progresso = (p: Projetil) => (tempo - p.lancadoEm) / VOO_MS;
-
-  // Choque no ar: argumentos dos dois lados indo para o mesmo setor, ambos já no meio do caminho.
-  const removidos = new Set<number>();
-  const bonus = new Set<number>();
-  for (const a of s.projeteis.filter((p) => p.lado === 'eu')) {
-    const b = s.projeteis.find((p) => p.lado === 'rival' && p.setor === a.setor && !removidos.has(p.id) && progresso(p) >= 0.55);
-    if (!b || removidos.has(a.id) || progresso(a) < 0.55) continue;
-    const quem = choque(a.carta, b.carta, s.setores[a.setor]!.lider);
-    if (quem !== 'rival') removidos.add(b.id);
-    if (quem !== 'eu') removidos.add(a.id);
-    if (quem === 'eu') bonus.add(a.id);
-    if (quem === 'rival') bonus.add(b.id);
-    s = { ...s, seq: s.seq + 1, efeitos: [...s.efeitos, { id: s.seq + 1, tipo: 'choque', lado: 'eu', setor: a.setor, ate: tempo + 700 }] };
-    sons('espadas');
-  }
-
-  // Chegadas: o argumento puxa o setor; rosas se a plateia amou, tomates se não gostou.
-  const voando: Projetil[] = [];
-  for (const p of s.projeteis) {
-    if (removidos.has(p.id)) continue;
-    if (progresso(p) < 1) {
-      voando.push(p);
-      continue;
-    }
-    const setor = s.setores[p.setor]!;
-    const f = forca(p.carta, setor.lider) + (bonus.has(p.id) ? 1 : 0);
-    s = { ...s, setores: s.setores.map((x, i) => (i === p.setor ? { ...x, valor: puxar(x.valor, f, p.lado) } : x)) };
-    if (f >= 2 || f <= 0) {
-      s = { ...s, seq: s.seq + 1, efeitos: [...s.efeitos, { id: s.seq + 1, tipo: f >= 2 ? 'rosas' : 'tomates', lado: p.lado, setor: p.setor, ate: tempo + 1200 }] };
-      if (p.lado === 'eu') sons(f >= 2 ? 'jurado' : 'falha');
-    }
-    if (f >= 2) s = p.lado === 'eu' ? { ...s, aplausos: Math.min(APLAUSOS_MAX, s.aplausos + 1) } : { ...s, aplausosRival: Math.min(APLAUSOS_MAX, s.aplausosRival + 1) };
-  }
-  s = { ...s, projeteis: voando };
-
-  // O rival joga quando tem fôlego; usa o Discurso Épico assim que pode.
-  if (s.aplausosRival >= APLAUSOS_MAX) {
-    s = discursoEpico(s, 'rival');
-    sons('fanfarra');
-  }
-  if (tempo >= s.proximoRival && s.folegoRival >= CUSTO) {
-    const j = jogadaDoRival(s.maoRival, s.setores, acerto, Math.random);
-    s = lancar(s, 'rival', j.carta, j.setor);
-    s = { ...s, proximoRival: tempo + 1600 + Math.random() * (2600 - acerto * 1200) };
-  }
-
-  if (tempo >= DURACAO * 1000) s = { ...s, fim: true, projeteis: [] };
-  return s;
-}
+const ICONE_PROJETIL: Record<Projetil['tipo'], string> = { argumento: '⚔️', forte: '💥', dado: '📊', raio: '☀️', replica: '🔁' };
 
 export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId; rival: IaId; onDeNovo: () => void; onSair: () => void }) {
   const p = useProgresso();
   const dificuldade = useDificuldade();
   const { liga } = useAparencia(ia);
+  const tutorial = useTutorial('duelo');
   const [acerto] = useState(() => (modoRanqueado() ? ACERTO_RIVAL[indiceLiga(p.trofeus[ia])]! : ACERTO_TREINO[dificuldade]));
   const [config] = useState(() => ({ lado: (Math.random() < 0.5 ? 'favor' : 'contra') as LadoId, dilema: Math.floor(Math.random() * DILEMAS.length) }));
-  const [e, setE] = useState<Estado>(() => inicio(config.lado, config.dilema));
-  const [selecionada, setSelecionada] = useState<string | null>(null);
-  const sonsPendentes = useRef<Parameters<typeof tocar>[0][]>([]);
+  const dilema = DILEMAS[config.dilema]!;
+  const ladoRival: LadoId = config.lado === 'favor' ? 'contra' : 'favor';
+  const [e, setE] = useState<EstadoDuelo>(() =>
+    novoDuelo(
+      embaralhar(dilema.lados[config.lado].tempos.flat().map((c) => c.titulo)),
+      embaralhar(dilema.lados[ladoRival].tempos.flat().map((c) => c.titulo)),
+    ),
+  );
+  const pausado = tutorial.aberto;
+
+  // O relógio do duelo (para enquanto o tutorial está aberto).
+  useEffect(() => {
+    if (pausado) return;
+    const ctx = { acerto, iaRival: rival, aleatorio: Math.random };
+    const id = window.setInterval(() => setE((s) => passo(s, ctx)), TICK);
+    return () => window.clearInterval(id);
+  }, [acerto, rival, pausado]);
 
   useEffect(() => {
     tocar('vs');
-    const id = window.setInterval(() => {
-      setE((s) => passo(s, acerto, (som) => sonsPendentes.current.push(som)));
-    }, TICK);
-    return () => window.clearInterval(id);
-  }, [acerto]);
+  }, []);
 
-  // Sons decididos dentro do passo tocam depois da atualização (um de cada por tick).
+  // Sons: cada efeito ou aviso novo toca uma vez.
+  const visto = useRef(0);
   useEffect(() => {
-    const unicos = [...new Set(sonsPendentes.current)];
-    sonsPendentes.current = [];
-    unicos.forEach((s) => tocar(s));
-  });
+    const novos: NomeSom[] = [];
+    for (const x of e.efeitos) {
+      if (x.id <= visto.current) continue;
+      if (x.tipo === 'rosas' && x.lado === 'eu') novos.push('jurado');
+      if (x.tipo === 'tomates' && x.lado === 'eu') novos.push('falha');
+      if (x.tipo === 'bloqueio' || x.tipo === 'replica') novos.push('espadas');
+      if (x.tipo === 'esquiva') novos.push('passos');
+      if (x.tipo === 'final') novos.push('fanfarra');
+    }
+    for (const a of e.avisos) if (a.id > visto.current && a.lado === null && e.fase === 'luta') novos.push('plateia');
+    visto.current = Math.max(visto.current, ...e.efeitos.map((x) => x.id), ...e.avisos.map((a) => a.id));
+    [...new Set(novos)].forEach((s) => tocar(s));
+  }, [e.efeitos, e.avisos, e.fase]);
 
   useEffect(() => {
-    if (e.fim) tocar(resultado(e.setores) === 'vitoria' ? 'vitoria' : resultado(e.setores) === 'derrota' ? 'derrota' : 'martelo');
-  }, [e.fim]);
+    if (e.fase === 'intervalo') tocar('martelo');
+    if (e.fase === 'fim') {
+      const r = resultadoFinal(e);
+      tocar(r === 'vitoria' ? 'vitoria' : r === 'derrota' ? 'derrota' : 'martelo');
+    }
+  }, [e.fase]);
 
-  const dilema = DILEMAS[config.dilema]!;
-  const voce = PERSONAGENS[ia];
-  const dele = PERSONAGENS[rival];
-  const restante = Math.max(0, Math.ceil(DURACAO - e.tempo / 1000));
-  const carta = e.mao.find((c) => c.id === selecionada) ?? null;
-
-  const mirar = (setor: number) => {
-    if (!carta || e.folego < CUSTO || e.fim) return;
+  const lancar = (carta: CartaDuelo, altura?: Altura) => {
     desbloquear();
     tocar('selecionar');
-    setE((s) => lancar(s, 'eu', carta, setor));
-    setSelecionada(null);
+    setE((s) => jogarCarta(s, 'eu', carta.id, altura));
+  };
+  const mexer = (mov: 'pular' | 'abaixar') => {
+    desbloquear();
+    setE((s) => esquivar(s, 'eu', mov));
+  };
+  const final = () => {
+    desbloquear();
+    setE((s) => golpeFinal(s, 'eu', ia));
   };
 
-  if (e.fim) return <FimDuelo e={e} ia={ia} rival={rival} onDeNovo={onDeNovo} onSair={onSair} />;
+  // Teclado: ⬆/W pula, ⬇/S abaixa, espaço solta o golpe final.
+  useEffect(() => {
+    if (pausado) return;
+    const tecla = (ev: KeyboardEvent) => {
+      if (ev.key === 'ArrowUp' || ev.key === 'w' || ev.key === 'W') mexer('pular');
+      else if (ev.key === 'ArrowDown' || ev.key === 's' || ev.key === 'S') mexer('abaixar');
+      else if (ev.key === ' ') final();
+      else return;
+      ev.preventDefault();
+    };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  });
+
+  if (e.fase === 'fim') return <FimDuelo e={e} ia={ia} rival={rival} onDeNovo={onDeNovo} onSair={onSair} />;
+
+  const voce = PERSONAGENS[ia];
+  const dele = PERSONAGENS[rival];
+  const restante = Math.max(0, Math.ceil((RODADA_MS - e.tempo) / 1000));
+  const eu = e.eu;
+  const esquivaPronta = eu.esquivaProntaEm <= e.tempo && eu.atordoadoAte <= e.tempo;
+  const evento = e.evento && e.evento.ate > e.tempo ? e.evento : null;
+  // Dica de defesa: o golpe do rival que está mais perto de chegar.
+  const ameaca = e.projeteis
+    .filter((x) => x.de === 'rival')
+    .sort((a, b) => progresso(b, e.tempo) - progresso(a, e.tempo))[0];
 
   return (
     <div className="flex flex-col gap-3">
+      {tutorial.aberto && <ComoJogar titulo="DUELO" slides={TUTORIAL_DUELO} onFechar={tutorial.fechar} />}
+
       <div className="pixel-box flex items-center justify-between gap-3 px-3 py-2">
-        <p className="min-w-0 truncate text-xs sm:text-sm">
+        <p className="min-w-0 flex-1 text-xs sm:text-sm">
           <span className="font-pixel text-[9px] text-[rgb(242_193_78)]">PROTÓTIPO · </span>
           {dilema.pergunta} <span style={{ color: VERDE }}>Você: {dilema.lados[config.lado].nome}</span>
         </p>
-        <p className={`font-pixel text-lg tabular-nums ${restante <= 10 ? 'piscar text-accent-2' : 'text-accent'}`}>⏱ {restante}</p>
+        <BotaoComoJogar onClick={tutorial.abrir} />
+      </div>
+
+      {/* Placar: rodadas, plateia (cabo de guerra) e relógio */}
+      <div className="pixel-box grid grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-2">
+        <Pontos nome={voce.gladiador} cor={VERDE} vitorias={e.rodadas.eu} />
+        <div>
+          <p className="text-center font-pixel text-[8px] text-muted">
+            RODADA {e.rodada}/3 · PLATEIA ·{' '}
+            <span className={`tabular-nums ${restante <= 5 ? 'piscar text-accent-2' : 'text-accent'}`}>⏱ {restante}</span>
+          </p>
+          <BarraPlateia valor={e.plateia} />
+        </div>
+        <Pontos nome={dele.gladiador} cor={VERMELHO} vitorias={e.rodadas.rival} direita />
       </div>
 
       <Palco rodando={false} onPular={() => undefined}>
         <CenaColiseu corA={`rgb(${voce.cor})`} corB={`rgb(${dele.cor})`} />
 
-        {/* Os 3 setores da plateia: tocar num setor lança a carta escolhida nele */}
-        {e.setores.map((s, i) => (
-          <button
-            key={s.lider}
-            type="button"
-            onClick={() => mirar(i)}
-            disabled={!carta || e.folego < CUSTO}
-            aria-label={`Setor do ${JURADOS[s.lider].nome}`}
-            className={`absolute top-[3%] w-[30%] -translate-x-1/2 rounded bg-black/55 p-1 text-center transition ${carta ? 'ring-2 ring-[rgb(242_193_78)] hover:bg-black/75' : ''}`}
-            style={{ left: `${SETOR_X[i]}%` }}
-          >
-            <div className="mx-auto w-[22%]">
-              <JuradoPixel jurado={s.lider} />
-            </div>
-            <p className="font-pixel text-[6px] sm:text-[8px]" style={{ color: JURADOS[s.lider].toga }}>
-              {JURADOS[s.lider].nome.toUpperCase()}
-            </p>
-            <p className="text-[9px] sm:text-[11px]">
-              {TEMAS[GOSTOS[s.lider].ama].icone}
-              {TEMAS[GOSTOS[s.lider].gosta].icone} <span className="opacity-60">✗{TEMAS[GOSTOS[s.lider].naoGosta].icone}</span>
-            </p>
-            <BarraSetor valor={s.valor} />
-          </button>
+        {/* As duas alturas dos golpes */}
+        {(['alto', 'baixo'] as Altura[]).map((a) => (
+          <div key={a} className="pointer-events-none absolute inset-x-[20%] border-t-2 border-dashed border-white/15" style={{ top: `${ALTURA_Y[a]}%` }}>
+            <span className="absolute left-1/2 -translate-x-1/2 -translate-y-full font-pixel text-[6px] text-white/40 sm:text-[8px]">{a.toUpperCase()}</span>
+          </div>
         ))}
 
-        {/* Gladiadores */}
-        <div className="absolute bottom-[4%] left-[10%] w-[14%]">
-          <GladiadorEnfeitado ia={ia} />
-        </div>
-        <div className="absolute bottom-[4%] right-[10%] w-[14%]">
-          <div className="respirar">
-            <GladiadorPixel ia={rival} liga={liga} espelhar />
-          </div>
-        </div>
+        <Gladiador lado="eu" l={eu} tempo={e.tempo}>
+          <GladiadorEnfeitado ia={ia} parado />
+        </Gladiador>
+        <Gladiador lado="rival" l={e.rival} tempo={e.tempo}>
+          <GladiadorPixel ia={rival} liga={liga} espelhar />
+        </Gladiador>
 
-        {/* Argumentos voando */}
+        {/* Golpes voando, cada um com a frase do debate */}
         {e.projeteis.map((pr) => {
-          const de = ORIGEM[pr.lado];
-          const estilo = {
-            '--x0': `${de.x}%`,
-            '--y0': `${de.y}%`,
-            '--x1': `${SETOR_X[pr.setor]}%`,
-            '--y1': `${ALVO_Y}%`,
-            animationDuration: `${VOO_MS}ms`,
-            boxShadow: `0 0 14px 3px ${pr.lado === 'eu' ? VERDE : VERMELHO}`,
-            borderColor: pr.lado === 'eu' ? VERDE : VERMELHO,
-          } as CSSProperties;
+          const prog = Math.min(1, Math.max(0, progresso(pr, e.tempo)));
+          const x = SAIDA[pr.de] + (SAIDA[pr.de === 'eu' ? 'rival' : 'eu'] - SAIDA[pr.de]) * prog;
+          const cor = pr.tipo === 'raio' ? '#f2c14e' : pr.de === 'eu' ? VERDE : VERMELHO;
           return (
-            <div key={pr.id} className="argumento-voando absolute z-10 rounded-full border-2 bg-black/80 px-1.5 py-0.5 text-xs sm:text-base" style={estilo} aria-hidden>
-              {pr.carta.temas.map((t) => TEMAS[t].icone).join('')}
+            <div key={pr.id} className="projetil absolute z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center" style={{ left: `${x}%`, top: `${ALTURA_Y[pr.altura]}%` }} aria-hidden>
+              {pr.frase && <span className="mb-0.5 max-w-[22vw] truncate bg-black/70 px-1 text-[7px] sm:max-w-40 sm:text-[10px]" style={{ color: cor }}>"{pr.frase}"</span>}
+              <span
+                className={`rounded-full border-2 bg-black/80 px-1.5 py-0.5 ${pr.valor >= 4 ? 'text-base sm:text-2xl' : 'text-xs sm:text-base'}`}
+                style={{ borderColor: cor, boxShadow: `0 0 14px 3px ${cor}` }}
+              >
+                {ICONE_PROJETIL[pr.tipo]}
+                {pr.valor > 2 && <span className="ml-0.5 font-pixel text-[7px] sm:text-[9px]">+{pr.valor}</span>}
+              </span>
             </div>
           );
         })}
 
-        {/* Efeitos: choque no ar, rosas, tomates e o Discurso Épico */}
+        {/* O leão: aparece no portão e varre o chão no impacto */}
+        {evento?.tipo === 'leao' && evento.impactoEm !== undefined && (
+          <>
+            {!evento.resolvido ? (
+              <div className="surgir absolute bottom-[3%] left-1/2 z-10 -translate-x-1/2 text-center">
+                <p className="piscar font-pixel text-[8px] text-accent-2 sm:text-xs">PULE EM {Math.max(1, Math.ceil((evento.impactoEm - e.tempo) / 1000))}!</p>
+                <p className="text-3xl sm:text-5xl">🦁</p>
+              </div>
+            ) : (
+              <>
+                <span className="leao-esq absolute bottom-[3%] z-10 text-3xl sm:text-5xl">🦁</span>
+                <span className="leao-dir absolute bottom-[3%] z-10 text-3xl sm:text-5xl">🦁</span>
+              </>
+            )}
+          </>
+        )}
+        {evento?.tipo === 'petalas' && <Chuva tipo="petalas" lado={null} />}
+        {evento?.tipo === 'silencio' && <div className="pointer-events-none absolute inset-0 bg-[rgb(20_20_60/0.35)]" />}
+
+        {/* Faixa do evento da arena */}
+        {evento && (
+          <div className="absolute left-1/2 top-[3%] z-20 -translate-x-1/2 text-center">
+            <p className="pancada neon whitespace-nowrap font-pixel text-[9px] text-[rgb(242_193_78)] sm:text-sm">
+              {EVENTOS[evento.tipo].icone} {EVENTOS[evento.tipo].titulo}
+            </p>
+            <p className="mt-1 bg-black/60 px-2 text-[9px] sm:text-xs">{EVENTOS[evento.tipo].dica}</p>
+          </div>
+        )}
+
+        {/* Avisos: combos, réplicas, golpes finais, esquivas */}
+        <div className="pointer-events-none absolute inset-x-2 top-[22%] z-20 flex flex-col gap-1">
+          {e.avisos
+            .filter((a) => a.lado !== null || e.fase !== 'luta')
+            .slice(-3)
+            .map((a) => (
+              <p
+                key={a.id}
+                className={`pancada w-fit max-w-[60%] bg-black/70 px-2 py-0.5 font-pixel text-[7px] leading-relaxed sm:text-[10px] ${a.lado === 'rival' ? 'self-end text-right' : a.lado === 'eu' ? 'self-start' : 'self-center'}`}
+                style={{ color: a.lado === 'eu' ? VERDE : a.lado === 'rival' ? VERMELHO : '#f2c14e' }}
+              >
+                {a.texto}
+              </p>
+            ))}
+        </div>
+
+        {/* Efeitos */}
         {e.efeitos.map((x) =>
-          x.tipo === 'choque' ? (
-            <Faiscas key={x.id} x={SETOR_X[x.setor ?? 1]!} y={ALVO_Y + 10} />
-          ) : x.tipo === 'epico' ? (
+          x.tipo === 'rosas' || x.tipo === 'tomates' ? (
+            <Chuva key={x.id} tipo={x.tipo} lado={x.lado} />
+          ) : x.tipo === 'bloqueio' || x.tipo === 'replica' ? (
+            <Faiscas key={x.id} x={ESCUDO_X[x.lado]} y={60} cor={x.tipo === 'replica' ? (x.lado === 'eu' ? VERDE : VERMELHO) : undefined} />
+          ) : x.tipo === 'final' ? (
             <div key={x.id} className="clarao pointer-events-none absolute inset-0 z-20" style={{ background: x.lado === 'eu' ? 'rgb(242 193 78 / 0.6)' : 'rgb(255 74 90 / 0.5)' }} />
           ) : (
-            <Chuva key={x.id} tipo={x.tipo} lado={x.lado} />
+            <span key={x.id} className="pancada absolute top-[40%] z-10 text-2xl sm:text-4xl" style={{ left: `${x.lado === 'eu' ? 12 : 80}%` }} aria-hidden>
+              💨
+            </span>
           ),
+        )}
+
+        {/* Entre as rodadas */}
+        {e.fase === 'intervalo' && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/70 text-center">
+            <p className="pancada neon font-pixel text-sm text-accent sm:text-2xl">{e.avisos[e.avisos.length - 1]?.texto ?? 'FIM DA RODADA'}</p>
+            <p className="font-pixel text-[9px] text-muted sm:text-xs">
+              {e.rodadas.eu} × {e.rodadas.rival} · PREPARE-SE PARA A RODADA {e.rodada + 1}
+            </p>
+          </div>
         )}
       </Palco>
 
-      {/* Fôlego, aplausos e a mão */}
+      {/* Defesa: pular, abaixar e a dica do golpe que vem */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <button
+          type="button"
+          disabled={!esquivaPronta || e.fase !== 'luta'}
+          onClick={() => mexer('pular')}
+          className="pixel-box pixel-hover px-2 py-3 font-pixel text-[9px] disabled:opacity-40 sm:text-[11px]"
+        >
+          ⤒ PULAR <span className="block text-[7px] text-muted">desvia do BAIXO · ⬆/W</span>
+        </button>
+        <p className="w-28 text-center text-[10px] leading-tight sm:w-40 sm:text-xs" aria-live="polite">
+          {eu.atordoadoAte > e.tempo ? (
+            <span className="text-accent-2">💫 Você está tonto!</span>
+          ) : ameaca ? (
+            <span style={{ color: VERMELHO }}>Golpe {ameaca.altura.toUpperCase()} vindo: {ameaca.tipo === 'raio' ? 'nada bloqueia!' : ameaca.altura === 'baixo' ? 'PULE!' : 'ABAIXE!'}</span>
+          ) : (
+            <span className="text-muted">Ataque com as cartas!</span>
+          )}
+        </p>
+        <button
+          type="button"
+          disabled={!esquivaPronta || e.fase !== 'luta'}
+          onClick={() => mexer('abaixar')}
+          className="pixel-box pixel-hover px-2 py-3 font-pixel text-[9px] disabled:opacity-40 sm:text-[11px]"
+        >
+          ⤓ ABAIXAR <span className="block text-[7px] text-muted">desvia do ALTO · ⬇/S</span>
+        </button>
+      </div>
+
+      {/* Fôlego e golpe final */}
       <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <div>
           <p className="font-pixel text-[9px] text-muted">
-            FÔLEGO {Math.floor(e.folego)}/{FOLEGO_MAX} · cada argumento custa {CUSTO}
+            FÔLEGO {Math.floor(eu.folego)}/{FOLEGO_MAX}
+            {evento?.tipo === 'silencio' && <span className="text-accent-2"> · SILÊNCIO: SEM RECUPERAR</span>}
           </p>
           <div className="mt-1 flex gap-1" aria-label="Fôlego">
             {Array.from({ length: FOLEGO_MAX }, (_, i) => (
-              <span key={i} className="h-3 flex-1" style={{ background: i < Math.floor(e.folego) ? 'rgb(var(--accent))' : 'rgb(var(--line))' }} />
+              <span key={i} className="h-3 flex-1" style={{ background: i < Math.floor(eu.folego) ? 'rgb(var(--accent))' : 'rgb(var(--line))' }} />
             ))}
           </div>
         </div>
         <button
           type="button"
-          disabled={e.aplausos < APLAUSOS_MAX}
-          onClick={() => {
-            desbloquear();
-            tocar('fanfarra');
-            setE((s) => discursoEpico(s, 'eu'));
-          }}
-          className="pixel-box pixel-hover px-3 py-2 font-pixel text-[9px] text-[rgb(242_193_78)] disabled:opacity-40"
+          disabled={eu.aplausos < APLAUSOS_MAX || e.fase !== 'luta'}
+          onClick={final}
+          title={GOLPES_FINAIS[ia].efeito}
+          className={`pixel-box pixel-hover px-3 py-2 font-pixel text-[9px] text-[rgb(242_193_78)] disabled:opacity-40 ${eu.aplausos >= APLAUSOS_MAX ? 'piscar' : ''}`}
         >
-          📣 DISCURSO ÉPICO {e.aplausos}/{APLAUSOS_MAX}
+          ⭐ {GOLPES_FINAIS[ia].nome.toUpperCase()} {'👏'.repeat(eu.aplausos)}
+          {'·'.repeat(APLAUSOS_MAX - eu.aplausos)}
         </button>
       </div>
 
-      <section aria-label="Seus argumentos" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {e.mao.map((c) => {
-          const sel = c.id === selecionada;
-          const pode = e.folego >= CUSTO;
-          return (
-            <button
-              key={c.id}
-              type="button"
-              aria-pressed={sel}
-              onClick={() => {
-                desbloquear();
-                tocar('clique');
-                setSelecionada(sel ? null : c.id);
-              }}
-              className={`pixel-box p-2 text-left transition ${pode ? 'pixel-hover' : 'opacity-50'}`}
-              style={sel ? { boxShadow: `0 0 0 3px ${VERDE}, 0 0 20px -4px ${VERDE}`, transform: 'translateY(-4px)' } : undefined}
-            >
-              <p className="text-sm">{c.temas.map((t) => TEMAS[t].icone).join(' ')}</p>
-              <p className="mt-1 font-pixel text-[8px] leading-relaxed" style={{ color: VERDE }}>
-                {c.titulo}
-              </p>
-              {/* Força da carta em cada setor, na ordem da arquibancada */}
-              <p className="mt-1 flex gap-1 text-[10px]">
-                {e.setores.map((s) => {
-                  const f = forca(c, s.lider);
-                  return (
-                    <span key={s.lider} className={f >= 2 ? 'text-accent' : f <= 0 ? 'text-accent-2' : 'text-muted'}>
-                      {f >= 2 ? '▲▲' : f === 1 ? '▲' : f === 0 ? '·' : '▼'}
-                    </span>
-                  );
-                })}
-              </p>
-            </button>
-          );
-        })}
+      <section aria-label="Suas cartas" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {eu.mao.map((c) => (
+          <CartaNaMao key={c.id} carta={c} pode={podeJogar(e, 'eu', c.id)} onJogar={(a) => lancar(c, a)} />
+        ))}
       </section>
-      <p className="text-center text-xs text-muted">
-        {carta ? 'Agora toque num setor da plateia para lançar o argumento.' : 'Escolha um argumento e toque no setor da plateia que mais gosta dele (▲▲).'}
+    </div>
+  );
+}
+
+function CartaNaMao({ carta, pode, onJogar }: { carta: CartaDuelo; pode: boolean; onJogar: (a?: Altura) => void }) {
+  const info = CARTAS[carta.tipo];
+  const ouro = '#f2c14e';
+  return (
+    <div className={`pixel-box flex flex-col gap-1 p-2 text-left transition ${pode ? '' : 'opacity-50'}`} style={info.rara ? { boxShadow: `0 0 0 2px ${ouro}, 0 0 16px -4px ${ouro}` } : undefined}>
+      <p className="flex items-center justify-between gap-1">
+        <span className="font-pixel text-[8px] leading-relaxed" style={{ color: info.rara ? ouro : VERDE }}>
+          {info.icone} {info.nome.toUpperCase()}
+        </span>
+        <span className="shrink-0 font-pixel text-[8px] text-accent" title="Custo em fôlego">
+          💨{info.custo}
+        </span>
+      </p>
+      <p className="line-clamp-2 text-[11px] italic leading-snug">"{carta.frase}"</p>
+      <p className="text-[10px] leading-snug text-muted">
+        {info.rara && <span style={{ color: ouro }}>RARA · </span>}
+        {info.efeito}
+      </p>
+      {info.comAltura ? (
+        <div className="mt-auto grid grid-cols-2 gap-1">
+          {(['alto', 'baixo'] as Altura[]).map((a) => (
+            <button
+              key={a}
+              type="button"
+              disabled={!pode}
+              onClick={() => onJogar(a)}
+              aria-label={`${info.nome} ${a}`}
+              className="pixel-box pixel-hover px-1 py-1.5 font-pixel text-[8px] disabled:cursor-not-allowed"
+            >
+              {a === 'alto' ? '▲ ALTO' : '▼ BAIXO'}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <button type="button" disabled={!pode} onClick={() => onJogar()} aria-label={`Usar ${info.nome}`} className="pixel-box pixel-hover mt-auto px-1 py-1.5 font-pixel text-[8px] disabled:cursor-not-allowed">
+          USAR
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Um gladiador no palco, com as poses: pulando, abaixado, escudo, tonto, imune. */
+function Gladiador({ lado, l, tempo, children }: { lado: Lado; l: Lutador; tempo: number; children: ReactNode }) {
+  const pulando = !!l.esquiva && l.esquiva.evita === 'baixo' && l.esquiva.ate >= tempo;
+  const abaixado = !!l.esquiva && l.esquiva.evita === 'alto' && l.esquiva.ate >= tempo;
+  const tonto = l.atordoadoAte > tempo;
+  const imune = l.imuneAte > tempo;
+  const escudo = l.escudo && l.escudo.ate >= tempo ? l.escudo : null;
+  const pose = pulando ? 'translateY(-55%)' : abaixado ? 'scaleY(0.55)' : 'none';
+  return (
+    <>
+      <div className={`absolute bottom-[4%] w-[13%] ${lado === 'eu' ? 'left-[8%]' : 'right-[8%]'}`}>
+        {imune && <div className="aura-imune pointer-events-none absolute -inset-[20%] rounded-full" />}
+        {tonto && <span className="absolute -top-[18%] left-1/2 z-10 -translate-x-1/2 text-lg sm:text-3xl">💫</span>}
+        <div className="pose" style={{ transform: pose, transformOrigin: 'bottom', filter: tonto ? 'grayscale(0.7)' : undefined }}>
+          {children}
+        </div>
+      </div>
+      {escudo && (
+        <span
+          className="surgir absolute z-10 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl"
+          style={{ left: `${ESCUDO_X[lado]}%`, top: `${ALTURA_Y[escudo.altura]}%`, filter: `drop-shadow(0 0 8px ${lado === 'eu' ? VERDE : VERMELHO})` }}
+          aria-hidden
+        >
+          🛡️
+        </span>
+      )}
+    </>
+  );
+}
+
+function Pontos({ nome, cor, vitorias, direita = false }: { nome: string; cor: string; vitorias: number; direita?: boolean }) {
+  return (
+    <div className={`flex flex-col gap-1 ${direita ? 'items-end' : 'items-start'}`}>
+      <p className="max-w-[24vw] truncate font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>
+        {nome.toUpperCase()}
+      </p>
+      <p className="flex gap-1" aria-label={`${vitorias} rodadas ganhas`}>
+        {[0, 1].map((i) => (
+          <span key={i} className="h-2.5 w-2.5 border border-white/40 sm:h-3 sm:w-3" style={{ background: i < vitorias ? cor : 'transparent' }} />
+        ))}
       </p>
     </div>
   );
 }
 
-/** Barra de um setor: metade esquerda é sua (verde), direita é do rival (vermelho). */
-function BarraSetor({ valor }: { valor: number }) {
+/** A plateia inteira: o meio é neutro, a esquerda é sua (verde), a direita é do rival. */
+function BarraPlateia({ valor }: { valor: number }) {
   const pct = (Math.abs(valor) / LIMITE) * 50;
   return (
-    <div className="relative mt-0.5 h-1.5 w-full bg-black/60 sm:h-2" aria-label={`Setor em ${valor}`} role="meter" aria-valuenow={valor} aria-valuemin={-LIMITE} aria-valuemax={LIMITE}>
-      <div className="absolute inset-y-0 left-1/2 w-px bg-white/60" />
+    <div className="relative mt-1 h-4 w-full bg-black/60 sm:h-5" role="meter" aria-label="Plateia" aria-valuenow={valor} aria-valuemin={-LIMITE} aria-valuemax={LIMITE}>
+      <div className="absolute inset-y-0 left-1/2 z-10 w-0.5 bg-white/70" />
       <div
         className="absolute inset-y-0 transition-all duration-300"
         style={valor >= 0 ? { left: `${50 - pct}%`, width: `${pct}%`, background: VERDE } : { left: '50%', width: `${pct}%`, background: VERMELHO }}
       />
+      <span className="absolute inset-0 flex items-center justify-center font-pixel text-[8px] text-white [text-shadow:1px_1px_0_#000]">
+        {valor > 0 ? `+${valor} SEU` : valor < 0 ? `${-valor} DO RIVAL` : 'DIVIDIDA'}
+      </span>
     </div>
   );
 }
 
-/** Rosas (a plateia amou) ou tomates (não gostou) caindo sobre quem lançou. */
-function Chuva({ tipo, lado }: { tipo: 'rosas' | 'tomates'; lado: Lado }) {
-  const x = lado === 'eu' ? 17 : 83;
+/** Rosas (acertou), tomates (levou o golpe) ou pétalas (evento) caindo da arquibancada. */
+function Chuva({ tipo, lado }: { tipo: 'rosas' | 'tomates' | 'petalas'; lado: Lado | null }) {
+  const x = lado === 'eu' ? 15 : lado === 'rival' ? 85 : 50;
+  const n = lado === null ? 12 : 5;
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-[35%] z-10 h-[60%]" aria-hidden>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <span key={i} className="chuva absolute text-base sm:text-2xl" style={{ left: `${x - 8 + i * 4}%`, animationDelay: `${i * 90}ms` }}>
-          {tipo === 'rosas' ? (i % 2 ? '🌹' : '🌿') : '🍅'}
+    <div className="pointer-events-none absolute inset-x-0 top-[25%] z-10 h-[70%]" aria-hidden>
+      {Array.from({ length: n }, (_, i) => (
+        <span
+          key={i}
+          className="chuva absolute text-base sm:text-2xl"
+          style={{ left: lado === null ? `${4 + i * 8}%` : `${x - 8 + i * 4}%`, animationDelay: `${(i % 5) * 90}ms`, animationIterationCount: lado === null ? 'infinite' : undefined }}
+        >
+          {tipo === 'rosas' ? (i % 2 ? '🌹' : '🌿') : tipo === 'tomates' ? '🍅' : '🌸'}
         </span>
       ))}
     </div>
   );
 }
 
-/** Fim: o polegar do César decide, e o placar dos setores. */
-function FimDuelo({ e, ia, rival, onDeNovo, onSair }: { e: Estado; ia: IaId; rival: IaId; onDeNovo: () => void; onSair: () => void }) {
-  const r = resultado(e.setores);
-  const pl = placar(e.setores);
+/** Fim: o polegar do César decide, com o placar das rodadas. */
+function FimDuelo({ e, ia, rival, onDeNovo, onSair }: { e: EstadoDuelo; ia: IaId; rival: IaId; onDeNovo: () => void; onSair: () => void }) {
+  const r = resultadoFinal(e);
   return (
     <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">
       <div className="relative w-24 sm:w-32">
@@ -430,21 +479,13 @@ function FimDuelo({ e, ia, rival, onDeNovo, onSair }: { e: Estado; ia: IaId; riv
       <h2 className={`pancada neon font-pixel text-3xl sm:text-5xl ${r === 'derrota' ? 'text-accent-2' : 'text-accent'}`}>
         {r === 'vitoria' ? 'VITÓRIA!' : r === 'derrota' ? 'DERROTA' : 'EMPATE'}
       </h2>
-      <p className="text-sm">
-        Setores: <span style={{ color: VERDE }}>{pl.eu} seus</span> × <span style={{ color: VERMELHO }}>{pl.rival} de {PERSONAGENS[rival].gladiador}</span>
+      <p className="font-pixel text-sm">
+        <span style={{ color: VERDE }}>{e.rodadas.eu}</span> × <span style={{ color: VERMELHO }}>{e.rodadas.rival}</span>
       </p>
-      <ul className="grid w-full max-w-md grid-cols-3 gap-2">
-        {e.setores.map((s) => (
-          <li key={s.lider} className="pixel-box p-2 text-xs">
-            <div className="mx-auto w-8">
-              <JuradoPixel jurado={s.lider} />
-            </div>
-            <p className="font-pixel text-[7px]">{JURADOS[s.lider].nome.toUpperCase()}</p>
-            <p style={{ color: s.valor > 0 ? VERDE : s.valor < 0 ? VERMELHO : undefined }}>{s.valor > 0 ? 'Seu' : s.valor < 0 ? 'Do rival' : 'Dividido'}</p>
-          </li>
-        ))}
-      </ul>
-      <p className="font-pixel text-[8px] text-muted">PROTÓTIPO · NÃO VALE TROFÉUS · {PERSONAGENS[ia].gladiador.toUpperCase()}</p>
+      <p className="text-sm">
+        Rodadas: <span style={{ color: VERDE }}>{PERSONAGENS[ia].gladiador}</span> contra <span style={{ color: VERMELHO }}>{PERSONAGENS[rival].gladiador}</span>
+      </p>
+      <p className="font-pixel text-[8px] text-muted">PROTÓTIPO · AINDA NÃO VALE TROFÉUS</p>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" autoFocus onClick={onDeNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
           ↻ JOGAR DE NOVO

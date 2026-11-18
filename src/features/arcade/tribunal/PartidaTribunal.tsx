@@ -24,6 +24,7 @@ import { PATENTES } from '@/game/ligas';
 import { PretorDestaque, VERDE, VERMELHO } from './visual';
 import { desbloquear, tocar } from '@/ui/som';
 import VereditoTribunal from './VereditoTribunal';
+import ComoJogar, { BotaoComoJogar, TUTORIAL_TRIBUNAL, useTutorial } from '../ComoJogar';
 
 const SEGUNDOS = 90;
 const NOMES_TEMPO = ['Sustentação oral', 'Réplica', 'Alegações finais'];
@@ -51,15 +52,18 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
   const [escolhida, setEscolhida] = useState<string | null>(null);
   const [modoHabilidade, setModoHabilidade] = useState(false);
   const [restante, setRestante] = useState(SEGUNDOS);
+  const tutorial = useTutorial('tribunal');
+  const modalTutorial = tutorial.aberto && <ComoJogar titulo="TRIBUNAL" slides={TUTORIAL_TRIBUNAL} onFechar={tutorial.fechar} />;
 
   // Cronômetro de 90 s por tempo; ao zerar, o tribunal joga uma carta por você.
   // O relógio é zerado nos botões que abrem um tempo (Começar e Próximo tempo),
   // nunca aqui, para o efeito de "tempo esgotado" não ver o valor velho.
+  // Com o tutorial aberto, o relógio para.
   useEffect(() => {
-    if (!comecou || e.fase !== 'escolha') return;
+    if (!comecou || e.fase !== 'escolha' || tutorial.aberto) return;
     const id = window.setInterval(() => setRestante((r) => r - 1), 1000);
     return () => window.clearInterval(id);
-  }, [comecou, e.fase, e.tempo]);
+  }, [comecou, e.fase, e.tempo, tutorial.aberto]);
 
   useEffect(() => {
     if (restante <= 0 && e.fase === 'escolha' && comecou) {
@@ -84,15 +88,21 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
 
   if (!comecou) {
     return (
-      <Briefing
-        e={e}
-        onComecar={() => {
-          desbloquear();
-          tocar('start');
-          setRestante(SEGUNDOS);
-          setComecou(true);
-        }}
-      />
+      <>
+        {modalTutorial}
+        <div className="flex justify-end">
+          <BotaoComoJogar onClick={tutorial.abrir} />
+        </div>
+        <Briefing
+          e={e}
+          onComecar={() => {
+            desbloquear();
+            tocar('start');
+            setRestante(SEGUNDOS);
+            setComecou(true);
+          }}
+        />
+      </>
     );
   }
 
@@ -114,6 +124,10 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
 
   return (
     <div className="flex flex-col gap-4">
+      {modalTutorial}
+      <div className="flex justify-end">
+        <BotaoComoJogar onClick={tutorial.abrir} />
+      </div>
       {/* Quem é quem: você (verde) contra o rival (vermelho), com a IA e o lado de cada um */}
       <FaixaCombatentes e={e} />
 

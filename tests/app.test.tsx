@@ -10,8 +10,31 @@ function abrir(rota: string) {
   );
 }
 
+/** Marca os tutoriais como vistos, para os testes irem direto ao jogo. */
+function tutoriaisVistos() {
+  localStorage.setItem('coliseu.tutorial.tribunal', '1');
+  localStorage.setItem('coliseu.tutorial.duelo', '1');
+}
+
 describe('App', () => {
-  beforeEach(() => sessionStorage.clear());
+  beforeEach(() => {
+    sessionStorage.clear();
+    tutoriaisVistos();
+  });
+
+  it('o tutorial do Tribunal abre sozinho na primeira vez e depois pelo botão', () => {
+    localStorage.removeItem('coliseu.tutorial.tribunal');
+    abrir('/arena/tribunal');
+    fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+    fireEvent.click(screen.getByRole('button', { name: /ENTRAR NA SESSÃO/ }));
+    const dialogo = screen.getByRole('dialog', { name: /Como jogar: TRIBUNAL/ });
+    for (let i = 0; i < 4; i++) fireEvent.click(within(dialogo).getByRole('button', { name: /PRÓXIMO/ }));
+    fireEvent.click(within(dialogo).getByRole('button', { name: /ENTENDI/ }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(localStorage.getItem('coliseu.tutorial.tribunal')).toBe('1');
+    fireEvent.click(screen.getByRole('button', { name: /COMO JOGAR/ }));
+    expect(screen.getByRole('dialog', { name: /Como jogar: TRIBUNAL/ })).toBeInTheDocument();
+  });
 
   it('mostra os três portais na tela inicial', () => {
     abrir('/');
@@ -203,17 +226,23 @@ describe('mapa de troféus na tela', () => {
 });
 
 describe('duelo jogável (protótipo)', () => {
-  it('lança um argumento num setor e termina com o polegar do César', () => {
+  it('tutorial na primeira vez, golpes e esquiva, e o polegar do César no fim das rodadas', () => {
+    localStorage.removeItem('coliseu.tutorial.duelo');
     vi.useFakeTimers();
     try {
       abrir('/arena/duelo');
       fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
       fireEvent.click(screen.getByRole('button', { name: /LUTAR/ }));
-      const mao = within(screen.getByRole('region', { name: 'Seus argumentos' })).getAllByRole('button');
-      expect(mao).toHaveLength(4);
-      fireEvent.click(mao[0]!);
-      fireEvent.click(screen.getAllByRole('button', { name: /Setor do/ })[1]!);
-      for (let i = 0; i < 62; i++) {
+      const dialogo = screen.getByRole('dialog', { name: /Como jogar: DUELO/ });
+      fireEvent.click(within(dialogo).getByRole('button', { name: /PULAR/ }));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('meter', { name: 'Plateia' })).toBeInTheDocument();
+      const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
+      expect(botoes.length).toBeGreaterThanOrEqual(4);
+      fireEvent.click(botoes.find((b) => !(b as HTMLButtonElement).disabled)!);
+      fireEvent.keyDown(window, { key: 'ArrowUp' });
+      // Até 3 rodadas de 25 s, com intervalos.
+      for (let i = 0; i < 90; i++) {
         act(() => {
           vi.advanceTimersByTime(1000);
         });
