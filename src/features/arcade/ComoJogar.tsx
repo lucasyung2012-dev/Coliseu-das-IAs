@@ -113,14 +113,12 @@ export default function ComoJogar({ titulo, slides, onFechar }: { titulo: string
 }
 
 export const TUTORIAL_DUELO: Slide[] = [
-  { icone: '🏟️', titulo: 'CONQUISTE A PLATEIA', texto: 'A barra lá em cima é a plateia. Cada golpe que acerta puxa ela para o seu lado (verde). Puxou até o fim, ou estava na frente quando o tempo acabou: a rodada é sua. Quem ganhar 2 rodadas vence.' },
-  { icone: '⚔️', titulo: 'CARTAS SÃO GOLPES', texto: 'Cada carta traz uma frase do debate e custa fôlego. Argumento (⚔️) é rápido, Argumento forte (💥) é lento mas puxa muito. Toque em ▲ ALTO ou ▼ BAIXO na carta para lançar naquela altura.' },
-  { icone: '🤸', titulo: 'PULE OU ABAIXE', texto: 'Golpe BAIXO vindo? PULE (⬆ ou W). Golpe ALTO? ABAIXE (⬇ ou S). Esquivar é de graça, mas precisa de um tempinho para recarregar.' },
-  { icone: '🛡️', titulo: 'ESCUDO E RÉPLICA', texto: 'O Escudo bloqueia a altura que você escolher por 1,5 s. A Réplica (🔁), bem na hora em que o golpe vai bater, devolve ele mais forte!' },
-  { icone: '🔗', titulo: 'COMBOS', texto: 'Retórica em cadeia: 2 Argumentos e depois um Forte, rapidinho, e o Forte voa em dobro de velocidade. Contra-ataque perfeito: atacou logo depois de bloquear? Golpe em dobro!' },
-  { icone: '⭐', titulo: 'GOLPE FINAL', texto: 'Cada acerto dá um aplauso. Com 5, solte o golpe final da sua IA (ESPAÇO): Muralha de escudos (Claude), Rede (ChatGPT) ou Raio solar (Gemini).' },
-  { icone: '🦁', titulo: 'A ARENA TEM SURPRESAS', texto: 'Às vezes soltam o leão (PULE!), a arena fica em silêncio (sem fôlego novo) ou chove pétalas (aplausos em dobro). Fique de olho no aviso!' },
+  { icone: '🏟️', titulo: 'CONQUISTE A PLATEIA', texto: 'A barra lá em cima é a plateia. Cada golpe que chega no rival puxa ela para o seu lado (verde). Puxou até o fim, ou estava na frente quando o tempo acabou: a rodada é sua. Quem ganhar 2 rodadas vence.' },
+  { icone: '⚔️', titulo: 'UM TOQUE, UM GOLPE', texto: 'Toque numa carta para lançar o golpe. Cada carta custa fôlego (💨), que volta sozinho. O número no golpe é a força: Argumento tem força 2, Argumento forte tem força 4.' },
+  { icone: '💥', titulo: 'CHOQUE NO AR', texto: 'Quando o seu golpe encontra o do rival no meio, o mais forte passa, com a força que sobrou. Força igual, os dois somem. Para se defender, ataque!' },
+  { icone: '⭐', titulo: 'RARAS E GOLPE FINAL', texto: 'Cartas douradas são raras: o Dado atravessa os golpes do rival. Cada acerto dá um aplauso; com 5, solte o golpe final da sua IA.' },
 ];
+
 
 export const TUTORIAL_TRIBUNAL: Slide[] = [
   { icone: '⚖️', titulo: 'CONVENÇA O JÚRI', texto: 'Um dilema, dois lados: você (verde) contra o rival (vermelho). Cinco jurados decidem quem argumentou melhor em 3 tempos.' },

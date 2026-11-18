@@ -226,7 +226,7 @@ describe('mapa de troféus na tela', () => {
 });
 
 describe('duelo jogável (protótipo)', () => {
-  it('tutorial na primeira vez, golpes e esquiva, e o polegar do César no fim das rodadas', () => {
+  it('tutorial na primeira vez, golpes no toque e no teclado, e o polegar do César no fim das rodadas', () => {
     localStorage.removeItem('coliseu.tutorial.duelo');
     vi.useFakeTimers();
     try {
@@ -240,9 +240,8 @@ describe('duelo jogável (protótipo)', () => {
       const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
       expect(botoes.length).toBeGreaterThanOrEqual(4);
       fireEvent.click(botoes.find((b) => !(b as HTMLButtonElement).disabled)!);
-      fireEvent.keyDown(window, { key: 'ArrowUp' });
-      // Até 3 rodadas de 25 s, com intervalos.
-      for (let i = 0; i < 90; i++) {
+      // Até 3 rodadas de 30 s, com intervalos.
+      for (let i = 0; i < 100; i++) {
         act(() => {
           vi.advanceTimersByTime(1000);
         });
