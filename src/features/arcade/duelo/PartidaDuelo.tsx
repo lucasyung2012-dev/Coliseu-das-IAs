@@ -294,16 +294,15 @@ export default function PartidaDuelo({
             {manga && (
               <div className="flex flex-col items-center gap-0.5" aria-label={`Carta na manga: ${CARTAS[manga.tipo].nome}`}>
                 <span className="font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">NA MANGA</span>
-                <span className="relative block w-14 pt-2 sm:w-[4.5rem]">
-                  {/* A manga da toga, com a carta saindo dela */}
-                  <span key={manga.id} className="surgir relative z-0 block w-[80%] -rotate-12">
+                <span className="relative block w-16 pb-[45%] sm:w-20">
+                  {/* A carta saindo da manga, inclinada */}
+                  <span key={manga.id} className="surgir relative z-0 block w-[64%] -rotate-12">
                     <CartaVisual tipo={manga.tipo} paleta={c.paleta} corNome={c.cor} tamanho="mini" />
                   </span>
-                  <span
-                    className="absolute -bottom-1 -right-1 z-10 h-[45%] w-[70%] rounded-[50%_50%_40%_40%] border-2 border-[#8a7f6a]"
-                    style={{ background: 'linear-gradient(160deg, #f4efe2, #cfc6b0)', boxShadow: `inset -3px -3px 0 ${c.escura}` }}
-                    aria-hidden
-                  />
+                  {/* A manga da toga em pixel: o braço, as dobras, o punho na cor do lado e a mão segurando a carta */}
+                  <span className="absolute bottom-0 right-[-8%] z-10 block w-[80%]" aria-hidden>
+                    <Sprite grade={MANGA} paleta={c.paleta} />
+                  </span>
                 </span>
               </div>
             )}
