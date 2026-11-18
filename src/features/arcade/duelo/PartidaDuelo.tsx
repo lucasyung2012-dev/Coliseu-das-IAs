@@ -11,7 +11,6 @@ import {
   custoAgora,
   emVirada,
   FOLEGO_MAX,
-  GLADIADOR_RECARGA_MS,
   golpeDoGladiador,
   HABILIDADES,
   jogarCarta,
