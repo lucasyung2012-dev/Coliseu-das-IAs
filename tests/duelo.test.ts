@@ -47,12 +47,15 @@ describe('duelo v4: tropas de argumentos', () => {
     expect([conta('argumento'), conta('forte'), conta('dado'), conta('capciosa'), conta('apelo')]).toEqual([8, 4, 1, 1, 1]);
   });
 
-  it('segurar e soltar: metade da carga dá +1, carga cheia dá +2 (o arqueiro não ganha)', () => {
-    expect([bonusDaCarga(0), bonusDaCarga(0.4), bonusDaCarga(0.5), bonusDaCarga(1)]).toEqual([0, 0, 1, 2]);
+  it('segurar e soltar: carga cheia dá só +1 e custa +1 de fôlego (o arqueiro não carrega)', () => {
+    expect([bonusDaCarga(0), bonusDaCarga(0.6), bonusDaCarga(1)]).toEqual([0, 0, 1]);
     const s = comMao(base(), 'eu', ['argumento', 'dado'], 20);
-    const forte = jogarCarta(s, 'eu', 'eu0', 1).tropas[0]!;
-    expect(forte.forca).toBe(4);
-    expect(forte.carregada).toBe(true);
+    const depois = jogarCarta(s, 'eu', 'eu0', 1);
+    expect(depois.tropas[0]).toMatchObject({ forca: 3, carregada: true });
+    expect(depois.eu.folego).toBe(17);
+    // Sem fôlego sobrando para a carga, a tropa sai normal.
+    const semFolego = jogarCarta(comMao(base(), 'eu', ['argumento'], 2), 'eu', 'eu0', 1);
+    expect(semFolego.tropas[0]!.forca).toBe(2);
     expect(jogarCarta(s, 'eu', 'eu1', 1).tropas[0]!.forca).toBe(1);
   });
 
@@ -89,7 +92,7 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(golpeDoGladiador(s, 'eu')).toBe(s);
   });
 
-  it('Claude (Ponderação): o escudo segura golpes que chegariam', () => {
+  it('Claude (Escudo): o escudo segura golpes que chegariam', () => {
     let s = base();
     s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'claude');
     expect(s.eu.escudo).toBe(2);
@@ -98,7 +101,7 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(s.eu.escudo).toBe(1);
   });
 
-  it('ChatGPT (Improviso): só a próxima carta sai de graça', () => {
+  it('ChatGPT (Carta grátis): só a próxima carta sai de graça', () => {
     let s = comMao(base(), 'eu', ['forte', 'forte']);
     s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'chatgpt');
     s = jogarCarta(s, 'eu', 'eu0');
@@ -107,7 +110,7 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(s.eu.folego).toBe(6);
   });
 
-  it('Gemini (Visão): o raio tira 3 da tropa inimiga mais perto, não limpa a arena', () => {
+  it('Gemini (Raio): o raio tira 3 da tropa inimiga mais perto, não limpa a arena', () => {
     let s = { ...base(), tropas: [tropa('rival', 40, 4, 1), tropa('rival', 70, 4, 2)] };
     s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'gemini');
     expect(s.tropas.map((t) => t.forca)).toEqual([1, 4]);

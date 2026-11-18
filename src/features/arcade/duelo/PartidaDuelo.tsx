@@ -11,6 +11,7 @@ import {
   custoAgora,
   emVirada,
   FOLEGO_MAX,
+  GLADIADOR_ALCANCE,
   golpeDoGladiador,
   HABILIDADES,
   jogarCarta,
@@ -203,11 +204,23 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         {(['eu', 'rival'] as Lado[]).map((l) => (
           <div key={l} className="pointer-events-none absolute bottom-[3%] top-[45%] w-0.5 opacity-50" style={{ left: `${PONTA[l]}%`, background: COR[l].cor }} />
         ))}
+        {/* Alcance do gladiador: tropa inimiga que entra aqui leva golpe */}
+        {(['eu', 'rival'] as Lado[]).map((l) => (
+          <div
+            key={`alcance-${l}`}
+            className="pointer-events-none absolute bottom-[2%] flex h-[7%] items-end justify-center border-2 border-dashed"
+            style={{ left: `${PONTA[l] - GLADIADOR_ALCANCE}%`, width: `${GLADIADOR_ALCANCE * 2}%`, borderColor: COR[l].cor, background: `color-mix(in srgb, ${COR[l].cor} 14%, transparent)` }}
+          >
+            <span className="font-pixel text-[5px] opacity-70 sm:text-[7px]" style={{ color: COR[l].cor }}>
+              ALCANCE
+            </span>
+          </div>
+        ))}
 
-        <Gladiador lado="eu" l={eu} tempo={e.tempo} onTocar={gladiador}>
+        <Gladiador lado="eu" l={eu} tempo={e.tempo} golpeando={e.efeitos.some((x) => x.tipo === 'golpe' && x.lado === 'eu')} onTocar={gladiador}>
           <GladiadorEnfeitado ia={ia} parado />
         </Gladiador>
-        <Gladiador lado="rival" l={e.rival} tempo={e.tempo}>
+        <Gladiador lado="rival" l={e.rival} tempo={e.tempo} golpeando={e.efeitos.some((x) => x.tipo === 'golpe' && x.lado === 'rival')}>
           <GladiadorPixel ia={rival} liga={liga} espelhar />
         </Gladiador>
 
@@ -282,23 +295,32 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
             ))}
           </div>
         </div>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
           disabled={!gladiadorPronto || e.fase !== 'luta'}
           onClick={gladiador}
-          className="pixel-box pixel-hover px-2 py-2 font-pixel text-[8px] disabled:opacity-40 sm:text-[9px]"
+          className="pixel-box pixel-hover flex flex-col items-center gap-1 px-2 py-2 text-center disabled:opacity-40"
         >
-          🗡️ GLADIADOR {gladiadorPronto ? '' : Math.ceil((eu.gladiadorProntoEm - e.tempo) / 1000) + 's'}
+          <span className="font-pixel text-[8px] sm:text-[10px]">
+            🗡️ GOLPE DO GLADIADOR {gladiadorPronto ? '' : `· ${Math.ceil((eu.gladiadorProntoEm - e.tempo) / 1000)}s`}
+          </span>
+          <span className="text-[9px] leading-tight text-muted sm:text-[11px]">Ele já bate sozinho em quem entra no ALCANCE. Toque: golpe extra (-1).</span>
         </button>
         <button
           type="button"
           disabled={eu.carga < SUPER_MAX || e.fase !== 'luta'}
           onClick={habilidade}
-          title={HABILIDADES[ia].efeito}
-          className={`pixel-box pixel-hover px-2 py-2 font-pixel text-[8px] text-[rgb(242_193_78)] disabled:opacity-40 sm:text-[9px] ${eu.carga >= SUPER_MAX ? 'piscar' : ''}`}
+          className={`pixel-box pixel-hover flex flex-col items-center gap-1 px-2 py-2 text-center disabled:opacity-40 ${eu.carga >= SUPER_MAX ? 'piscar' : ''}`}
         >
-          ⭐ {HABILIDADES[ia].nome.toUpperCase()} {'●'.repeat(eu.carga)}
-          {'○'.repeat(SUPER_MAX - eu.carga)}
+          <span className="font-pixel text-[8px] text-[rgb(242_193_78)] sm:text-[10px]">
+            {HABILIDADES[ia].icone} {HABILIDADES[ia].nome.toUpperCase()} {'●'.repeat(eu.carga)}
+            {'○'.repeat(SUPER_MAX - eu.carga)}
+          </span>
+          <span className="text-[9px] leading-tight text-muted sm:text-[11px]">
+            {HABILIDADES[ia].efeito} {eu.carga < SUPER_MAX && `Enche com ${SUPER_MAX} tropas que chegam.`}
+          </span>
         </button>
       </div>
 
@@ -319,7 +341,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           />
         ))}
       </section>
-      <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure para carregar um argumento forte</p>
+      <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💨)</p>
     </div>
   );
 }
@@ -385,11 +407,10 @@ function CartaNaMao(props: {
         <span className={custo === 0 ? 'text-[rgb(242_193_78)]' : ''}>💨{custo}</span>
       </span>
       <span className="hidden font-pixel text-[7px] text-muted sm:block">[{numero}]</span>
-      {/* Barra de carga: metade = +1, cheia = +2 */}
+      {/* Barra de carga: cheia = +1 de força (custa +1 de fôlego) */}
       {carrega && (
         <span className="absolute inset-x-0 bottom-0 h-1.5 bg-black/50" aria-hidden>
           {carregando && <span className="carga-enchendo absolute inset-y-0 left-0" style={{ animationDuration: `${CARGA_MS}ms` } as CSSProperties} />}
-          <span className="absolute inset-y-0 left-1/2 w-px bg-white/60" />
         </span>
       )}
     </button>
@@ -397,7 +418,7 @@ function CartaNaMao(props: {
 }
 
 /** Gladiador de cada lado: defende a ponta. O seu dá um golpe quando você toca nele. */
-function Gladiador({ lado, l, tempo, onTocar, children }: { lado: Lado; l: Lutador; tempo: number; onTocar?: () => void; children: ReactNode }) {
+function Gladiador({ lado, l, tempo, golpeando, onTocar, children }: { lado: Lado; l: Lutador; tempo: number; golpeando: boolean; onTocar?: () => void; children: ReactNode }) {
   const preso = l.presoAte > tempo;
   const pronto = l.gladiadorProntoEm <= tempo;
   const corpo = (
@@ -412,7 +433,9 @@ function Gladiador({ lado, l, tempo, onTocar, children }: { lado: Lado; l: Lutad
       )}
       {preso && <span className="absolute -top-[15%] left-1/2 z-10 -translate-x-1/2 text-lg sm:text-3xl">💫</span>}
       {l.escudo > 0 && <span className="absolute -top-[2%] left-1/2 z-10 -translate-x-1/2 text-sm sm:text-xl">{'🛡️'.repeat(l.escudo)}</span>}
-      <div style={{ filter: preso ? 'grayscale(0.7)' : undefined }}>{children}</div>
+      <div className={golpeando ? (lado === 'eu' ? 'investida-esq' : 'investida-dir') : ''} style={{ filter: preso ? 'grayscale(0.7)' : undefined }}>
+        {children}
+      </div>
     </>
   );
   const pos = `absolute bottom-[4%] w-[12%] ${lado === 'eu' ? 'left-[3%]' : 'right-[3%]'}`;

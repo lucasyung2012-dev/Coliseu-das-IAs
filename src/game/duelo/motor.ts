@@ -35,9 +35,13 @@ const GOLPE_LUTA_MS = 500;
 
 /** Segurar e soltar: tempo para carregar a carta até o máximo. */
 export const CARGA_MS = 1200;
-/** Força extra pela carga: metade = +1, cheia = +2. */
+/**
+ * Carga cheia: +1 de força, pagando +1 de fôlego (sem fôlego sobrando, sai normal).
+ * Antes era +2 de graça e ficou forte demais (teste do Lucas, 20/11/2026).
+ */
+export const CUSTO_CARGA = 1;
 export function bonusDaCarga(carga: number): number {
-  return carga >= 1 ? 2 : carga >= 0.5 ? 1 : 0;
+  return carga >= 1 ? 1 : 0;
 }
 
 export interface InfoCarta {
@@ -68,16 +72,16 @@ export const MAX_ARQUEIROS = 2;
 
 /** Gladiador: 1 golpe automático a cada 3 s em quem chega perto; toque = golpe na hora (recarga 8 s). */
 const GLADIADOR_AUTO_MS = 3000;
-const GLADIADOR_ALCANCE = 8;
+export const GLADIADOR_ALCANCE = 8;
 export const GLADIADOR_RECARGA_MS = 8000;
 const GLADIADOR_ALCANCE_TOQUE = 25;
 
 /** Habilidade da IA: enche com 4 acertos. */
 export const SUPER_MAX = 4;
-export const HABILIDADES: Record<IaId, { nome: string; efeito: string }> = {
-  claude: { nome: 'Ponderação', efeito: 'Um escudo segura os próximos 2 golpes que chegariam em você.' },
-  chatgpt: { nome: 'Improviso', efeito: 'A próxima carta sai de graça.' },
-  gemini: { nome: 'Visão', efeito: 'Um raio tira 3 de força da tropa inimiga mais perto.' },
+export const HABILIDADES: Record<IaId, { nome: string; icone: string; efeito: string }> = {
+  claude: { nome: 'Escudo', icone: '🛡️', efeito: 'Bloqueia os próximos 2 golpes que chegariam em você.' },
+  chatgpt: { nome: 'Carta grátis', icone: '🃏', efeito: 'A próxima carta não custa fôlego.' },
+  gemini: { nome: 'Raio', icone: '⚡', efeito: 'Tira 3 de força da tropa inimiga mais perto.' },
 };
 
 export interface CartaDuelo {
@@ -228,6 +232,9 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, carga =
   const carta = s0[lado].mao.find((c) => c.id === cartaId)!;
   const info = CARTAS[carta.tipo];
   const agora = s0.tempo;
+  const custo = custoAgora(s0[lado], carta.tipo);
+  // O arqueiro é frágil de propósito: não carrega. A carga custa +1 de fôlego.
+  const bonus = info.tropa && info.tropa !== 'arqueiro' && s0[lado].folego - custo >= CUSTO_CARGA ? bonusDaCarga(carga) : 0;
   let s = comLutador(s0, lado, (l) => {
     const mao = l.mao.filter((c) => c.id !== carta.id);
     const [proxima, ...resto] = l.monte;
@@ -236,7 +243,7 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, carga =
       ...l,
       mao,
       monte: [...resto, carta],
-      folego: l.folego - custoAgora(l, carta.tipo),
+      folego: l.folego - custo - (bonus > 0 ? CUSTO_CARGA : 0),
       gratis: false,
       fala: { texto: carta.frase, ate: agora + 1800 },
     };
@@ -250,16 +257,14 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, carga =
     s = efeito(s, 'acerto', lado);
     return { ...s, plateia: limitar(s.plateia + sinal(lado)) };
   }
-  // O arqueiro é frágil de propósito: a carga não aumenta a vida dele.
-  const bonus = info.tropa === 'arqueiro' ? 0 : bonusDaCarga(carga);
   const forca = info.forca + bonus;
-  if (bonus === 2) s = avisar(s, '💪 ARGUMENTO FORTE!', lado, 1000);
+  if (bonus > 0) s = avisar(s, '💪 CARREGADO! +1', lado, 900);
   return {
     ...s,
     seq: s.seq + 1,
     tropas: [
       ...s.tropas,
-      { id: s.seq + 1, de: lado, tipo: info.tropa!, forca, forcaInicial: forca, x: PONTA[lado], carregada: bonus === 2, proximoGolpe: agora },
+      { id: s.seq + 1, de: lado, tipo: info.tropa!, forca, forcaInicial: forca, x: PONTA[lado], carregada: bonus > 0, proximoGolpe: agora },
     ],
   };
 }
@@ -401,11 +406,11 @@ function vezDoRival(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   const temCenturiao = s.tropas.some((t) => t.de === 'eu' && t.tipo === 'centuriao');
   const forte = jogaveis.find((c) => c.tipo === 'forte');
   const escolhida = temCenturiao && forte ? forte : jogaveis[Math.floor(ctx.aleatorio() * jogaveis.length)];
-  // Ritmo: de ~4,5 s (liga baixa) a ~3 s (liga alta) entre jogadas
-  s = { ...s, proximoRival: agora + 4500 - ctx.acerto * 1500 + ctx.aleatorio() * 1000 };
+  // Ritmo: de ~3,4 s (liga baixa) a ~2,5 s (liga alta) entre jogadas
+  s = { ...s, proximoRival: agora + 3600 - ctx.acerto * 1600 + ctx.aleatorio() * 800 };
   if (!escolhida) return s;
-  // Carga: quanto melhor a liga, mais vezes carrega até o máximo
-  const carga = ctx.aleatorio() < ctx.acerto * 0.6 ? 1 : ctx.aleatorio() < 0.5 ? 0.5 : 0;
+  // Carga: quanto melhor a liga, mais vezes carrega (pagando +1 de fôlego)
+  const carga = ctx.aleatorio() < 0.2 + ctx.acerto * 0.5 ? 1 : 0;
   return jogarCarta(s, 'rival', escolhida.id, carga);
 }
 
