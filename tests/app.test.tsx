@@ -127,3 +127,22 @@ describe('App', () => {
     }
   });
 });
+
+describe('apagar progresso', () => {
+  it('pede duas confirmações e só apaga depois de digitar APAGAR', () => {
+    sessionStorage.setItem('coliseu.boot.vista', '1');
+    localStorage.setItem(
+      'coliseu.progresso.v1',
+      JSON.stringify({ versao: 1, iaAtual: 'claude', trofeus: { claude: 120, chatgpt: 0, gemini: 0 }, xp: { claude: 0, chatgpt: 0, gemini: 0 }, partidas: [] }),
+    );
+    abrir('/arena');
+    fireEvent.click(screen.getByRole('button', { name: /APAGAR PROGRESSO/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'CONTINUAR' }));
+    const apagar = screen.getByRole('button', { name: 'APAGAR TUDO' });
+    expect(apagar).toBeDisabled();
+    fireEvent.change(screen.getByLabelText(/digite/), { target: { value: 'apagar' } });
+    fireEvent.click(apagar);
+    expect(screen.getByText(/PROGRESSO APAGADO/)).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem('coliseu.progresso.v1')!).trofeus.claude).toBe(0);
+  });
+});

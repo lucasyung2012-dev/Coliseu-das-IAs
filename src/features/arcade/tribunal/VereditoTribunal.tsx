@@ -4,7 +4,8 @@ import { JURADOS } from '@/game/jurados';
 import { registrarPartida, type Partida } from '@/game/progresso';
 import { FALAS_PRETOR } from '@/game/tribunal/temas';
 import { cartaDecisiva, veredito, type EstadoTribunal, type Voto } from '@/game/tribunal/motor';
-import { JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import { JuradoPixel } from '@/ui/pixel/Personagens';
+import { PretorDestaque, VERDE, VERMELHO } from './visual';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear, tocar } from '@/ui/som';
 import { Faiscas } from '../cenas/Palco';
@@ -56,26 +57,19 @@ export default function VereditoTribunal({ estado: e, onRevanche, onSair }: { es
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="pixel-box relative flex items-center gap-4 overflow-hidden p-4">
-        <div className="w-16 shrink-0 sm:w-24">
-          <PretorPixel />
-        </div>
-        <div>
-          <p className="font-pixel text-[9px] text-[rgb(242_193_78)]">PRETOR SUPREMO</p>
-          <p className="mt-1 text-sm italic text-muted">"{FALAS_PRETOR.veredito}"</p>
+      <PretorDestaque fala={FALAS_PRETOR.veredito}>
           <p className="mt-2 font-pixel text-lg tabular-nums">
-            <span style={{ color: `rgb(${voce.cor})` }}>{Math.min(v.jogador, contar(e, revelados, 'jogador'))}</span>
+            <span style={{ color: VERDE }}>{Math.min(v.jogador, contar(e, revelados, 'jogador'))}</span>
             <span className="text-muted"> × </span>
-            <span style={{ color: `rgb(${dele.cor})` }}>{Math.min(v.rival, contar(e, revelados, 'rival'))}</span>
+            <span style={{ color: VERMELHO }}>{Math.min(v.rival, contar(e, revelados, 'rival'))}</span>
           </p>
-        </div>
-      </div>
+      </PretorDestaque>
 
       <ul className="grid grid-cols-5 gap-1.5 sm:gap-3" aria-label="Votos do júri">
         {e.jurados.map((j, i) => {
           const voto = v.votos[j]!;
           const aberto = i < revelados;
-          const cor = voto === 'jogador' ? `rgb(${voce.cor})` : voto === 'rival' ? `rgb(${dele.cor})` : 'rgb(var(--line))';
+          const cor = voto === 'jogador' ? VERDE : voto === 'rival' ? VERMELHO : 'rgb(var(--line))';
           return (
             <li
               key={j}
@@ -87,7 +81,7 @@ export default function VereditoTribunal({ estado: e, onRevanche, onSair }: { es
               </div>
               <p className="mt-1 truncate font-pixel text-[6px] sm:text-[8px]">{JURADOS[j].nome.toUpperCase()}</p>
               <p className="mt-1 font-pixel text-[7px] sm:text-[9px]" style={{ color: aberto ? cor : undefined }}>
-                {aberto ? (voto === 'jogador' ? voce.gladiador.toUpperCase() : voto === 'rival' ? dele.gladiador.toUpperCase() : 'DIVIDIDO') : '?'}
+                {aberto ? (voto === 'jogador' ? 'VOCÊ' : voto === 'rival' ? 'RIVAL' : 'DIVIDIDO') : '?'}
               </p>
             </li>
           );

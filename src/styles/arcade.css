@@ -543,3 +543,26 @@
   to { transform: scale(1.6); opacity: 0; }
 }
 @keyframes letreiro { 50% { filter: brightness(1.4); } }
+
+/* ===== Pretor em destaque ===== */
+.pretor-destaque {
+  background:
+    radial-gradient(ellipse at 15% 50%, rgb(242 193 78 / 0.22), transparent 55%),
+    linear-gradient(90deg, rgb(90 20 30 / 0.55), rgb(var(--surface)) 70%);
+  box-shadow:
+    0 -3px 0 0 rgb(242 193 78),
+    0 3px 0 0 rgb(242 193 78),
+    -3px 0 0 0 rgb(242 193 78),
+    3px 0 0 0 rgb(242 193 78),
+    0 0 36px -6px rgb(242 193 78 / 0.6);
+}
+.aura-pretor {
+  background: radial-gradient(circle, rgb(242 193 78 / 0.55), transparent 65%);
+  animation: aura-pretor 2.4s ease-in-out infinite;
+}
+@keyframes aura-pretor {
+  50% { transform: scale(1.12); opacity: 0.6; }
+}
+.neon-ouro {
+  text-shadow: 0 0 6px rgb(242 193 78 / 0.9), 0 0 18px rgb(242 193 78 / 0.5), 2px 2px 0 rgb(140 30 40);
+}

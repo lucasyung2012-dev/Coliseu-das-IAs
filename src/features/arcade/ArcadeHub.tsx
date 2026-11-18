@@ -7,6 +7,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
 import { LOUROS, PALETA_OURO } from '@/ui/pixel/sprites';
 import BootArcade from './BootArcade';
+import ApagarProgresso from './ApagarProgresso';
 import { desbloquear, tocar } from '@/ui/som';
 
 const CHAVE_BOOT = 'coliseu.boot.vista';
@@ -183,6 +184,7 @@ export default function ArcadeHub() {
         </section>
 
         <Historico partidas={p.partidas} />
+        <ApagarProgresso />
       </div>
     </main>
   );

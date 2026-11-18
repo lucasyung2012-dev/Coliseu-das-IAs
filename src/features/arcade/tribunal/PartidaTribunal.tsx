@@ -17,7 +17,8 @@ import {
   usarHabilidade,
   type EstadoTribunal,
 } from '@/game/tribunal/motor';
-import { JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import { PretorDestaque, VERDE, VERMELHO } from './visual';
 import { desbloquear, tocar } from '@/ui/som';
 import VereditoTribunal from './VereditoTribunal';
 
@@ -25,6 +26,7 @@ const SEGUNDOS = 90;
 const NOMES_TEMPO = ['Sustentação oral', 'Réplica', 'Alegações finais'];
 
 const corDe = (id: IaId) => `rgb(${PERSONAGENS[id].cor})`;
+const FALAS_DO_TEMPO = ['Apresentem suas teses!', 'Agora, respondam ao rival!', 'Alegações finais: este tempo vale mais!'];
 
 interface Props {
   ia: IaId;
@@ -66,7 +68,6 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
 
   const voce = PERSONAGENS[ia];
   const dele = PERSONAGENS[rival];
-  const lado = e.dilema.lados[e.ladoJogador];
   const ultima = e.rodadas[e.rodadas.length - 1];
 
   if (e.fase === 'fim') {
@@ -105,18 +106,21 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Placar do tempo */}
-      <div className="pixel-box flex flex-wrap items-center justify-between gap-3 p-3">
-        <div className="min-w-0">
-          <p className="font-pixel text-[9px] text-muted">
+      {/* Quem é quem: você (verde) contra o rival (vermelho), com a IA e o lado de cada um */}
+      <FaixaCombatentes e={e} />
+
+      {/* Tempo, dilema e cronômetro, com o Pretor anunciando o tempo */}
+      <div className="pixel-box flex items-center gap-3 p-3">
+        <div className="w-10 shrink-0 sm:w-12">
+          <PretorPixel />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-pixel text-[9px] text-[rgb(242_193_78)]">
             TEMPO {e.tempo + 1}/{TOTAL_TEMPOS} · {NOMES_TEMPO[e.tempo]!.toUpperCase()}
-            {e.tempo === TOTAL_TEMPOS - 1 && <span className="text-[rgb(242_193_78)]"> · VALE 1,5×</span>}
+            {e.tempo === TOTAL_TEMPOS - 1 && ' · VALE 1,5×'}
           </p>
           <p className="mt-1 text-sm font-semibold">{e.dilema.pergunta}</p>
-          <p className="text-xs text-muted">
-            Você defende: <span style={{ color: corDe(ia) }}>{lado.nome}</span> · {dele.gladiador} defende:{' '}
-            <span style={{ color: corDe(rival) }}>{e.dilema.lados[ladoRival(e.ladoJogador)].nome}</span>
-          </p>
+          <p className="text-xs italic text-muted">Pretor: "{FALAS_DO_TEMPO[e.tempo]}"</p>
         </div>
         {e.fase === 'escolha' && (
           <p className={`font-pixel text-lg tabular-nums ${restante <= 10 ? 'piscar text-accent-2' : 'text-accent'}`} aria-label={`${restante} segundos`}>
@@ -126,7 +130,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
       </div>
 
       {/* Avisos do rival e do Pretor */}
-      {e.fase === 'escolha' && e.avisos.map((a) => <Aviso key={a} texto={textoAviso(a, rival)} cor={corDe(rival)} />)}
+      {e.fase === 'escolha' && e.avisos.map((a) => <Aviso key={a} texto={textoAviso(a, rival)} cor={VERMELHO} />)}
       {e.fase === 'revelacao' && ultima?.automatica && <Aviso texto={`Pretor: "${FALAS_PRETOR.tempoEsgotado}"`} cor="rgb(242 193 78)" />}
 
       {/* Júri */}
@@ -136,8 +140,8 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
             key={j}
             jurado={j}
             valor={ponteiro(e, j)}
-            corVoce={corDe(ia)}
-            corRival={corDe(rival)}
+            corVoce={VERDE}
+            corRival={VERMELHO}
             fala={e.fase === 'revelacao' && ultima ? falaDoJurado(j, ultima, i) : null}
             alvo={modoHabilidade && ia === 'claude' && ponteiro(e, j) < 0}
             onAlvo={() => {
@@ -153,17 +157,17 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
         <>
           {e.visao && e.cartaRival && (
             <div className="flex flex-col gap-2">
-              <p className="font-pixel text-[9px]" style={{ color: corDe(rival) }}>
+              <p className="font-pixel text-[9px]" style={{ color: VERMELHO }}>
                 👁 VISÃO: A CARTA QUE {dele.gladiador.toUpperCase()} VAI JOGAR
               </p>
-              <CartaView carta={e.cartaRival} e={e} cor={corDe(rival)} doRival />
+              <CartaView carta={e.cartaRival} e={e} cor={VERMELHO} doRival />
             </div>
           )}
 
           {modoHabilidade && (
             <Aviso
               texto={ia === 'claude' ? 'Diplomacia: toque num jurado que está do lado do rival (marcado com ✋).' : 'Improviso: toque na carta que você quer trocar.'}
-              cor={corDe(ia)}
+              cor={VERDE}
             />
           )}
 
@@ -173,7 +177,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
                 key={c.id}
                 carta={c}
                 e={e}
-                cor={corDe(ia)}
+                cor={VERDE}
                 selecionada={escolhida === c.id}
                 trocar={modoHabilidade && ia === 'chatgpt'}
                 onClick={() => {
@@ -217,16 +221,16 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
         <>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <p className="mb-1 font-pixel text-[9px]" style={{ color: corDe(ia) }}>
-                VOCÊ ({voce.gladiador.toUpperCase()})
+              <p className="mb-1 font-pixel text-[9px]" style={{ color: VERDE }}>
+                ▶ VOCÊ · {voce.ia.toUpperCase()} ({voce.gladiador.toUpperCase()})
               </p>
-              <CartaView carta={ultima.cartaJogador} e={e} cor={corDe(ia)} tempoFixo={ultima.tempo} revelada />
+              <CartaView carta={ultima.cartaJogador} e={e} cor={VERDE} tempoFixo={ultima.tempo} revelada />
             </div>
             <div>
-              <p className="mb-1 font-pixel text-[9px]" style={{ color: corDe(rival) }}>
-                {dele.gladiador.toUpperCase()} ({dele.ia.toUpperCase()})
+              <p className="mb-1 font-pixel text-[9px]" style={{ color: VERMELHO }}>
+                ◀ RIVAL · {dele.ia.toUpperCase()} ({dele.gladiador.toUpperCase()})
               </p>
-              <CartaView carta={ultima.cartaRival} e={e} cor={corDe(rival)} tempoFixo={ultima.tempo} doRival revelada />
+              <CartaView carta={ultima.cartaRival} e={e} cor={VERMELHO} tempoFixo={ultima.tempo} doRival revelada />
             </div>
           </div>
           <button
@@ -289,6 +293,12 @@ function CadeiraJurado(props: {
 }) {
   const j = JURADOS[props.jurado];
   const g = GOSTOS[props.jurado];
+  // A ficha inteira fica esverdeada (seu lado) ou avermelhada (lado do rival).
+  const lado = props.valor > 0 ? 'voce' : props.valor < 0 ? 'rival' : 'meio';
+  const cor = lado === 'voce' ? props.corVoce : lado === 'rival' ? props.corRival : null;
+  const tinta: CSSProperties = cor
+    ? { background: `color-mix(in srgb, ${cor} ${8 + Math.abs(props.valor) * 7}%, rgb(var(--surface)))`, boxShadow: `0 0 0 2px ${cor}` }
+    : {};
   const conteudo = (
     <>
       <div className="mx-auto w-9 sm:w-14">
@@ -302,17 +312,28 @@ function CadeiraJurado(props: {
         {TEMAS[g.gosta].icone} <span className="opacity-60">✗{TEMAS[g.naoGosta].icone}</span>
       </p>
       <Ponteiro valor={props.valor} corVoce={props.corVoce} corRival={props.corRival} />
+      <p className="mt-1 font-pixel text-[6px] sm:text-[8px]" style={{ color: lado === 'voce' ? props.corVoce : lado === 'rival' ? props.corRival : undefined }}>
+        {lado === 'voce' ? 'SEU LADO ▶' : lado === 'rival' ? '◀ RIVAL' : 'NO MEIO'}
+      </p>
       {props.alvo && <p className="piscar mt-1 text-sm">✋</p>}
     </>
   );
   return (
     <div className="relative flex flex-col">
       {props.alvo ? (
-        <button type="button" onClick={props.onAlvo} aria-label={`Usar Diplomacia no ${j.nome}`} className="pixel-box pixel-hover p-1.5 text-center sm:p-2">
+        <button
+          type="button"
+          onClick={props.onAlvo}
+          aria-label={`Usar Diplomacia no ${j.nome}`}
+          className="pixel-box pixel-hover p-1.5 text-center transition-all duration-500 sm:p-2"
+          style={tinta}
+        >
           {conteudo}
         </button>
       ) : (
-        <div className="pixel-box p-1.5 text-center sm:p-2">{conteudo}</div>
+        <div className="pixel-box p-1.5 text-center transition-all duration-500 sm:p-2" style={tinta}>
+          {conteudo}
+        </div>
       )}
       {props.fala && (
         <p
@@ -396,37 +417,55 @@ function CartaView(props: {
   );
 }
 
+/**
+ * Faixa de quem é quem, presente no briefing e em toda a partida: você (verde)
+ * contra o rival (vermelho), com o gladiador, a IA, o lado e a opinião de cada um.
+ */
+function FaixaCombatentes({ e, comTese = false }: { e: EstadoTribunal; comTese?: boolean }) {
+  return (
+    <div className="grid grid-cols-[1fr_auto_1fr] items-stretch gap-2 sm:gap-3">
+      <Combatente id={e.ia} quem="voce" lado={e.dilema.lados[e.ladoJogador]} comTese={comTese} />
+      <p className="self-center font-pixel text-sm text-[rgb(242_193_78)] sm:text-xl">VS</p>
+      <Combatente id={e.rival} quem="rival" lado={e.dilema.lados[ladoRival(e.ladoJogador)]} comTese={comTese} />
+    </div>
+  );
+}
+
+function Combatente({ id, quem, lado, comTese }: { id: IaId; quem: 'voce' | 'rival'; lado: { nome: string; tese: string }; comTese: boolean }) {
+  const p = PERSONAGENS[id];
+  const cor = quem === 'voce' ? VERDE : VERMELHO;
+  return (
+    <div
+      className={`pixel-box flex min-w-0 items-center gap-2 p-2 sm:gap-3 sm:p-3 ${quem === 'rival' ? 'flex-row-reverse text-right' : ''}`}
+      style={{ boxShadow: `0 0 0 3px ${cor}, 0 0 22px -6px ${cor}` }}
+    >
+      <div className="w-9 shrink-0 sm:w-14">
+        <GladiadorPixel ia={id} espelhar={quem === 'rival'} />
+      </div>
+      <div className="min-w-0">
+        <p className="font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>
+          {quem === 'voce' ? 'VOCÊ' : 'RIVAL'}
+        </p>
+        <p className="mt-1 truncate text-sm font-semibold sm:text-base">
+          <span style={{ color: corDe(id) }}>{p.emblema}</span> {p.ia}
+        </p>
+        <p className="truncate text-[11px] text-muted sm:text-xs">{p.gladiador}</p>
+        <p className="mt-1 inline-block px-1.5 py-0.5 font-pixel text-[7px] text-black sm:text-[9px]" style={{ background: cor }}>
+          {lado.nome.toUpperCase()}
+        </p>
+        {comTese && <p className="mt-1.5 text-xs leading-snug">"{lado.tese}"</p>}
+      </div>
+    </div>
+  );
+}
+
 function Briefing({ e, onComecar }: { e: EstadoTribunal; onComecar: () => void }) {
-  const lado = e.dilema.lados[e.ladoJogador];
-  const outro = e.dilema.lados[ladoRival(e.ladoJogador)];
-  const voce = PERSONAGENS[e.ia];
-  const dele = PERSONAGENS[e.rival];
   return (
     <div className="flex flex-col gap-4">
-      <div className="pixel-box flex items-start gap-3 p-4">
-        <div className="w-14 shrink-0 sm:w-20">
-          <PretorPixel />
-        </div>
-        <div className="min-w-0">
-          <p className="font-pixel text-[9px] text-[rgb(242_193_78)]">PRETOR SUPREMO</p>
-          <p className="mt-1 text-sm italic text-muted">"{FALAS_PRETOR.abertura}"</p>
-          <h2 className="mt-3 text-lg font-semibold sm:text-xl">{e.dilema.pergunta}</h2>
-        </div>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="pixel-box p-4" style={{ borderTop: `4px solid ${corDe(e.ia)}` }}>
-          <p className="font-pixel text-[9px]" style={{ color: corDe(e.ia) }}>
-            VOCÊ ({voce.gladiador.toUpperCase()}) · {lado.nome.toUpperCase()}
-          </p>
-          <p className="mt-2 text-sm">{lado.tese}</p>
-        </div>
-        <div className="pixel-box p-4" style={{ borderTop: `4px solid ${corDe(e.rival)}` }}>
-          <p className="font-pixel text-[9px]" style={{ color: corDe(e.rival) }}>
-            {dele.gladiador.toUpperCase()} ({dele.ia.toUpperCase()}) · {outro.nome.toUpperCase()}
-          </p>
-          <p className="mt-2 text-sm">{outro.tese}</p>
-        </div>
-      </div>
+      <PretorDestaque fala={FALAS_PRETOR.abertura}>
+        <h2 className="mt-3 text-lg font-semibold sm:text-xl">{e.dilema.pergunta}</h2>
+      </PretorDestaque>
+      <FaixaCombatentes e={e} comTese />
       <section aria-label="O que cada jurado gosta">
         <p className="mb-2 font-pixel text-[9px] text-muted">CONHEÇA O JÚRI</p>
         <ul className="grid gap-2 sm:grid-cols-5">
