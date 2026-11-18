@@ -2,6 +2,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { useSequencia } from '@/ui/movimento';
+import { tocar } from '@/ui/som';
+import { useSonsDaFase } from '@/ui/BotaoSom';
 import { CenaColiseu } from './Cenarios';
 import { Clarao, Faiscas, Palco, Portoes } from './Palco';
 
@@ -14,6 +16,16 @@ const cor = (id: IaId) => `rgb(${PERSONAGENS[id].cor})`;
 export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; fim: ReactNode }) {
   const [fase, pular] = useSequencia(MARCOS);
   const roleta = useRoleta(ia, rival, fase === 0);
+  useSonsDaFase(fase, {
+    1: 'portao',
+    2: 'passos',
+    3: 'vs',
+    4: () => {
+      tocar('espadas');
+      tocar('plateia');
+    },
+    5: 'fanfarra',
+  });
 
   return (
     <div className="flex flex-col gap-5">
@@ -112,6 +124,7 @@ function useRoleta(ia: IaId, rival: IaId, ativa: boolean): IaId {
     const id = window.setInterval(() => {
       i++;
       setAtual(outras[i % outras.length]!);
+      tocar('roleta');
     }, 110);
     return () => window.clearInterval(id);
   }, [ativa, ia, rival]);

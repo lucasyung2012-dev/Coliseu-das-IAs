@@ -21,12 +21,27 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /Coliseu/ })).toHaveAttribute('href', '/coliseu');
   });
 
-  it('liga o fliperama na primeira visita ao Arcade, e o toque pula a animação', () => {
+  it('mostra a sala de fliperama na primeira visita: a moeda entra e o crédito sobe', () => {
     abrir('/arena');
-    const boot = screen.getByRole('button', { name: /Fliperama ligando/ });
-    fireEvent.click(boot);
-    expect(screen.queryByRole('button', { name: /Fliperama ligando/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: /Entrada do Imperium Arcade/ })).toBeInTheDocument();
+    expect(screen.getByText('CRÉDITOS 00')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Inserir moeda' }));
+    expect(screen.getByText('CRÉDITOS 01')).toBeInTheDocument();
+  });
+
+  it('o botão de pular sai da sala de fliperama e lembra nesta visita', () => {
+    abrir('/arena');
+    fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+    expect(screen.queryByRole('dialog', { name: /Entrada do Imperium Arcade/ })).not.toBeInTheDocument();
     expect(sessionStorage.getItem('coliseu.boot.vista')).toBe('1');
+  });
+
+  it('o botão de som liga e desliga', () => {
+    abrir('/');
+    const botao = screen.getByRole('button', { name: 'Desligar sons' });
+    fireEvent.click(botao);
+    expect(screen.getByRole('button', { name: 'Ligar sons' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ligar sons' }));
   });
 
   it('abre o Arcade com o gladiador em destaque, os dois modos e o histórico vazio', () => {

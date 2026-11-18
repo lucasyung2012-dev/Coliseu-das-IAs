@@ -7,6 +7,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
 import { LOUROS, PALETA_OURO } from '@/ui/pixel/sprites';
 import BootArcade from './BootArcade';
+import { desbloquear, tocar } from '@/ui/som';
 
 const CHAVE_BOOT = 'coliseu.boot.vista';
 
@@ -39,6 +40,8 @@ export default function ArcadeHub() {
   const [troca, setTroca] = useState<{ n: number; anterior: IaId | null }>({ n: 0, anterior: null });
   const trocarPara = (id: IaId) => {
     if (id === p.iaAtual) return;
+    desbloquear();
+    tocar('selecionar');
     setTroca((t) => ({ n: t.n + 1, anterior: p.iaAtual }));
     escolherIa(id);
   };
@@ -55,7 +58,7 @@ export default function ArcadeHub() {
       <div className="crt-overlay" />
 
       <div className="relative mx-auto flex max-w-5xl flex-col gap-7 px-4 pb-12 pt-6 sm:px-8">
-        <Link to="/" className="self-start font-pixel text-[10px] text-muted hover:text-accent">
+        <Link to="/" onClick={() => tocar('clique')} className="self-start font-pixel text-[10px] text-muted hover:text-accent">
           ◀ INÍCIO
         </Link>
 
@@ -207,7 +210,7 @@ function Barra({ valor, rotulo, fina }: { valor: number; rotulo: string; fina?: 
 
 function CartaoModo(props: { rota: string; icone: ReactNode; titulo: string; frase: string; ganho: number; perda: number }) {
   return (
-    <Link to={props.rota} className="pixel-box pixel-hover group block min-w-0 p-5 transition hover:-translate-y-1">
+    <Link to={props.rota} onMouseEnter={() => tocar('passarMouse')} onClick={() => { desbloquear(); tocar('clique'); }} className="pixel-box pixel-hover group block min-w-0 p-5 transition hover:-translate-y-1">
       <div className="flex items-center gap-3">
         <span className="text-3xl text-accent" aria-hidden>
           {props.icone}

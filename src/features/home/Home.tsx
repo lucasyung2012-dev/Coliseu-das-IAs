@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { IAS } from '@/game/personagens';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import { desbloquear, tocar } from '@/ui/som';
 import { PORTAIS } from './areas';
 
 export default function Home() {
@@ -20,6 +21,11 @@ export default function Home() {
             key={p.area}
             to={p.rota}
             data-area={p.area}
+            onMouseEnter={() => tocar('passarMouse')}
+            onClick={() => {
+              desbloquear();
+              tocar('clique');
+            }}
             style={{ animationDelay: `${220 + i * 90}ms` }}
             className="group animate-fade-up rounded-2xl border border-line bg-surface p-6 text-fg transition hover:-translate-y-1 hover:border-accent"
           >
@@ -41,6 +47,11 @@ function PortalArcade({ rota, frase }: { rota: string; frase: string }) {
     <Link
       to={rota}
       state={{ boot: true }}
+      onMouseEnter={() => tocar('passarMouse')}
+      onClick={() => {
+        desbloquear();
+        tocar('clique');
+      }}
       data-area="arcade"
       aria-label={`Imperium Arcade. ${frase}`}
       className="maquina-arcade group animate-fade-up relative block overflow-hidden bg-bg p-5 text-fg sm:col-span-2 sm:p-8"

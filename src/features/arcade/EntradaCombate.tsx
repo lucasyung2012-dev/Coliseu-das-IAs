@@ -5,6 +5,7 @@ import { sortearJurados, type JuradoId } from '@/game/jurados';
 import { useProgresso } from '@/game/progresso';
 import IntroDuelo from './cenas/IntroDuelo';
 import IntroTribunal from './cenas/IntroTribunal';
+import { desbloquear, tocar } from '@/ui/som';
 
 interface Sorteio {
   rodada: number;
@@ -21,7 +22,11 @@ const novoSorteio = (ia: IaId, rodada: number): Sorteio => ({ rodada, rival: sor
 export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' }) {
   const { iaAtual } = useProgresso();
   const [sorteio, setSorteio] = useState(() => novoSorteio(iaAtual, 0));
-  const deNovo = () => setSorteio((s) => novoSorteio(iaAtual, s.rodada + 1));
+  const deNovo = () => {
+    desbloquear();
+    tocar('clique');
+    setSorteio((s) => novoSorteio(iaAtual, s.rodada + 1));
+  };
 
   const fim = (
     <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">

@@ -5,6 +5,8 @@ import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens
 import Sprite from '@/ui/pixel/Sprite';
 import { MARTELO, PALETA_MARTELO } from '@/ui/pixel/sprites';
 import { useSequencia } from '@/ui/movimento';
+import { tocar } from '@/ui/som';
+import { useSonsDaFase } from '@/ui/BotaoSom';
 import { CenaTribunal } from './Cenarios';
 import { Clarao, Palco, Portoes } from './Palco';
 
@@ -20,6 +22,14 @@ const cor = (id: IaId) => `rgb(${PERSONAGENS[id].cor})`;
 
 export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; rival: IaId; jurados: JuradoId[]; fim: ReactNode }) {
   const [fase, pular] = useSequencia(MARCOS);
+  useSonsDaFase(fase, {
+    1: 'portao',
+    2: 'pretor',
+    // um "pop" para cada jurado, no mesmo ritmo em que eles aparecem
+    3: () => jurados.forEach((_, i) => window.setTimeout(() => tocar('jurado'), i * 260)),
+    4: 'passos',
+    5: 'martelo',
+  });
 
   return (
     <div className="flex flex-col gap-5">
