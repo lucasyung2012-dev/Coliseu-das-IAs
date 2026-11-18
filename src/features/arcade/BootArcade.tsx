@@ -133,8 +133,13 @@ function SalaDeFliperama({ ligada }: { ligada: boolean }) {
       <p className="neon-placa neon-placa-2 absolute right-[6%] top-[12%] rotate-3 font-pixel text-[10px] text-[#4ef0dc] sm:text-base">
         HIGH SCORE
       </p>
-      <div className="absolute left-1/2 top-[3%] w-10 -translate-x-1/2 opacity-80 sm:w-16">
-        <Sprite grade={LOUROS} paleta={PALETA_OURO} />
+      <div className="absolute left-1/2 top-[3%] flex -translate-x-1/2 gap-1 opacity-80">
+        <div className="w-8 sm:w-12">
+          <Sprite grade={LOUROS} paleta={PALETA_OURO} />
+        </div>
+        <div className="w-8 sm:w-12">
+          <Sprite grade={LOUROS} paleta={PALETA_OURO} espelhar />
+        </div>
       </div>
       {/* máquinas vizinhas, apagadas e cortadas pelas bordas */}
       <MaquinaVizinha className="left-[-6%] sm:left-[4%]" cor="#ff4fc8" />
