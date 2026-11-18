@@ -86,7 +86,7 @@ export default function ArcadeHub() {
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} />
           <div>
             <h1 className="neon letreiro font-pixel text-xl leading-snug text-accent sm:text-3xl">Imperium Arcade</h1>
-            <p className="mt-2 font-pixel text-[9px] tracking-[0.25em] text-accent-2 sm:text-[10px]">QUE VENÇA O MELHOR ARGUMENTO</p>
+            <p className="mt-2 font-pixel text-[9px] tracking-[0.25em] text-accent-2 sm:text-[10px]">TODOS OS CAMINHOS LEVAM À ARENA</p>
           </div>
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} espelhar />
         </header>
