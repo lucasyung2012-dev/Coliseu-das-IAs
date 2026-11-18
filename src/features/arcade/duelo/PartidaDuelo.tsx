@@ -140,6 +140,8 @@ export default function PartidaDuelo({
   );
   // Segurar e soltar: qual carta está sendo segurada e desde quando.
   const [segurando, setSegurando] = useState<Record<Lado, { id: string; inicio: number } | null>>({ eu: null, rival: null });
+  // Carta que acabou de ser jogada, voando da mão para a arena (por lugar na mão).
+  const [saindo, setSaindo] = useState<Record<string, { tipo: TipoCarta; id: string }>>({});
   const [abertura, setAbertura] = useState<Abertura>('tema');
   const pausado = tutorial.aberto || abertura !== null;
 
@@ -206,9 +208,13 @@ export default function PartidaDuelo({
   useEffect(() => () => void registrarAbandono(), []);
 
   const jogar = (lado: Lado, carta: CartaDuelo, carga: number) => {
-    if (pausado) return;
+    if (pausado || !podeJogar(e, lado, carta.id)) return;
     desbloquear();
     if (carga >= 1) tocar('start');
+    // A carta voa da mão para a arena; a da manga entra no lugar dela.
+    const vaga = `${lado}-${e[lado].mao.findIndex((x) => x.id === carta.id)}`;
+    setSaindo((x) => ({ ...x, [vaga]: { tipo: carta.tipo, id: carta.id } }));
+    window.setTimeout(() => setSaindo((x) => (x[vaga]?.id === carta.id ? Object.fromEntries(Object.entries(x).filter(([k]) => k !== vaga)) : x)), 650);
     setE((s) => jogarCarta(s, lado, carta.id, carga));
   };
   const comecarCarga = (lado: Lado, carta: CartaDuelo) => {
@@ -313,22 +319,35 @@ export default function PartidaDuelo({
     );
     const cartas = (
       <section aria-label={lado === 'eu' ? 'Suas cartas' : 'Cartas do Jogador 2'} className={`grid grid-cols-4 ${doisJogadores ? 'gap-1.5' : 'gap-2'}`}>
-        {l.mao.map((carta, i) => (
-          <CartaNaMao
-            key={carta.id}
-            carta={carta}
-            numero={lado === 'eu' ? String(i + 1) : TECLAS_J2[i]!}
-            custo={custoAgora(l, carta.tipo)}
-            pode={podeJogar(e, lado, carta.id) && !pausado}
-            carregando={segurando[lado]?.id === carta.id}
-            cores={c}
-            compacto={doisJogadores}
-            onSegurar={() => comecarCarga(lado, carta)}
-            onSoltar={() => soltar(lado, carta)}
-            onCancelar={() => setSegurando((x) => ({ ...x, [lado]: null }))}
-            onTocar={() => jogar(lado, carta, 0)}
-          />
-        ))}
+        {l.mao.map((carta, i) => {
+          const voando = saindo[`${lado}-${i}`];
+          return (
+            <div key={`vaga-${i}`} className="relative">
+              {/* A carta jogada voando da mão para a arena */}
+              {voando && (
+                <div key={voando.id} className="voar-para-arena pointer-events-none absolute inset-0 z-30" aria-hidden>
+                  <CartaVisual tipo={voando.tipo} paleta={c.paleta} corNome={c.cor} tamanho={doisJogadores ? 'colecao' : 'mao'} />
+                </div>
+              )}
+              {/* A carta que estava na manga entrando no lugar vazio */}
+              <div key={carta.id} className="entrar-da-manga h-full">
+                <CartaNaMao
+                  carta={carta}
+                  numero={lado === 'eu' ? String(i + 1) : TECLAS_J2[i]!}
+                  custo={custoAgora(l, carta.tipo)}
+                  pode={podeJogar(e, lado, carta.id) && !pausado}
+                  carregando={segurando[lado]?.id === carta.id}
+                  cores={c}
+                  compacto={doisJogadores}
+                  onSegurar={() => comecarCarga(lado, carta)}
+                  onSoltar={() => soltar(lado, carta)}
+                  onCancelar={() => setSegurando((x) => ({ ...x, [lado]: null }))}
+                  onTocar={() => jogar(lado, carta, 0)}
+                />
+              </div>
+            </div>
+          );
+        })}
       </section>
     );
 

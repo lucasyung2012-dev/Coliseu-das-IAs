@@ -792,3 +792,17 @@
 @keyframes respingo-esq { from { transform: translate(120%, 0); } to { transform: translate(-60%, -160%); } }
 @keyframes respingo-dir { from { transform: translate(-120%, 0); } to { transform: translate(60%, -160%); } }
 .menos-movimento .gota-caindo, .menos-movimento .respingo, .menos-movimento .respingo span { animation: none; }
+
+/* ===== Duelo: a carta jogada voa para a arena e a da manga entra na mão ===== */
+.voar-para-arena { animation: voar-para-arena 0.6s ease-in both; }
+@keyframes voar-para-arena {
+  0% { transform: none; opacity: 1; }
+  30% { transform: translateY(-25%) scale(1.08); opacity: 1; }
+  100% { transform: translateY(-280%) scale(0.35) rotate(-12deg); opacity: 0; }
+}
+.entrar-da-manga { animation: entrar-da-manga 0.45s ease-out both; animation-delay: 0.2s; }
+@keyframes entrar-da-manga {
+  from { transform: translateX(140%) rotate(14deg) scale(0.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.menos-movimento .voar-para-arena, .menos-movimento .entrar-da-manga { animation-duration: 1ms; animation-delay: 0s; }
