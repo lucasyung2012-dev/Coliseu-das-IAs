@@ -58,7 +58,7 @@ export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' })
     ) : (
       <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">
         <p className="font-pixel text-[10px] text-accent sm:text-xs">TUDO PRONTO PARA O DUELO</p>
-        <p className="max-w-md text-sm text-muted">Protótipo do Duelo: ainda não vale troféus. Sair no meio conta como derrota.</p>
+        <p className="max-w-md text-sm text-muted">Com a conta conectada, o Duelo vale troféus e XP de Maestria. Sair no meio conta como derrota.</p>
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"

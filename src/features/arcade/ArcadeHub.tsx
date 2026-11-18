@@ -221,7 +221,6 @@ export default function ArcadeHub() {
               ganho={variacaoTrofeus('duelo', trofeus, true)}
               perda={variacaoTrofeus('duelo', trofeus, false)}
               treino={treino}
-              prototipo
             />
           </div>
         </section>
@@ -264,8 +263,6 @@ function CartaoModo(props: {
   treino: boolean;
   /** O combate principal (Tribunal): bem maior. */
   grande?: boolean;
-  /** Ainda em teste: não vale troféus. */
-  prototipo?: boolean;
 }) {
   return (
     <Link
@@ -290,9 +287,7 @@ function CartaoModo(props: {
       <div className="flex flex-col justify-center p-4">
         {props.grande && <p className="mb-1 font-pixel text-[9px] text-[rgb(242_193_78)]">★ COMBATE PRINCIPAL</p>}
         <p className="text-sm text-muted">{props.frase}</p>
-        {props.prototipo ? (
-          <p className="mt-2 text-sm text-[rgb(242_193_78)]">Protótipo: ainda não vale troféus.</p>
-        ) : props.treino ? (
+        {props.treino ? (
           <p className="mt-2 text-sm text-[rgb(242_193_78)]">Treino: não vale troféus.</p>
         ) : (
           <p className="mt-2 text-sm tabular-nums">

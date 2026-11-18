@@ -12,6 +12,7 @@ import {
   montarMonte,
   novoDuelo,
   passo,
+  PRORROGACAO_BONUS,
   PRORROGACAO_MS,
   resultadoFinal,
   ritmoDoFolego,
@@ -209,17 +210,20 @@ describe('duelo v7: gladiador, habilidades e Tribuna', () => {
     expect(resultadoFinal(s)).toBe('vitoria');
   });
 
-  it('rodadas de 1:30, 1:30 e a final de 30 s; empate na vida vai para a prorrogação', () => {
-    expect([...DURACOES_MS]).toEqual([90_000, 90_000, 30_000]);
+  it('duas rodadas de 1:30 e depois sempre a Prorrogação de 20 s com gotas +25%', () => {
+    expect([...DURACOES_MS]).toEqual([90_000, 90_000]);
+    expect(PRORROGACAO_BONUS).toBe(1.25);
     let s = { ...base(), tribunas: { eu: 20, rival: 20 } };
     s = passo({ ...s, tempo: 90_000 - TICK }, ctx);
     expect(s.fase).toBe('intervalo');
     s = avancar(s, INTERVALO_MS + TICK);
     expect(s).toMatchObject({ fase: 'luta', rodada: 2, tribunas: { eu: 20, rival: 20 } });
-    s = passo({ ...s, rodada: 3, tempo: 30_000 - TICK, proximoRival: SEM_RIVAL }, ctx);
+    s = passo({ ...s, tribunas: { eu: 25, rival: 20 }, tempo: 90_000 - TICK, proximoRival: SEM_RIVAL }, ctx);
     expect(s.fase).toBe('intervalo');
     s = avancar(s, INTERVALO_MS + TICK);
-    expect(s.rodada).toBe(4);
+    expect(s.rodada).toBe(3);
+    expect(ritmoDoFolego(s, 'eu')).toBeCloseTo(FOLEGO_POR_SEGUNDO * 1.25);
+    s = { ...s, tribunas: { eu: 20, rival: 20 } };
     s = passo({ ...s, tempo: PRORROGACAO_MS - TICK, proximoRival: SEM_RIVAL }, ctx);
     expect(s.fase).toBe('fim');
     expect(resultadoFinal(s)).toBe('empate');

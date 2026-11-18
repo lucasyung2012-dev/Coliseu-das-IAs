@@ -280,7 +280,7 @@ describe('duelo jogável (protótipo)', () => {
       const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
       expect(botoes.length).toBeGreaterThanOrEqual(4);
       fireEvent.click(botoes.find((b) => !(b as HTMLButtonElement).disabled)!);
-      // Rodadas de 1:30, 1:30 e 30 s, e a prorrogação, com intervalos.
+      // Rodadas de 1:30 e 1:30 e a Prorrogação de 20 s, com intervalos.
       for (let i = 0; i < 260; i++) {
         act(() => {
           vi.advanceTimersByTime(1000);

@@ -3,7 +3,7 @@ import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { ACERTO_RIVAL } from '@/game/tribunal/motor';
 import { indiceLiga } from '@/game/ligas';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
-import { marcarPartidaAberta, registrarAbandono, registrarPartida, useProgresso } from '@/game/progresso';
+import { marcarPartidaAberta, registrarAbandono, registrarPartida, useProgresso, type Partida } from '@/game/progresso';
 import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import {
   baralhoDaIa,
@@ -119,7 +119,10 @@ export default function PartidaDuelo({
   const dificuldade = useDificuldade();
   const { liga } = useAparencia(ia);
   const tutorial = useTutorial('duelo');
-  const [acerto] = useState(() => (modoRanqueado() ? ACERTO_RIVAL[indiceLiga(p.trofeus[ia])]! : ACERTO_TREINO[dificuldade]));
+  // O modo (valendo troféus ou treino) fica fixo do começo ao fim da partida.
+  const [ranqueado] = useState(() => modoRanqueado());
+  const [registrada, setRegistrada] = useState<Partida | null>(null);
+  const [acerto] = useState(() => (ranqueado ? ACERTO_RIVAL[indiceLiga(p.trofeus[ia])]! : ACERTO_TREINO[dificuldade]));
   const [config] = useState(() => ({ lado: (Math.random() < 0.5 ? 'favor' : 'contra') as LadoId, dilema: Math.floor(Math.random() * DILEMAS.length) }));
   const dilema = DILEMAS[config.dilema]!;
   const ladoRival: LadoId = config.lado === 'favor' ? 'contra' : 'favor';
@@ -198,9 +201,9 @@ export default function PartidaDuelo({
     if (e.fase === 'fim') {
       const r = resultadoFinal(e);
       tocar(r === 'vitoria' ? 'vitoria' : r === 'derrota' ? 'derrota' : 'martelo');
-      // O Duelo ainda é protótipo: entra no histórico como treino (sem troféus nem XP).
+      // Com conta, o Duelo vale troféus e XP de Maestria, como o Tribunal.
       // A partida de 2 jogadores é amistosa: não entra no histórico.
-      if (!doisJogadores) registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: true, dilema: dilema.pergunta });
+      if (!doisJogadores) setRegistrada(registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: !ranqueado, dilema: dilema.pergunta }));
     }
   }, [e.fase]);
 
@@ -265,7 +268,7 @@ export default function PartidaDuelo({
     };
   });
 
-  if (e.fase === 'fim') return <FimDuelo e={e} ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} doisJogadores={doisJogadores} />;
+  if (e.fase === 'fim') return <FimDuelo e={e} partida={registrada} ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} doisJogadores={doisJogadores} />;
 
   const voce = PERSONAGENS[ia];
   const dele = PERSONAGENS[rival];
@@ -294,7 +297,7 @@ export default function PartidaDuelo({
         max={FOLEGO_MAX}
         cor={doisJogadores ? c.cor : undefined}
         pequena={doisJogadores}
-        rotulo={ritmoDoFolego(e, lado) > FOLEGO_POR_SEGUNDO ? (extra ? 'GOTAS EM DOBRO' : 'VIRADA +25%') : undefined}
+        rotulo={extra ? 'PRORROGAÇÃO +25%' : ritmoDoFolego(e, lado) > FOLEGO_POR_SEGUNDO ? 'DISCURSO +30%' : undefined}
       />
     );
     // A carta na manga: a próxima que entra na mão, reta e inteira, com o nome em cima.
@@ -407,7 +410,7 @@ export default function PartidaDuelo({
             tocar('start');
             setAbertura('entrada');
             // A partida começou: sair antes do fim conta como derrota.
-            if (!doisJogadores) marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: true, dilema: dilema.pergunta });
+            if (!doisJogadores) marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: !ranqueado, dilema: dilema.pergunta });
           }}
           onComoJogar={tutorial.abrir}
         />
@@ -883,6 +886,7 @@ function VidaTribuna({
 
 function FimDuelo({
   e,
+  partida,
   ia,
   rival,
   cores,
@@ -891,6 +895,7 @@ function FimDuelo({
   doisJogadores = false,
 }: {
   e: EstadoDuelo;
+  partida: Partida | null;
   ia: IaId;
   rival: IaId;
   cores: Record<Lado, Cores>;
@@ -931,7 +936,11 @@ function FimDuelo({
           {e.tribunas.rival} {PERSONAGENS[rival].gladiador}
         </span>
       </p>
-      <p className="font-pixel text-[8px] text-muted">{doisJogadores ? 'PARTIDA AMISTOSA · 2 JOGADORES' : 'PROTÓTIPO · AINDA NÃO VALE TROFÉUS'}</p>
+      <p className="font-pixel text-[8px] text-muted">{doisJogadores
+          ? 'PARTIDA AMISTOSA · 2 JOGADORES'
+          : !partida || partida.treino
+            ? 'TREINO · CONECTE A CONTA PARA VALER TROFÉUS'
+            : `TROFÉUS ${partida.trofeus > 0 ? '+' : ''}${partida.trofeus} 🏆 · XP DE MAESTRIA +${partida.xp}`}</p>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" autoFocus onClick={onDeNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
           ↻ JOGAR DE NOVO
