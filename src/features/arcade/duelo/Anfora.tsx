@@ -59,8 +59,23 @@ export default function Anfora({ gotas, max, rotulo, cor, pequena = false }: { g
     <div className="flex flex-col items-center gap-1" role="meter" aria-label="Gotas" aria-valuenow={cheias} aria-valuemin={0} aria-valuemax={max}>
       <div className={`relative ${pequena ? 'w-9 sm:w-12' : 'w-14 sm:w-20'}`} style={{ filter: gotas >= max ? 'drop-shadow(0 0 8px #2f86ff)' : undefined }}>
         <Sprite grade={grade} paleta={PALETA} />
-        {/* Uma gota caindo na boca da ânfora enquanto ela enche */}
-        {gotas < max && <span className="gota-caindo absolute left-1/2 top-[-8%] h-[6%] w-[6%] -translate-x-1/2 rounded-full bg-[#a8dcff]" aria-hidden />}
+        {/* Gotas caindo na boca da ânfora enquanto ela enche, com respingo quando batem */}
+        {gotas < max && (
+          <>
+            {[0, 1].map((i) => (
+              <span
+                key={i}
+                className="gota-caindo absolute left-1/2 top-[-22%] h-[13%] w-[14%] rounded-[50%_50%_50%_50%/60%_60%_40%_40%] border-2 border-[#0b2a5c]"
+                style={{ background: 'radial-gradient(circle at 35% 30%, #ffffff, #5fb0ff 55%, #2f86ff)', animationDelay: `${i * 0.55}s` }}
+                aria-hidden
+              />
+            ))}
+            <span className="respingo absolute left-1/2 top-[8%] h-[6%] w-[40%] -translate-x-1/2" aria-hidden>
+              <span className="absolute left-0 top-0 h-full w-[20%] bg-[#a8dcff]" />
+              <span className="absolute right-0 top-0 h-full w-[20%] bg-[#a8dcff]" />
+            </span>
+          </>
+        )}
       </div>
       <p className="font-pixel text-[9px] tabular-nums sm:text-xs" style={{ color: cor ?? '#a8dcff' }}>
         💧 {cheias}/{max}

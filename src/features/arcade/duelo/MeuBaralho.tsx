@@ -45,12 +45,20 @@ export default function SalaDoDuelo() {
     }
   }, [escolhidas]);
 
+  /** Tirar do baralho: só tocando na carta lá em cima, em "Seu baralho". */
+  const tirar = (c: TipoCarta) => {
+    desbloquear();
+    setMensagem('');
+    tocar('clique');
+    setEscolhidas((l) => l.filter((x) => x !== c));
+  };
+  /** Na coleção: põe no baralho. Se já está, não tira (para não tirar sem querer). */
   const alternar = (c: TipoCarta) => {
     desbloquear();
     setMensagem('');
     if (escolhidas.includes(c)) {
-      tocar('clique');
-      setEscolhidas((l) => l.filter((x) => x !== c));
+      tocar('falha');
+      setMensagem(`${CARTAS[c].nome} já está no seu baralho. Para tirar, toque nela lá em cima.`);
     } else if (!completo) {
       tocar('selecionar');
       setEscolhidas((l) => [...l, c]);
@@ -101,7 +109,7 @@ export default function SalaDoDuelo() {
                   return (
                     <li key={c ?? `vazio-${i}`} className="min-h-[9rem]">
                       {c ? (
-                        <button type="button" onClick={() => alternar(c)} aria-label={`Tirar ${CARTAS[c].nome}`} className="surgir h-full w-full transition hover:-translate-y-1">
+                        <button type="button" onClick={() => tirar(c)} aria-label={`Tirar ${CARTAS[c].nome}`} className="surgir h-full w-full transition hover:-translate-y-1">
                           <CartaVisual tipo={c} paleta={paleta} corNome={forte} />
                         </button>
                       ) : (
@@ -166,13 +174,21 @@ export default function SalaDoDuelo() {
                           onClick={() => alternar(c)}
                           aria-pressed={no}
                           aria-label={`${CARTAS[c].nome}: ${CARTAS[c].dica}`}
-                          className="relative block h-full w-full transition hover:-translate-y-1"
-                          style={no ? { filter: `drop-shadow(0 0 8px ${forte})`, transform: 'translateY(-3px)' } : { opacity: completo ? 0.6 : 1 }}
+                          className="relative block h-full w-full rounded-md transition hover:-translate-y-1"
+                          style={
+                            no
+                              ? { boxShadow: `0 0 0 4px ${forte}, 0 0 22px ${forte}`, transform: 'translateY(-4px)' }
+                              : { opacity: completo ? 0.45 : 0.85 }
+                          }
                         >
                           <CartaVisual tipo={c} paleta={paleta} corNome={forte} mostrarDica />
+                          {/* Escolhida: faixa bem visível atravessando a carta */}
                           {no && (
-                            <span className="absolute right-1 top-4 rounded-full bg-black px-1 font-pixel text-[9px] sm:top-5" style={{ color: forte }}>
-                              ✔
+                            <span
+                              className="pointer-events-none absolute inset-x-0 top-[38%] z-20 -rotate-6 py-1 text-center font-pixel text-[9px] text-black shadow-[0_3px_0_rgb(0_0_0/0.5)] sm:text-xs"
+                              style={{ background: forte }}
+                            >
+                              ✔ NO BARALHO
                             </span>
                           )}
                         </button>
