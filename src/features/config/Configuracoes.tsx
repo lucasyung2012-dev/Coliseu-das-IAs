@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { escolherDificuldade, modoRanqueado, NOMES_DIFICULDADE, useConta, useDificuldade, type Dificuldade } from '@/game/conta';
 import { alternarSom, desbloquear, mudarVolume, tocar, useSomLigado, useVolume } from '@/ui/som';
 import { mudarPreferencia, usePreferencias } from '@/ui/preferencias';
-import { anunciar, escolherVoz, FALA_AMOSTRA, useVozPretor, VOZES } from '@/ui/voz';
 import ApagarProgresso from '../arcade/ApagarProgresso';
 import SecaoConta from './SecaoConta';
 
@@ -16,7 +15,6 @@ export default function Configuracoes() {
   const somLigado = useSomLigado();
   const volume = useVolume();
   const pref = usePreferencias();
-  const voz = useVozPretor();
 
   return (
     <main data-area="arcade" className="fundo-arcade relative min-h-screen text-fg">
@@ -82,39 +80,6 @@ export default function Configuracoes() {
             />
             <span className="w-10 text-right font-pixel text-[9px] tabular-nums">{Math.round(volume * 100)}</span>
           </label>
-        </Secao>
-
-        <Secao titulo="🎙 VOZ DO PRETOR">
-          <p className="text-sm text-muted">Escolha a voz do Pretor Supremo no Tribunal. Toque em Ouvir para testar.</p>
-          <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Voz do Pretor">
-            {VOZES.map((x) => (
-              <button
-                key={x.id}
-                type="button"
-                role="radio"
-                aria-checked={voz === x.id}
-                onClick={() => {
-                  desbloquear();
-                  escolherVoz(x.id);
-                  anunciar([FALA_AMOSTRA]);
-                }}
-                className={`px-3 py-2 font-pixel text-[9px] ${voz === x.id ? 'bg-[rgb(242_193_78)] text-black' : 'pixel-box pixel-hover text-muted'}`}
-              >
-                {x.nome.toUpperCase()}
-              </button>
-            ))}
-            <button
-              type="button"
-              disabled={!somLigado}
-              onClick={() => {
-                desbloquear();
-                anunciar([FALA_AMOSTRA]);
-              }}
-              className="pixel-box pixel-hover px-3 py-2 font-pixel text-[9px] text-accent disabled:opacity-40"
-            >
-              ▶ OUVIR
-            </button>
-          </div>
         </Secao>
 
         <Secao titulo="✨ ANIMAÇÕES">

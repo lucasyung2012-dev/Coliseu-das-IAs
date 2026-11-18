@@ -6,7 +6,3 @@ coverage
 .DS_Store
 Thumbs.db
 .vscode/*
-
-# Falas do Pretor geradas no CI
-public/vozes/
-scripts/vozes/.modelos/

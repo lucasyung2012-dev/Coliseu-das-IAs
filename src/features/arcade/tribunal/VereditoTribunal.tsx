@@ -10,11 +10,9 @@ import { JuradoPixel } from '@/ui/pixel/Personagens';
 import { PretorDestaque, VERDE, VERMELHO } from './visual';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear, tocar } from '@/ui/som';
-import { anunciar, calar, FALA_SILENCIO, falaDoVoto, falasDoResultado, precarregar, vozPossivel } from '@/ui/voz';
 import { Faiscas } from '../cenas/Palco';
 
 const PAUSA_VOTO = 700;
-const PAUSA_VOTO_COM_VOZ = 2300;
 
 /** Martelo, votos revelados cadeira por cadeira e o resultado com troféus, XP e o porquê de cada voto. */
 export default function VereditoTribunal({
@@ -52,49 +50,22 @@ export default function VereditoTribunal({
     tocar('martelo');
   }, []);
 
-  const voce = PERSONAGENS[e.ia];
-  const dele = PERSONAGENS[e.rival];
-
-  // A voz do Pretor: abre o veredito, conta voto a voto e anuncia quem venceu.
-  // Com voz, a contagem vai mais devagar para dar tempo de ele falar.
-  const [comVoz] = useState(() => vozPossivel() && !prefereMenosMovimento());
-  useEffect(() => {
-    if (comVoz) {
-      const vencedor = v.resultado === 'vitoria' ? e.ia : v.resultado === 'derrota' ? e.rival : null;
-      const votos = e.jurados.map((j) => falaDoVoto(j, v.votos[j] === 'jogador' ? e.ia : v.votos[j] === 'rival' ? e.rival : null));
-      precarregar([FALA_SILENCIO, ...votos, ...falasDoResultado(v.jogador, v.rival, vencedor)]);
-      anunciar([FALA_SILENCIO]);
-    }
-    return () => calar();
-  }, []);
-
   useEffect(() => {
     if (fim) return;
-    const id = window.setTimeout(
-      () => {
-        tocar('jurado');
-        setRevelados((n) => n + 1);
-      },
-      (comVoz ? PAUSA_VOTO_COM_VOZ : PAUSA_VOTO) + (revelados === 0 ? (comVoz ? 1800 : 600) : 0),
-    );
+    const id = window.setTimeout(() => {
+      tocar('jurado');
+      setRevelados((n) => n + 1);
+    }, PAUSA_VOTO + (revelados === 0 ? 600 : 0));
     return () => window.clearTimeout(id);
   }, [revelados, fim]);
-
-  // Cada voto revelado, o Pretor lê em voz alta (com o nome da IA).
-  useEffect(() => {
-    if (!comVoz || revelados === 0) return;
-    const j = e.jurados[revelados - 1]!;
-    const voto = v.votos[j];
-    anunciar([falaDoVoto(j, voto === 'jogador' ? e.ia : voto === 'rival' ? e.rival : null)], { fila: true });
-  }, [revelados]);
 
   useEffect(() => {
     if (!fim) return;
     tocar(v.resultado === 'vitoria' ? 'vitoria' : v.resultado === 'derrota' ? 'derrota' : 'clique');
-    if (!comVoz) return;
-    const vencedor = v.resultado === 'vitoria' ? e.ia : v.resultado === 'derrota' ? e.rival : null;
-    anunciar(falasDoResultado(v.jogador, v.rival, vencedor), { fila: true });
   }, [fim]);
+
+  const voce = PERSONAGENS[e.ia];
+  const dele = PERSONAGENS[e.rival];
   const titulo = v.resultado === 'vitoria' ? 'VITÓRIA!' : v.resultado === 'derrota' ? 'DERROTA' : 'EMPATE';
 
   return (

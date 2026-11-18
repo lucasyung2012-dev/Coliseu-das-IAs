@@ -37,27 +37,6 @@ jobs:
         if: success() || failure()
         run: npx vitest run --reporter=default --reporter=github-actions
 
-      # Falas do Pretor com voz neural (Piper, gratuito). Se falhar, o site sai assim
-      # mesmo e o jogo usa a voz do navegador.
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Cache das vozes do Piper
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            scripts/vozes/.modelos
-          key: piper-vozes-v1
-
-      - name: Gerar as falas do Pretor (Piper)
-        continue-on-error: true
-        run: |
-          command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
-          pip install piper-tts==1.2.0
-          python scripts/vozes/gerar.py
-
       - name: Build de produção
         run: npx vite build
 

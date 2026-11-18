@@ -8,7 +8,6 @@ import Sprite from '@/ui/pixel/Sprite';
 import { MARTELO, PALETA_MARTELO } from '@/ui/pixel/sprites';
 import { useSequencia } from '@/ui/movimento';
 import { tocar } from '@/ui/som';
-import { anunciar, FALA_ABERTURA } from '@/ui/voz';
 import { useSonsDaFase } from '@/ui/BotaoSom';
 import { CenaTribunal } from './Cenarios';
 import { Clarao, Palco, Portoes } from './Palco';
@@ -32,11 +31,7 @@ export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; r
     // um "pop" para cada jurado, no mesmo ritmo em que eles aparecem
     3: () => jurados.forEach((_, i) => window.setTimeout(() => tocar('jurado'), i * 260)),
     4: 'passos',
-    // a martelada, e o Pretor abre a sessão com a voz dele
-    5: () => {
-      tocar('martelo');
-      anunciar([FALA_ABERTURA]);
-    },
+    5: 'martelo',
   });
 
   return (
