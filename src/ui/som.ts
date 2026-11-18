@@ -76,12 +76,23 @@ function contexto(): AudioContext | null {
 
 let desbloqueado = false;
 
+let vozLiberada = false;
+
 /** Chame dentro de um toque/clique: cria e acorda o áudio (exigência do iPad e dos navegadores). */
 export function desbloquear() {
+  // O iPad só deixa o navegador falar depois de uma fala dentro de um toque: uma fala vazia libera a voz do Pretor.
+  if (!vozLiberada && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    vozLiberada = true;
+    window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+  }
   const c = contexto();
   if (!c) return;
   desbloqueado = true;
   if (c.state === 'suspended') void c.resume();
+}
+
+export function volumeAtual(): number {
+  return volume;
 }
 
 export function somLigado(): boolean {
