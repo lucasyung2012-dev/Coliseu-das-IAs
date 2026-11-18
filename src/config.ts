@@ -4,4 +4,4 @@
  * (passo a passo em docs/DROPBOX.md). Enquanto estiver vazia, não existe conta e
  * o jogo continua valendo troféus neste aparelho, como antes.
  */
-export const DROPBOX_APP_KEY = '';
+export const DROPBOX_APP_KEY = '0vnz534ifxzbv7b';

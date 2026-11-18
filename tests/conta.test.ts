@@ -35,8 +35,8 @@ describe('modo treino', () => {
     expect(pt.treino).toBe(true);
   });
 
-  it('enquanto a chave do Dropbox não existe no jogo, as partidas continuam valendo troféus', () => {
-    expect(contaConfigurada()).toBe(false);
-    expect(modoRanqueado()).toBe(true);
+  it('com a chave do Dropbox no jogo e sem conta conectada, as partidas são treino', () => {
+    expect(contaConfigurada()).toBe(true);
+    expect(modoRanqueado()).toBe(false);
   });
 });
