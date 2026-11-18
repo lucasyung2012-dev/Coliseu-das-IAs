@@ -77,7 +77,7 @@ export default function IntroTribunal({ ia, rival, jurados, fim }: { ia: IaId; r
               <div className="w-10">
                 <JuradoPixel jurado={j} />
               </div>
-              <p className="mt-1 font-pixel text-[9px]" style={{ color: JURADOS[j].toga }}>
+              <p className="mt-1 max-w-full font-pixel text-[7px] [overflow-wrap:anywhere] sm:text-[8px]" style={{ color: JURADOS[j].toga }}>
                 {JURADOS[j].nome.toUpperCase()}
               </p>
               <p className="mt-1 text-[11px] text-muted">{JURADOS[j].jeito}</p>
