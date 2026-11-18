@@ -3,10 +3,10 @@
 Leia este arquivo primeiro em qualquer conversa nova sobre o Coliseu das IAs.
 
 ## Ideias guardadas (para fazer depois)
-- **Voz do Pretor Supremo** (ideia do Lucas, 20/11/2026): no Tribunal, o Pretor **fala de verdade, com voz**. No veredito ele conta os votos em voz alta, um a um, e no fim anuncia quem venceu. Caminho sem custo: a voz do próprio navegador (Web Speech API, `speechSynthesis` em pt-BR), com tom mais grave e devagar; respeita o botão de som. Só guardado, nada construído.
 - **Combos e eventos da arena no Duelo**: o Lucas vai reelaborar (saíram no v3).
 
 ## Estado da conversa (2026-11-15)
+- 20/11/2026: **voz do Pretor Supremo feita** (ideia do Lucas): `src/ui/voz.ts` usa a voz do navegador (Web Speech API, pt-BR, tom grave, sem custo; respeita som e volume; no iPad a voz é liberada no primeiro toque em `desbloquear`). O Pretor diz "A sessão está aberta!" na martelada da entrada e, no veredito, "Silêncio no tribunal!", lê cada voto ("O Lógico vota em Cassius.") e anuncia "Por 3 votos a 2, o tribunal declara a vitória de …". Com voz, a contagem fica mais lenta (2,3 s por voto). Falta o Lucas ouvir no iPad (o navegador do app aqui não tem voz em português). **Em conversa com o Lucas (sem as caixinhas de escolha, que ele achou difíceis):** como deixar o Duelo mais divertido (gostou de tropas no lugar das bolinhas, inspiração Clash Royale e Brawl Stars) e a animação de abertura do app (tema romano + IA, com cara de feito à mão).
 - Pasta local criada (`C:\Users\mauricio.yung\coliseu-das-ias`), git iniciado, sem commit e **sem repositório no GitHub** (o Lucas vai criar).
 - Dilemas do Lovable extraídos em `docs/referencia/dilemas-lovable.json`.
 - Análise e plano em `docs/ANALISE-E-PLANO.md`.
