@@ -246,7 +246,7 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, altura:
       s = aviso(s, '🔗 RETÓRICA EM CADEIA! Forte duas vezes mais rápido', lado);
     }
     // Combo "Contra-ataque perfeito": atacar logo depois de bloquear vale o dobro.
-    if (eu.contraAtaqueAte >= agora) {
+    if (eu.contraAtaqueAte > agora) {
       valor *= 2;
       s = aviso(s, '🔗 CONTRA-ATAQUE PERFEITO! Golpe em dobro', lado);
     }
