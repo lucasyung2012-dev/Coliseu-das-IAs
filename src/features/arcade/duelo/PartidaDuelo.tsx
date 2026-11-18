@@ -47,7 +47,7 @@ import { Faiscas } from '../cenas/Palco';
 import { GladiadorPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
-import { EFEITOS, LARGURA_TROPA, PALETA_EFEITOS, paletaTropa, TRIBUNA, TROPAS } from '@/ui/pixel/tropas';
+import { EFEITOS, LARGURA_TROPA, MANGA, PALETA_EFEITOS, paletaTropa, TRIBUNA, TROPAS } from '@/ui/pixel/tropas';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { PretorDestaque } from '../tribunal/visual';
 import ComoJogar, { BotaoComoJogar, TUTORIAL_DUELO, useTutorial } from '../ComoJogar';

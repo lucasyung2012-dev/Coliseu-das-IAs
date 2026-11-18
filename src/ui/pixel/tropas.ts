@@ -371,3 +371,30 @@ export function paletaTropa(cor: string, escura: string): Paleta {
     p: '#6a5c50',
   };
 }
+
+/**
+ * A manga da toga para a "carta na manga": o braço sai do canto de baixo à direita,
+ * com dobras no tecido, a barra na cor do lado e a mão segurando a carta pela ponta.
+ */
+export const MANGA = desenhar(20, 16, [
+  // tecido da toga (mais claro em cima, dobras em cinza)
+  ['T', 11, 8, 7, 6],
+  ['T', 9, 6, 6, 5],
+  ['T', 8, 5, 4, 3],
+  ['E', 13, 9, 5, 1],
+  ['E', 15, 11, 3, 1],
+  ['E', 11, 7, 3, 1],
+  ['E', 16, 13, 2, 1],
+  ['W', 10, 6, 2, 1],
+  ['W', 12, 8, 2, 1],
+  // barra da manga (punho), na cor do lado
+  ['C', 7, 4, 4, 1],
+  ['C', 6, 5, 2, 2],
+  ['D', 8, 5, 1, 1],
+  // mão segurando a carta
+  ['S', 4, 2, 3, 3],
+  ['S', 3, 1, 2, 1],
+  ['S', 6, 1, 1, 1],
+  ['S', 2, 2, 1, 1],
+  ['K', 4, 3],
+]);
