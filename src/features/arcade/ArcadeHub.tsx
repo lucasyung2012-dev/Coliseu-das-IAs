@@ -188,12 +188,12 @@ function Barra({ valor, rotulo, fina }: { valor: number; rotulo: string; fina?: 
 
 function CartaoModo(props: { rota: string; icone: ReactNode; titulo: string; frase: string; ganho: number; perda: number }) {
   return (
-    <Link to={props.rota} className="pixel-box pixel-hover group block p-5 transition hover:-translate-y-1">
+    <Link to={props.rota} className="pixel-box pixel-hover group block min-w-0 p-5 transition hover:-translate-y-1">
       <div className="flex items-center gap-3">
         <span className="text-3xl text-accent" aria-hidden>
           {props.icone}
         </span>
-        <h3 className="neon font-pixel text-xl text-accent">{props.titulo}</h3>
+        <h3 className="neon min-w-0 font-pixel text-base text-accent sm:text-xl">{props.titulo}</h3>
       </div>
       <p className="mt-3 text-sm text-muted">{props.frase}</p>
       <p className="mt-3 text-sm tabular-nums">
