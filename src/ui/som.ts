@@ -161,7 +161,7 @@ function ruido(c: AudioContext, { dur, vol = 0.3, atraso = 0, filtro = 'lowpass'
 
 /** Sequência de notas, uma depois da outra. */
 function melodia(c: AudioContext, notas: number[], passo: number, extra: Partial<Tom> = {}) {
-  notas.forEach((freq, i) => tom(c, { freq, dur: passo * 1.1, atraso: (extra.atraso ?? 0) + i * passo, ...extra, freq }));
+  notas.forEach((freq, i) => tom(c, { dur: passo * 1.1, ...extra, atraso: (extra.atraso ?? 0) + i * passo, freq }));
 }
 
 // Notas (Hz)
