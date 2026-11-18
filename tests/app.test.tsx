@@ -236,11 +236,11 @@ describe('duelo jogável (protótipo)', () => {
       const dialogo = screen.getByRole('dialog', { name: /Como jogar: DUELO/ });
       fireEvent.click(within(dialogo).getByRole('button', { name: /PULAR/ }));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      expect(screen.getByRole('meter', { name: 'Plateia' })).toBeInTheDocument();
+      expect(screen.getAllByRole('meter', { name: /Torre de/ })).toHaveLength(2);
       const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
       expect(botoes.length).toBeGreaterThanOrEqual(4);
       fireEvent.click(botoes.find((b) => !(b as HTMLButtonElement).disabled)!);
-      // Até 3 rodadas de 60 s, com intervalos.
+      // Até 3 rodadas de 45 s e a prorrogação, com intervalos.
       for (let i = 0; i < 200; i++) {
         act(() => {
           vi.advanceTimersByTime(1000);

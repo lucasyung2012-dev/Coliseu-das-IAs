@@ -1,14 +1,17 @@
 import {
   bonusDaCarga,
+  FOLEGO_POR_SEGUNDO,
   golpeDoGladiador,
   INTERVALO_MS,
   jogarCarta,
   montarMonte,
   novoDuelo,
   passo,
+  PRORROGACAO_MS,
   resultadoFinal,
   RODADA_MS,
   TICK,
+  TORRE_VIDA,
   usarHabilidade,
   type EstadoDuelo,
   type Lado,
@@ -17,11 +20,12 @@ import {
 } from '@/game/duelo/motor';
 
 const sempre = (v: number) => () => v;
-// acerto 0: o rival não joga sozinho nem usa o gladiador (os testes controlam tudo).
+// acerto 0: o rival não usa o gladiador; proximoRival infinito: não joga sozinho.
 const ctx = { acerto: 0, iaRival: 'chatgpt' as const, aleatorio: sempre(0.5) };
+const SEM_RIVAL = Number.POSITIVE_INFINITY;
 
 function base(): EstadoDuelo {
-  return { ...novoDuelo(['frase a'], ['frase b'], sempre(0.5)), proximoRival: Number.POSITIVE_INFINITY };
+  return { ...novoDuelo(['frase a'], ['frase b'], sempre(0.5)), proximoRival: SEM_RIVAL };
 }
 
 function comMao(s: EstadoDuelo, lado: Lado, tipos: TipoCarta[], folego = 10): EstadoDuelo {
@@ -39,12 +43,12 @@ function avancar(s: EstadoDuelo, ms: number): EstadoDuelo {
   return x;
 }
 
-describe('duelo v4: tropas de argumentos', () => {
-  it('monte de 15 cartas com só 1 arqueiro', () => {
+describe('duelo v5: tropas contra a torre', () => {
+  it('monte de 15 cartas, sem as cartas roubadas, com só 1 arqueiro', () => {
     const monte = montarMonte(['a'], 'eu', sempre(0.3));
     const conta = (t: TipoCarta) => monte.filter((c) => c.tipo === t).length;
     expect(monte).toHaveLength(15);
-    expect([conta('argumento'), conta('forte'), conta('dado'), conta('capciosa'), conta('apelo')]).toEqual([8, 4, 1, 1, 1]);
+    expect([conta('argumento'), conta('forte'), conta('dado')]).toEqual([9, 5, 1]);
   });
 
   it('segurar e soltar: carga cheia dá só +1 e custa +1 de fôlego (o arqueiro não carrega)', () => {
@@ -53,18 +57,17 @@ describe('duelo v4: tropas de argumentos', () => {
     const depois = jogarCarta(s, 'eu', 'eu0', 1);
     expect(depois.tropas[0]).toMatchObject({ forca: 3, carregada: true });
     expect(depois.eu.folego).toBe(17);
-    // Sem fôlego sobrando para a carga, a tropa sai normal.
-    const semFolego = jogarCarta(comMao(base(), 'eu', ['argumento'], 2), 'eu', 'eu0', 1);
-    expect(semFolego.tropas[0]!.forca).toBe(2);
     expect(jogarCarta(s, 'eu', 'eu1', 1).tropas[0]!.forca).toBe(1);
+    // Sem fôlego sobrando para a carga, a tropa sai normal.
+    expect(jogarCarta(comMao(base(), 'eu', ['argumento'], 2), 'eu', 'eu0', 1).tropas[0]!.forca).toBe(2);
   });
 
-  it('o gladiador do rival tira 1 do legionário que chega: ele puxa a plateia com o que sobrou', () => {
+  it('o gladiador do rival tira 1 do legionário; ele chega e tira o resto da torre', () => {
     let s = jogarCarta(comMao(base(), 'eu', ['argumento']), 'eu', 'eu0');
     expect(s.eu.folego).toBe(8);
     s = avancar(s, 5500);
     expect(s.tropas).toHaveLength(0);
-    expect(s.plateia).toBe(1);
+    expect(s.torres).toEqual({ eu: TORRE_VIDA, rival: TORRE_VIDA - 1 });
     expect(s.eu.carga).toBe(1);
   });
 
@@ -75,7 +78,7 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(s.tropas).toHaveLength(1);
     expect(s.tropas[0]).toMatchObject({ de: 'eu', forca: 2 });
     s = avancar(s, 7000);
-    expect(s.plateia).toBe(1);
+    expect(s.torres.rival).toBe(TORRE_VIDA - 1);
   });
 
   it('no máximo 2 arqueiros seus em campo', () => {
@@ -92,12 +95,12 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(golpeDoGladiador(s, 'eu')).toBe(s);
   });
 
-  it('Claude (Escudo): o escudo segura golpes que chegariam', () => {
+  it('Claude (Escudo): bloqueia golpes que chegariam na torre', () => {
     let s = base();
     s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'claude');
     expect(s.eu.escudo).toBe(2);
     s = avancar({ ...s, tropas: [tropa('rival', 20.5, 3)] }, 300);
-    expect(s.plateia).toBe(0);
+    expect(s.torres.eu).toBe(TORRE_VIDA);
     expect(s.eu.escudo).toBe(1);
   });
 
@@ -110,7 +113,7 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(s.eu.folego).toBe(6);
   });
 
-  it('Gemini (Raio): o raio tira 3 da tropa inimiga mais perto, não limpa a arena', () => {
+  it('Gemini (Raio): tira 3 da tropa inimiga mais perto, não limpa a arena', () => {
     let s = { ...base(), tropas: [tropa('rival', 40, 4, 1), tropa('rival', 70, 4, 2)] };
     s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'gemini');
     expect(s.tropas.map((t) => t.forca)).toEqual([1, 4]);
@@ -121,25 +124,44 @@ describe('duelo v4: tropas de argumentos', () => {
     expect(usarHabilidade(s, 'eu', 'gemini')).toBe(s);
   });
 
-  it('virada: nos últimos 30 s quem perde recupera fôlego 25% mais rápido', () => {
-    let s = base();
-    s = { ...s, tempo: 40_000, plateia: -2, eu: { ...s.eu, folego: 0 }, rival: { ...s.rival, folego: 0 } };
-    s = avancar(s, 1000);
-    expect(s.eu.folego).toBeCloseTo(1.25);
-    expect(s.rival.folego).toBeCloseTo(1);
+  it('torre no chão: fim na hora', () => {
+    let s = { ...base(), torres: { eu: TORRE_VIDA, rival: 1 }, tropas: [tropa('eu', 79.5, 3)] };
+    s = passo(s, ctx);
+    expect(s.fase).toBe('fim');
+    expect(s.torres.rival).toBe(0);
+    expect(resultadoFinal(s)).toBe('vitoria');
   });
 
-  it('melhor de 3: rodada acaba na plateia toda, tem intervalo e termina com 2 vitórias', () => {
-    let s = { ...base(), plateia: 9, tropas: [tropa('eu', 79.5, 2)] };
-    s = passo(s, ctx);
+  it('virada: na 3ª rodada, quem tem menos vida recupera fôlego 25% mais rápido', () => {
+    let s = base();
+    s = { ...s, rodada: 3, torres: { eu: 20, rival: 25 }, eu: { ...s.eu, folego: 0 }, rival: { ...s.rival, folego: 0 } };
+    s = avancar(s, 1000);
+    expect(s.eu.folego).toBeCloseTo(FOLEGO_POR_SEGUNDO * 1.25);
+    expect(s.rival.folego).toBeCloseTo(FOLEGO_POR_SEGUNDO);
+  });
+
+  it('as torres guardam a vida entre as rodadas; no fim da 3ª, ganha quem tem mais vida', () => {
+    let s = { ...base(), torres: { eu: 25, rival: 20 } };
+    s = passo({ ...s, tempo: RODADA_MS - TICK }, ctx);
     expect(s.fase).toBe('intervalo');
-    expect(s.rodadas).toEqual({ eu: 1, rival: 0 });
     s = avancar(s, INTERVALO_MS + TICK);
-    expect(s.fase).toBe('luta');
-    expect(s.rodada).toBe(2);
-    expect(s.plateia).toBe(0);
-    s = passo({ ...s, tempo: RODADA_MS - TICK, plateia: 1, proximoRival: Number.POSITIVE_INFINITY }, ctx);
+    expect(s).toMatchObject({ fase: 'luta', rodada: 2, torres: { eu: 25, rival: 20 } });
+    s = passo({ ...s, rodada: 3, tempo: RODADA_MS - TICK, proximoRival: SEM_RIVAL }, ctx);
     expect(s.fase).toBe('fim');
     expect(resultadoFinal(s)).toBe('vitoria');
+  });
+
+  it('empate na vida depois da 3ª rodada: prorrogação de 20 s com fôlego em dobro', () => {
+    let s = { ...base(), rodada: 3, torres: { eu: 18, rival: 18 } };
+    s = passo({ ...s, tempo: RODADA_MS - TICK }, ctx);
+    expect(s.fase).toBe('intervalo');
+    s = avancar(s, INTERVALO_MS + TICK);
+    expect(s.rodada).toBe(4);
+    s = { ...s, proximoRival: SEM_RIVAL, eu: { ...s.eu, folego: 0 } };
+    s = avancar(s, 1000);
+    expect(s.eu.folego).toBeCloseTo(FOLEGO_POR_SEGUNDO * 2);
+    s = passo({ ...s, tempo: PRORROGACAO_MS - TICK }, ctx);
+    expect(s.fase).toBe('fim');
+    expect(resultadoFinal(s)).toBe('empate');
   });
 });

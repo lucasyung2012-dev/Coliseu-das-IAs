@@ -66,6 +66,31 @@ const ARQUEIRO: Passo[] = [
   ['B', 6, 12, 2, 1],
 ];
 
+/** A torre de cada lado: pedra, ameias no topo, janela, porta e o estandarte na cor do lado. */
+const TORRE_PASSOS: Passo[] = [
+  ['P', 0, 0, 3, 2], // ameias
+  ['P', 5, 0, 4, 2],
+  ['P', 11, 0, 3, 2],
+  ['P', 0, 2, 14, 2],
+  ['p', 0, 3, 14, 1],
+  ['P', 1, 4, 12, 18], // corpo
+  ['p', 1, 8, 12, 1], // fiadas de pedra
+  ['p', 1, 13, 12, 1],
+  ['p', 1, 18, 12, 1],
+  ['p', 4, 4, 1, 4],
+  ['p', 9, 9, 1, 4],
+  ['p', 4, 14, 1, 4],
+  ['p', 10, 14, 1, 4],
+  ['K', 6, 5, 2, 3], // janela
+  ['C', 3, 9, 3, 4], // estandarte
+  ['D', 3, 13],
+  ['D', 5, 13],
+  ['G', 4, 10],
+  ['B', 5, 18, 4, 4], // porta
+  ['p', 7, 18, 1, 4],
+];
+export const TORRE = desenhar(16, 24, TORRE_PASSOS);
+
 export const TROPAS: Record<TipoTropa, string[]> = {
   legionario: desenhar(14, 15, LEGIONARIO),
   centuriao: desenhar(15, 17, CENTURIAO),
@@ -83,5 +108,7 @@ export function paletaTropa(cor: string, escura: string): Paleta {
     N: '#efe2bd',
     C: cor,
     D: escura,
+    P: '#9a8a78',
+    p: '#6a5c50',
   };
 }

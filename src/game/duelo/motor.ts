@@ -1,33 +1,39 @@
 /**
- * Duelo em tempo real, versão 4 (combinada com o Lucas): tropas de argumentos.
- * Cada carta vira uma tropa que anda pela faixa. Quando duas tropas inimigas se
- * encontram, elas param e lutam (cada uma tira 1 de força da outra por vez);
- * a que sobra segue em frente. Tropa que chega ao outro lado puxa a plateia com
- * a força que tem. "Segurar e soltar": quanto mais você segura a carta, mais
- * forte ela sai. O gladiador de cada lado defende a sua ponta, a habilidade da
- * IA enche com acertos e, nos últimos 30 s, quem está perdendo recupera fôlego
- * mais rápido. Tudo equilibrado com números pequenos, para ajustar jogando.
+ * Duelo em tempo real, versão 5 (combinada com o Lucas): tropas de argumentos
+ * contra a torre do rival.
+ * Cada gladiador fica em cima da sua torre. Cada carta vira uma tropa que anda
+ * pela faixa; quando duas tropas inimigas se encontram, elas lutam (1 de dano
+ * por vez) e a que sobra segue. A tropa que chega à torre inimiga tira dela a
+ * força que tem. Torre no chão = derrota na hora. Se ninguém derrubar, ganha
+ * quem tiver mais vida no fim da 3ª rodada; empate leva à prorrogação (4ª
+ * rodada, 20 s, fôlego em dobro). "Segurar e soltar": carga cheia dá +1 de
+ * força e custa +1 de fôlego. O gladiador defende a torre, a habilidade da IA
+ * enche com acertos e, na 3ª rodada, quem tem menos vida recupera fôlego mais
+ * rápido (virada). Números pequenos, para ajustar jogando.
  * Funções puras: a tela chama `passo` a cada tick e as ações no toque.
  */
 import type { IaId } from '../personagens';
 
 export type Lado = 'eu' | 'rival';
-export type TipoCarta = 'argumento' | 'forte' | 'dado' | 'capciosa' | 'apelo';
+export type TipoCarta = 'argumento' | 'forte' | 'dado';
 export type TipoTropa = 'legionario' | 'centuriao' | 'arqueiro';
 
-export const LIMITE = 10;
+export const TORRE_VIDA = 30;
 export const FOLEGO_MAX = 10;
 export const FOLEGO_INICIAL = 5;
-export const FOLEGO_POR_SEGUNDO = 1;
-/** Últimos 30 s: quem está perdendo recupera fôlego 25% mais rápido. */
-export const VIRADA_MS = 30_000;
+/** O Lucas achou rápido demais a 1/s. */
+export const FOLEGO_POR_SEGUNDO = 0.7;
+/** 3ª rodada: quem tem menos vida na torre recupera fôlego 25% mais rápido. */
 export const VIRADA_BONUS = 1.25;
-export const RODADA_MS = 60_000;
+export const RODADAS = 3;
+export const RODADA_MS = 45_000;
+/** Prorrogação (4ª rodada, só se empatar a vida): 20 s com fôlego em dobro. */
+export const PRORROGACAO_MS = 20_000;
 export const INTERVALO_MS = 2_500;
 export const TAMANHO_MAO = 4;
 export const TICK = 100;
 
-/** Onde as tropas nascem e onde fica a ponta de cada lado (em % da largura). */
+/** Onde as tropas nascem e onde fica a torre de cada lado (em % da largura). */
 export const PONTA = { eu: 20, rival: 80 } as const;
 /** Distância em que duas tropas inimigas se encostam e lutam. */
 const ENCOSTO = 4;
@@ -48,19 +54,17 @@ export interface InfoCarta {
   nome: string;
   icone: string;
   custo: number;
-  /** Força da tropa (0 = carta de efeito). */
   forca: number;
-  tropa?: TipoTropa;
+  tropa: TipoTropa;
   dica: string;
   rara?: boolean;
 }
 
+/** Pergunta capciosa e Apelo à plateia saíram: o Lucas achou que eram "roubadas". */
 export const CARTAS: Record<TipoCarta, InfoCarta> = {
   argumento: { nome: 'Argumento', icone: '⚔️', custo: 2, forca: 2, tropa: 'legionario', dica: 'Legionário rápido.' },
   forte: { nome: 'Argumento forte', icone: '🛡️', custo: 4, forca: 4, tropa: 'centuriao', dica: 'Centurião lento e resistente.' },
   dado: { nome: 'Dado irrefutável', icone: '🏹', custo: 4, forca: 1, tropa: 'arqueiro', dica: 'Arqueiro: atira de longe, mas é frágil.', rara: true },
-  capciosa: { nome: 'Pergunta capciosa', icone: '❓', custo: 1, forca: 0, dica: 'O rival fica 2 s sem jogar.', rara: true },
-  apelo: { nome: 'Apelo à plateia', icone: '👏', custo: 2, forca: 0, dica: 'Plateia +1 na hora.', rara: true },
 };
 
 /** Velocidade de cada tropa (% da largura por segundo). */
@@ -76,10 +80,10 @@ export const GLADIADOR_ALCANCE = 8;
 export const GLADIADOR_RECARGA_MS = 8000;
 const GLADIADOR_ALCANCE_TOQUE = 25;
 
-/** Habilidade da IA: enche com 4 acertos. */
+/** Habilidade da IA: enche com 4 tropas que chegam à torre. */
 export const SUPER_MAX = 4;
 export const HABILIDADES: Record<IaId, { nome: string; icone: string; efeito: string }> = {
-  claude: { nome: 'Escudo', icone: '🛡️', efeito: 'Bloqueia os próximos 2 golpes que chegariam em você.' },
+  claude: { nome: 'Escudo', icone: '🛡️', efeito: 'Bloqueia os próximos 2 golpes na sua torre.' },
   chatgpt: { nome: 'Carta grátis', icone: '🃏', efeito: 'A próxima carta não custa fôlego.' },
   gemini: { nome: 'Raio', icone: '⚡', efeito: 'Tira 3 de força da tropa inimiga mais perto.' },
 };
@@ -98,7 +102,7 @@ export interface Tropa {
   forca: number;
   forcaInicial: number;
   x: number;
-  /** Saiu carregada (forte): brilha. */
+  /** Saiu carregada: brilha. */
   carregada: boolean;
   proximoGolpe: number;
 }
@@ -107,7 +111,6 @@ export interface Lutador {
   folego: number;
   mao: CartaDuelo[];
   monte: CartaDuelo[];
-  presoAte: number;
   /** Carga da habilidade (0 a SUPER_MAX). */
   carga: number;
   /** Claude: golpes que o escudo ainda segura. */
@@ -121,7 +124,7 @@ export interface Lutador {
 
 export interface EfeitoVisual {
   id: number;
-  tipo: 'choque' | 'acerto' | 'flecha' | 'golpe' | 'raio' | 'escudo' | 'super';
+  tipo: 'choque' | 'torre' | 'flecha' | 'golpe' | 'raio' | 'escudo' | 'super';
   lado: Lado;
   x?: number;
   ate: number;
@@ -129,9 +132,9 @@ export interface EfeitoVisual {
 
 export interface EstadoDuelo {
   tempo: number;
+  /** 1 a 3; a 4 é a prorrogação. */
   rodada: number;
-  rodadas: { eu: number; rival: number };
-  plateia: number;
+  torres: { eu: number; rival: number };
   eu: Lutador;
   rival: Lutador;
   tropas: Tropa[];
@@ -146,10 +149,11 @@ export interface EstadoDuelo {
 export type Aleatorio = () => number;
 
 const outro = (l: Lado): Lado => (l === 'eu' ? 'rival' : 'eu');
-const sinal = (l: Lado) => (l === 'eu' ? 1 : -1);
 /** Direção em que as tropas de cada lado andam. */
 const direcao = (l: Lado) => (l === 'eu' ? 1 : -1);
-const limitar = (v: number) => Math.max(-LIMITE, Math.min(LIMITE, v));
+
+export const prorrogacao = (s: EstadoDuelo) => s.rodada > RODADAS;
+export const duracaoDaRodada = (s: EstadoDuelo) => (prorrogacao(s) ? PRORROGACAO_MS : RODADA_MS);
 
 function embaralhar<T>(lista: T[], aleatorio: Aleatorio): T[] {
   const a = [...lista];
@@ -160,9 +164,9 @@ function embaralhar<T>(lista: T[], aleatorio: Aleatorio): T[] {
   return a;
 }
 
-/** Monte de 15 cartas: 8 argumentos, 4 fortes e 1 de cada rara (só 1 arqueiro). */
+/** Monte de 15 cartas: 9 argumentos, 5 fortes e só 1 arqueiro. */
 export function montarMonte(frases: string[], prefixo: string, aleatorio: Aleatorio): CartaDuelo[] {
-  const tipos: TipoCarta[] = [...Array<TipoCarta>(8).fill('argumento'), ...Array<TipoCarta>(4).fill('forte'), 'dado', 'capciosa', 'apelo'];
+  const tipos: TipoCarta[] = [...Array<TipoCarta>(9).fill('argumento'), ...Array<TipoCarta>(5).fill('forte'), 'dado'];
   return embaralhar(
     tipos.map((tipo, i) => ({ id: `${prefixo}-${i}`, tipo, frase: frases[i % Math.max(1, frases.length)] ?? '' })),
     aleatorio,
@@ -174,7 +178,6 @@ function lutador(monte: CartaDuelo[]): Lutador {
     folego: FOLEGO_INICIAL,
     mao: monte.slice(0, TAMANHO_MAO),
     monte: monte.slice(TAMANHO_MAO),
-    presoAte: 0,
     carga: 0,
     escudo: 0,
     gratis: false,
@@ -188,8 +191,7 @@ export function novoDuelo(frasesEu: string[], frasesRival: string[], aleatorio: 
   return {
     tempo: 0,
     rodada: 1,
-    rodadas: { eu: 0, rival: 0 },
-    plateia: 0,
+    torres: { eu: TORRE_VIDA, rival: TORRE_VIDA },
     eu: lutador(montarMonte(frasesEu, 'eu', aleatorio)),
     rival: lutador(montarMonte(frasesRival, 'rv', aleatorio)),
     tropas: [],
@@ -213,7 +215,7 @@ function efeito(s: EstadoDuelo, tipo: EfeitoVisual['tipo'], lado: Lado, x?: numb
   return { ...s, seq: s.seq + 1, efeitos: [...s.efeitos, { id: s.seq + 1, tipo, lado, x, ate: s.tempo + ms }] };
 }
 
-/** Quanto custa esta carta agora (a do Improviso sai de graça). */
+/** Quanto custa esta carta agora (com a Carta grátis, sai de graça). */
 export function custoAgora(l: Lutador, tipo: TipoCarta): number {
   return l.gratis ? 0 : CARTAS[tipo].custo;
 }
@@ -221,7 +223,7 @@ export function custoAgora(l: Lutador, tipo: TipoCarta): number {
 export function podeJogar(s: EstadoDuelo, lado: Lado, cartaId: string): boolean {
   const l = s[lado];
   const c = l.mao.find((x) => x.id === cartaId);
-  if (!c || s.fase !== 'luta' || l.presoAte > s.tempo || l.folego < custoAgora(l, c.tipo)) return false;
+  if (!c || s.fase !== 'luta' || l.folego < custoAgora(l, c.tipo)) return false;
   if (c.tipo === 'dado' && s.tropas.filter((t) => t.de === lado && t.tipo === 'arqueiro').length >= MAX_ARQUEIROS) return false;
   return true;
 }
@@ -234,7 +236,7 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, carga =
   const agora = s0.tempo;
   const custo = custoAgora(s0[lado], carta.tipo);
   // O arqueiro é frágil de propósito: não carrega. A carga custa +1 de fôlego.
-  const bonus = info.tropa && info.tropa !== 'arqueiro' && s0[lado].folego - custo >= CUSTO_CARGA ? bonusDaCarga(carga) : 0;
+  const bonus = info.tropa !== 'arqueiro' && s0[lado].folego - custo >= CUSTO_CARGA ? bonusDaCarga(carga) : 0;
   let s = comLutador(s0, lado, (l) => {
     const mao = l.mao.filter((c) => c.id !== carta.id);
     const [proxima, ...resto] = l.monte;
@@ -248,24 +250,12 @@ export function jogarCarta(s0: EstadoDuelo, lado: Lado, cartaId: string, carga =
       fala: { texto: carta.frase, ate: agora + 1800 },
     };
   });
-
-  if (carta.tipo === 'capciosa') {
-    s = avisar(s, '❓ PERGUNTA CAPCIOSA!', lado);
-    return comLutador(s, outro(lado), (l) => ({ ...l, presoAte: agora + 2000 }));
-  }
-  if (carta.tipo === 'apelo') {
-    s = efeito(s, 'acerto', lado);
-    return { ...s, plateia: limitar(s.plateia + sinal(lado)) };
-  }
   const forca = info.forca + bonus;
   if (bonus > 0) s = avisar(s, '💪 CARREGADO! +1', lado, 900);
   return {
     ...s,
     seq: s.seq + 1,
-    tropas: [
-      ...s.tropas,
-      { id: s.seq + 1, de: lado, tipo: info.tropa!, forca, forcaInicial: forca, x: PONTA[lado], carregada: bonus > 0, proximoGolpe: agora },
-    ],
+    tropas: [...s.tropas, { id: s.seq + 1, de: lado, tipo: info.tropa, forca, forcaInicial: forca, x: PONTA[lado], carregada: bonus > 0, proximoGolpe: agora }],
   };
 }
 
@@ -274,10 +264,10 @@ export function usarHabilidade(s0: EstadoDuelo, lado: Lado, ia: IaId): EstadoDue
   if (s0[lado].carga < SUPER_MAX || s0.fase !== 'luta') return s0;
   let s = comLutador(s0, lado, (l) => ({ ...l, carga: 0 }));
   s = efeito(s, 'super', lado, undefined, 1000);
-  s = avisar(s, `⭐ ${HABILIDADES[ia].nome.toUpperCase()}!`, lado, 1800);
+  s = avisar(s, `${HABILIDADES[ia].icone} ${HABILIDADES[ia].nome.toUpperCase()}!`, lado, 1800);
   if (ia === 'claude') return comLutador(s, lado, (l) => ({ ...l, escudo: 2 }));
   if (ia === 'chatgpt') return comLutador(s, lado, (l) => ({ ...l, gratis: true }));
-  // Gemini: raio na tropa inimiga mais perto da sua ponta
+  // Gemini: raio na tropa inimiga mais perto da sua torre
   const alvo = maisPerto(s, outro(lado), PONTA[lado]);
   if (!alvo) return s;
   s = efeito(s, 'raio', lado, alvo.x);
@@ -312,7 +302,7 @@ function inimigaAFrente(s: EstadoDuelo, t: Tropa): Tropa | undefined {
     .sort((a, b) => (a.x - t.x) * d - (b.x - t.x) * d)[0];
 }
 
-/** Lutas, tiros, passos e chegadas das tropas. */
+/** Lutas, tiros, passos, gladiadores e chegadas às torres. */
 function moverTropas(s0: EstadoDuelo): EstadoDuelo {
   let s = s0;
   const agora = s.tempo;
@@ -353,7 +343,7 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
     }),
   };
 
-  // 3) Gladiadores: golpe automático em quem chega perto da ponta
+  // 3) Gladiadores: golpe automático em quem chega perto da torre
   for (const lado of ['eu', 'rival'] as Lado[]) {
     if (s[lado].gladiadorAutoEm > agora) continue;
     const alvo = s.tropas.find((t) => t.de !== lado && Math.abs(t.x - PONTA[lado]) <= GLADIADOR_ALCANCE);
@@ -363,7 +353,7 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
     s = ferir(s, alvo.id, 1);
   }
 
-  // 4) Chegadas: a tropa que passa da ponta inimiga puxa a plateia
+  // 4) Chegadas: a tropa que alcança a torre inimiga tira dela a força que tem
   const chegaram = s.tropas.filter((t) => (t.x - PONTA[outro(t.de)]) * direcao(t.de) >= 0);
   s = { ...s, tropas: s.tropas.filter((t) => !chegaram.includes(t)) };
   for (const t of chegaram) {
@@ -373,9 +363,9 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
       s = efeito(s, 'escudo', alvo, PONTA[alvo]);
       continue;
     }
-    s = { ...s, plateia: limitar(s.plateia + sinal(t.de) * t.forca) };
+    s = { ...s, torres: { ...s.torres, [alvo]: Math.max(0, s.torres[alvo] - t.forca) } as EstadoDuelo['torres'] };
     s = comLutador(s, t.de, (l) => ({ ...l, carga: Math.min(SUPER_MAX, l.carga + 1) }));
-    s = efeito(s, 'acerto', t.de);
+    s = efeito(s, 'torre', alvo, PONTA[alvo], 500);
   }
   return s;
 }
@@ -391,7 +381,6 @@ function vezDoRival(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   let s = s0;
   const r = s.rival;
   const agora = s.tempo;
-  if (r.presoAte > agora) return s;
   if (r.carga >= SUPER_MAX) {
     const util = ctx.iaRival !== 'gemini' || s.tropas.some((t) => t.de === 'eu');
     if (util) return usarHabilidade(s, 'rival', ctx.iaRival);
@@ -406,12 +395,20 @@ function vezDoRival(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   const temCenturiao = s.tropas.some((t) => t.de === 'eu' && t.tipo === 'centuriao');
   const forte = jogaveis.find((c) => c.tipo === 'forte');
   const escolhida = temCenturiao && forte ? forte : jogaveis[Math.floor(ctx.aleatorio() * jogaveis.length)];
-  // Ritmo: de ~3,4 s (liga baixa) a ~2,5 s (liga alta) entre jogadas
-  s = { ...s, proximoRival: agora + 3600 - ctx.acerto * 1600 + ctx.aleatorio() * 800 };
+  // Ritmo: de ~3,4 s (liga baixa) a ~2,5 s (liga alta) entre jogadas (na prorrogação, mais rápido)
+  const ritmo = (3600 - ctx.acerto * 1600 + ctx.aleatorio() * 800) * (prorrogacao(s) ? 0.6 : 1);
+  s = { ...s, proximoRival: agora + ritmo };
   if (!escolhida) return s;
   // Carga: quanto melhor a liga, mais vezes carrega (pagando +1 de fôlego)
   const carga = ctx.aleatorio() < 0.2 + ctx.acerto * 0.5 ? 1 : 0;
   return jogarCarta(s, 'rival', escolhida.id, carga);
+}
+
+/** Quanto fôlego volta por segundo para este lado agora. */
+export function ritmoDoFolego(s: EstadoDuelo, lado: Lado): number {
+  if (prorrogacao(s)) return FOLEGO_POR_SEGUNDO * 2;
+  const menos = lado === 'eu' ? s.torres.eu < s.torres.rival : s.torres.rival < s.torres.eu;
+  return FOLEGO_POR_SEGUNDO * (s.rodada === RODADAS && menos ? VIRADA_BONUS : 1);
 }
 
 export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
@@ -419,16 +416,17 @@ export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   const tempo = s0.tempo + TICK;
   if (s0.fase === 'intervalo') {
     if (tempo < s0.fimIntervalo) return { ...s0, tempo };
-    const zerar = (l: Lutador): Lutador => ({ ...l, folego: FOLEGO_INICIAL, presoAte: 0, escudo: 0, gratis: false, gladiadorAutoEm: 0, gladiadorProntoEm: 0, fala: null });
-    return { ...s0, tempo: 0, rodada: s0.rodada + 1, plateia: 0, tropas: [], eu: zerar(s0.eu), rival: zerar(s0.rival), proximoRival: 3000, fase: 'luta', aviso: null, efeitos: [] };
+    // Nova rodada: as torres guardam a vida; tropas e fôlego recomeçam.
+    const zerar = (l: Lutador): Lutador => ({ ...l, folego: FOLEGO_INICIAL, escudo: 0, gratis: false, gladiadorAutoEm: 0, gladiadorProntoEm: 0, fala: null });
+    let s: EstadoDuelo = { ...s0, tempo: 0, rodada: s0.rodada + 1, tropas: [], eu: zerar(s0.eu), rival: zerar(s0.rival), proximoRival: 3000, fase: 'luta', aviso: null, efeitos: [] };
+    if (prorrogacao(s)) s = avisar(s, '⚡ PRORROGAÇÃO! FÔLEGO EM DOBRO', null, 2200);
+    else if (s.rodada === RODADAS) s = avisar(s, '⏳ ÚLTIMA RODADA: HORA DA VIRADA!', null, 2200);
+    return s;
   }
 
-  // Virada: nos últimos 30 s, quem está perdendo recupera fôlego mais rápido
-  const virada = tempo >= RODADA_MS - VIRADA_MS;
-  const perdendo: Lado | null = s0.plateia < 0 ? 'eu' : s0.plateia > 0 ? 'rival' : null;
   const recupera = (lado: Lado) => (l: Lutador): Lutador => ({
     ...l,
-    folego: Math.min(FOLEGO_MAX, l.folego + (FOLEGO_POR_SEGUNDO * (virada && perdendo === lado ? VIRADA_BONUS : 1) * TICK) / 1000),
+    folego: Math.min(FOLEGO_MAX, l.folego + (ritmoDoFolego(s0, lado) * TICK) / 1000),
     fala: l.fala && l.fala.ate > tempo ? l.fala : null,
   });
   let s: EstadoDuelo = {
@@ -439,27 +437,31 @@ export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
     aviso: s0.aviso && s0.aviso.ate > tempo ? s0.aviso : null,
     efeitos: s0.efeitos.filter((e) => e.ate > tempo),
   };
-  if (tempo === RODADA_MS - VIRADA_MS) s = avisar(s, '⏳ ÚLTIMOS 30 s: HORA DA VIRADA!', null, 2000);
 
   s = moverTropas(s);
   s = vezDoRival(s, ctx);
 
-  if (Math.abs(s.plateia) >= LIMITE || tempo >= RODADA_MS) {
-    const venceu: Lado | null = s.plateia > 0 ? 'eu' : s.plateia < 0 ? 'rival' : null;
-    const rodadas = { eu: s.rodadas.eu + (venceu === 'eu' ? 1 : 0), rival: s.rodadas.rival + (venceu === 'rival' ? 1 : 0) };
-    const acabou = rodadas.eu >= 2 || rodadas.rival >= 2 || s.rodada >= 3;
-    s = { ...s, rodadas, tropas: [], fase: acabou ? 'fim' : 'intervalo', fimIntervalo: tempo + INTERVALO_MS };
-    s = avisar(s, venceu === 'eu' ? `RODADA ${s.rodada}: SUA!` : venceu === 'rival' ? `RODADA ${s.rodada}: DO RIVAL` : `RODADA ${s.rodada}: EMPATE`, venceu, INTERVALO_MS);
+  // Torre no chão: fim na hora.
+  if (s.torres.eu <= 0 || s.torres.rival <= 0) {
+    const caiu: Lado = s.torres.eu <= 0 ? 'eu' : 'rival';
+    s = { ...s, tropas: [], fase: 'fim' };
+    return avisar(s, caiu === 'eu' ? 'SUA TORRE CAIU!' : 'A TORRE DO RIVAL CAIU!', outro(caiu), 3000);
+  }
+  // Fim do tempo da rodada
+  if (tempo >= duracaoDaRodada(s)) {
+    const empate = s.torres.eu === s.torres.rival;
+    const acabou = prorrogacao(s) || (s.rodada >= RODADAS && !empate);
+    s = { ...s, tropas: [], fase: acabou ? 'fim' : 'intervalo', fimIntervalo: tempo + INTERVALO_MS };
+    s = avisar(
+      s,
+      acabou ? 'FIM DO DUELO!' : s.rodada >= RODADAS ? 'EMPATE NA VIDA! VAI PARA A PRORROGAÇÃO' : `FIM DA RODADA ${s.rodada}`,
+      null,
+      INTERVALO_MS,
+    );
   }
   return s;
 }
 
 export function resultadoFinal(s: EstadoDuelo): 'vitoria' | 'derrota' | 'empate' {
-  return s.rodadas.eu > s.rodadas.rival ? 'vitoria' : s.rodadas.rival > s.rodadas.eu ? 'derrota' : 'empate';
-}
-
-/** Fôlego da virada está valendo para este lado agora? (para a tela mostrar) */
-export function emVirada(s: EstadoDuelo, lado: Lado): boolean {
-  const perdendo = lado === 'eu' ? s.plateia < 0 : s.plateia > 0;
-  return s.fase === 'luta' && s.tempo >= RODADA_MS - VIRADA_MS && perdendo;
+  return s.torres.eu > s.torres.rival ? 'vitoria' : s.torres.rival > s.torres.eu ? 'derrota' : 'empate';
 }

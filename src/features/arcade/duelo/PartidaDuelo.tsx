@@ -9,23 +9,25 @@ import {
   CARGA_MS,
   CARTAS,
   custoAgora,
-  emVirada,
+  duracaoDaRodada,
   FOLEGO_MAX,
+  FOLEGO_POR_SEGUNDO,
   GLADIADOR_ALCANCE,
   golpeDoGladiador,
   HABILIDADES,
   jogarCarta,
-  LIMITE,
   novoDuelo,
   passo,
   podeJogar,
   PONTA,
+  prorrogacao,
+  RODADAS,
   resultadoFinal,
-  RODADA_MS,
+  ritmoDoFolego,
   SUPER_MAX,
   TICK,
+  TORRE_VIDA,
   usarHabilidade,
-  VIRADA_MS,
   type CartaDuelo,
   type EstadoDuelo,
   type Lado,
@@ -37,7 +39,7 @@ import { Faiscas, Palco } from '../cenas/Palco';
 import { GladiadorPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import Sprite from '@/ui/pixel/Sprite';
-import { paletaTropa, TROPAS } from '@/ui/pixel/tropas';
+import { paletaTropa, TORRE, TROPAS } from '@/ui/pixel/tropas';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { VERDE, VERMELHO } from '../tribunal/visual';
 import ComoJogar, { BotaoComoJogar, TUTORIAL_DUELO, useTutorial } from '../ComoJogar';
@@ -99,7 +101,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
     for (const x of e.efeitos) {
       if (x.id <= visto.current) continue;
       if (x.tipo === 'choque' || x.tipo === 'escudo') novos.push('espadas');
-      if (x.tipo === 'acerto') novos.push(x.lado === 'eu' ? 'jurado' : 'falha');
+      if (x.tipo === 'torre') novos.push(x.lado === 'rival' ? 'jurado' : 'falha');
       if (x.tipo === 'super' || x.tipo === 'raio') novos.push('fanfarra');
       if (x.tipo === 'golpe') novos.push('passos');
       if (x.tipo === 'flecha') novos.push('roleta');
@@ -168,10 +170,11 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
 
   const voce = PERSONAGENS[ia];
   const dele = PERSONAGENS[rival];
-  const restante = Math.max(0, Math.ceil((RODADA_MS - e.tempo) / 1000));
-  const virada = e.tempo >= RODADA_MS - VIRADA_MS;
+  const restante = Math.max(0, Math.ceil((duracaoDaRodada(e) - e.tempo) / 1000));
+  const extra = prorrogacao(e);
   const eu = e.eu;
   const gladiadorPronto = eu.gladiadorProntoEm <= e.tempo;
+  const torreBatida = (l: Lado) => e.efeitos.some((x) => x.tipo === 'torre' && x.lado === l);
 
   return (
     <div className="flex flex-col gap-3">
@@ -180,17 +183,15 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         <BotaoComoJogar onClick={tutorial.abrir} />
       </div>
 
-      {/* Placar: quem é quem, rodadas, relógio e a plateia */}
-      <div className="pixel-box flex flex-col gap-1 px-3 py-2">
-        <div className="flex items-center justify-between gap-2">
-          <Pontos nome={voce.gladiador} cor={VERDE} vitorias={e.rodadas.eu} />
-          <p className="text-center font-pixel text-[8px] text-muted sm:text-[10px]">
-            RODADA {e.rodada}/3 ·{' '}
-            <span className={`tabular-nums ${virada ? 'piscar text-[rgb(242_193_78)]' : 'text-accent'}`}>⏱ {restante}</span>
-          </p>
-          <Pontos nome={dele.gladiador} cor={VERMELHO} vitorias={e.rodadas.rival} direita />
-        </div>
-        <BarraPlateia valor={e.plateia} />
+      {/* Placar: a vida das duas torres, a rodada e o relógio */}
+      <div className="pixel-box grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2">
+        <VidaTorre nome={voce.gladiador} cor={VERDE} vida={e.torres.eu} />
+        <p className="text-center font-pixel text-[8px] leading-relaxed text-muted sm:text-[10px]">
+          {extra ? <span className="piscar text-[rgb(242_193_78)]">⚡ PRORROGAÇÃO</span> : `RODADA ${e.rodada}/${RODADAS}`}
+          <br />
+          <span className={`tabular-nums ${restante <= 10 ? 'piscar text-accent-2' : 'text-accent'}`}>⏱ {restante}</span>
+        </p>
+        <VidaTorre nome={dele.gladiador} cor={VERMELHO} vida={e.torres.rival} direita />
       </div>
 
       <Palco rodando={false} onPular={() => undefined}>
@@ -200,9 +201,16 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           {dilema.pergunta} <span style={{ color: VERDE }}>Você: {dilema.lados[config.lado].nome}</span>
         </p>
 
-        {/* Marcas das pontas: passou daqui, puxa a plateia */}
+        {/* As torres, com o gladiador em cima */}
         {(['eu', 'rival'] as Lado[]).map((l) => (
-          <div key={l} className="pointer-events-none absolute bottom-[3%] top-[45%] w-0.5 opacity-50" style={{ left: `${PONTA[l]}%`, background: COR[l].cor }} />
+          <div
+            key={`torre-${l}`}
+            className={`absolute bottom-0 w-[13%] ${l === 'eu' ? 'left-[5%]' : 'right-[5%]'} ${torreBatida(l) ? 'tremer' : ''}`}
+            aria-label={`Torre ${l === 'eu' ? 'sua' : 'do rival'}: ${e.torres[l]} de vida`}
+            role="img"
+          >
+            <Sprite grade={TORRE} paleta={PALETAS[l]} />
+          </div>
         ))}
         {/* Alcance do gladiador: tropa inimiga que entra aqui leva golpe */}
         {(['eu', 'rival'] as Lado[]).map((l) => (
@@ -251,8 +259,8 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         {e.efeitos.map((x) =>
           x.tipo === 'choque' ? (
             <Faiscas key={x.id} x={x.x ?? 50} y={82} />
-          ) : x.tipo === 'acerto' ? (
-            <Chuva key={x.id} lado={x.lado} />
+          ) : x.tipo === 'torre' ? (
+            <Faiscas key={x.id} x={x.lado === 'eu' ? 11 : 89} y={60} cor={COR[x.lado].cor} />
           ) : x.tipo === 'super' ? (
             <div key={x.id} className="clarao pointer-events-none absolute inset-0 z-20" style={{ background: x.lado === 'eu' ? 'rgb(242 193 78 / 0.5)' : 'rgb(255 74 90 / 0.4)' }} />
           ) : (
@@ -276,7 +284,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/70 text-center">
             <p className="pancada neon font-pixel text-sm text-accent sm:text-2xl">{e.aviso?.texto ?? 'FIM DA RODADA'}</p>
             <p className="font-pixel text-[9px] text-muted sm:text-xs">
-              {e.rodadas.eu} × {e.rodadas.rival} · PREPARE-SE PARA A RODADA {e.rodada + 1}
+              TORRES {e.torres.eu} × {e.torres.rival} · {e.rodada >= RODADAS ? 'PREPARE-SE PARA A PRORROGAÇÃO' : `PREPARE-SE PARA A RODADA ${e.rodada + 1}`}
             </p>
           </div>
         )}
@@ -287,7 +295,9 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         <div className="min-w-[45%] flex-1">
           <p className="font-pixel text-[8px] text-muted">
             FÔLEGO {Math.floor(eu.folego)}/{FOLEGO_MAX}
-            {emVirada(e, 'eu') && <span className="text-[rgb(242_193_78)]"> · VIRADA +25%</span>}
+            {ritmoDoFolego(e, 'eu') > FOLEGO_POR_SEGUNDO && (
+              <span className="text-[rgb(242_193_78)]">{extra ? ' · FÔLEGO EM DOBRO' : ' · VIRADA +25%'}</span>
+            )}
           </p>
           <div className="mt-1 flex gap-1" aria-label="Fôlego">
             {Array.from({ length: FOLEGO_MAX }, (_, i) => (
@@ -417,9 +427,8 @@ function CartaNaMao(props: {
   );
 }
 
-/** Gladiador de cada lado: defende a ponta. O seu dá um golpe quando você toca nele. */
+/** Gladiador em cima da torre: defende. O seu dá um golpe quando você toca nele. */
 function Gladiador({ lado, l, tempo, golpeando, onTocar, children }: { lado: Lado; l: Lutador; tempo: number; golpeando: boolean; onTocar?: () => void; children: ReactNode }) {
-  const preso = l.presoAte > tempo;
   const pronto = l.gladiadorProntoEm <= tempo;
   const corpo = (
     <>
@@ -431,14 +440,11 @@ function Gladiador({ lado, l, tempo, golpeando, onTocar, children }: { lado: Lad
           "{l.fala.texto}"
         </span>
       )}
-      {preso && <span className="absolute -top-[15%] left-1/2 z-10 -translate-x-1/2 text-lg sm:text-3xl">💫</span>}
       {l.escudo > 0 && <span className="absolute -top-[2%] left-1/2 z-10 -translate-x-1/2 text-sm sm:text-xl">{'🛡️'.repeat(l.escudo)}</span>}
-      <div className={golpeando ? (lado === 'eu' ? 'investida-esq' : 'investida-dir') : ''} style={{ filter: preso ? 'grayscale(0.7)' : undefined }}>
-        {children}
-      </div>
+      <div className={golpeando ? (lado === 'eu' ? 'investida-esq' : 'investida-dir') : ''}>{children}</div>
     </>
   );
-  const pos = `absolute bottom-[4%] w-[12%] ${lado === 'eu' ? 'left-[3%]' : 'right-[3%]'}`;
+  const pos = `absolute bottom-[32%] w-[9%] ${lado === 'eu' ? 'left-[7%]' : 'right-[7%]'}`;
   return onTocar ? (
     <button type="button" onClick={onTocar} disabled={!pronto} aria-label="Golpe do gladiador" className={`${pos} z-10 text-left disabled:cursor-default`}>
       {corpo}
@@ -449,47 +455,27 @@ function Gladiador({ lado, l, tempo, golpeando, onTocar, children }: { lado: Lad
   );
 }
 
-function Pontos({ nome, cor, vitorias, direita = false }: { nome: string; cor: string; vitorias: number; direita?: boolean }) {
+/** Vida de uma torre no placar. */
+function VidaTorre({ nome, cor, vida, direita = false }: { nome: string; cor: string; vida: number; direita?: boolean }) {
+  const pct = (vida / TORRE_VIDA) * 100;
   return (
-    <div className={`flex items-center gap-2 ${direita ? 'flex-row-reverse' : ''}`}>
-      <p className="max-w-[28vw] truncate font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>
-        {nome.toUpperCase()}
+    <div className={`flex min-w-0 flex-col gap-1 ${direita ? 'items-end' : 'items-start'}`}>
+      <p className="max-w-full truncate font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>
+        🏰 {nome.toUpperCase()}
       </p>
-      <p className="flex gap-1" aria-label={`${vitorias} rodadas ganhas`}>
-        {[0, 1].map((i) => (
-          <span key={i} className="h-2.5 w-2.5 border border-white/40" style={{ background: i < vitorias ? cor : 'transparent' }} />
-        ))}
-      </p>
-    </div>
-  );
-}
-
-/** A plateia: o meio é neutro, a esquerda é sua (verde), a direita é do rival. */
-function BarraPlateia({ valor }: { valor: number }) {
-  const pct = (Math.abs(valor) / LIMITE) * 50;
-  return (
-    <div className="relative h-4 w-full bg-black/60 sm:h-5" role="meter" aria-label="Plateia" aria-valuenow={valor} aria-valuemin={-LIMITE} aria-valuemax={LIMITE}>
-      <div className="absolute inset-y-0 left-1/2 z-10 w-0.5 bg-white/70" />
       <div
-        className="absolute inset-y-0 transition-all duration-300"
-        style={valor >= 0 ? { left: `${50 - pct}%`, width: `${pct}%`, background: VERDE } : { left: '50%', width: `${pct}%`, background: VERMELHO }}
-      />
-      <span className="absolute inset-0 flex items-center justify-center font-pixel text-[8px] text-white [text-shadow:1px_1px_0_#000]">
-        PLATEIA {valor > 0 ? `+${valor} SUA` : valor < 0 ? `+${-valor} DO RIVAL` : 'DIVIDIDA'}
-      </span>
-    </div>
-  );
-}
-
-function Chuva({ lado }: { lado: Lado }) {
-  const x = lado === 'eu' ? 14 : 86;
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-[25%] z-10 h-[65%]" aria-hidden>
-      {[0, 1, 2, 3].map((i) => (
-        <span key={i} className="chuva absolute text-base sm:text-2xl" style={{ left: `${x - 6 + i * 4}%`, animationDelay: `${i * 90}ms` }}>
-          {i % 2 ? '🌹' : '🌿'}
+        className="relative h-3 w-full bg-black/60 sm:h-4"
+        role="meter"
+        aria-label={`Torre de ${nome}`}
+        aria-valuenow={vida}
+        aria-valuemin={0}
+        aria-valuemax={TORRE_VIDA}
+      >
+        <div className={`absolute inset-y-0 transition-all duration-300 ${direita ? 'right-0' : 'left-0'}`} style={{ width: `${pct}%`, background: cor }} />
+        <span className="absolute inset-0 flex items-center justify-center font-pixel text-[7px] text-white [text-shadow:1px_1px_0_#000] sm:text-[8px]">
+          {vida}/{TORRE_VIDA}
         </span>
-      ))}
+      </div>
     </div>
   );
 }
@@ -503,16 +489,19 @@ function FimDuelo({ e, ia, rival, onDeNovo, onSair }: { e: EstadoDuelo; ia: IaId
         <span className="pancada absolute -right-10 top-1/3 text-5xl sm:text-6xl">{r === 'vitoria' ? '👍' : r === 'derrota' ? '👎' : '✋'}</span>
       </div>
       <p className="font-pixel text-[9px] text-[rgb(242_193_78)]">O CÉSAR DECIDIU</p>
+      {e.aviso && <p className="font-pixel text-[9px] text-muted">{e.aviso.texto}</p>}
       <h2 className={`pancada neon font-pixel text-3xl sm:text-5xl ${r === 'derrota' ? 'text-accent-2' : 'text-accent'}`}>
         {r === 'vitoria' ? 'VITÓRIA!' : r === 'derrota' ? 'DERROTA' : 'EMPATE'}
       </h2>
-      <p className="font-pixel text-sm">
+      <p className="font-pixel text-[10px] leading-relaxed sm:text-sm">
+        VIDA DAS TORRES
+        <br />
         <span style={{ color: VERDE }}>
-          {PERSONAGENS[ia].gladiador} {e.rodadas.eu}
+          {PERSONAGENS[ia].gladiador} {e.torres.eu}
         </span>{' '}
         ×{' '}
         <span style={{ color: VERMELHO }}>
-          {e.rodadas.rival} {PERSONAGENS[rival].gladiador}
+          {e.torres.rival} {PERSONAGENS[rival].gladiador}
         </span>
       </p>
       <p className="font-pixel text-[8px] text-muted">PROTÓTIPO · AINDA NÃO VALE TROFÉUS</p>
