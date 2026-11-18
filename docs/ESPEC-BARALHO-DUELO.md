@@ -1,0 +1,48 @@
+# Baralho do Duelo (proposta para revisar com o Lucas)
+
+**Atualizado: 2026-11-20** · Status: **proposta**. Nada disto foi construído.
+
+## O que o Lucas pediu
+- Coleção de **16 cartas**, com bastante variedade e estratégias diferentes.
+- **Nenhum baralho que vence todos**: toda carta tem uma resposta (equilíbrio entre cartas e combinações).
+- A IA usa **baralhos diferentes**, mas com um padrão, para não ficar repetitivo nem aleatório demais.
+
+## Regras do baralho
+- O baralho tem **8 cartas** (como no Clash Royale), sem repetir carta.
+- Na mão ficam 4; a carta jogada volta para o fim da fila (igual hoje).
+- Ninguém ganha carta por tempo jogado: **todas as 16 ficam liberadas desde o começo** (nada dá vantagem).
+
+## As 16 cartas
+| # | Carta | Tropa | 💨 | Força | O que faz | Perde para |
+|---|---|---|---|---|---|---|
+| 1 | ⚔️ Frase rápida | Legionário | 2 | 2 | Rápida e barata (já existe) | Tese, Muralha |
+| 2 | 👥 Exemplos | 2 legionários pequenos | 2 | 1 + 1 | Dois de uma vez | Pergunta retórica |
+| 3 | 🐎 Analogia | Cavaleiro | 3 | 2 | A tropa mais rápida | Contra-argumento |
+| 4 | 🃏 Piada | Bobo da corte | 1 | 1 | Baratíssima, para girar o baralho | Qualquer tropa |
+| 5 | 🛡️ Tese | Centurião | 4 | 4 | Lenta e resistente (já existe) | Exemplos, Refutação |
+| 6 | 🐘 Discurso épico | Elefante | 7 | 8 | Muito lenta, aguenta muito | Muralha + tropas baratas |
+| 7 | 🏛️ Citação de autoridade | Senador | 5 | 3 | Suas tropas perto dele ganham +1 de força | Fato, Refutação |
+| 8 | 🏹 Fato | Arqueiro | 4 | 1 | Atira de longe (já existe) | Analogia |
+| 9 | 📊 Estatística | Balista | 5 | 2 | Fica parada no seu campo e atira mais longe; some em 15 s | Analogia, Exemplos |
+| 10 | 🎯 Prova | Catapulta | 6 | 2 | Só atira na torre, de longe | Cavaleiro, Frase rápida |
+| 11 | 🧱 Muralha de lógica | Barricada | 3 | 5 | Não anda nem ataca: segura as tropas; some em 12 s | Prova, Fato |
+| 12 | 🔄 Contra-argumento | Escudeiro | 3 | 3 | Fica na frente da sua torre e luta com quem chega | Fato, Estatística |
+| 13 | ❗ Refutação | (feitiço) | 3 | – | Tira 2 de força da tropa inimiga mais perto da sua torre | Exemplos |
+| 14 | ❓ Pergunta retórica | (feitiço) | 4 | – | Tira 1 de força de todas as tropas inimigas numa área | Tese, Elefante |
+| 15 | ⏸️ Pausa dramática | (feitiço) | 2 | – | As tropas inimigas ficam paradas 2 s | — |
+| 16 | 📣 Aplauso | (feitiço) | 3 | – | Suas tropas em campo andam mais rápido por 4 s | — |
+
+Números para começar; a gente ajusta jogando.
+
+## Baralhos da IA: 4 estilos
+A cada partida a IA sorteia um **estilo** e monta 8 cartas daquele estilo, trocando 1 ou 2 por sorte. Cada IA tem um estilo preferido, para ter personalidade:
+- **Pressa** (ChatGPT gosta): Frase rápida, Exemplos, Analogia, Piada, Aplauso…
+- **Muralha** (Claude gosta): Tese, Muralha de lógica, Contra-argumento, Refutação…
+- **Artilharia** (Gemini gosta): Fato, Estatística, Prova, Pausa dramática…
+- **Equilibrado** (todas): um pouco de cada.
+
+## Perguntas para o Lucas
+1. As 16 cartas e os nomes estão bons? Quer trocar, tirar ou criar alguma?
+2. Baralho de **8 cartas** está bom?
+3. Os 4 estilos da IA (com o preferido de cada IA) fazem sentido?
+4. A tela de montar o baralho fica onde: antes de cada Duelo ou numa aba "Meu baralho"?
