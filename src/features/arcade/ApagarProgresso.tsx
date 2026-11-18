@@ -45,7 +45,7 @@ export default function ApagarProgresso() {
       {passo === 'aviso' ? (
         <>
           <p className="text-sm">
-            Isso apaga, <strong>neste aparelho</strong>, os troféus, as ligas, a Maestria e o histórico das 3 IAs. <strong>Não dá para desfazer.</strong>
+            Isso apaga, <strong>neste aparelho e na nuvem</strong> (se a conta estiver conectada), os troféus, as ligas, a Maestria e o histórico das 3 IAs. <strong>Não dá para desfazer.</strong>
           </p>
           <div className="flex justify-end gap-3">
             <button type="button" autoFocus onClick={fechar} className="pixel-box pixel-hover px-3 py-2 font-pixel text-[10px]">

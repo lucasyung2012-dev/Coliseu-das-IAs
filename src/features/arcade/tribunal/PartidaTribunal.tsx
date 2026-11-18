@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties } from 'react';
 import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { JURADOS, type JuradoId } from '@/game/jurados';
 import { useProgresso } from '@/game/progresso';
+import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
 import { FALAS_PRETOR, GOSTOS, REACOES, TEMAS } from '@/game/tribunal/temas';
 import type { Carta } from '@/game/tribunal/dilemas';
 import {
@@ -38,7 +39,12 @@ interface Props {
 
 export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair }: Props) {
   const { trofeus } = useProgresso();
-  const [e, setE] = useState<EstadoTribunal>(() => novaPartida({ ia, rival, jurados, trofeus: trofeus[ia] }));
+  const dificuldade = useDificuldade();
+  // O modo (valendo troféus ou treino) fica fixo do começo ao fim da partida.
+  const [ranqueado] = useState(() => modoRanqueado());
+  const [e, setE] = useState<EstadoTribunal>(() =>
+    novaPartida({ ia, rival, jurados, trofeus: trofeus[ia], acerto: ranqueado ? undefined : ACERTO_TREINO[dificuldade] }),
+  );
   const [comecou, setComecou] = useState(false);
   const [escolhida, setEscolhida] = useState<string | null>(null);
   const [modoHabilidade, setModoHabilidade] = useState(false);
@@ -71,7 +77,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
   const ultima = e.rodadas[e.rodadas.length - 1];
 
   if (e.fase === 'fim') {
-    return <VereditoTribunal estado={e} onRevanche={onRevanche} onSair={onSair} />;
+    return <VereditoTribunal estado={e} treino={!ranqueado} onRevanche={onRevanche} onSair={onSair} />;
   }
 
   if (!comecou) {

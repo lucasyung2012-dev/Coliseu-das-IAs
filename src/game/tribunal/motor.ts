@@ -114,6 +114,8 @@ export interface Inicio {
   rival: IaId;
   jurados: JuradoId[];
   trofeus: number;
+  /** Modo Treino: chance de o rival acertar, pela dificuldade escolhida (no lugar da liga). */
+  acerto?: number;
   dilema?: Dilema;
   lado?: LadoId;
 }
@@ -127,7 +129,7 @@ export function novaPartida(ini: Inicio, aleatorio: Aleatorio = Math.random): Es
     ia: ini.ia,
     rival: ini.rival,
     jurados: ini.jurados,
-    acertoRival: ACERTO_RIVAL[indiceLiga(ini.trofeus)]!,
+    acertoRival: ini.acerto ?? ACERTO_RIVAL[indiceLiga(ini.trofeus)]!,
     tempo: 0,
     ponteiros: Object.fromEntries(ini.jurados.map((j) => [j, 0])),
     mao: [],

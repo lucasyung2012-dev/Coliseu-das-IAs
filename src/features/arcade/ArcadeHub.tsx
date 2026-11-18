@@ -8,6 +8,8 @@ import Sprite from '@/ui/pixel/Sprite';
 import { LOUROS, PALETA_OURO } from '@/ui/pixel/sprites';
 import BootArcade from './BootArcade';
 import ApagarProgresso from './ApagarProgresso';
+import PainelConta from './PainelConta';
+import { modoRanqueado, useConta } from '@/game/conta';
 import { desbloquear, tocar } from '@/ui/som';
 
 const CHAVE_BOOT = 'coliseu.boot.vista';
@@ -25,6 +27,7 @@ const varIa = (id: IaId) => ({ '--ia': PERSONAGENS[id].cor }) as CSSProperties;
 
 export default function ArcadeHub() {
   const p = useProgresso();
+  const treino = !modoRanqueado(useConta());
   const location = useLocation();
   // O fliperama liga ao chegar pela tela inicial, e na primeira vez de cada visita.
   const [boot, setBoot] = useState(() => (location.state as { boot?: boolean } | null)?.boot === true || !jaViuBootNestaVisita());
@@ -71,6 +74,8 @@ export default function ArcadeHub() {
           </div>
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} espelhar />
         </header>
+
+        <PainelConta />
 
         {/* Gladiador em destaque */}
         <section
@@ -171,6 +176,7 @@ export default function ArcadeHub() {
               frase="Um round. Duas cartas. Um veredito."
               ganho={variacaoTrofeus('duelo', trofeus, true)}
               perda={variacaoTrofeus('duelo', trofeus, false)}
+              treino={treino}
             />
             <CartaoModo
               rota="/arena/tribunal"
@@ -179,6 +185,7 @@ export default function ArcadeHub() {
               frase="Três tempos. Cinco jurados. Conquiste a maioria."
               ganho={variacaoTrofeus('tribunal', trofeus, true)}
               perda={variacaoTrofeus('tribunal', trofeus, false)}
+              treino={treino}
             />
           </div>
         </section>
@@ -210,7 +217,7 @@ function Barra({ valor, rotulo, fina }: { valor: number; rotulo: string; fina?: 
   );
 }
 
-function CartaoModo(props: { rota: string; icone: ReactNode; titulo: string; frase: string; ganho: number; perda: number }) {
+function CartaoModo(props: { rota: string; icone: ReactNode; titulo: string; frase: string; ganho: number; perda: number; treino: boolean }) {
   return (
     <Link to={props.rota} onMouseEnter={() => tocar('passarMouse')} onClick={() => { desbloquear(); tocar('clique'); }} className="pixel-box pixel-hover group block min-w-0 p-5 transition hover:-translate-y-1">
       <div className="flex items-center gap-3">
@@ -220,14 +227,18 @@ function CartaoModo(props: { rota: string; icone: ReactNode; titulo: string; fra
         <h3 className="neon min-w-0 font-pixel text-base text-accent sm:text-xl">{props.titulo}</h3>
       </div>
       <p className="mt-3 text-sm text-muted">{props.frase}</p>
-      <p className="mt-3 text-sm tabular-nums">
-        Vitória <span className="text-accent">+{props.ganho}</span> · Derrota{' '}
-        {props.perda === 0 ? (
-          <span className="text-muted">0 (você ainda não tem troféus a perder)</span>
-        ) : (
-          <span className="text-accent-2">{props.perda}</span>
-        )}
-      </p>
+      {props.treino ? (
+        <p className="mt-3 text-sm text-[rgb(242_193_78)]">Treino: não vale troféus.</p>
+      ) : (
+        <p className="mt-3 text-sm tabular-nums">
+          Vitória <span className="text-accent">+{props.ganho}</span> · Derrota{' '}
+          {props.perda === 0 ? (
+            <span className="text-muted">0 (você ainda não tem troféus a perder)</span>
+          ) : (
+            <span className="text-accent-2">{props.perda}</span>
+          )}
+        </p>
+      )}
       <span className="piscar mt-4 inline-block font-pixel text-[10px] text-accent">▶ ENTRAR</span>
     </Link>
   );
@@ -250,7 +261,7 @@ function Historico({ partidas }: { partidas: Partida[] }) {
                 <span className={pt.empate ? 'text-muted' : pt.venceu ? 'text-accent' : 'text-accent-2'}>{pt.empate ? 'Empate' : pt.venceu ? 'Vitória' : 'Derrota'}</span>
               </span>
               <span className="shrink-0 font-pixel text-[10px] tabular-nums text-muted">
-                {pt.trofeus > 0 ? `+${pt.trofeus}` : pt.trofeus} 🏆
+                {pt.treino ? 'TREINO' : <>{pt.trofeus > 0 ? `+${pt.trofeus}` : pt.trofeus} 🏆</>}
               </span>
             </li>
           ))}

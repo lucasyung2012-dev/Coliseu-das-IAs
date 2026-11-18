@@ -13,7 +13,17 @@ import { Faiscas } from '../cenas/Palco';
 const PAUSA_VOTO = 700;
 
 /** Martelo, votos revelados cadeira por cadeira e o resultado com troféus, XP e o porquê de cada voto. */
-export default function VereditoTribunal({ estado: e, onRevanche, onSair }: { estado: EstadoTribunal; onRevanche: () => void; onSair: () => void }) {
+export default function VereditoTribunal({
+  estado: e,
+  treino,
+  onRevanche,
+  onSair,
+}: {
+  estado: EstadoTribunal;
+  treino: boolean;
+  onRevanche: () => void;
+  onSair: () => void;
+}) {
   const v = veredito(e);
   const [revelados, setRevelados] = useState(() => (prefereMenosMovimento() ? e.jurados.length : 0));
   const [partida, setPartida] = useState<Partida | null>(null);
@@ -31,6 +41,7 @@ export default function VereditoTribunal({ estado: e, onRevanche, onSair }: { es
         rival: e.rival,
         venceu: v.resultado === 'vitoria',
         empate: v.resultado === 'empate',
+        treino,
         dilema: e.dilema.pergunta,
       }),
     );
@@ -101,7 +112,7 @@ export default function VereditoTribunal({ estado: e, onRevanche, onSair }: { es
           </p>
           {partida && (
             <p className="font-pixel text-xs tabular-nums sm:text-sm">
-              🏆 {partida.trofeus > 0 ? `+${partida.trofeus}` : partida.trofeus} · ⭐ +{partida.xp} XP
+              {treino ? 'MODO TREINO · NÃO VALE TROFÉUS' : <>🏆 {partida.trofeus > 0 ? `+${partida.trofeus}` : partida.trofeus} · ⭐ +{partida.xp} XP</>}
             </p>
           )}
 
