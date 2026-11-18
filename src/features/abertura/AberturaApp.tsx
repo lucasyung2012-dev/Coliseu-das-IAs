@@ -136,13 +136,13 @@ export default function AberturaApp({ onFim }: { onFim: () => void }) {
       ))}
 
       {/* O sol do logo nasce atrás do Coliseu */}
-      <img
-        src={`${import.meta.env.BASE_URL}logo.svg`}
-        alt=""
+      <div
         aria-hidden
-        className="absolute left-1/2 w-[38vmin] -translate-x-1/2 transition-all duration-[1400ms] ease-out [image-rendering:pixelated]"
-        style={{ bottom: fase >= 1 ? '34%' : '8%', opacity: fase >= 1 ? 1 : 0, filter: 'drop-shadow(0 0 30px #ffd04a)' }}
-      />
+        className="absolute left-1/2 w-[46vmin] -translate-x-1/2 transition-all duration-[1400ms] ease-out"
+        style={{ bottom: fase >= 1 ? '30%' : '6%', opacity: fase >= 1 ? 1 : 0, filter: 'drop-shadow(0 0 40px #ffb03a)' }}
+      >
+        <Sprite grade={SOL} paleta={PALETA_SOL} />
+      </div>
 
       {/* O título: cada letra cai como uma pedra */}
       <h1 className="absolute inset-x-0 top-[8%] z-20 flex flex-col items-center gap-2 font-pixel text-[9vmin] leading-none sm:text-[8vmin]" aria-label="Coliseu das IAs">
