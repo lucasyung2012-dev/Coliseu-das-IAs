@@ -54,8 +54,6 @@ A cada partida a IA sorteia um **estilo** e monta 8 cartas daquele estilo, troca
 - **Estatística mais fraca** (o Lucas achou que parada atirando seria forte demais): atira só 4 vezes ou some em 10 s, tem só 2 de vida, máximo 1 em campo, custa 5. *(proposta, aguardando OK)*
 - **Arena continua deitada** (visão de lado = essência própria, não cópia do Clash Royale), mais detalhada e organizada.
 - **Meu baralho:** aba onde se monta as 8 cartas uma vez; fica salvo (progresso e Dropbox) para os próximos duelos.
-- **Escolher onde a tropa entra** (tocar na carta e depois num ponto do seu lado): **decidir depois**. Até lá, toda tropa sai da torre.
 - **Estatística: aprovada** (4 tiros ou 10 s, 2 de vida, máx. 1 em campo, 5 de fôlego).
-- **Rodadas novas:** 2 rodadas de 1 min 30 s e uma rodada final de 30 s. Empate na vida: prorrogação de 20 s com fôlego em dobro (mantida, a confirmar).
-- **Escolher onde a tropa entra:** recomendação = deixar para depois; primeiro as 16 cartas saindo do lado de cada um, feitiços com alvo automático.
+- **Rodadas (decisão do Lucas, revista):** 2 rodadas de 1 min 30 s e depois sempre a **Prorrogação**: 20 s com gotas +25% para os dois. Não existe mais a "virada" (quem perdia ganhava +25% na rodada final). Empate na vida no fim = empate.
 - **Trocar a torre** (não existia no Coliseu): opções Rostra (tribuna dos oradores, recomendada: combina com debate), Águia da legião (estandarte) ou Portão do Coliseu. Aguardando a escolha do Lucas.

@@ -2,6 +2,10 @@ import type { Tema } from './temas';
 import { MEDICINA, ROBOS, FACIAL } from './conteudo/saude-e-tecnologia';
 import { JOGOS, PROJETOS, PUBLICIDADE } from './conteudo/escola-e-internet';
 import { ANIMAIS, ESPACO, QUATRO_DIAS } from './conteudo/cidade-e-mundo';
+import { TRANSPORTE, PENSAMENTO, FERRAMENTAS, CONGESTIONAMENTO, MUSEUS } from './conteudo/lote-a';
+import { DESPERDICIO, AVALIAR_PROFESSORES, HORTAS, PREVENCAO, PARQUES } from './conteudo/lote-b';
+import { VOTO, LOJAS_ANTIGAS, SOLAR, RENDA_BASICA, UNIVERSIDADES } from './conteudo/lote-c';
+import { AGUA, DADOS_DESASTRES, ONIBUS_NOTURNO, BIBLIOTECA_DOMINGO, JURI_CIDADAO } from './conteudo/lote-d';
 
 export interface Carta {
   id: string;
@@ -31,7 +35,7 @@ function cartas(prefixo: string, lista: [string, string, Carta['temas']][]): Car
   return lista.map(([titulo, texto, temas], i) => ({ id: `${prefixo}-${i + 1}`, titulo, texto, temas }));
 }
 
-// Textos escritos à mão (decisão D6). O 1º dilema está aqui; os outros 9 ficam em conteudo/.
+// Textos escritos à mão (decisão D6). O 1º dilema está aqui; os outros 29 ficam em conteudo/.
 export const DILEMAS: Dilema[] = [
   {
     id: 'celulares',
@@ -108,4 +112,24 @@ export const DILEMAS: Dilema[] = [
   ANIMAIS,
   PUBLICIDADE,
   FACIAL,
+  TRANSPORTE,
+  PENSAMENTO,
+  FERRAMENTAS,
+  CONGESTIONAMENTO,
+  MUSEUS,
+  DESPERDICIO,
+  AVALIAR_PROFESSORES,
+  HORTAS,
+  PREVENCAO,
+  PARQUES,
+  VOTO,
+  LOJAS_ANTIGAS,
+  SOLAR,
+  RENDA_BASICA,
+  UNIVERSIDADES,
+  AGUA,
+  DADOS_DESASTRES,
+  ONIBUS_NOTURNO,
+  BIBLIOTECA_DOMINGO,
+  JURI_CIDADAO,
 ];
