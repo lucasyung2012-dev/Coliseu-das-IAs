@@ -55,7 +55,7 @@ export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' })
     ) : (
       <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">
         <p className="font-pixel text-[10px] text-accent sm:text-xs">TUDO PRONTO PARA O DUELO</p>
-        <p className="max-w-md text-sm text-muted">Protótipo do Duelo em tempo real: ainda não vale troféus. Jogue e diga se ficou divertido!</p>
+        <p className="max-w-md text-sm text-muted">Protótipo do Duelo: ainda não vale troféus. Monte o seu baralho de 8 cartas em MEU BARALHO.</p>
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
@@ -72,6 +72,9 @@ export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' })
           <button type="button" onClick={deNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px]">
             ↻ VER DE NOVO
           </button>
+          <Link to="/arena/baralho" className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-[rgb(242_193_78)]">
+            🃏 MEU BARALHO
+          </Link>
           <Link to="/arena" className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px]">
             ◀ ARCADE
           </Link>

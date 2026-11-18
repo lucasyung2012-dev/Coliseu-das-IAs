@@ -712,3 +712,26 @@
 .contagem { animation: contagem 0.9s ease-out both; }
 @keyframes contagem { from { transform: scale(2.4); opacity: 0; } 30% { opacity: 1; } to { transform: scale(1); opacity: 1; } }
 .menos-movimento .torcedor, .menos-movimento .ola .torcedor, .menos-movimento .alcance-luz { animation: none; }
+
+/* ===== Duelo v7: os gladiadores entram na arena e sobem na Tribuna ===== */
+.chegar-esq { animation: chegar-esq 2.8s ease-out both; }
+.chegar-dir { animation: chegar-dir 2.8s ease-out both; }
+@keyframes chegar-esq {
+  0% { transform: translate(-260%, 170%); }
+  15% { transform: translate(-200%, 165%); }
+  30% { transform: translate(-140%, 170%); }
+  45% { transform: translate(-80%, 165%); }
+  62% { transform: translate(0, 170%); }
+  82% { transform: translate(0, -25%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes chegar-dir {
+  0% { transform: translate(260%, 170%); }
+  15% { transform: translate(200%, 165%); }
+  30% { transform: translate(140%, 170%); }
+  45% { transform: translate(80%, 165%); }
+  62% { transform: translate(0, 170%); }
+  82% { transform: translate(0, -25%); }
+  100% { transform: translate(0, 0); }
+}
+.menos-movimento .chegar-esq, .menos-movimento .chegar-dir { animation: none; }

@@ -40,6 +40,8 @@ export interface Progresso {
   xp: Record<IaId, number>;
   estatisticas: Record<IaId, Estatisticas>;
   partidas: Partida[];
+  /** Meu baralho do Duelo: as 8 cartas escolhidas (ids). Conferido pelo motor do Duelo. */
+  baralhoDuelo?: string[];
   /** Quando o progresso mudou pela última vez (ISO). Decide qual cópia vale ao sincronizar. */
   atualizadoEm?: string;
 }
@@ -136,6 +138,11 @@ export function useProgresso(): Progresso {
 
 export function escolherIa(ia: IaId) {
   salvar({ ...obterProgresso(), iaAtual: ia });
+}
+
+/** Salva o meu baralho do Duelo (fica para os próximos combates e vai para a nuvem). */
+export function escolherBaralho(cartas: string[]) {
+  salvar({ ...obterProgresso(), baralhoDuelo: [...cartas] });
 }
 
 export function nivelMaestria(xp: number): number {

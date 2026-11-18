@@ -239,17 +239,17 @@ describe('duelo jogável (protótipo)', () => {
       // Abertura como no Tribunal: o tema e a sua opinião; começa no ESTOU PRONTO e conta 3, 2, 1.
       expect(screen.getByRole('region', { name: 'Sua opinião' })).toBeInTheDocument();
       fireEvent.click(screen.getByRole('button', { name: /ESTOU PRONTO/ }));
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 9; i++) {
         act(() => {
           vi.advanceTimersByTime(900);
         });
       }
-      expect(screen.getAllByRole('meter', { name: /Torre de/ })).toHaveLength(2);
+      expect(screen.getAllByRole('meter', { name: /Tribuna de/ })).toHaveLength(2);
       const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
       expect(botoes.length).toBeGreaterThanOrEqual(4);
       fireEvent.click(botoes.find((b) => !(b as HTMLButtonElement).disabled)!);
-      // Até 3 rodadas de 45 s e a prorrogação, com intervalos.
-      for (let i = 0; i < 200; i++) {
+      // Rodadas de 1:30, 1:30 e 30 s, e a prorrogação, com intervalos.
+      for (let i = 0; i < 260; i++) {
         act(() => {
           vi.advanceTimersByTime(1000);
         });

@@ -7,6 +7,7 @@ import BotaoSom from './ui/BotaoSom';
 import Configuracoes from './features/config/Configuracoes';
 import PerfilCombatente from './features/arcade/PerfilCombatente';
 import MapaTrofeus from './features/arcade/MapaTrofeus';
+import MeuBaralho from './features/arcade/duelo/MeuBaralho';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/arena" element={<ArcadeHub />} />
         <Route path="/arena/duelo" element={<EntradaCombate modo="duelo" />} />
         <Route path="/arena/tribunal" element={<EntradaCombate modo="tribunal" />} />
+        <Route path="/arena/baralho" element={<MeuBaralho />} />
         <Route path="/arena/mapa/:ia" element={<MapaTrofeus />} />
         <Route path="/arena/perfil/:ia" element={<PerfilCombatente />} />
         <Route path="/configuracoes" element={<Configuracoes />} />
