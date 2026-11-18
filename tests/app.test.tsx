@@ -236,9 +236,14 @@ describe('duelo jogável (protótipo)', () => {
       const dialogo = screen.getByRole('dialog', { name: /Como jogar: DUELO/ });
       fireEvent.click(within(dialogo).getByRole('button', { name: /PULAR/ }));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      // Abertura do debate: o tema e os dois lados; dá para pular.
-      expect(screen.getByText(/O TEMA DO DUELO/)).toBeInTheDocument();
-      fireEvent.click(screen.getByRole('button', { name: /PULAR ▶▶/ }));
+      // Abertura como no Tribunal: o tema e a sua opinião; começa no ESTOU PRONTO e conta 3, 2, 1.
+      expect(screen.getByRole('region', { name: 'Sua opinião' })).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: /ESTOU PRONTO/ }));
+      for (let i = 0; i < 5; i++) {
+        act(() => {
+          vi.advanceTimersByTime(900);
+        });
+      }
       expect(screen.getAllByRole('meter', { name: /Torre de/ })).toHaveLength(2);
       const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
       expect(botoes.length).toBeGreaterThanOrEqual(4);

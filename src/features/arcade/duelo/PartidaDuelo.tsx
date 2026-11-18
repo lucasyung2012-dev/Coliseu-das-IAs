@@ -41,6 +41,7 @@ import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado'
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import { paletaTropa, TORRE, TROPAS } from '@/ui/pixel/tropas';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
+import { PretorDestaque } from '../tribunal/visual';
 import ComoJogar, { BotaoComoJogar, TUTORIAL_DUELO, useTutorial } from '../ComoJogar';
 
 const OURO = '#f2c14e';
@@ -97,9 +98,9 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
   const [abertura, setAbertura] = useState<Abertura>('tema');
   const pausado = tutorial.aberto || abertura !== null;
 
-  // A abertura anda sozinha (espera o tutorial fechar).
+  // A contagem anda sozinha; o tema espera o jogador ler com calma e apertar ESTOU PRONTO.
   useEffect(() => {
-    if (abertura === null || tutorial.aberto) return;
+    if (abertura === null || abertura === 'tema' || tutorial.aberto) return;
     if (typeof abertura === 'number') tocar('roleta');
     if (abertura === 'lutem') tocar('vs');
     const id = window.setTimeout(() => setAbertura(PROXIMA[abertura]), TEMPO_ABERTURA[abertura]);
@@ -197,6 +198,33 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
   const eu = e.eu;
   const gladiadorPronto = eu.gladiadorProntoEm <= e.tempo;
   const torreBatida = (l: Lado) => e.efeitos.some((x) => x.tipo === 'torre' && x.lado === l);
+  const lados: Record<Lado, LadoDoDebate> = {
+    eu: { nome: voce.gladiador, ia: voce.ia, cor: cores.eu.cor, lado: dilema.lados[config.lado].nome, tese: dilema.lados[config.lado].tese },
+    rival: { nome: dele.gladiador, ia: dele.ia, cor: cores.rival.cor, lado: dilema.lados[ladoRival].nome, tese: dilema.lados[ladoRival].tese },
+  };
+
+  // Antes da luta: o tema, com calma, como no Tribunal.
+  if (abertura === 'tema') {
+    return (
+      <>
+        {tutorial.aberto && <ComoJogar titulo="DUELO" slides={TUTORIAL_DUELO} onFechar={tutorial.fechar} />}
+        <BriefingDuelo
+          pergunta={dilema.pergunta}
+          voce={lados.eu}
+          dele={lados.rival}
+          iaVoce={ia}
+          iaDele={rival}
+          liga={liga}
+          onPronto={() => {
+            desbloquear();
+            tocar('start');
+            setAbertura(3);
+          }}
+          onComoJogar={tutorial.abrir}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -207,13 +235,13 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
 
       {/* Placar: a vida das duas torres, a rodada e o relógio */}
       <div className="pixel-box grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2">
-        <VidaTorre nome={voce.gladiador} cor={cores.eu.cor} vida={e.torres.eu} />
+        <VidaTorre nome={voce.gladiador} cor={cores.eu.cor} vida={e.torres.eu} lado={lados.eu.lado} />
         <p className="text-center font-pixel text-[8px] leading-relaxed text-muted sm:text-[10px]">
           {extra ? <span className="piscar text-[rgb(242_193_78)]">⚡ PRORROGAÇÃO</span> : `RODADA ${e.rodada}/${RODADAS}`}
           <br />
           <span className={`tabular-nums ${restante <= 10 ? 'piscar text-accent-2' : 'text-accent'}`}>⏱ {restante}</span>
         </p>
-        <VidaTorre nome={dele.gladiador} cor={cores.rival.cor} vida={e.torres.rival} direita />
+        <VidaTorre nome={dele.gladiador} cor={cores.rival.cor} vida={e.torres.rival} lado={lados.rival.lado} direita />
       </div>
 
       {/* A arena, mais comprida */}
@@ -253,8 +281,15 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
             >
               {l === 'eu' ? <GladiadorEnfeitado ia={ia} parado /> : <GladiadorPixel ia={rival} liga={liga} espelhar />}
             </Gladiador>
-            <div className={torreBatida(l) ? 'tremer' : ''} role="img" aria-label={`Torre ${l === 'eu' ? 'sua' : 'do rival'}: ${e.torres[l]} de vida`}>
+            <div className={`relative ${torreBatida(l) ? 'tremer' : ''}`} role="img" aria-label={`Torre ${l === 'eu' ? 'sua' : 'do rival'} (${lados[l].lado}): ${e.torres[l]} de vida`}>
               <Sprite grade={TORRE} paleta={cores[l].paleta} />
+              {/* Placa com o lado do debate */}
+              <span
+                className="absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap border-2 bg-black/80 px-1 py-0.5 font-pixel text-[6px] text-white sm:text-[10px]"
+                style={{ borderColor: cores[l].cor, textShadow: `0 0 6px ${cores[l].cor}` }}
+              >
+                {lados[l].lado.toUpperCase()}
+              </span>
             </div>
           </div>
         ))}
@@ -312,13 +347,11 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         )}
 
         {abertura !== null && (
-          <AberturaDebate
-            etapa={abertura}
-            pergunta={dilema.pergunta}
-            voce={{ nome: voce.gladiador, ia: voce.ia, cor: cores.eu.cor, lado: dilema.lados[config.lado].nome, tese: dilema.lados[config.lado].tese }}
-            dele={{ nome: dele.gladiador, ia: dele.ia, cor: cores.rival.cor, lado: dilema.lados[ladoRival].nome, tese: dilema.lados[ladoRival].tese }}
-            onPular={() => setAbertura(null)}
-          />
+          <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70">
+            <p key={String(abertura)} className="contagem neon font-pixel text-4xl text-accent sm:text-7xl">
+              {abertura === 'lutem' ? 'LUTEM!' : abertura}
+            </p>
+          </div>
         )}
       </div>
 
@@ -395,38 +428,71 @@ interface LadoDoDebate {
   tese: string;
 }
 
-/** Abertura: o tema do debate, a tese de cada lado e a contagem 3, 2, 1. */
-function AberturaDebate({ etapa, pergunta, voce, dele, onPular }: { etapa: Exclude<Abertura, null>; pergunta: string; voce: LadoDoDebate; dele: LadoDoDebate; onPular: () => void }) {
+/** Antes da luta, como no Tribunal: o tema em destaque, a sua opinião e a do rival. Começa quando você quiser. */
+function BriefingDuelo({
+  pergunta,
+  voce,
+  dele,
+  iaVoce,
+  iaDele,
+  liga,
+  onPronto,
+  onComoJogar,
+}: {
+  pergunta: string;
+  voce: LadoDoDebate;
+  dele: LadoDoDebate;
+  iaVoce: IaId;
+  iaDele: IaId;
+  liga: number;
+  onPronto: () => void;
+  onComoJogar: () => void;
+}) {
   return (
-    <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 bg-black/80 px-3 text-center sm:gap-3">
-      <button type="button" onClick={onPular} className="absolute right-2 top-2 bg-black/60 px-2 py-1 font-pixel text-[8px] text-fg hover:text-accent sm:text-[10px]">
-        PULAR ▶▶
-      </button>
-      {etapa === 'tema' ? (
-        <>
-          <p className="surgir font-pixel text-[8px] text-[rgb(242_193_78)] sm:text-xs">⚖ O TEMA DO DUELO</p>
-          <h2 className="surgir max-w-xl text-sm font-semibold sm:text-xl">{pergunta}</h2>
-          <div className="grid w-full max-w-2xl grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4">
-            {[voce, dele].map((x, i) => (
-              <div key={x.nome} className={`surgir flex flex-col gap-1 ${i === 0 ? 'order-1 text-left' : 'order-3 text-right'}`} style={{ animationDelay: `${300 + i * 300}ms` }}>
-                <p className="font-pixel text-[8px] sm:text-[11px]" style={{ color: x.cor }}>
-                  {i === 0 ? 'VOCÊ · ' : ''}
-                  {x.nome.toUpperCase()} · {x.ia.toUpperCase()}
-                </p>
-                <p className="font-pixel text-[10px] text-white sm:text-base" style={{ textShadow: `0 0 8px ${x.cor}` }}>
-                  {x.lado.toUpperCase()}
-                </p>
-                <p className="line-clamp-3 text-[9px] italic leading-snug text-white/80 sm:text-xs">"{x.tese}"</p>
-              </div>
-            ))}
-            <p className="pancada neon order-2 font-pixel text-base text-accent sm:text-3xl">VS</p>
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-end">
+        <BotaoComoJogar onClick={onComoJogar} />
+      </div>
+      <PretorDestaque fala="Leia com calma: este é o tema do duelo.">
+        <p className="mt-3 font-pixel text-[9px] text-[rgb(242_193_78)] sm:text-[11px]">⚖ O TEMA</p>
+        <h2 className="mt-2 text-xl font-semibold leading-snug sm:text-3xl">{pergunta}</h2>
+      </PretorDestaque>
+
+      <div className="grid gap-3 sm:grid-cols-[3fr_2fr]">
+        {/* Você: bem em destaque */}
+        <section aria-label="Sua opinião" className="pixel-box flex items-center gap-4 p-4" style={{ boxShadow: `0 0 0 3px ${voce.cor}, 0 0 24px -6px ${voce.cor}` }}>
+          <div className="w-16 shrink-0 sm:w-20">
+            <GladiadorEnfeitado ia={iaVoce} parado />
           </div>
-        </>
-      ) : (
-        <p key={String(etapa)} className="contagem neon font-pixel text-4xl text-accent sm:text-7xl">
-          {etapa === 'lutem' ? 'LUTEM!' : etapa}
-        </p>
-      )}
+          <div className="min-w-0">
+            <p className="font-pixel text-[8px] sm:text-[10px]" style={{ color: voce.cor }}>
+              VOCÊ · {voce.nome.toUpperCase()} · {voce.ia.toUpperCase()}
+            </p>
+            <p className="mt-1 font-pixel text-base text-white sm:text-2xl" style={{ textShadow: `0 0 10px ${voce.cor}` }}>
+              {voce.lado.toUpperCase()}
+            </p>
+            <p className="mt-2 text-sm font-semibold leading-snug sm:text-base">Sua opinião: "{voce.tese}"</p>
+          </div>
+        </section>
+        {/* O rival */}
+        <section aria-label="Opinião do rival" className="pixel-box flex items-center gap-3 p-4 opacity-90" style={{ boxShadow: `0 0 0 2px ${dele.cor}` }}>
+          <div className="w-12 shrink-0 sm:w-14">
+            <GladiadorPixel ia={iaDele} liga={liga} espelhar />
+          </div>
+          <div className="min-w-0">
+            <p className="font-pixel text-[8px] sm:text-[9px]" style={{ color: dele.cor }}>
+              RIVAL · {dele.nome.toUpperCase()} · {dele.ia.toUpperCase()}
+            </p>
+            <p className="mt-1 font-pixel text-sm text-white sm:text-lg">{dele.lado.toUpperCase()}</p>
+            <p className="mt-1 text-xs italic leading-snug text-muted sm:text-sm">"{dele.tese}"</p>
+          </div>
+        </section>
+      </div>
+
+      <p className="text-center text-sm text-muted">Suas tropas levam as frases do seu lado. Defenda a sua opinião derrubando a torre do rival!</p>
+      <button type="button" autoFocus onClick={onPronto} className="pixel-box pixel-hover self-center px-6 py-3 font-pixel text-xs text-accent sm:text-sm">
+        ⚔ ESTOU PRONTO
+      </button>
     </div>
   );
 }
@@ -527,12 +593,13 @@ function Gladiador({ lado, l, tempo, golpeando, onTocar, children }: { lado: Lad
 }
 
 /** Vida de uma torre no placar. */
-function VidaTorre({ nome, cor, vida, direita = false }: { nome: string; cor: string; vida: number; direita?: boolean }) {
+function VidaTorre({ nome, cor, vida, lado, direita = false }: { nome: string; cor: string; vida: number; lado: string; direita?: boolean }) {
   const pct = (vida / TORRE_VIDA) * 100;
   return (
     <div className={`flex min-w-0 flex-col gap-1 ${direita ? 'items-end' : 'items-start'}`}>
       <p className="max-w-full truncate font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>
         🏰 {nome.toUpperCase()}
+        <span className="ml-1 text-white">· {lado.toUpperCase()}</span>
       </p>
       <div className="relative h-3 w-full bg-black/60 sm:h-4" role="meter" aria-label={`Torre de ${nome}`} aria-valuenow={vida} aria-valuemin={0} aria-valuemax={TORRE_VIDA}>
         <div className={`absolute inset-y-0 transition-all duration-300 ${direita ? 'right-0' : 'left-0'}`} style={{ width: `${pct}%`, background: cor }} />
