@@ -226,6 +226,8 @@ export interface Tropa {
   golpeouEm?: number;
   /** Quando pulou (a tela anima o salto em arco). */
   puloEm?: number;
+  /** Quando levou golpe (a tela faz piscar). */
+  feridaEm?: number;
 }
 
 export interface Lutador {
@@ -242,7 +244,7 @@ export interface Lutador {
 
 export interface EfeitoVisual {
   id: number;
-  tipo: 'choque' | 'tribuna' | 'flecha' | 'dardo' | 'pedra' | 'golpe' | 'raio' | 'escudo' | 'super' | 'feitico' | 'pulo' | 'riso';
+  tipo: 'choque' | 'tribuna' | 'flecha' | 'dardo' | 'pedra' | 'golpe' | 'raio' | 'escudo' | 'super' | 'feitico' | 'pulo' | 'riso' | 'morte';
   lado: Lado;
   /** De onde sai o tiro (para a tela animar a flecha voando). */
   x0?: number;
@@ -455,9 +457,11 @@ function maisPerto(s: EstadoDuelo, de: Lado, x: number): Tropa | undefined {
   return s.tropas.filter((t) => t.de === de).sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
 }
 
-/** Tira força de uma tropa (some quando chega a zero). */
-function ferir(s: EstadoDuelo, id: number, dano: number): EstadoDuelo {
-  return { ...s, tropas: s.tropas.map((t) => (t.id === id ? { ...t, forca: t.forca - dano } : t)).filter((t) => t.forca > 0.01) };
+/** Tira força de uma tropa (pisca na tela; some numa nuvem quando chega a zero). */
+function ferir(s0: EstadoDuelo, id: number, dano: number): EstadoDuelo {
+  let s: EstadoDuelo = { ...s0, tropas: s0.tropas.map((t) => (t.id === id ? { ...t, forca: t.forca - dano, feridaEm: s0.tempo } : t)) };
+  for (const t of s.tropas.filter((t) => t.forca <= 0.01)) s = efeito(s, 'morte', t.de, t.x, 600);
+  return { ...s, tropas: s.tropas.filter((t) => t.forca > 0.01) };
 }
 
 function inimigaAFrente(tropas: Tropa[], t: Tropa): Tropa | undefined {
@@ -521,6 +525,8 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
       ? efeito(s, t.tipo === 'balista' ? 'dardo' : 'flecha', t.de, alvo.x, 450, undefined, t.x)
       : efeito(s, 'choque', t.de, (alvo.x + t.x) / 2, 350);
   }
+  // Quem cai nesta troca some numa nuvem de poeira.
+  for (const t of s.tropas.filter((t) => t.forca - (dano.get(t.id) ?? 0) <= 0.01)) s = efeito(s, 'morte', t.de, t.x, 600);
   s = {
     ...s,
     tropas: s.tropas
@@ -530,6 +536,7 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
         return {
           ...t,
           forca: t.forca - (dano.get(t.id) ?? 0),
+          feridaEm: dano.has(t.id) ? agora : t.feridaEm,
           paradaAte: parar.get(t.id) ?? t.paradaAte,
           pulou: t.pulou || pulo,
           puloEm: pulo ? agora : t.puloEm,
@@ -615,10 +622,7 @@ function vezDoRival(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   let s = s0;
   const r = s.rival;
   const agora = s.tempo;
-  if (r.carga >= SUPER_MAX) {
-    const util = ctx.iaRival !== 'gemini' || s.tropas.some((t) => t.de === 'eu');
-    if (util) return usarHabilidade(s, 'rival', ctx.iaRival);
-  }
+  // A habilidade da IA saiu do Duelo (decisão do Lucas: agora as cartas fazem esse papel).
   const perigo = s.tropas.some((t) => t.de === 'eu' && Math.abs(t.x - PONTA.rival) <= 18);
   if (perigo && r.gladiadorProntoEm <= agora && ctx.aleatorio() < ctx.acerto * 0.2) s = golpeDoGladiador(s, 'rival');
 

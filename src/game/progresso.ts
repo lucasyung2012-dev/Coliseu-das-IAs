@@ -16,6 +16,8 @@ export interface Partida {
   trofeus: number;
   xp: number;
   dilema: string;
+  /** Saiu no meio da partida: conta como derrota (para ninguém fugir quando está perdendo). */
+  abandono?: boolean;
 }
 
 export interface PlacarModo {
@@ -150,7 +152,9 @@ export function nivelMaestria(xp: number): number {
 }
 
 /** Registra o resultado e devolve a partida com a variação de troféus e XP aplicada. */
-export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 'venceu' | 'empate' | 'treino' | 'dilema'>): Partida {
+export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 'venceu' | 'empate' | 'treino' | 'dilema' | 'abandono'>): Partida {
+  // A partida acabou de verdade: não está mais "em andamento".
+  fecharPartidaAberta();
   const p = obterProgresso();
   const trofeus = dados.treino || dados.empate ? 0 : variacaoTrofeus(dados.modo, p.trofeus[dados.ia], dados.venceu);
   const xp = dados.treino ? 0 : dados.empate ? XP_EMPATE : dados.venceu ? XP_VITORIA : XP_DERROTA;
@@ -217,4 +221,52 @@ export function juntarProgresso(local: Progresso, nuvem: Progresso, primeiraVez:
     partidas,
     atualizadoEm: new Date().toISOString(),
   };
+}
+
+// ---------- Sair no meio = derrota ----------
+// Ao começar uma partida, ela fica marcada como "em andamento" neste aparelho.
+// Se o jogador sair (voltar ao Arcade, fechar o app ou recarregar) antes do fim,
+// a partida vale como derrota: assim ninguém foge quando está perdendo.
+
+const CHAVE_ABERTA = 'coliseu.partida.aberta';
+type PartidaAberta = Pick<Partida, 'modo' | 'ia' | 'rival' | 'treino' | 'dilema'>;
+
+export function marcarPartidaAberta(dados: PartidaAberta) {
+  try {
+    localStorage.setItem(CHAVE_ABERTA, JSON.stringify(dados));
+  } catch {
+    /* sem armazenamento: não dá para marcar */
+  }
+}
+
+export function fecharPartidaAberta() {
+  try {
+    localStorage.removeItem(CHAVE_ABERTA);
+  } catch {
+    /* nada a fazer */
+  }
+}
+
+export function temPartidaAberta(): boolean {
+  try {
+    return localStorage.getItem(CHAVE_ABERTA) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/** Se ficou uma partida em andamento, registra como derrota (abandono). */
+export function registrarAbandono(): Partida | null {
+  let dados: PartidaAberta | null = null;
+  try {
+    const bruto = localStorage.getItem(CHAVE_ABERTA);
+    dados = bruto ? (JSON.parse(bruto) as PartidaAberta) : null;
+  } catch {
+    dados = null;
+  }
+  if (!dados || !IAS.includes(dados.ia) || !IAS.includes(dados.rival)) {
+    fecharPartidaAberta();
+    return null;
+  }
+  return registrarPartida({ ...dados, venceu: false, empate: false, abandono: true });
 }

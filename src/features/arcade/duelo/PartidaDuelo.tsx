@@ -3,7 +3,7 @@ import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { ACERTO_RIVAL } from '@/game/tribunal/motor';
 import { indiceLiga } from '@/game/ligas';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
-import { useProgresso } from '@/game/progresso';
+import { marcarPartidaAberta, registrarAbandono, registrarPartida, useProgresso } from '@/game/progresso';
 import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import {
   baralhoDaIa,
@@ -17,7 +17,6 @@ import {
   GLADIADOR_ALCANCE,
   GLADIADOR_RECARGA_MS,
   golpeDoGladiador,
-  HABILIDADES,
   jogarCarta,
   novoDuelo,
   passo,
@@ -27,10 +26,8 @@ import {
   RODADAS,
   resultadoFinal,
   ritmoDoFolego,
-  SUPER_MAX,
   TICK,
   TRIBUNA_VIDA,
-  usarHabilidade,
   validarBaralho,
   type CartaDuelo,
   type EfeitoVisual,
@@ -41,7 +38,7 @@ import {
   type Lutador,
 } from '@/game/duelo/motor';
 import { Link } from 'react-router-dom';
-import { Arte } from './MeuBaralho';
+import { Arte, CartaVisual } from './CartaVisual';
 import { CenaColiseu } from '../cenas/Cenarios';
 import { Faiscas } from '../cenas/Palco';
 import { GladiadorPixel, PretorPixel } from '@/ui/pixel/Personagens';
@@ -152,8 +149,13 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
     if (e.fase === 'fim') {
       const r = resultadoFinal(e);
       tocar(r === 'vitoria' ? 'vitoria' : r === 'derrota' ? 'derrota' : 'martelo');
+      // O Duelo ainda é protótipo: entra no histórico como treino (sem troféus nem XP).
+      registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: true, dilema: dilema.pergunta });
     }
   }, [e.fase]);
+
+  // Saiu no meio (voltou, trocou de tela)? Vale derrota. Se já acabou, não faz nada.
+  useEffect(() => () => void registrarAbandono(), []);
 
   const jogar = (carta: CartaDuelo, carga: number) => {
     if (pausado) return;
@@ -175,23 +177,16 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
     desbloquear();
     setE((s) => golpeDoGladiador(s, 'eu'));
   };
-  const habilidade = () => {
-    if (pausado) return;
-    desbloquear();
-    setE((s) => usarHabilidade(s, 'eu', ia));
-  };
-
-  // Teclado: segure 1 a 4 para carregar e solte para lançar; G = gladiador; espaço = habilidade.
+  // Teclado: segure 1 a 4 para carregar e solte para lançar; G ou espaço = golpe do gladiador.
   useEffect(() => {
     if (pausado) return;
     const desce = (ev: KeyboardEvent) => {
       if (ev.repeat) return;
       const c = e.eu.mao[Number(ev.key) - 1];
       if (c && podeJogar(e, 'eu', c.id)) comecarCarga(c);
-      else if (ev.key === 'g' || ev.key === 'G') gladiador();
-      else if (ev.key === ' ') {
+      else if (ev.key === 'g' || ev.key === 'G' || ev.key === ' ') {
         ev.preventDefault();
-        habilidade();
+        gladiador();
       }
     };
     const sobe = (ev: KeyboardEvent) => {
@@ -239,6 +234,8 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
             desbloquear();
             tocar('start');
             setAbertura('entrada');
+            // A partida começou: sair antes do fim conta como derrota.
+            marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: true, dilema: dilema.pergunta });
           }}
           onComoJogar={tutorial.abrir}
         />
@@ -323,6 +320,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           const correndo = (t.rapidaAte ?? 0) > e.tempo;
           const saltando = t.puloEm !== undefined && e.tempo - t.puloEm < 600;
           const estocada = t.golpeouEm !== undefined && e.tempo - t.golpeouEm < 250;
+          const ferida = t.feridaEm !== undefined && e.tempo - t.feridaEm < 160;
           const atras = t.de === 'eu' ? -1 : 1;
           // Movimento da tropa: salta em arco, dá estocada quando golpeia, marcha quando anda.
           const pose = saltando ? 'saltar' : estocada ? (t.de === 'eu' ? 'estocada-dir' : 'estocada-esq') : parada ? '' : 'marchar';
@@ -332,6 +330,8 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
             correndo ? `drop-shadow(${atras * 6}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 55%, transparent)) drop-shadow(${atras * 12}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 25%, transparent))` : '',
             // Parada (Piada ou Pausa): fica azulada, congelada.
             parada ? 'saturate(0.4) brightness(1.25) hue-rotate(170deg)' : '',
+            // Levou golpe: pisca branco.
+            ferida ? 'brightness(2.6)' : '',
           ].join(' ');
           return (
             <div
@@ -434,15 +434,6 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
             dica="Golpe do gladiador: ele já bate sozinho em quem entra no círculo de luz; tocando, dá um golpe extra (-1). Recarrega em 8 s."
             onClick={gladiador}
           />
-          <BotaoRedondo
-            rotulo={HABILIDADES[ia].nome.toUpperCase()}
-            icone={HABILIDADES[ia].icone}
-            cor={OURO}
-            progresso={eu.carga / SUPER_MAX}
-            pronto={eu.carga >= SUPER_MAX && e.fase === 'luta' && !pausado}
-            dica={`${HABILIDADES[ia].nome}: ${HABILIDADES[ia].efeito} Enche com ${SUPER_MAX} tropas que acertam a Tribuna.`}
-            onClick={habilidade}
-          />
         </div>
       </div>
       <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💨)</p>
@@ -532,7 +523,7 @@ function BriefingDuelo({
           <p className="font-pixel text-[8px] sm:text-[10px]" style={{ color: voce.cor }}>
             🃏 SEU BARALHO
           </p>
-          <Link to="/arena/baralho" onClick={() => tocar('clique')} className="font-pixel text-[8px] text-accent hover:underline sm:text-[9px]">
+          <Link to="/arena/duelo" onClick={() => tocar('clique')} className="font-pixel text-[8px] text-accent hover:underline sm:text-[9px]">
             ✎ TROCAR CARTAS
           </Link>
         </div>
@@ -596,25 +587,26 @@ function CartaNaMao(props: {
       onContextMenu={(ev) => ev.preventDefault()}
       aria-label={`${info.nome}, ${info.forca ? `força ${info.forca}, ` : ''}custa ${custo}`}
       title={info.dica}
-      className="pixel-box pixel-hover relative flex select-none flex-col items-center gap-1 overflow-hidden px-1 py-2 text-center [-webkit-touch-callout:none] disabled:cursor-not-allowed disabled:opacity-40"
-      style={info.papel === 'feitico' ? { boxShadow: `0 0 0 2px ${OURO}, 0 0 14px -4px ${OURO}` } : undefined}
+      className="relative select-none transition [-webkit-touch-callout:none] enabled:hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-40"
     >
-      <Arte tipo={carta.tipo} paleta={cores.paleta} grande />
-      <span className="font-pixel text-[8px] leading-relaxed sm:text-[10px]" style={{ color: info.papel === 'feitico' ? OURO : cores.cor }}>
-        {info.icone} {info.nome.toUpperCase()}
-      </span>
-      <span className="font-pixel text-[7px] text-muted sm:text-[8px]">
-        ★ {info.jeito.toUpperCase()} · {info.forca ? `FORÇA ${info.forca} · ` : ''}
-        <span className={custo === 0 ? 'text-[rgb(242_193_78)]' : ''}>💨{custo}</span>
-      </span>
-      <span className="hidden text-[10px] leading-tight text-muted sm:block">{info.dica}</span>
-      <span className="hidden font-pixel text-[7px] text-muted sm:block">[{numero}]</span>
-      {/* Barra de carga: cheia = +1 de força (custa +1 de fôlego) */}
-      {carrega && (
-        <span className="absolute inset-x-0 bottom-0 h-1.5 bg-black/50" aria-hidden>
-          {carregando && <span className="carga-enchendo absolute inset-y-0 left-0" style={{ animationDuration: `${CARGA_MS}ms` } as CSSProperties} />}
-        </span>
-      )}
+      <CartaVisual
+        tipo={carta.tipo}
+        paleta={cores.paleta}
+        corNome={cores.cor}
+        custo={custo}
+        tamanho="mao"
+        rodape={
+          <>
+            <span className="mt-auto hidden pb-0.5 font-pixel text-[7px] text-muted sm:block">[{numero}]</span>
+            {/* Barra de carga: cheia = +1 de força (custa +1 de fôlego) */}
+            {carrega && (
+              <span className="relative mt-auto block h-1.5 w-full bg-black/60" aria-hidden>
+                {carregando && <span className="carga-enchendo absolute inset-y-0 left-0" style={{ animationDuration: `${CARGA_MS}ms` } as CSSProperties} />}
+              </span>
+            )}
+          </>
+        }
+      />
     </button>
   );
 }
@@ -825,6 +817,15 @@ function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
       );
     case 'pulo':
       return <Faiscas x={alvo} y={92} cor="#e8c89a" />;
+    case 'morte':
+      // A tropa caiu: some numa nuvem de poeira em pixel.
+      return (
+        <div className="fumaca pointer-events-none absolute bottom-[6%] z-20 aspect-square w-[6%] -translate-x-1/2" style={{ left: `%` }} aria-hidden>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <span key={i} />
+          ))}
+        </div>
+      );
     case 'riso':
       return (
         <p className="subir-sumir pointer-events-none absolute bottom-[24%] z-20 -translate-x-1/2 whitespace-nowrap font-pixel text-[8px] text-[rgb(255_224_102)] [text-shadow:2px_2px_0_#000] sm:text-sm" style={{ left: `${alvo}%` }}>

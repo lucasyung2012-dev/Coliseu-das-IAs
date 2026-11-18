@@ -86,7 +86,7 @@ describe('App', () => {
   });
 
   it('roda a entrada do Duelo e, ao pular, mostra o fim com "ver de novo"', () => {
-    abrir('/arena/duelo');
+    abrir('/arena/duelo/jogar');
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
     expect(screen.getByText('VS')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /VER DE NOVO/ })).toBeInTheDocument();
@@ -131,6 +131,18 @@ describe('App', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('sair no meio da partida pede confirmação e conta como derrota', () => {
+    abrir('/arena/tribunal');
+    fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+    fireEvent.click(screen.getByRole('button', { name: /ENTRAR NA SESSÃO/ }));
+    fireEvent.click(screen.getByRole('button', { name: /COMEÇAR/ }));
+    fireEvent.click(screen.getByRole('link', { name: /ARCADE/ }));
+    const aviso = screen.getByRole('dialog', { name: /Sair da partida/ });
+    fireEvent.click(within(aviso).getByRole('button', { name: /SAIR/ }));
+    const salvo = JSON.parse(localStorage.getItem('coliseu.progresso.v1')!);
+    expect(salvo.partidas[0]).toMatchObject({ modo: 'tribunal', venceu: false, abandono: true });
   });
 
   it('o tempo esgotado joga uma carta pelo jogador', () => {
@@ -226,11 +238,20 @@ describe('mapa de troféus na tela', () => {
 });
 
 describe('duelo jogável (protótipo)', () => {
+  it('sala do Duelo: baralho à esquerda, organizar por fôlego, Jogar e 2 jogadores (em breve)', () => {
+    abrir('/arena/duelo');
+    expect(screen.getByRole('region', { name: 'Seu baralho' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: /POR FÔLEGO/ }));
+    expect(screen.getByRole('region', { name: /Do mais barato ao mais caro/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /JOGAR/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /2 jogadores/ })).toBeDisabled();
+  });
+
   it('tutorial na primeira vez, golpes no toque e no teclado, e o polegar do César no fim das rodadas', () => {
     localStorage.removeItem('coliseu.tutorial.duelo');
     vi.useFakeTimers();
     try {
-      abrir('/arena/duelo');
+      abrir('/arena/duelo/jogar');
       fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
       fireEvent.click(screen.getByRole('button', { name: /LUTAR/ }));
       const dialogo = screen.getByRole('dialog', { name: /Como jogar: DUELO/ });

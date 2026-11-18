@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Home from './features/home/Home';
 import EmConstrucao from './features/home/EmConstrucao';
 import ArcadeHub from './features/arcade/ArcadeHub';
@@ -7,17 +8,25 @@ import BotaoSom from './ui/BotaoSom';
 import Configuracoes from './features/config/Configuracoes';
 import PerfilCombatente from './features/arcade/PerfilCombatente';
 import MapaTrofeus from './features/arcade/MapaTrofeus';
-import MeuBaralho from './features/arcade/duelo/MeuBaralho';
+import SalaDoDuelo from './features/arcade/duelo/MeuBaralho';
+import { registrarAbandono } from './game/progresso';
 
 export default function App() {
+  // Fechou o app ou recarregou no meio de uma partida? Ela vale como derrota.
+  useEffect(() => {
+    registrarAbandono();
+  }, []);
+
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/arena" element={<ArcadeHub />} />
-        <Route path="/arena/duelo" element={<EntradaCombate modo="duelo" />} />
+        {/* Duelo: primeiro a sala (baralho, Jogar, 2 jogadores); depois a partida. */}
+        <Route path="/arena/duelo" element={<SalaDoDuelo />} />
+        <Route path="/arena/duelo/jogar" element={<EntradaCombate modo="duelo" />} />
         <Route path="/arena/tribunal" element={<EntradaCombate modo="tribunal" />} />
-        <Route path="/arena/baralho" element={<MeuBaralho />} />
+        <Route path="/arena/baralho" element={<Navigate to="/arena/duelo" replace />} />
         <Route path="/arena/mapa/:ia" element={<MapaTrofeus />} />
         <Route path="/arena/perfil/:ia" element={<PerfilCombatente />} />
         <Route path="/configuracoes" element={<Configuracoes />} />

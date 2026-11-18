@@ -199,17 +199,8 @@ export default function ArcadeHub() {
           <h2 id="titulo-modos" className="mb-3 font-pixel text-[10px] text-muted">
             ESCOLHA SEU COMBATE
           </h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <CartaoModo
-              rota="/arena/duelo"
-              icone="⚔"
-              titulo="Duelo"
-              frase="Um round. Duas cartas. Um veredito."
-              arte={<ArteDuelo ia={ia} />}
-              ganho={variacaoTrofeus('duelo', trofeus, true)}
-              perda={variacaoTrofeus('duelo', trofeus, false)}
-              treino={treino}
-            />
+          {/* O Tribunal é o combate principal: bem grande, em cima. O Duelo vem embaixo. */}
+          <div className="flex flex-col gap-5">
             <CartaoModo
               rota="/arena/tribunal"
               icone="⚖"
@@ -219,6 +210,18 @@ export default function ArcadeHub() {
               ganho={variacaoTrofeus('tribunal', trofeus, true)}
               perda={variacaoTrofeus('tribunal', trofeus, false)}
               treino={treino}
+              grande
+            />
+            <CartaoModo
+              rota="/arena/duelo"
+              icone="⚔"
+              titulo="Duelo"
+              frase="Monte seu baralho. Tropas de argumentos. Derrube a Tribuna do rival."
+              arte={<ArteDuelo ia={ia} />}
+              ganho={variacaoTrofeus('duelo', trofeus, true)}
+              perda={variacaoTrofeus('duelo', trofeus, false)}
+              treino={treino}
+              prototipo
             />
           </div>
         </section>
@@ -259,6 +262,10 @@ function CartaoModo(props: {
   ganho: number;
   perda: number;
   treino: boolean;
+  /** O combate principal (Tribunal): bem maior. */
+  grande?: boolean;
+  /** Ainda em teste: não vale troféus. */
+  prototipo?: boolean;
 }) {
   return (
     <Link
@@ -268,21 +275,24 @@ function CartaoModo(props: {
         desbloquear();
         tocar('clique');
       }}
-      className="pixel-box pixel-hover group block min-w-0 overflow-hidden transition hover:-translate-y-1"
+      className={`pixel-box pixel-hover group block min-w-0 overflow-hidden transition hover:-translate-y-1 ${props.grande ? 'sm:grid sm:grid-cols-[2fr_1fr]' : 'sm:grid sm:grid-cols-[3fr_2fr]'}`}
     >
-      <div className="relative aspect-[16/7] w-full overflow-hidden">
+      <div className={`relative w-full overflow-hidden ${props.grande ? 'aspect-[16/8]' : 'aspect-[16/6]'}`}>
         <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">{props.arte}</div>
         <div className="absolute inset-0 bg-gradient-to-t from-[rgb(var(--surface))] via-transparent to-transparent" aria-hidden />
         <div className="absolute bottom-2 left-3 flex items-center gap-2">
-          <span className="text-2xl text-accent drop-shadow-[0_2px_0_#000]" aria-hidden>
+          <span className={`${props.grande ? 'text-3xl sm:text-4xl' : 'text-2xl'} text-accent drop-shadow-[0_2px_0_#000]`} aria-hidden>
             {props.icone}
           </span>
-          <h3 className="neon font-pixel text-base text-accent drop-shadow-[0_2px_0_#000] sm:text-xl">{props.titulo}</h3>
+          <h3 className={`neon font-pixel text-accent drop-shadow-[0_2px_0_#000] ${props.grande ? 'text-xl sm:text-3xl' : 'text-base sm:text-xl'}`}>{props.titulo}</h3>
         </div>
       </div>
-      <div className="p-4">
+      <div className="flex flex-col justify-center p-4">
+        {props.grande && <p className="mb-1 font-pixel text-[9px] text-[rgb(242_193_78)]">★ COMBATE PRINCIPAL</p>}
         <p className="text-sm text-muted">{props.frase}</p>
-        {props.treino ? (
+        {props.prototipo ? (
+          <p className="mt-2 text-sm text-[rgb(242_193_78)]">Protótipo: ainda não vale troféus.</p>
+        ) : props.treino ? (
           <p className="mt-2 text-sm text-[rgb(242_193_78)]">Treino: não vale troféus.</p>
         ) : (
           <p className="mt-2 text-sm tabular-nums">

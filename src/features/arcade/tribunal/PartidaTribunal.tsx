@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { JURADOS, type JuradoId } from '@/game/jurados';
-import { useProgresso } from '@/game/progresso';
+import { marcarPartidaAberta, registrarAbandono, useProgresso } from '@/game/progresso';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
 import { FALAS_PRETOR, GOSTOS, REACOES, TEMAS } from '@/game/tribunal/temas';
 import type { Carta } from '@/game/tribunal/dilemas';
@@ -52,6 +52,8 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
   const [escolhida, setEscolhida] = useState<string | null>(null);
   const [modoHabilidade, setModoHabilidade] = useState(false);
   const [restante, setRestante] = useState(SEGUNDOS);
+  // Saiu no meio (voltou ao Arcade, trocou de tela)? Vale derrota. Se a partida já acabou, não faz nada.
+  useEffect(() => () => void registrarAbandono(), []);
   const tutorial = useTutorial('tribunal');
   const modalTutorial = tutorial.aberto && <ComoJogar titulo="TRIBUNAL" slides={TUTORIAL_TRIBUNAL} onFechar={tutorial.fechar} />;
 
@@ -98,6 +100,8 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
           onComecar={() => {
             desbloquear();
             tocar('start');
+            // A partida começou: se sair antes do veredito, conta como derrota.
+            marcarPartidaAberta({ modo: 'tribunal', ia, rival, treino: !ranqueado, dilema: e.dilema.pergunta });
             setRestante(SEGUNDOS);
             setComecou(true);
           }}
