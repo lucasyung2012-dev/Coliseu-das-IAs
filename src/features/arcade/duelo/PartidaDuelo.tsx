@@ -15,6 +15,7 @@ import {
   FOLEGO_MAX,
   FOLEGO_POR_SEGUNDO,
   GLADIADOR_ALCANCE,
+  GLADIADOR_RECARGA_MS,
   golpeDoGladiador,
   HABILIDADES,
   jogarCarta,
@@ -32,6 +33,7 @@ import {
   usarHabilidade,
   validarBaralho,
   type CartaDuelo,
+  type EfeitoVisual,
   type EstadoDuelo,
   type EstiloIa,
   type Lado,
@@ -45,7 +47,7 @@ import { Faiscas } from '../cenas/Palco';
 import { GladiadorPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
-import { LARGURA_TROPA, paletaTropa, TRIBUNA, TROPAS } from '@/ui/pixel/tropas';
+import { EFEITOS, LARGURA_TROPA, PALETA_EFEITOS, paletaTropa, TRIBUNA, TROPAS } from '@/ui/pixel/tropas';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { PretorDestaque } from '../tribunal/visual';
 import ComoJogar, { BotaoComoJogar, TUTORIAL_DUELO, useTutorial } from '../ComoJogar';
@@ -289,7 +291,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
 
         {/* As Tribunas, com o gladiador em cima */}
         {(['eu', 'rival'] as Lado[]).map((l) => (
-          <div key={`tribuna-${l}`} className={`absolute bottom-0 w-[12%] ${l === 'eu' ? 'left-[6%]' : 'right-[6%]'}`}>
+          <div key={`tribuna-${l}`} className={`absolute bottom-0 w-[15%] ${l === 'eu' ? 'left-[5%]' : 'right-[5%]'}`}>
             {/* Na entrada, o gladiador chega andando pela arena e sobe na Tribuna */}
             <div className={abertura === 'entrada' ? (l === 'eu' ? 'chegar-esq' : 'chegar-dir') : ''}>
               <Gladiador
@@ -317,23 +319,35 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
 
         {/* As tropas */}
         {e.tropas.map((t) => {
-          const lutando = e.tropas.some((o) => o.de !== t.de && Math.abs(o.x - t.x) <= 4);
+          const parada = (t.paradaAte ?? 0) > e.tempo;
+          const correndo = (t.rapidaAte ?? 0) > e.tempo;
+          const saltando = t.puloEm !== undefined && e.tempo - t.puloEm < 600;
+          const estocada = t.golpeouEm !== undefined && e.tempo - t.golpeouEm < 250;
+          const atras = t.de === 'eu' ? -1 : 1;
+          // Movimento da tropa: salta em arco, dá estocada quando golpeia, marcha quando anda.
+          const pose = saltando ? 'saltar' : estocada ? (t.de === 'eu' ? 'estocada-dir' : 'estocada-esq') : parada ? '' : 'marchar';
+          const filtros = [
+            t.carregada ? `drop-shadow(0 0 4px ${OURO})` : '',
+            // Aplauso: rastro de velocidade atrás da tropa.
+            correndo ? `drop-shadow(${atras * 6}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 55%, transparent)) drop-shadow(${atras * 12}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 25%, transparent))` : '',
+            // Parada (Piada ou Pausa): fica azulada, congelada.
+            parada ? 'saturate(0.4) brightness(1.25) hue-rotate(170deg)' : '',
+          ].join(' ');
           return (
-            <div key={t.id} className="tropa absolute bottom-[4%] z-10 -translate-x-1/2" style={{ left: `${t.x}%`, width: `${LARGURA_TROPA[t.tipo]}%` }} aria-hidden>
+            <div
+              key={t.id}
+              className="tropa absolute bottom-[4%] z-10 -translate-x-1/2"
+              style={{ left: `${t.x}%`, width: `${LARGURA_TROPA[t.tipo]}%`, transition: saltando ? 'left 550ms ease-out' : undefined }}
+              aria-hidden
+            >
               <span
                 className="absolute -top-3 left-1/2 -translate-x-1/2 rounded bg-black/80 px-1 font-pixel text-[7px] sm:-top-5 sm:text-[11px]"
                 style={{ color: t.carregada ? OURO : cores[t.de].cor }}
               >
                 {Math.ceil(t.forca)}
               </span>
-              {(t.paradaAte ?? 0) > e.tempo && <span className="absolute -top-7 left-1/2 -translate-x-1/2 text-sm sm:-top-10 sm:text-xl">💫</span>}
-              <div
-                className={lutando ? 'lutando' : (t.paradaAte ?? 0) > e.tempo ? '' : 'marchar'}
-                style={{
-                  filter: t.carregada ? `drop-shadow(0 0 4px ${OURO})` : (t.rapidaAte ?? 0) > e.tempo ? `drop-shadow(0 0 4px ${cores[t.de].cor})` : undefined,
-                  opacity: t.someEm !== undefined && t.someEm - e.tempo < 2000 ? 0.6 : undefined,
-                }}
-              >
+              {parada && <span className="girar-estrelas absolute -top-6 left-1/2 -translate-x-1/2 font-pixel text-[8px] text-[rgb(159_232_255)] sm:-top-9 sm:text-sm">✦ ✦</span>}
+              <div className={pose} style={{ filter: filtros.trim() || undefined, opacity: t.someEm !== undefined && t.someEm - e.tempo < 2000 ? 0.6 : undefined }}>
                 <Sprite grade={TROPAS[t.tipo]} paleta={cores[t.de].paleta} espelhar={t.de === 'rival'} />
               </div>
             </div>
@@ -341,24 +355,9 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         })}
 
         {/* Efeitos */}
-        {e.efeitos.map((x) =>
-          x.tipo === 'choque' ? (
-            <Faiscas key={x.id} x={x.x ?? 50} y={84} />
-          ) : x.tipo === 'tribuna' ? (
-            <Faiscas key={x.id} x={x.lado === 'eu' ? 12 : 88} y={60} cor={cores[x.lado].cor} />
-          ) : x.tipo === 'super' ? (
-            <div key={x.id} className="clarao pointer-events-none absolute inset-0 z-20" style={{ background: `color-mix(in srgb, ${cores[x.lado].cor} 45%, transparent)` }} />
-          ) : (
-            <span
-              key={x.id}
-              className={`pancada absolute z-20 -translate-x-1/2 ${x.tipo === 'feitico' ? 'bottom-[25%] text-2xl sm:text-5xl' : 'bottom-[20%] text-base sm:text-3xl'}`}
-              style={{ left: `${x.x ?? 50}%` }}
-              aria-hidden
-            >
-              {x.icone ?? (x.tipo === 'flecha' ? '➶' : x.tipo === 'golpe' ? '💥' : x.tipo === 'raio' ? '⚡' : x.tipo === 'riso' ? '😂' : x.tipo === 'pulo' ? '↷' : '🛡️')}
-            </span>
-          ),
-        )}
+        {e.efeitos.map((x) => (
+          <EfeitoNaArena key={x.id} x={x} cor={cores[x.lado].cor} />
+        ))}
 
         {e.aviso && e.fase === 'luta' && (
           <p
@@ -406,53 +405,46 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         </div>
       </div>
 
-      {/* Gladiador e habilidade */}
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          disabled={!gladiadorPronto || e.fase !== 'luta' || pausado}
-          onClick={gladiador}
-          className="pixel-box pixel-hover flex flex-col items-center gap-1 px-2 py-2 text-center disabled:opacity-40"
-        >
-          <span className="font-pixel text-[8px] sm:text-[10px]">
-            🗡️ GOLPE DO GLADIADOR {gladiadorPronto ? '' : `· ${Math.ceil((eu.gladiadorProntoEm - e.tempo) / 1000)}s`}
-          </span>
-          <span className="text-[9px] leading-tight text-muted sm:text-[11px]">Ele já bate sozinho em quem entra no círculo de luz. Toque: golpe extra (-1).</span>
-        </button>
-        <button
-          type="button"
-          disabled={eu.carga < SUPER_MAX || e.fase !== 'luta' || pausado}
-          onClick={habilidade}
-          className={`pixel-box pixel-hover flex flex-col items-center gap-1 px-2 py-2 text-center disabled:opacity-40 ${eu.carga >= SUPER_MAX ? 'piscar' : ''}`}
-        >
-          <span className="font-pixel text-[8px] text-[rgb(242_193_78)] sm:text-[10px]">
-            {HABILIDADES[ia].icone} {HABILIDADES[ia].nome.toUpperCase()} {'●'.repeat(eu.carga)}
-            {'○'.repeat(SUPER_MAX - eu.carga)}
-          </span>
-          <span className="text-[9px] leading-tight text-muted sm:text-[11px]">
-            {HABILIDADES[ia].efeito} {eu.carga < SUPER_MAX && `Enche com ${SUPER_MAX} tropas que acertam a Tribuna.`}
-          </span>
-        </button>
-      </div>
-
-      {/* A mão: toque para lançar, segure para carregar */}
-      <section aria-label="Suas cartas" className="grid grid-cols-4 gap-2">
-        {eu.mao.map((c, i) => (
-          <CartaNaMao
-            key={c.id}
-            carta={c}
-            numero={i + 1}
-            custo={custoAgora(eu, c.tipo)}
-            pode={podeJogar(e, 'eu', c.id) && !pausado}
-            carregando={segurando?.id === c.id}
-            cores={cores.eu}
-            onSegurar={() => comecarCarga(c)}
-            onSoltar={() => soltar(c)}
-            onCancelar={() => setSegurando(null)}
-            onTocar={() => jogar(c, 0)}
+      {/* As cartas (grandes) e, ao lado, os dois botões redondos: golpe do gladiador e habilidade */}
+      <div className="grid grid-cols-[1fr_auto] items-stretch gap-2 sm:gap-3">
+        <section aria-label="Suas cartas" className="grid grid-cols-4 gap-2">
+          {eu.mao.map((c, i) => (
+            <CartaNaMao
+              key={c.id}
+              carta={c}
+              numero={i + 1}
+              custo={custoAgora(eu, c.tipo)}
+              pode={podeJogar(e, 'eu', c.id) && !pausado}
+              carregando={segurando?.id === c.id}
+              cores={cores.eu}
+              onSegurar={() => comecarCarga(c)}
+              onSoltar={() => soltar(c)}
+              onCancelar={() => setSegurando(null)}
+              onTocar={() => jogar(c, 0)}
+            />
+          ))}
+        </section>
+        <div className="flex flex-col items-center justify-around gap-2">
+          <BotaoRedondo
+            rotulo="GOLPE"
+            icone="🗡️"
+            cor={cores.eu.cor}
+            progresso={gladiadorPronto ? 1 : 1 - (eu.gladiadorProntoEm - e.tempo) / GLADIADOR_RECARGA_MS}
+            pronto={gladiadorPronto && e.fase === 'luta' && !pausado}
+            dica="Golpe do gladiador: ele já bate sozinho em quem entra no círculo de luz; tocando, dá um golpe extra (-1). Recarrega em 8 s."
+            onClick={gladiador}
           />
-        ))}
-      </section>
+          <BotaoRedondo
+            rotulo={HABILIDADES[ia].nome.toUpperCase()}
+            icone={HABILIDADES[ia].icone}
+            cor={OURO}
+            progresso={eu.carga / SUPER_MAX}
+            pronto={eu.carga >= SUPER_MAX && e.fase === 'luta' && !pausado}
+            dica={`${HABILIDADES[ia].nome}: ${HABILIDADES[ia].efeito} Enche com ${SUPER_MAX} tropas que acertam a Tribuna.`}
+            onClick={habilidade}
+          />
+        </div>
+      </div>
       <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💨)</p>
     </div>
   );
@@ -607,7 +599,7 @@ function CartaNaMao(props: {
       className="pixel-box pixel-hover relative flex select-none flex-col items-center gap-1 overflow-hidden px-1 py-2 text-center [-webkit-touch-callout:none] disabled:cursor-not-allowed disabled:opacity-40"
       style={info.papel === 'feitico' ? { boxShadow: `0 0 0 2px ${OURO}, 0 0 14px -4px ${OURO}` } : undefined}
     >
-      <Arte tipo={carta.tipo} paleta={cores.paleta} />
+      <Arte tipo={carta.tipo} paleta={cores.paleta} grande />
       <span className="font-pixel text-[8px] leading-relaxed sm:text-[10px]" style={{ color: info.papel === 'feitico' ? OURO : cores.cor }}>
         {info.icone} {info.nome.toUpperCase()}
       </span>
@@ -645,7 +637,7 @@ function Gladiador({ lado, l, tempo, golpeando, onTocar, children }: { lado: Lad
     </>
   );
   // Em pé no alto da Tribuna, na plataforma de cima.
-  const pos = 'relative z-10 mx-auto -mb-[18%] block w-[78%]';
+  const pos = 'relative z-10 mx-auto -mb-[14%] block w-[92%]';
   return onTocar ? (
     <button type="button" onClick={onTocar} disabled={!pronto} aria-label="Golpe do gladiador" className={`${pos} text-left disabled:cursor-default`}>
       {corpo}
@@ -737,4 +729,138 @@ function FimDuelo({ e, ia, rival, cores, onDeNovo, onSair }: { e: EstadoDuelo; i
       </div>
     </div>
   );
+}
+
+/** Botão redondo de ação (golpe do gladiador, habilidade), com anel que enche até ficar pronto. */
+function BotaoRedondo({
+  rotulo,
+  icone,
+  cor,
+  progresso,
+  pronto,
+  dica,
+  onClick,
+}: {
+  rotulo: string;
+  icone: string;
+  cor: string;
+  progresso: number;
+  pronto: boolean;
+  dica: string;
+  onClick: () => void;
+}) {
+  const graus = Math.max(0, Math.min(1, progresso)) * 360;
+  return (
+    <button type="button" disabled={!pronto} onClick={onClick} aria-label={dica} title={dica} className="group flex flex-col items-center gap-1 disabled:cursor-not-allowed">
+      <span
+        className={`grid h-14 w-14 place-items-center rounded-full p-1 sm:h-20 sm:w-20 ${pronto ? 'piscar' : ''}`}
+        style={{ background: `conic-gradient(${cor} ${graus}deg, rgb(255 255 255 / 0.12) 0)`, boxShadow: pronto ? `0 0 18px ${cor}` : undefined }}
+      >
+        <span className={`grid h-full w-full place-items-center rounded-full bg-[rgb(20_14_30)] text-2xl transition group-hover:brightness-125 sm:text-4xl ${pronto ? '' : 'opacity-50'}`}>
+          {icone}
+        </span>
+      </span>
+      <span className="max-w-[5.5rem] text-center font-pixel text-[6px] leading-tight sm:text-[8px]" style={{ color: pronto ? cor : undefined }}>
+        {rotulo}
+      </span>
+    </button>
+  );
+}
+
+/** Cada efeito da luta em pixel: flechas e pedras voando, cortes, raios, feitiços, risadas. */
+function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
+  const paleta = { ...PALETA_EFEITOS, C: cor };
+  const alvo = x.x ?? 50;
+  const voo = (largura: number, ms: number, base: string, filho: ReactNode, arco = false) => (
+    <div
+      className={`voar pointer-events-none absolute z-20 -translate-x-1/2 ${base}`}
+      style={{ '--de': `${x.x0 ?? alvo}%`, '--ate': `${alvo}%`, width: `${largura}%`, animationDuration: `${ms}ms` } as CSSProperties}
+      aria-hidden
+    >
+      <div className={arco ? 'arco' : ''} style={{ animationDuration: `${ms}ms` }}>
+        {filho}
+      </div>
+    </div>
+  );
+  const indo = (x.x0 ?? 0) <= alvo;
+  switch (x.tipo) {
+    case 'flecha':
+      return voo(3.5, 420, 'bottom-[14%]', <Sprite grade={EFEITOS.flecha} paleta={paleta} espelhar={!indo} />);
+    case 'dardo':
+      return voo(5, 420, 'bottom-[12%]', <Sprite grade={EFEITOS.dardo} paleta={paleta} espelhar={!indo} />);
+    case 'pedra':
+      return voo(2.5, 650, 'bottom-[14%]', <Sprite grade={EFEITOS.pedra} paleta={paleta} />, true);
+    case 'choque':
+      return (
+        <>
+          <Faiscas x={alvo} y={86} cor="#ffffff" />
+          <div className="pancada pointer-events-none absolute bottom-[10%] z-20 w-[3%] -translate-x-1/2" style={{ left: `${alvo}%` }} aria-hidden>
+            <Sprite grade={EFEITOS.corte} paleta={paleta} espelhar={x.lado === 'rival'} />
+          </div>
+        </>
+      );
+    case 'golpe':
+      return (
+        <div className="pancada pointer-events-none absolute bottom-[10%] z-20 w-[6%] -translate-x-1/2" style={{ left: `${alvo}%`, filter: `drop-shadow(0 0 6px ${OURO})` }} aria-hidden>
+          <Sprite grade={EFEITOS.corte} paleta={{ ...paleta, W: OURO }} espelhar={x.lado === 'rival'} />
+        </div>
+      );
+    case 'raio':
+      return (
+        <div className="cair pointer-events-none absolute bottom-[8%] z-20 w-[5%]" style={{ left: `${alvo}%`, filter: 'drop-shadow(0 0 8px #ffe066)' }} aria-hidden>
+          <Sprite grade={EFEITOS.raio} paleta={paleta} />
+        </div>
+      );
+    case 'tribuna':
+      return <Faiscas x={x.lado === 'eu' ? 12 : 88} y={55} cor={cor} />;
+    case 'super':
+      return <div className="clarao pointer-events-none absolute inset-0 z-20" style={{ background: `color-mix(in srgb, ${cor} 45%, transparent)` }} />;
+    case 'escudo':
+      return (
+        <div
+          className="onda-area pointer-events-none absolute bottom-[10%] z-20 aspect-square w-[12%] -translate-x-1/2 rounded-full border-4"
+          style={{ left: `${alvo}%`, borderColor: OURO, boxShadow: `0 0 16px ${OURO}` }}
+          aria-hidden
+        />
+      );
+    case 'pulo':
+      return <Faiscas x={alvo} y={92} cor="#e8c89a" />;
+    case 'riso':
+      return (
+        <p className="subir-sumir pointer-events-none absolute bottom-[24%] z-20 -translate-x-1/2 whitespace-nowrap font-pixel text-[8px] text-[rgb(255_224_102)] [text-shadow:2px_2px_0_#000] sm:text-sm" style={{ left: `${alvo}%` }}>
+          HA HA!
+        </p>
+      );
+    case 'feitico': {
+      const tipo = x.icone as 'refutacao' | 'pergunta' | 'pausa' | 'aplauso';
+      if (tipo === 'refutacao')
+        return (
+          <>
+            <div className="cair pointer-events-none absolute bottom-[10%] z-20 w-[3.5%]" style={{ left: `${alvo}%`, filter: 'drop-shadow(0 0 8px #ff3b4a)' }} aria-hidden>
+              <Sprite grade={EFEITOS.refutacao} paleta={paleta} />
+            </div>
+            <Faiscas x={alvo} y={86} cor="#ff3b4a" />
+          </>
+        );
+      if (tipo === 'pergunta')
+        return (
+          <>
+            <div className="onda-area pointer-events-none absolute bottom-[2%] z-20 aspect-[2/1] w-[18%] -translate-x-1/2 rounded-[50%] border-4" style={{ left: `${alvo}%`, borderColor: OURO }} aria-hidden />
+            <div className="pancada pointer-events-none absolute bottom-[28%] z-20 w-[3.5%] -translate-x-1/2" style={{ left: `${alvo}%` }} aria-hidden>
+              <Sprite grade={EFEITOS.pergunta} paleta={paleta} />
+            </div>
+          </>
+        );
+      return (
+        <>
+          <div className="clarao pointer-events-none absolute inset-0 z-20" style={{ background: tipo === 'pausa' ? 'rgb(159 232 255 / 0.35)' : 'rgb(242 193 78 / 0.3)' }} />
+          <div className="pancada pointer-events-none absolute left-1/2 top-[30%] z-20 w-[7%] -translate-x-1/2" aria-hidden>
+            <Sprite grade={EFEITOS[tipo]} paleta={paleta} />
+          </div>
+        </>
+      );
+    }
+    default:
+      return null;
+  }
 }

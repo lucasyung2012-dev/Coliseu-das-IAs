@@ -207,34 +207,74 @@ const ESCUDEIRO: Passo[] = [
 ];
 
 /**
- * A Tribuna (a tribuna dos oradores do Fórum romano): plataforma de pedra com
- * colunas de mármore, as pontas de bronze dos navios (os "rostros") e o
- * estandarte do lado.
+ * A Tribuna (a tribuna dos oradores do Fórum romano), mais detalhada: balaustrada
+ * no alto, friso dourado, três colunas de mármore com capitel e base, as pontas
+ * de bronze dos navios (os "rostros") saindo entre as colunas, o estandarte do
+ * lado e os degraus.
  */
+const COLUNAS = [2, 9, 16];
 const TRIBUNA_PASSOS: Passo[] = [
-  ['P', 0, 0, 16, 2], // plataforma de cima
-  ['p', 0, 2, 16, 1],
-  ['P', 1, 3, 14, 17], // corpo
-  ['T', 2, 3, 2, 17], // colunas
-  ['T', 7, 3, 2, 17],
-  ['T', 12, 3, 2, 17],
-  ['p', 4, 3, 1, 17],
-  ['p', 9, 3, 1, 17],
-  ['p', 14, 3, 1, 17],
-  ['C', 5, 3, 2, 4], // estandarte
-  ['C', 10, 3, 2, 4],
-  ['D', 5, 7],
-  ['D', 11, 7],
-  ['G', 4, 10, 3, 2], // pontas de bronze dos navios
-  ['G', 9, 14, 3, 2],
-  ['G', 4, 16, 3, 2],
-  ['G', 3, 11],
-  ['G', 8, 15],
-  ['G', 3, 17],
-  ['P', 0, 20, 16, 1], // degraus
-  ['p', 0, 21, 16, 1],
+  // balaustrada
+  ['P', 0, 0, 24, 1],
+  ...[0, 4, 8, 12, 16, 20, 23].map((x): Passo => ['P', x, 1, 1, 2]),
+  ['P', 0, 3, 24, 1],
+  // cornija e friso dourado
+  ['T', 0, 4, 24, 1],
+  ['p', 0, 5, 24, 1],
+  ['G', 1, 6, 22, 1],
+  // corpo
+  ['P', 1, 7, 22, 19],
+  ['p', 1, 25, 22, 1],
+  // colunas de mármore
+  ...COLUNAS.flatMap((x): Passo[] => [
+    ['T', x - 1, 7, 5, 1],
+    ['T', x, 8, 3, 16],
+    ['W', x, 8, 1, 16],
+    ['p', x + 2, 8, 1, 16],
+    ['T', x - 1, 24, 5, 1],
+  ]),
+  // estandarte
+  ['C', 12, 8, 4, 6],
+  ['D', 12, 14],
+  ['D', 15, 14],
+  ['G', 13, 10, 2, 1],
+  // pontas de bronze dos navios
+  ['G', 5, 11, 3, 2],
+  ['G', 8, 12],
+  ['B', 5, 13, 3, 1],
+  ['G', 19, 11, 3, 2],
+  ['G', 22, 12],
+  ['B', 19, 13, 3, 1],
+  ['G', 5, 19, 3, 2],
+  ['G', 8, 20],
+  ['B', 5, 21, 3, 1],
+  ['G', 12, 17, 3, 2],
+  ['G', 15, 18],
+  ['B', 12, 19, 3, 1],
+  ['G', 19, 19, 3, 2],
+  ['G', 22, 20],
+  ['B', 19, 21, 3, 1],
+  // degraus
+  ['P', 0, 26, 24, 1],
+  ['p', 1, 27, 22, 1],
+  ['P', 0, 28, 24, 1],
+  ['p', 0, 29, 24, 1],
 ];
-export const TRIBUNA = desenhar(18, 24, TRIBUNA_PASSOS);
+export const TRIBUNA = desenhar(26, 32, TRIBUNA_PASSOS);
+
+/** Efeitos em pixel (sem contorno): flecha, dardo, pedra, corte de espada, raio e os feitiços. */
+export const EFEITOS: Record<'flecha' | 'dardo' | 'pedra' | 'corte' | 'raio' | 'refutacao' | 'pergunta' | 'pausa' | 'aplauso', string[]> = {
+  flecha: ['C........', 'BBBBBBBMM', 'C........'],
+  dardo: ['C..........', 'BBBBBBBBBMMM', 'C..........'],
+  pedra: ['.pp.', 'pPPp', 'pPPp', '.pp.'],
+  corte: ['..WW....', '....WW..', '.....GW.', '......GW', '.....GW.', '....WW..', '..WW....'],
+  raio: ['...YYY', '..YYY.', '.YYY..', 'YYYYYY', '..YYY.', '.YYY..', 'YYY...', 'YY....'],
+  refutacao: ['.RRR.', '.RRR.', '.RRR.', '.RRR.', '..R..', '.....', '.RRR.', '.RRR.'],
+  pergunta: ['.GGGG.', 'GG..GG', '....GG', '...GG.', '..GG..', '......', '..GG..', '..GG..'],
+  pausa: ['.I...I.', '..I.I..', 'IIIIIII', '..I.I..', '.I...I.', '...I...', '..III..'],
+  aplauso: ['G.G.G', '.GGG.', 'GGGGG', '.GGG.', 'G.G.G'],
+};
+export const PALETA_EFEITOS = { W: '#ffffff', G: '#f2c14e', Y: '#ffe066', R: '#ff3b4a', I: '#9fe8ff', B: '#7a4a2a', M: '#b9c2dc', P: '#9a8a78', p: '#6a5c50' };
 
 export const TROPAS: Record<TipoTropa, string[]> = {
   legionario: desenhar(14, 15, LEGIONARIO),
@@ -253,18 +293,18 @@ export const TROPAS: Record<TipoTropa, string[]> = {
 
 /** Largura de cada tropa na arena (% da largura): o elefante é o maior. */
 export const LARGURA_TROPA: Record<TipoTropa, number> = {
-  legionario: 6,
-  exemplo: 4.5,
-  cavaleiro: 8,
-  bobo: 5,
-  centuriao: 7.5,
-  elefante: 12,
-  senador: 6,
-  arqueiro: 6,
-  balista: 8,
-  catapulta: 8,
-  barricada: 6,
-  escudeiro: 6.5,
+  legionario: 7,
+  exemplo: 5.5,
+  cavaleiro: 9.5,
+  bobo: 6,
+  centuriao: 9,
+  elefante: 14,
+  senador: 7,
+  arqueiro: 7,
+  balista: 9.5,
+  catapulta: 9.5,
+  barricada: 7,
+  escudeiro: 7.5,
 };
 
 export function paletaTropa(cor: string, escura: string): Paleta {

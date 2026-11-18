@@ -173,16 +173,19 @@ export default function MeuBaralho() {
 }
 
 /** O desenho da carta: a tropa em pixel, ou o ícone grande nos feitiços. */
-export function Arte({ tipo, paleta, pequena = false }: { tipo: TipoCarta; paleta: Record<string, string>; pequena?: boolean }) {
+export function Arte({ tipo, paleta, pequena = false, grande = false }: { tipo: TipoCarta; paleta: Record<string, string>; pequena?: boolean; grande?: boolean }) {
   const tropa = CARTAS[tipo].tropa;
+  const altura = pequena ? 'h-9 sm:h-10' : grande ? 'h-16 sm:h-24' : 'h-14 sm:h-16';
+  const largura =
+    tropa === 'elefante' ? (pequena ? 'w-12' : grande ? 'w-24 sm:w-32' : 'w-20') : pequena ? 'w-8' : grande ? 'w-14 sm:w-20' : 'w-12 sm:w-14';
   return (
-    <span className={`flex items-end justify-center ${pequena ? 'h-9 sm:h-10' : 'h-14 sm:h-16'}`} aria-hidden>
+    <span className={`flex items-end justify-center ${altura}`} aria-hidden>
       {tropa ? (
-        <span className={tropa === 'elefante' ? (pequena ? 'w-12' : 'w-20') : pequena ? 'w-8' : 'w-12 sm:w-14'}>
+        <span className={largura}>
           <Sprite grade={TROPAS[tropa]} paleta={paleta} />
         </span>
       ) : (
-        <span className={pequena ? 'text-2xl' : 'text-4xl sm:text-5xl'}>{CARTAS[tipo].icone}</span>
+        <span className={pequena ? 'text-2xl' : grande ? 'text-5xl sm:text-6xl' : 'text-4xl sm:text-5xl'}>{CARTAS[tipo].icone}</span>
       )}
     </span>
   );

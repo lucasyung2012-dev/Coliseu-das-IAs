@@ -222,6 +222,10 @@ export interface Tropa {
   someEm?: number;
   /** Tiros que ainda faltam (Estatística). */
   tiros?: number;
+  /** Quando deu o último golpe (a tela anima a estocada). */
+  golpeouEm?: number;
+  /** Quando pulou (a tela anima o salto em arco). */
+  puloEm?: number;
 }
 
 export interface Lutador {
@@ -238,8 +242,10 @@ export interface Lutador {
 
 export interface EfeitoVisual {
   id: number;
-  tipo: 'choque' | 'tribuna' | 'flecha' | 'golpe' | 'raio' | 'escudo' | 'super' | 'feitico' | 'pulo' | 'riso';
+  tipo: 'choque' | 'tribuna' | 'flecha' | 'dardo' | 'pedra' | 'golpe' | 'raio' | 'escudo' | 'super' | 'feitico' | 'pulo' | 'riso';
   lado: Lado;
+  /** De onde sai o tiro (para a tela animar a flecha voando). */
+  x0?: number;
   x?: number;
   icone?: string;
   ate: number;
@@ -331,8 +337,8 @@ function avisar(s: EstadoDuelo, texto: string, lado: Lado | null, ms = 1600): Es
   return { ...s, aviso: { texto, lado, ate: s.tempo + ms } };
 }
 
-function efeito(s: EstadoDuelo, tipo: EfeitoVisual['tipo'], lado: Lado, x?: number, ms = 800, icone?: string): EstadoDuelo {
-  return { ...s, seq: s.seq + 1, efeitos: [...s.efeitos, { id: s.seq + 1, tipo, lado, x, icone, ate: s.tempo + ms }] };
+function efeito(s: EstadoDuelo, tipo: EfeitoVisual['tipo'], lado: Lado, x?: number, ms = 800, icone?: string, x0?: number): EstadoDuelo {
+  return { ...s, seq: s.seq + 1, efeitos: [...s.efeitos, { id: s.seq + 1, tipo, lado, x, x0, icone, ate: s.tempo + ms }] };
 }
 
 export function custoAgora(l: Lutador, tipo: TipoCarta): number {
@@ -398,7 +404,8 @@ function feitico(s0: EstadoDuelo, lado: Lado, tipo: TipoCarta): EstadoDuelo {
   const agora = s.tempo;
   const inimigas = s.tropas.filter((t) => t.de !== lado);
   const perto = maisPerto(s, outro(lado), PONTA[lado]);
-  const icone = CARTAS[tipo].icone;
+  // A tela desenha o efeito de cada feitiço a partir do nome da carta.
+  const icone = tipo;
   if (tipo === 'refutacao') {
     if (!perto) return avisar(s, '❗ Ninguém para refutar…', lado, 1000);
     s = efeito(s, 'feitico', lado, perto.x, 900, icone);
@@ -491,7 +498,7 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
       if (Math.abs(tribuna - t.x) <= info.alcance!) {
         tiroNaTribuna.push(outro(t.de));
         golpearam.add(t.id);
-        s = efeito(s, 'flecha', t.de, tribuna, 500, '🪨');
+        s = efeito(s, 'pedra', t.de, tribuna, 700, undefined, t.x);
       }
       continue;
     }
@@ -510,7 +517,9 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
       s = efeito(s, 'riso', t.de, alvo.x, 900);
     }
     golpearam.add(t.id);
-    s = efeito(s, tiro ? 'flecha' : 'choque', t.de, tiro ? alvo.x : (alvo.x + t.x) / 2, tiro ? 500 : 400, tiro ? '➶' : undefined);
+    s = tiro
+      ? efeito(s, t.tipo === 'balista' ? 'dardo' : 'flecha', t.de, alvo.x, 450, undefined, t.x)
+      : efeito(s, 'choque', t.de, (alvo.x + t.x) / 2, 350);
   }
   s = {
     ...s,
@@ -523,6 +532,8 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
           forca: t.forca - (dano.get(t.id) ?? 0),
           paradaAte: parar.get(t.id) ?? t.paradaAte,
           pulou: t.pulou || pulo,
+          puloEm: pulo ? agora : t.puloEm,
+          golpeouEm: golpearam.has(t.id) ? agora : t.golpeouEm,
           x: pulo ? t.x + direcao(t.de) * (ENCOSTO + 4) : t.x,
           tiros: golpearam.has(t.id) && t.tiros !== undefined ? t.tiros - 1 : t.tiros,
           proximoGolpe: golpearam.has(t.id) ? agora + (info.tiroMs ?? GOLPE_LUTA_MS) : t.proximoGolpe,
