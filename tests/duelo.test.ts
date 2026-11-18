@@ -1,5 +1,6 @@
 import {
-  golpeFinal,
+  bonusDaCarga,
+  golpeDoGladiador,
   INTERVALO_MS,
   jogarCarta,
   montarMonte,
@@ -8,23 +9,28 @@ import {
   resultadoFinal,
   RODADA_MS,
   TICK,
+  usarHabilidade,
   type EstadoDuelo,
   type Lado,
   type TipoCarta,
+  type Tropa,
 } from '@/game/duelo/motor';
 
 const sempre = (v: number) => () => v;
-// acerto 0: o rival nunca responde (os testes controlam tudo).
+// acerto 0: o rival não joga sozinho nem usa o gladiador (os testes controlam tudo).
 const ctx = { acerto: 0, iaRival: 'chatgpt' as const, aleatorio: sempre(0.5) };
 
-/** Duelo sem ataques automáticos do rival. */
 function base(): EstadoDuelo {
   return { ...novoDuelo(['frase a'], ['frase b'], sempre(0.5)), proximoRival: Number.POSITIVE_INFINITY };
 }
 
-function comMao(s: EstadoDuelo, lado: Lado, tipos: TipoCarta[]): EstadoDuelo {
-  const l = { ...s[lado], folego: 10, mao: tipos.map((tipo, i) => ({ id: `${lado}${i}`, tipo, frase: 'f' })) };
+function comMao(s: EstadoDuelo, lado: Lado, tipos: TipoCarta[], folego = 10): EstadoDuelo {
+  const l = { ...s[lado], folego, mao: tipos.map((tipo, i) => ({ id: `${lado}${i}`, tipo, frase: 'f' })) };
   return lado === 'eu' ? { ...s, eu: l } : { ...s, rival: l };
+}
+
+function tropa(de: Lado, x: number, forca: number, id = 900): Tropa {
+  return { id, de, tipo: 'legionario', forca, forcaInicial: forca, x, carregada: false, proximoGolpe: 0 };
 }
 
 function avancar(s: EstadoDuelo, ms: number): EstadoDuelo {
@@ -33,82 +39,103 @@ function avancar(s: EstadoDuelo, ms: number): EstadoDuelo {
   return x;
 }
 
-/** Os dois lançam ao mesmo tempo. */
-function duelo(meu: TipoCarta, dele: TipoCarta): EstadoDuelo {
-  let s = comMao(comMao(base(), 'eu', [meu]), 'rival', [dele]);
-  s = jogarCarta(s, 'eu', 'eu0');
-  return jogarCarta(s, 'rival', 'rival0');
-}
-
-describe('duelo v3: choque no ar', () => {
-  it('monta um monte de 15 cartas: 8 argumentos, 4 fortes e 1 de cada rara', () => {
-    const monte = montarMonte(['a', 'b'], 'eu', sempre(0.3));
+describe('duelo v4: tropas de argumentos', () => {
+  it('monte de 15 cartas com só 1 arqueiro', () => {
+    const monte = montarMonte(['a'], 'eu', sempre(0.3));
     const conta = (t: TipoCarta) => monte.filter((c) => c.tipo === t).length;
     expect(monte).toHaveLength(15);
     expect([conta('argumento'), conta('forte'), conta('dado'), conta('capciosa'), conta('apelo')]).toEqual([8, 4, 1, 1, 1]);
   });
 
-  it('golpe que chega puxa a plateia, dá aplauso e mostra a frase', () => {
+  it('segurar e soltar: metade da carga dá +1, carga cheia dá +2 (o arqueiro não ganha)', () => {
+    expect([bonusDaCarga(0), bonusDaCarga(0.4), bonusDaCarga(0.5), bonusDaCarga(1)]).toEqual([0, 0, 1, 2]);
+    const s = comMao(base(), 'eu', ['argumento', 'dado'], 20);
+    const forte = jogarCarta(s, 'eu', 'eu0', 1).tropas[0]!;
+    expect(forte.forca).toBe(4);
+    expect(forte.carregada).toBe(true);
+    expect(jogarCarta(s, 'eu', 'eu1', 1).tropas[0]!.forca).toBe(1);
+  });
+
+  it('o gladiador do rival tira 1 do legionário que chega: ele puxa a plateia com o que sobrou', () => {
     let s = jogarCarta(comMao(base(), 'eu', ['argumento']), 'eu', 'eu0');
     expect(s.eu.folego).toBe(8);
-    expect(s.eu.fala?.texto).toBe('f');
-    s = avancar(s, 2700);
-    expect(s.plateia).toBe(2);
-    expect(s.eu.aplausos).toBe(1);
+    s = avancar(s, 5500);
+    expect(s.tropas).toHaveLength(0);
+    expect(s.plateia).toBe(1);
+    expect(s.eu.carga).toBe(1);
   });
 
-  it('sem fôlego não joga', () => {
-    let s = comMao(base(), 'eu', ['forte']);
-    s = { ...s, eu: { ...s.eu, folego: 3 } };
-    expect(jogarCarta(s, 'eu', 'eu0')).toBe(s);
+  it('tropas que se encontram lutam e a mais forte segue com o que sobrou', () => {
+    let s = jogarCarta(comMao(base(), 'eu', ['forte']), 'eu', 'eu0');
+    s = jogarCarta(comMao(s, 'rival', ['argumento']), 'rival', 'rival0');
+    s = avancar(s, 4000);
+    expect(s.tropas).toHaveLength(1);
+    expect(s.tropas[0]).toMatchObject({ de: 'eu', forca: 2 });
+    s = avancar(s, 7000);
+    expect(s.plateia).toBe(1);
   });
 
-  it('força igual: os dois golpes somem no choque', () => {
-    const s = avancar(duelo('argumento', 'argumento'), 1500);
-    expect(s.projeteis).toHaveLength(0);
-    expect(s.efeitos.some((x) => x.tipo === 'choque')).toBe(true);
-    expect(avancar(s, 2000).plateia).toBe(0);
+  it('no máximo 2 arqueiros seus em campo', () => {
+    let s = comMao(base(), 'eu', ['dado', 'dado', 'dado'], 20);
+    s = jogarCarta(jogarCarta(s, 'eu', 'eu0'), 'eu', 'eu1');
+    expect(s.tropas).toHaveLength(2);
+    expect(jogarCarta(s, 'eu', 'eu2')).toBe(s);
   });
 
-  it('o mais forte passa com a força que sobrou', () => {
-    const s = avancar(duelo('forte', 'argumento'), 3500);
-    expect(s.plateia).toBe(2);
+  it('toque no gladiador: golpe na hora e depois recarga', () => {
+    let s = { ...base(), tropas: [tropa('rival', 30, 3)] };
+    s = golpeDoGladiador(s, 'eu');
+    expect(s.tropas[0]!.forca).toBe(2);
+    expect(golpeDoGladiador(s, 'eu')).toBe(s);
   });
 
-  it('o dado irrefutável atravessa o golpe do rival', () => {
-    const s = avancar(duelo('dado', 'argumento'), 3100);
-    expect(s.plateia).toBe(3 - 2);
+  it('Claude (Ponderação): o escudo segura golpes que chegariam', () => {
+    let s = base();
+    s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'claude');
+    expect(s.eu.escudo).toBe(2);
+    s = avancar({ ...s, tropas: [tropa('rival', 20.5, 3)] }, 300);
+    expect(s.plateia).toBe(0);
+    expect(s.eu.escudo).toBe(1);
   });
 
-  it('pergunta capciosa deixa o rival sem jogar', () => {
-    const s = comMao(jogarCarta(comMao(base(), 'eu', ['capciosa']), 'eu', 'eu0'), 'rival', ['argumento']);
-    expect(jogarCarta(s, 'rival', 'rival0')).toBe(s);
+  it('ChatGPT (Improviso): só a próxima carta sai de graça', () => {
+    let s = comMao(base(), 'eu', ['forte', 'forte']);
+    s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'chatgpt');
+    s = jogarCarta(s, 'eu', 'eu0');
+    expect(s.eu.folego).toBe(10);
+    s = jogarCarta(s, 'eu', 'eu1');
+    expect(s.eu.folego).toBe(6);
   });
 
-  it('golpe final só com 5 aplausos; a Muralha do Claude apaga os golpes do rival', () => {
-    let s = jogarCarta(comMao(base(), 'rival', ['forte']), 'rival', 'rival0');
-    expect(golpeFinal(s, 'eu', 'claude')).toBe(s);
-    s = golpeFinal({ ...s, eu: { ...s.eu, aplausos: 5 } }, 'eu', 'claude');
-    expect(s.projeteis).toHaveLength(0);
-    expect(s.eu.aplausos).toBe(0);
+  it('Gemini (Visão): o raio tira 3 da tropa inimiga mais perto, não limpa a arena', () => {
+    let s = { ...base(), tropas: [tropa('rival', 40, 4, 1), tropa('rival', 70, 4, 2)] };
+    s = usarHabilidade({ ...s, eu: { ...s.eu, carga: 4 } }, 'eu', 'gemini');
+    expect(s.tropas.map((t) => t.forca)).toEqual([1, 4]);
   });
 
-  it('o Raio solar do Gemini atravessa tudo com força 5', () => {
-    let s = jogarCarta(comMao(base(), 'rival', ['forte']), 'rival', 'rival0');
-    s = avancar(golpeFinal({ ...s, eu: { ...s.eu, aplausos: 5 } }, 'eu', 'gemini'), 1700);
-    expect(s.plateia).toBe(5);
+  it('habilidade só com a carga cheia', () => {
+    const s = base();
+    expect(usarHabilidade(s, 'eu', 'gemini')).toBe(s);
+  });
+
+  it('virada: nos últimos 30 s quem perde recupera fôlego 25% mais rápido', () => {
+    let s = base();
+    s = { ...s, tempo: 40_000, plateia: -2, eu: { ...s.eu, folego: 0 }, rival: { ...s.rival, folego: 0 } };
+    s = avancar(s, 1000);
+    expect(s.eu.folego).toBeCloseTo(1.25);
+    expect(s.rival.folego).toBeCloseTo(1);
   });
 
   it('melhor de 3: rodada acaba na plateia toda, tem intervalo e termina com 2 vitórias', () => {
-    let s = comMao(base(), 'eu', ['forte']);
-    s = avancar(jogarCarta({ ...s, plateia: 7 }, 'eu', 'eu0'), 3500);
+    let s = { ...base(), plateia: 9, tropas: [tropa('eu', 79.5, 2)] };
+    s = passo(s, ctx);
     expect(s.fase).toBe('intervalo');
     expect(s.rodadas).toEqual({ eu: 1, rival: 0 });
     s = avancar(s, INTERVALO_MS + TICK);
     expect(s.fase).toBe('luta');
     expect(s.rodada).toBe(2);
     expect(s.plateia).toBe(0);
-    s = passo({ ...s, tempo: RODADA_MS - TICK, plateia: 1, projeteis: [] }, ctx);
+    s = passo({ ...s, tempo: RODADA_MS - TICK, plateia: 1, proximoRival: Number.POSITIVE_INFINITY }, ctx);
     expect(s.fase).toBe('fim');
     expect(resultadoFinal(s)).toBe('vitoria');
   });

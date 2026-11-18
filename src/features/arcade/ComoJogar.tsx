@@ -113,11 +113,13 @@ export default function ComoJogar({ titulo, slides, onFechar }: { titulo: string
 }
 
 export const TUTORIAL_DUELO: Slide[] = [
-  { icone: '🏟️', titulo: 'CONQUISTE A PLATEIA', texto: 'A barra lá em cima é a plateia. Cada golpe que chega no rival puxa ela para o seu lado (verde). Puxou até o fim, ou estava na frente quando o tempo acabou: a rodada é sua. Quem ganhar 2 rodadas vence.' },
-  { icone: '⚔️', titulo: 'UM TOQUE, UM GOLPE', texto: 'Toque numa carta para lançar o golpe. Cada carta custa fôlego (💨), que volta sozinho. O número no golpe é a força: Argumento tem força 2, Argumento forte tem força 4.' },
-  { icone: '💥', titulo: 'CHOQUE NO AR', texto: 'Quando o seu golpe encontra o do rival no meio, o mais forte passa, com a força que sobrou. Força igual, os dois somem. Para se defender, ataque!' },
-  { icone: '⭐', titulo: 'RARAS E GOLPE FINAL', texto: 'Cartas douradas são raras: o Dado atravessa os golpes do rival. Cada acerto dá um aplauso; com 5, solte o golpe final da sua IA.' },
+  { icone: '🏟️', titulo: 'CONQUISTE A PLATEIA', texto: 'A barra lá em cima é a plateia. Toda tropa sua que passa da linha do rival puxa a plateia para o seu lado (verde). Puxou até o fim, ou estava na frente quando o tempo acabou: a rodada é sua. Quem ganhar 2 rodadas vence.' },
+  { icone: '⚔️', titulo: 'CARTAS VIRAM TROPAS', texto: 'Legionário: rápido, força 2. Centurião: lento, força 4. Arqueiro: atira de longe, mas é frágil. Quando duas tropas se encontram, elas lutam e a que sobrar segue em frente.' },
+  { icone: '💪', titulo: 'SEGURE PARA CARREGAR', texto: 'Tocou rápido: argumento normal. Segure a carta: até a metade da barrinha ganha +1 de força; até o fim, +2 e a tropa brilha. Mas cuidado: o rival não espera!' },
+  { icone: '🗡️', titulo: 'SEU GLADIADOR', texto: 'Ele defende a sua ponta sozinho. Toque nele (ou no botão GLADIADOR) para um golpe na hora; depois ele precisa de 8 s para recarregar.' },
+  { icone: '⭐', titulo: 'HABILIDADE E VIRADA', texto: 'Cada tropa que chega enche a habilidade da sua IA. Claude segura 2 golpes, ChatGPT ganha 1 carta de graça, Gemini solta um raio. Nos últimos 30 s, quem está perdendo recupera fôlego mais rápido.' },
 ];
+
 
 
 export const TUTORIAL_TRIBUNAL: Slide[] = [

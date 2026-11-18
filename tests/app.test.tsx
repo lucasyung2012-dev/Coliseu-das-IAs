@@ -240,8 +240,8 @@ describe('duelo jogável (protótipo)', () => {
       const botoes = within(screen.getByRole('region', { name: 'Suas cartas' })).getAllByRole('button');
       expect(botoes.length).toBeGreaterThanOrEqual(4);
       fireEvent.click(botoes.find((b) => !(b as HTMLButtonElement).disabled)!);
-      // Até 3 rodadas de 30 s, com intervalos.
-      for (let i = 0; i < 100; i++) {
+      // Até 3 rodadas de 60 s, com intervalos.
+      for (let i = 0; i < 200; i++) {
         act(() => {
           vi.advanceTimersByTime(1000);
         });

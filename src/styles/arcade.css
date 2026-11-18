@@ -690,3 +690,14 @@
 @keyframes leao-esq { from { left: 45%; } to { left: -15%; } }
 @keyframes leao-dir { from { left: 50%; transform: scaleX(-1); } to { left: 110%; transform: scaleX(-1); } }
 .menos-movimento .projetil, .menos-movimento .pose { transition: none; }
+
+/* ===== Duelo v4: tropas ===== */
+.tropa { transition: left 100ms linear; }
+.marchar { animation: marchar 0.45s steps(2) infinite; }
+@keyframes marchar { 50% { transform: translateY(-8%); } }
+.lutando { animation: lutando 0.25s steps(2) infinite; }
+@keyframes lutando { 50% { transform: translateX(6%) rotate(-4deg); } }
+/* Barra de carga da carta: metade = +1, cheia = +2 (fica dourada no fim). */
+.carga-enchendo { animation-name: carga-enchendo; animation-timing-function: linear; animation-fill-mode: forwards; background: rgb(var(--accent)); }
+@keyframes carga-enchendo { from { width: 0; } 99% { background: rgb(var(--accent)); } to { width: 100%; background: #f2c14e; } }
+.menos-movimento .marchar, .menos-movimento .lutando { animation: none; }
