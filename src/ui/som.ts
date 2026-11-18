@@ -29,6 +29,9 @@ export type NomeSom =
   | 'derrota';
 
 const CHAVE = 'coliseu.som.desligado';
+const CHAVE_VOLUME = 'coliseu.som.volume';
+/** Volume máximo do jogo (0 a 1 do controle vira 0 a 0,35 na saída). */
+const VOLUME_MAXIMO = 0.35;
 
 let ctx: AudioContext | null = null;
 let saida: GainNode | null = null;
@@ -43,6 +46,17 @@ function lerDesligado(): boolean {
 }
 
 let desligado = lerDesligado();
+
+function lerVolume(): number {
+  try {
+    const v = Number(localStorage.getItem(CHAVE_VOLUME));
+    return localStorage.getItem(CHAVE_VOLUME) !== null && v >= 0 && v <= 1 ? v : 0.8;
+  } catch {
+    return 0.8;
+  }
+}
+
+let volume = lerVolume();
 const ouvintes = new Set<() => void>();
 
 function contexto(): AudioContext | null {
@@ -52,7 +66,7 @@ function contexto(): AudioContext | null {
   try {
     ctx = new Ctor();
     saida = ctx.createGain();
-    saida.gain.value = 0.35;
+    saida.gain.value = VOLUME_MAXIMO * volume;
     saida.connect(ctx.destination);
   } catch {
     ctx = null;
@@ -268,4 +282,28 @@ export function tocar(nome: NomeSom) {
   } catch {
     /* áudio é enfeite: nunca pode quebrar o jogo */
   }
+}
+
+// ---------- Volume (aba Configurações) ----------
+
+export function mudarVolume(v: number) {
+  volume = Math.max(0, Math.min(1, v));
+  if (saida) saida.gain.value = VOLUME_MAXIMO * volume;
+  try {
+    localStorage.setItem(CHAVE_VOLUME, String(volume));
+  } catch {
+    /* vale só nesta visita */
+  }
+  ouvintes.forEach((f) => f());
+}
+
+export function useVolume(): number {
+  return useSyncExternalStore(
+    (f) => {
+      ouvintes.add(f);
+      return () => ouvintes.delete(f);
+    },
+    () => volume,
+    () => volume,
+  );
 }

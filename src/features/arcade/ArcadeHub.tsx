@@ -7,9 +7,8 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
 import { LOUROS, PALETA_OURO } from '@/ui/pixel/sprites';
 import BootArcade from './BootArcade';
-import ApagarProgresso from './ApagarProgresso';
-import PainelConta from './PainelConta';
-import { modoRanqueado, useConta } from '@/game/conta';
+import { modoRanqueado, NOMES_DIFICULDADE, useConta, useDificuldade } from '@/game/conta';
+import { usePreferencias } from '@/ui/preferencias';
 import { desbloquear, tocar } from '@/ui/som';
 
 const CHAVE_BOOT = 'coliseu.boot.vista';
@@ -28,9 +27,14 @@ const varIa = (id: IaId) => ({ '--ia': PERSONAGENS[id].cor }) as CSSProperties;
 export default function ArcadeHub() {
   const p = useProgresso();
   const treino = !modoRanqueado(useConta());
+  const dificuldade = useDificuldade();
+  const { entradaFliperama } = usePreferencias();
   const location = useLocation();
-  // O fliperama liga ao chegar pela tela inicial, e na primeira vez de cada visita.
-  const [boot, setBoot] = useState(() => (location.state as { boot?: boolean } | null)?.boot === true || !jaViuBootNestaVisita());
+  // O fliperama liga ao chegar pela tela inicial e na primeira vez de cada visita
+  // (a não ser que a entrada esteja desligada nas Configurações).
+  const [boot, setBoot] = useState(
+    () => entradaFliperama && ((location.state as { boot?: boolean } | null)?.boot === true || !jaViuBootNestaVisita()),
+  );
   const fimBoot = useCallback(() => {
     try {
       sessionStorage.setItem(CHAVE_BOOT, '1');
@@ -62,20 +66,37 @@ export default function ArcadeHub() {
       <div className="crt-overlay" />
 
       <div className="relative mx-auto flex max-w-5xl flex-col gap-7 px-4 pb-12 pt-6 sm:px-8">
-        <Link to="/" onClick={() => tocar('clique')} className="self-start font-pixel text-[10px] text-muted hover:text-accent">
-          ◀ INÍCIO
-        </Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link to="/" onClick={() => tocar('clique')} className="font-pixel text-[10px] text-muted hover:text-accent">
+            ◀ INÍCIO
+          </Link>
+          <Link
+            to="/configuracoes"
+            onClick={() => tocar('clique')}
+            aria-label="Configurações"
+            className="pixel-box pixel-hover px-2.5 py-1.5 font-pixel text-[10px] text-muted hover:text-accent"
+          >
+            ⚙ CONFIG
+          </Link>
+        </div>
 
         <header className="flex items-center justify-center gap-3 text-center sm:gap-5">
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} />
           <div>
             <h1 className="neon letreiro font-pixel text-xl leading-snug text-accent sm:text-3xl">Imperium Arcade</h1>
-            <p className="mt-2 font-pixel text-[9px] tracking-[0.25em] text-accent-2 sm:text-[10px]">A GLÓRIA TEM UM NOVO JOGO</p>
+            <p className="mt-2 font-pixel text-[9px] tracking-[0.25em] text-accent-2 sm:text-[10px]">QUE VENÇA O MELHOR ARGUMENTO</p>
           </div>
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} espelhar />
         </header>
 
-        <PainelConta />
+        {/* Etiqueta do modo: com conta vale troféus; sem conta é treino (detalhes em Configurações). */}
+        <Link
+          to="/configuracoes"
+          onClick={() => tocar('clique')}
+          className={`-mt-3 self-center px-3 py-1 text-center font-pixel text-[9px] leading-relaxed hover:underline ${treino ? 'text-[rgb(242_193_78)]' : 'text-accent'}`}
+        >
+          {treino ? `🎯 TREINO · ${NOMES_DIFICULDADE[dificuldade].toUpperCase()} · CONECTE A CONTA PARA VALER TROFÉUS` : '🏆 VALENDO TROFÉUS'}
+        </Link>
 
         {/* Gladiador em destaque */}
         <section
@@ -191,7 +212,6 @@ export default function ArcadeHub() {
         </section>
 
         <Historico partidas={p.partidas} />
-        <ApagarProgresso />
       </div>
     </main>
   );

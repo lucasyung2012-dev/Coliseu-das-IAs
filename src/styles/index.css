@@ -59,3 +59,12 @@ body {
     transition-duration: 1ms !important;
   }
 }
+
+/* "Reduzir animações" das Configurações: o mesmo efeito do ajuste do aparelho. */
+.menos-movimento *,
+.menos-movimento *::before,
+.menos-movimento *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}

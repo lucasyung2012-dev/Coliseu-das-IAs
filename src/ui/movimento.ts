@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
+import { obterPreferencias } from './preferencias';
 
-/** Respeita o "reduzir movimento" do aparelho. O jsdom dos testes não tem matchMedia. */
+/**
+ * Respeita o "reduzir movimento" do aparelho e a opção "Reduzir animações" das
+ * Configurações. O jsdom dos testes não tem matchMedia.
+ */
 export function prefereMenosMovimento(): boolean {
+  if (obterPreferencias().menosMovimento) return true;
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 

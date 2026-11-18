@@ -135,7 +135,7 @@ describe('apagar progresso', () => {
       'coliseu.progresso.v1',
       JSON.stringify({ versao: 1, iaAtual: 'claude', trofeus: { claude: 120, chatgpt: 0, gemini: 0 }, xp: { claude: 0, chatgpt: 0, gemini: 0 }, partidas: [] }),
     );
-    abrir('/arena');
+    abrir('/configuracoes');
     fireEvent.click(screen.getByRole('button', { name: /APAGAR PROGRESSO/ }));
     fireEvent.click(screen.getByRole('button', { name: 'CONTINUAR' }));
     const apagar = screen.getByRole('button', { name: 'APAGAR TUDO' });
@@ -144,5 +144,29 @@ describe('apagar progresso', () => {
     fireEvent.click(apagar);
     expect(screen.getByText(/PROGRESSO APAGADO/)).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem('coliseu.progresso.v1')!).trofeus.claude).toBe(0);
+  });
+});
+
+describe('configurações', () => {
+  it('tem conta, treino, som, animações, progresso e sobre, e os interruptores funcionam', () => {
+    abrir('/configuracoes');
+    for (const nome of ['CONTA', 'MODO TREINO', 'SOM', 'ANIMAÇÕES', 'PROGRESSO', 'SOBRE']) {
+      expect(screen.getByRole('region', { name: nome })).toBeInTheDocument();
+    }
+    const entrada = screen.getByRole('switch', { name: /Entrada do fliperama/ });
+    expect(entrada).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(entrada);
+    expect(screen.getByRole('switch', { name: /Entrada do fliperama/ })).toHaveAttribute('aria-checked', 'false');
+    fireEvent.click(screen.getByRole('radio', { name: 'DIFÍCIL' }));
+    expect(screen.getByRole('radio', { name: 'DIFÍCIL' })).toHaveAttribute('aria-checked', 'true');
+    // volta ao padrão para não afetar os outros testes
+    fireEvent.click(screen.getByRole('switch', { name: /Entrada do fliperama/ }));
+  });
+
+  it('o Arcade leva às Configurações e mostra o subtítulo novo', () => {
+    sessionStorage.setItem('coliseu.boot.vista', '1');
+    abrir('/arena');
+    expect(screen.getByText('QUE VENÇA O MELHOR ARGUMENTO')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Configurações' })).toHaveAttribute('href', '/configuracoes');
   });
 });
