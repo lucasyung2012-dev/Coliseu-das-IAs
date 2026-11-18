@@ -20,6 +20,7 @@ export default {
       fontFamily: {
         display: ['Cinzel', 'Georgia', 'serif'],
         arcade: ['"Chakra Petch"', 'system-ui', 'sans-serif'],
+        pixel: ['"Press Start 2P"', '"Courier New"', 'monospace'],
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       keyframes: {

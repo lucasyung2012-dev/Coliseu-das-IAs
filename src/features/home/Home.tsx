@@ -15,6 +15,7 @@ export default function Home() {
           <Link
             key={p.area}
             to={p.rota}
+            state={p.area === 'arcade' ? { boot: true } : undefined}
             data-area={p.area}
             style={{ animationDelay: `${120 + i * 90}ms` }}
             className="group animate-fade-up rounded-2xl border border-line bg-surface p-6 text-fg transition hover:-translate-y-1 hover:border-accent"

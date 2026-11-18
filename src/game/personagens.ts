@@ -66,6 +66,12 @@ export const PERSONAGENS: Record<IaId, Personagem> = {
 
 export const IAS: IaId[] = ['claude', 'chatgpt', 'gemini'];
 
+/** Sorteia o rival entre as outras duas IAs (o matchmaking do documento, seção 4.2). */
+export function sortearRival(ia: IaId, aleatorio: () => number = Math.random): IaId {
+  const outras = IAS.filter((id) => id !== ia);
+  return outras[Math.floor(aleatorio() * outras.length)] ?? outras[0]!;
+}
+
 /** Nome completo usado nas telas: "Cassius, o Estrategista". */
 export function nomeGladiador(id: IaId): string {
   const p = PERSONAGENS[id];
