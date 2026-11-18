@@ -13,38 +13,69 @@ import { desbloquear, tocar } from '@/ui/som';
 const CHAVE = 'coliseu.abertura.vista';
 const TITULO = ['COLISEU', 'DAS IAS'];
 
-// O Coliseu em pixel, desenhado por código: três andares de arcos e a borda de cima.
-// P = pedra clara, p = pedra na sombra, a = dentro do arco (escuro), K = contorno.
+// O Coliseu em pixel, desenhado por código: o ático com janelinhas, três andares de
+// arcos e, à direita, o pedaço quebrado do muro (como o Coliseu de verdade).
+// P = pedra clara, p = junta, Q = pedra na sombra (as pontas, para parecer curvo),
+// a = dentro do arco, K = contorno.
 function desenharColiseu(): string[] {
-  const largura = 72;
+  const largura = 80;
   const linhas: string[] = [];
-  const andar = (alturaArco: number, passo: number, recuo: number) => {
-    // Faixa (cornija) em cima de cada andar
-    linhas.push(' '.repeat(recuo) + 'K'.repeat(largura - recuo * 2) + ' '.repeat(recuo));
-    linhas.push(' '.repeat(recuo) + 'P'.repeat(largura - recuo * 2) + ' '.repeat(recuo));
-    for (let y = 0; y < alturaArco; y++) {
+  const faixa = () => {
+    linhas.push('K'.repeat(largura));
+    linhas.push('P'.repeat(largura));
+  };
+  const andar = (altura: number, passo: number, janela: boolean) => {
+    faixa();
+    for (let y = 0; y < altura; y++) {
       let l = '';
-      for (let x = recuo; x < largura - recuo; x++) {
-        const m = (x - recuo) % passo;
-        // O arco: abertura no meio de cada vão, com o topo arredondado.
-        const meio = passo / 2;
-        const dist = Math.abs(m + 0.5 - meio);
+      for (let x = 0; x < largura; x++) {
+        const m = x % passo;
+        const dist = Math.abs(m + 0.5 - passo / 2);
         const raio = passo / 2 - 1.5;
-        const dentro = y === 0 ? dist < raio - 1 : dist < raio;
+        // Janela quadrada no ático; arco de topo redondo nos andares.
+        const dentro = janela ? y >= 1 && y <= 2 && dist < 1 : y === 0 ? dist < raio - 1 : dist < raio;
         l += dentro ? 'a' : m === 0 ? 'p' : 'P';
       }
-      linhas.push(' '.repeat(recuo) + l + ' '.repeat(recuo));
+      linhas.push(l);
     }
   };
-  andar(3, 6, 4);
-  andar(5, 6, 2);
-  andar(6, 6, 1);
-  andar(7, 6, 0);
+  andar(4, 5, true);
+  andar(6, 6, false);
+  andar(6, 6, false);
+  andar(7, 6, false);
   linhas.push('K'.repeat(largura));
-  return linhas;
+  // Sombra nas pontas (o prédio é redondo) e o muro quebrado à direita.
+  return linhas.map((l, y) =>
+    [...l]
+      .map((c, x) => {
+        const corte = x < 56 ? 0 : Math.min(16, Math.round((x - 56) * 0.9) + ((x * 7) % 3));
+        if (y < corte) return '.';
+        if (c === 'P' && (x < 6 || x > largura - 7)) return 'Q';
+        return c;
+      })
+      .join(''),
+  );
 }
 const COLISEU = desenharColiseu();
-const PALETA_COLISEU = { K: '#140c22', P: '#c9a27a', p: '#8a6448', a: '#2a1240' };
+const PALETA_COLISEU = { K: '#140c22', P: '#d9b48a', p: '#8a6448', Q: '#a07a58', a: '#2a1240' };
+
+// O sol do logo, em pixel: amarelo em cima, laranja embaixo, com as faixas do pôr do sol.
+function desenharSol(): string[] {
+  const r = 16;
+  const linhas: string[] = [];
+  for (let y = 0; y <= r * 2; y++) {
+    let l = '';
+    for (let x = 0; x <= r * 2; x++) {
+      const d = Math.hypot(x - r, y - r);
+      const faixa = y > r && (y - r) % 4 === 0;
+      l += d > r || faixa ? '.' : y < r * 0.7 ? 'Y' : y < r * 1.2 ? 'O' : 'R';
+    }
+    linhas.push(l);
+  }
+  return linhas;
+}
+const SOL = desenharSol();
+const PALETA_SOL = { Y: '#fff07a', O: '#ffd04a', R: '#ff8a3c' };
 
 // Estrelas fixas (mesmas posições sempre, para não pular a cada render).
 const ESTRELAS = Array.from({ length: 40 }, (_, i) => ({
