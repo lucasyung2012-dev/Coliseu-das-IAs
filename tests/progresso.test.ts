@@ -47,3 +47,24 @@ describe('progresso', () => {
     expect(nivelMaestria(1_000_000)).toBe(100);
   });
 });
+
+describe('estatísticas do perfil', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    redefinirProgresso();
+  });
+
+  it('conta vitórias, derrotas e empates por modo e a melhor sequência; treino não conta', () => {
+    const base = { ia: 'claude' as const, rival: 'gemini' as const, dilema: 'x' };
+    registrarPartida({ ...base, modo: 'tribunal', venceu: true });
+    registrarPartida({ ...base, modo: 'tribunal', venceu: true });
+    registrarPartida({ ...base, modo: 'duelo', venceu: false, empate: true });
+    registrarPartida({ ...base, modo: 'tribunal', venceu: false });
+    registrarPartida({ ...base, modo: 'tribunal', venceu: true, treino: true });
+    const e = JSON.parse(localStorage.getItem('coliseu.progresso.v1')!).estatisticas.claude;
+    expect(e.tribunal).toEqual({ vitorias: 2, derrotas: 1, empates: 0 });
+    expect(e.duelo).toEqual({ vitorias: 0, derrotas: 0, empates: 1 });
+    expect(e.sequencia).toBe(0);
+    expect(e.melhorSequencia).toBe(2);
+  });
+});

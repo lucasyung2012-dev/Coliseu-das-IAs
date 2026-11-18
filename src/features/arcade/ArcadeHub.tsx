@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { ligaDe, proximaLiga, variacaoTrofeus } from '@/game/ligas';
 import { escolherIa, nivelMaestria, useProgresso, XP_POR_NIVEL, type Partida } from '@/game/progresso';
-import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
+import { CenaColiseu, CenaTribunal } from './cenas/Cenarios';
+import { tituloDoNivel } from '@/game/maestria';
 import Sprite from '@/ui/pixel/Sprite';
 import { LOUROS, PALETA_OURO } from '@/ui/pixel/sprites';
 import BootArcade from './BootArcade';
@@ -140,7 +142,7 @@ export default function ArcadeHub() {
             <p className="mt-1 text-xs text-muted">{prox ? `Faltam ${prox.faltam} troféus para ${prox.liga.nome}` : 'Liga máxima: Imperadores'}</p>
 
             <p className="mt-3 font-pixel text-[10px]">
-              MAESTRIA {nivelMaestria(p.xp[ia])} <span className="text-muted">· {xpNivel}/{XP_POR_NIVEL} XP</span>
+              MAESTRIA {nivelMaestria(p.xp[ia])} · {tituloDoNivel(nivelMaestria(p.xp[ia])).nome.toUpperCase()} <span className="text-muted">· {xpNivel}/{XP_POR_NIVEL} XP</span>
             </p>
             <Barra valor={xpNivel / XP_POR_NIVEL} rotulo="Progresso de Maestria" fina />
 
@@ -150,6 +152,16 @@ export default function ArcadeHub() {
                 Duelo: {pers.habilidade.duelo} Tribunal: {pers.habilidade.tribunal}
               </span>
             </p>
+            <Link
+              to={`/arena/perfil/${ia}`}
+              onClick={() => {
+                desbloquear();
+                tocar('selecionar');
+              }}
+              className="pixel-box pixel-hover mt-4 inline-block px-3 py-2 font-pixel text-[10px] text-[rgb(var(--ia))]"
+            >
+              ▶ VER PERFIL DE {pers.gladiador.toUpperCase()}
+            </Link>
           </div>
         </section>
 
@@ -195,6 +207,7 @@ export default function ArcadeHub() {
               icone="⚔"
               titulo="Duelo"
               frase="Um round. Duas cartas. Um veredito."
+              arte={<ArteDuelo ia={ia} />}
               ganho={variacaoTrofeus('duelo', trofeus, true)}
               perda={variacaoTrofeus('duelo', trofeus, false)}
               treino={treino}
@@ -204,6 +217,7 @@ export default function ArcadeHub() {
               icone="⚖"
               titulo="Tribunal"
               frase="Três tempos. Cinco jurados. Conquiste a maioria."
+              arte={<ArteTribunal />}
               ganho={variacaoTrofeus('tribunal', trofeus, true)}
               perda={variacaoTrofeus('tribunal', trofeus, false)}
               treino={treino}
@@ -237,34 +251,95 @@ function Barra({ valor, rotulo, fina }: { valor: number; rotulo: string; fina?: 
   );
 }
 
-function CartaoModo(props: { rota: string; icone: ReactNode; titulo: string; frase: string; ganho: number; perda: number; treino: boolean }) {
+/** Cartão do modo com uma cena em pixel de fundo (Coliseu ou Tribunal), estilo tela de seleção de fase. */
+function CartaoModo(props: {
+  rota: string;
+  icone: ReactNode;
+  titulo: string;
+  frase: string;
+  arte: ReactNode;
+  ganho: number;
+  perda: number;
+  treino: boolean;
+}) {
   return (
-    <Link to={props.rota} onMouseEnter={() => tocar('passarMouse')} onClick={() => { desbloquear(); tocar('clique'); }} className="pixel-box pixel-hover group block min-w-0 p-5 transition hover:-translate-y-1">
-      <div className="flex items-center gap-3">
-        <span className="text-3xl text-accent" aria-hidden>
-          {props.icone}
-        </span>
-        <h3 className="neon min-w-0 font-pixel text-base text-accent sm:text-xl">{props.titulo}</h3>
+    <Link
+      to={props.rota}
+      onMouseEnter={() => tocar('passarMouse')}
+      onClick={() => {
+        desbloquear();
+        tocar('clique');
+      }}
+      className="pixel-box pixel-hover group block min-w-0 overflow-hidden transition hover:-translate-y-1"
+    >
+      <div className="relative aspect-[16/7] w-full overflow-hidden">
+        <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">{props.arte}</div>
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgb(var(--surface))] via-transparent to-transparent" aria-hidden />
+        <div className="absolute bottom-2 left-3 flex items-center gap-2">
+          <span className="text-2xl text-accent drop-shadow-[0_2px_0_#000]" aria-hidden>
+            {props.icone}
+          </span>
+          <h3 className="neon font-pixel text-base text-accent drop-shadow-[0_2px_0_#000] sm:text-xl">{props.titulo}</h3>
+        </div>
       </div>
-      <p className="mt-3 text-sm text-muted">{props.frase}</p>
-      {props.treino ? (
-        <p className="mt-3 text-sm text-[rgb(242_193_78)]">Treino: não vale troféus.</p>
-      ) : (
-        <p className="mt-3 text-sm tabular-nums">
-          Vitória <span className="text-accent">+{props.ganho}</span> · Derrota{' '}
-          {props.perda === 0 ? (
-            <span className="text-muted">0 (você ainda não tem troféus a perder)</span>
-          ) : (
-            <span className="text-accent-2">{props.perda}</span>
-          )}
-        </p>
-      )}
-      <span className="piscar mt-4 inline-block font-pixel text-[10px] text-accent">▶ ENTRAR</span>
+      <div className="p-4">
+        <p className="text-sm text-muted">{props.frase}</p>
+        {props.treino ? (
+          <p className="mt-2 text-sm text-[rgb(242_193_78)]">Treino: não vale troféus.</p>
+        ) : (
+          <p className="mt-2 text-sm tabular-nums">
+            Vitória <span className="text-accent">+{props.ganho}</span> · Derrota{' '}
+            {props.perda === 0 ? <span className="text-muted">0 (ainda sem troféus a perder)</span> : <span className="text-accent-2">{props.perda}</span>}
+          </p>
+        )}
+        <span className="piscar mt-3 inline-block font-pixel text-[10px] text-accent">▶ ENTRAR</span>
+      </div>
     </Link>
   );
 }
 
+/** Arte do cartão do Duelo: o Coliseu com o seu gladiador encarando um rival. */
+function ArteDuelo({ ia }: { ia: IaId }) {
+  const rival = IAS.find((x) => x !== ia)!;
+  return (
+    <>
+      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} />
+      <div className="absolute bottom-[4%] left-[22%] w-[17%]">
+        <GladiadorPixel ia={ia} />
+      </div>
+      <div className="absolute bottom-[4%] right-[22%] w-[17%]">
+        <GladiadorPixel ia={rival} espelhar />
+      </div>
+      <p className="absolute left-1/2 top-[38%] -translate-x-1/2 font-pixel text-lg text-[rgb(242_193_78)] drop-shadow-[0_2px_0_#000] sm:text-2xl">VS</p>
+    </>
+  );
+}
+
+/** Arte do cartão do Tribunal: o Pretor na bancada e três jurados. */
+function ArteTribunal() {
+  return (
+    <>
+      <CenaTribunal />
+      <div className="absolute left-[44.5%] top-[12%] w-[11%]">
+        <PretorPixel />
+      </div>
+      {(['logico', 'empatico', 'cetico'] as const).map((j, i) => (
+        <div key={j} className="absolute top-[46%] w-[9%]" style={{ left: `${28 + i * 18}%` }}>
+          <JuradoPixel jurado={j} />
+        </div>
+      ))}
+    </>
+  );
+}
+
+const ROTULO_RESULTADO = (pt: Partida) => (pt.empate ? 'Empate' : pt.venceu ? 'Vitória' : 'Derrota');
+const COR_RESULTADO = (pt: Partida) => (pt.empate ? 'text-muted' : pt.venceu ? 'text-accent' : 'text-accent-2');
+
+/** Histórico compacto: uma linha por partida; tocar abre os detalhes. Mostra 5 e um "ver todas". */
 function Historico({ partidas }: { partidas: Partida[] }) {
+  const [aberta, setAberta] = useState<string | null>(null);
+  const [todas, setTodas] = useState(false);
+  const lista = todas ? partidas : partidas.slice(0, 5);
   return (
     <section aria-labelledby="titulo-historico">
       <h2 id="titulo-historico" className="mb-3 font-pixel text-[10px] text-muted">
@@ -273,19 +348,68 @@ function Historico({ partidas }: { partidas: Partida[] }) {
       {partidas.length === 0 ? (
         <p className="text-sm text-muted">A primeira glória ainda está por conquistar.</p>
       ) : (
-        <ul className="pixel-box divide-y divide-line">
-          {partidas.slice(0, 8).map((pt) => (
-            <li key={pt.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
-              <span className="min-w-0 truncate">
-                {pt.modo === 'duelo' ? '⚔' : '⚖'} {PERSONAGENS[pt.ia].gladiador} vs {PERSONAGENS[pt.rival].gladiador} ·{' '}
-                <span className={pt.empate ? 'text-muted' : pt.venceu ? 'text-accent' : 'text-accent-2'}>{pt.empate ? 'Empate' : pt.venceu ? 'Vitória' : 'Derrota'}</span>
-              </span>
-              <span className="shrink-0 font-pixel text-[10px] tabular-nums text-muted">
-                {pt.treino ? 'TREINO' : <>{pt.trofeus > 0 ? `+${pt.trofeus}` : pt.trofeus} 🏆</>}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="pixel-box divide-y divide-line">
+            {lista.map((pt) => {
+              const aberto = aberta === pt.id;
+              return (
+                <li key={pt.id}>
+                  <button
+                    type="button"
+                    aria-expanded={aberto}
+                    onClick={() => {
+                      tocar('clique');
+                      setAberta(aberto ? null : pt.id);
+                    }}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs hover:bg-black/20"
+                  >
+                    <span aria-hidden>{pt.modo === 'duelo' ? '⚔' : '⚖'}</span>
+                    <span className="w-5 shrink-0">
+                      <GladiadorPixel ia={pt.ia} />
+                    </span>
+                    <span className="text-muted">×</span>
+                    <span className="w-5 shrink-0">
+                      <GladiadorPixel ia={pt.rival} espelhar />
+                    </span>
+                    <span className={`ml-1 font-pixel text-[9px] ${COR_RESULTADO(pt)}`}>{ROTULO_RESULTADO(pt).toUpperCase()}</span>
+                    <span className="ml-auto shrink-0 font-pixel text-[9px] tabular-nums text-muted">
+                      {pt.treino ? 'TREINO' : `${pt.trofeus > 0 ? '+' : ''}${pt.trofeus} 🏆`}
+                    </span>
+                    <span className="text-muted" aria-hidden>
+                      {aberto ? '▴' : '▾'}
+                    </span>
+                  </button>
+                  {aberto && (
+                    <div className="surgir space-y-1 bg-black/20 px-4 py-3 text-xs">
+                      <p>
+                        <strong>{pt.modo === 'duelo' ? 'Duelo' : 'Tribunal'}</strong> · {new Date(pt.quando).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                      </p>
+                      <p className="text-muted">"{pt.dilema}"</p>
+                      <p>
+                        {PERSONAGENS[pt.ia].gladiador} ({PERSONAGENS[pt.ia].ia}) contra {PERSONAGENS[pt.rival].gladiador} ({PERSONAGENS[pt.rival].ia})
+                      </p>
+                      <p>
+                        {pt.treino ? 'Treino: não valeu troféus nem XP.' : `Troféus: ${pt.trofeus > 0 ? '+' : ''}${pt.trofeus} · XP de Maestria: +${pt.xp}`}
+                      </p>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          {partidas.length > 5 && (
+            <button
+              type="button"
+              onClick={() => {
+                tocar('clique');
+                setTodas((t) => !t);
+              }}
+              className="mt-2 font-pixel text-[9px] text-muted hover:text-accent"
+            >
+              {todas ? '▴ MOSTRAR MENOS' : `▾ VER TODAS (${partidas.length})`}
+            </button>
+          )}
+        </>
       )}
     </section>
   );

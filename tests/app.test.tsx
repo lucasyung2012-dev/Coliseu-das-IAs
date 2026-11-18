@@ -170,3 +170,23 @@ describe('configurações', () => {
     expect(screen.getByRole('link', { name: 'Configurações' })).toHaveAttribute('href', '/configuracoes');
   });
 });
+
+describe('perfil do combatente', () => {
+  it('abre pelo Arcade e mostra troféus, Maestria com títulos e estatísticas', () => {
+    sessionStorage.setItem('coliseu.boot.vista', '1');
+    abrir('/arena');
+    const link = screen.getByRole('link', { name: /VER PERFIL DE CASSIUS/ });
+    expect(link).toHaveAttribute('href', '/arena/perfil/claude');
+    abrir('/arena/perfil/gemini');
+    expect(screen.getByRole('heading', { level: 1, name: 'HELIOS' })).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Títulos de Maestria' }).children).toHaveLength(8);
+    expect(screen.getByRole('list', { name: 'Ligas' }).children).toHaveLength(5);
+    expect(screen.getByRole('region', { name: 'ESTATÍSTICAS' })).toBeInTheDocument();
+  });
+
+  it('um endereço de perfil inválido volta para o Arcade', () => {
+    sessionStorage.setItem('coliseu.boot.vista', '1');
+    abrir('/arena/perfil/xyz');
+    expect(screen.getByRole('heading', { level: 1, name: 'Imperium Arcade' })).toBeInTheDocument();
+  });
+});

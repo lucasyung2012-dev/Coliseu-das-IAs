@@ -18,11 +18,27 @@ export interface Partida {
   dilema: string;
 }
 
+export interface PlacarModo {
+  vitorias: number;
+  derrotas: number;
+  empates: number;
+}
+
+/** Números de cada IA para o perfil (só partidas que valem; treino não conta). */
+export interface Estatisticas {
+  duelo: PlacarModo;
+  tribunal: PlacarModo;
+  /** Vitórias seguidas agora e o recorde. */
+  sequencia: number;
+  melhorSequencia: number;
+}
+
 export interface Progresso {
   versao: 1;
   iaAtual: IaId;
   trofeus: Record<IaId, number>;
   xp: Record<IaId, number>;
+  estatisticas: Record<IaId, Estatisticas>;
   partidas: Partida[];
   /** Quando o progresso mudou pela última vez (ISO). Decide qual cópia vale ao sincronizar. */
   atualizadoEm?: string;
@@ -38,9 +54,12 @@ const XP_DERROTA = 20;
 const XP_EMPATE = 20;
 
 const zerado = (): Record<IaId, number> => ({ claude: 0, chatgpt: 0, gemini: 0 });
+const placarZerado = (): PlacarModo => ({ vitorias: 0, derrotas: 0, empates: 0 });
+export const estatisticasZeradas = (): Estatisticas => ({ duelo: placarZerado(), tribunal: placarZerado(), sequencia: 0, melhorSequencia: 0 });
+const estatisticasDeTodas = (): Record<IaId, Estatisticas> => ({ claude: estatisticasZeradas(), chatgpt: estatisticasZeradas(), gemini: estatisticasZeradas() });
 
 export function progressoInicial(): Progresso {
-  return { versao: 1, iaAtual: 'claude', trofeus: zerado(), xp: zerado(), partidas: [] };
+  return { versao: 1, iaAtual: 'claude', trofeus: zerado(), xp: zerado(), estatisticas: estatisticasDeTodas(), partidas: [] };
 }
 
 /** Confere e completa um progresso vindo do aparelho ou da nuvem; null se não for válido. */
@@ -52,6 +71,7 @@ export function validarProgresso(bruto: unknown): Progresso | null {
     ...p,
     trofeus: { ...zerado(), ...p.trofeus },
     xp: { ...zerado(), ...p.xp },
+    estatisticas: Object.fromEntries(IAS.map((ia) => [ia, { ...estatisticasZeradas(), ...p.estatisticas?.[ia] }])) as Record<IaId, Estatisticas>,
     partidas: Array.isArray(p.partidas) ? p.partidas : [],
   } as Progresso;
 }
@@ -138,9 +158,25 @@ export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 
     ...p,
     trofeus: { ...p.trofeus, [dados.ia]: p.trofeus[dados.ia] + trofeus },
     xp: { ...p.xp, [dados.ia]: p.xp[dados.ia] + xp },
+    estatisticas: dados.treino ? p.estatisticas : { ...p.estatisticas, [dados.ia]: somarResultado(p.estatisticas[dados.ia], dados) },
     partidas: [partida, ...p.partidas].slice(0, MAX_HISTORICO),
   });
   return partida;
+}
+
+function somarResultado(e: Estatisticas, d: Pick<Partida, 'modo' | 'venceu' | 'empate'>): Estatisticas {
+  const placar = { ...e[d.modo] };
+  if (d.empate) placar.empates++;
+  else if (d.venceu) placar.vitorias++;
+  else placar.derrotas++;
+  // Empate não quebra nem aumenta a sequência de vitórias.
+  const sequencia = d.empate ? e.sequencia : d.venceu ? e.sequencia + 1 : 0;
+  return { ...e, [d.modo]: placar, sequencia, melhorSequencia: Math.max(e.melhorSequencia, sequencia) };
+}
+
+/** Total de partidas que valem, somando os dois modos. */
+export function totalPartidas(e: Estatisticas): number {
+  return [e.duelo, e.tribunal].reduce((s, m) => s + m.vitorias + m.derrotas + m.empates, 0);
 }
 
 /** Apaga tudo (com conta, a cópia zerada também vai para a nuvem, por ser a mais nova). */
@@ -167,6 +203,10 @@ export function juntarProgresso(local: Progresso, nuvem: Progresso, primeiraVez:
     ...maisNovo,
     trofeus: maior(local.trofeus, nuvem.trofeus),
     xp: maior(local.xp, nuvem.xp),
+    // Estatísticas: fica a cópia com mais partidas jogadas de cada IA.
+    estatisticas: Object.fromEntries(
+      IAS.map((ia) => [ia, totalPartidas(nuvem.estatisticas[ia]) > totalPartidas(local.estatisticas[ia]) ? nuvem.estatisticas[ia] : local.estatisticas[ia]]),
+    ) as Record<IaId, Estatisticas>,
     partidas,
     atualizadoEm: new Date().toISOString(),
   };
