@@ -655,3 +655,24 @@
 /* Pose de vitória (Maestria 20): pulos de alegria. */
 .pulos-vitoria { animation: pulos-vitoria 0.7s steps(4) infinite; }
 @keyframes pulos-vitoria { 50% { transform: translateY(-18%); } }
+
+/* ===== Duelo em tempo real (protótipo) ===== */
+/* O argumento voa do gladiador até o setor da plateia. */
+.argumento-voando {
+  transform: translate(-50%, -50%);
+  animation-name: argumento-voando;
+  animation-timing-function: cubic-bezier(.3, .1, .6, 1);
+  animation-fill-mode: both;
+}
+@keyframes argumento-voando {
+  from { left: var(--x0); top: var(--y0); }
+  50% { top: calc((var(--y0) + var(--y1)) / 2 - 12%); }
+  to { left: var(--x1); top: var(--y1); }
+}
+/* Rosas e tomates caindo da arquibancada. */
+.chuva { top: 0; animation: chuva 1.1s ease-in both; }
+@keyframes chuva {
+  from { transform: translateY(-40%) rotate(0deg); opacity: 0; }
+  20% { opacity: 1; }
+  to { transform: translateY(260%) rotate(240deg); opacity: 0.9; }
+}

@@ -6,6 +6,7 @@ import { useProgresso } from '@/game/progresso';
 import IntroDuelo from './cenas/IntroDuelo';
 import IntroTribunal from './cenas/IntroTribunal';
 import PartidaTribunal from './tribunal/PartidaTribunal';
+import PartidaDuelo from './duelo/PartidaDuelo';
 import { desbloquear, tocar } from '@/ui/som';
 
 interface Sorteio {
@@ -54,9 +55,21 @@ export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' })
     ) : (
       <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">
         <p className="font-pixel text-[10px] text-accent sm:text-xs">TUDO PRONTO PARA O DUELO</p>
-        <p className="max-w-md text-sm text-muted">A partida de verdade chega na Etapa 1c. Por enquanto, dá para ver a entrada de novo, com outro rival.</p>
+        <p className="max-w-md text-sm text-muted">Protótipo do Duelo em tempo real: ainda não vale troféus. Jogue e diga se ficou divertido!</p>
         <div className="flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={deNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
+          <button
+            type="button"
+            autoFocus
+            onClick={() => {
+              desbloquear();
+              tocar('start');
+              setJogando(true);
+            }}
+            className="pixel-box pixel-hover px-5 py-3 font-pixel text-xs text-accent"
+          >
+            ⚔ LUTAR
+          </button>
+          <button type="button" onClick={deNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px]">
             ↻ VER DE NOVO
           </button>
           <Link to="/arena" className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px]">
@@ -77,7 +90,11 @@ export default function EntradaCombate({ modo }: { modo: 'duelo' | 'tribunal' })
           <p className="font-pixel text-[10px] text-accent-2">{modo === 'duelo' ? '⚔ DUELO' : '⚖ TRIBUNAL'}</p>
         </div>
         {modo === 'duelo' ? (
-          <IntroDuelo key={sorteio.rodada} ia={iaAtual} rival={sorteio.rival} fim={fim} />
+          jogando ? (
+            <PartidaDuelo key={sorteio.rodada} ia={iaAtual} rival={sorteio.rival} onDeNovo={revanche} onSair={() => navegar('/arena')} />
+          ) : (
+            <IntroDuelo key={sorteio.rodada} ia={iaAtual} rival={sorteio.rival} fim={fim} />
+          )
         ) : jogando ? (
           <PartidaTribunal
             key={sorteio.rodada}

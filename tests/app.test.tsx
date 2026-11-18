@@ -201,3 +201,27 @@ describe('mapa de troféus na tela', () => {
     expect(screen.getByText(/IMPERADORES · 7000/)).toBeInTheDocument();
   });
 });
+
+describe('duelo jogável (protótipo)', () => {
+  it('lança um argumento num setor e termina com o polegar do César', () => {
+    vi.useFakeTimers();
+    try {
+      abrir('/arena/duelo');
+      fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+      fireEvent.click(screen.getByRole('button', { name: /LUTAR/ }));
+      const mao = within(screen.getByRole('region', { name: 'Seus argumentos' })).getAllByRole('button');
+      expect(mao).toHaveLength(4);
+      fireEvent.click(mao[0]!);
+      fireEvent.click(screen.getAllByRole('button', { name: /Setor do/ })[1]!);
+      for (let i = 0; i < 62; i++) {
+        act(() => {
+          vi.advanceTimersByTime(1000);
+        });
+      }
+      expect(screen.getByText('O CÉSAR DECIDIU')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /JOGAR DE NOVO/ })).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
