@@ -11,6 +11,7 @@ import {
   CARGA_MS,
   CARTAS,
   custoAgora,
+  ESTILO_PREFERIDO,
   ESTILOS,
   duracaoDaRodada,
   FOLEGO_MAX,
@@ -82,7 +83,20 @@ type Abertura = 'tema' | 'entrada' | 3 | 2 | 1 | 'lutem' | null;
 const TEMPO_ABERTURA: Record<Exclude<Abertura, null>, number> = { tema: 0, entrada: 3400, 3: 800, 2: 800, 1: 800, lutem: 700 };
 const PROXIMA: Record<Exclude<Abertura, null>, Abertura> = { tema: 'entrada', entrada: 3, 3: 2, 2: 1, 1: 'lutem', lutem: null };
 
-export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId; rival: IaId; onDeNovo: () => void; onSair: () => void }) {
+export default function PartidaDuelo({
+  ia,
+  rival,
+  onDeNovo,
+  onSair,
+  doisJogadores = false,
+}: {
+  ia: IaId;
+  rival: IaId;
+  onDeNovo: () => void;
+  onSair: () => void;
+  /** Modo 2 jogadores no mesmo aparelho: o "rival" é o Jogador 2. */
+  doisJogadores?: boolean;
+}) {
   const p = useProgresso();
   const dificuldade = useDificuldade();
   const { liga } = useAparencia(ia);
@@ -93,7 +107,11 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
   const ladoRival: LadoId = config.lado === 'favor' ? 'contra' : 'favor';
   const cores = useMemo<Record<Lado, Cores>>(() => ({ eu: coresDaIa(ia), rival: coresDaIa(rival) }), [ia, rival]);
   // Meu baralho salvo contra o baralho do estilo que a IA rival sorteou.
-  const [baralhos] = useState(() => ({ eu: validarBaralho(p.baralhoDuelo, baralhoInicial(ia)), rival: baralhoDaIa(rival) }));
+  // No modo 2 jogadores, o Jogador 2 joga com o baralho inicial da IA que escolheu.
+  const [baralhos] = useState(() => ({
+    eu: validarBaralho(p.baralhoDuelo, baralhoInicial(ia)),
+    rival: doisJogadores ? { estilo: ESTILO_PREFERIDO[rival], cartas: baralhoInicial(rival) } : baralhoDaIa(rival),
+  }));
   const [e, setE] = useState<EstadoDuelo>(() =>
     novoDuelo({
       frasesEu: embaralhar(dilema.lados[config.lado].tempos.flat().map((c) => c.titulo)),
@@ -103,7 +121,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
     }),
   );
   // Segurar e soltar: qual carta está sendo segurada e desde quando.
-  const [segurando, setSegurando] = useState<{ id: string; inicio: number } | null>(null);
+  const [segurando, setSegurando] = useState<Record<Lado, { id: string; inicio: number } | null>>({ eu: null, rival: null });
   const [abertura, setAbertura] = useState<Abertura>('tema');
   const pausado = tutorial.aberto || abertura !== null;
 
@@ -123,7 +141,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
 
   useEffect(() => {
     if (pausado) return;
-    const ctx = { acerto, iaRival: rival, aleatorio: Math.random };
+    const ctx = { acerto, iaRival: rival, aleatorio: Math.random, rivalHumano: doisJogadores };
     const id = window.setInterval(() => setE((s) => passo(s, ctx)), TICK);
     return () => window.clearInterval(id);
   }, [acerto, rival, pausado]);
@@ -152,48 +170,59 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
       const r = resultadoFinal(e);
       tocar(r === 'vitoria' ? 'vitoria' : r === 'derrota' ? 'derrota' : 'martelo');
       // O Duelo ainda é protótipo: entra no histórico como treino (sem troféus nem XP).
-      registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: true, dilema: dilema.pergunta });
+      // A partida de 2 jogadores é amistosa: não entra no histórico.
+      if (!doisJogadores) registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: true, dilema: dilema.pergunta });
     }
   }, [e.fase]);
 
   // Saiu no meio (voltou, trocou de tela)? Vale derrota. Se já acabou, não faz nada.
   useEffect(() => () => void registrarAbandono(), []);
 
-  const jogar = (carta: CartaDuelo, carga: number) => {
+  const jogar = (lado: Lado, carta: CartaDuelo, carga: number) => {
     if (pausado) return;
     desbloquear();
     tocar(carga >= 1 ? 'start' : 'selecionar');
-    setE((s) => jogarCarta(s, 'eu', carta.id, carga));
+    setE((s) => jogarCarta(s, lado, carta.id, carga));
   };
-  const comecarCarga = (carta: CartaDuelo) => {
+  const comecarCarga = (lado: Lado, carta: CartaDuelo) => {
     desbloquear();
-    setSegurando({ id: carta.id, inicio: agoraMs() });
+    setSegurando((x) => ({ ...x, [lado]: { id: carta.id, inicio: agoraMs() } }));
   };
-  const soltar = (carta: CartaDuelo) => {
-    if (segurando?.id !== carta.id) return;
-    jogar(carta, Math.min(1, (agoraMs() - segurando.inicio) / CARGA_MS));
-    setSegurando(null);
+  const soltar = (lado: Lado, carta: CartaDuelo) => {
+    const seg = segurando[lado];
+    if (seg?.id !== carta.id) return;
+    jogar(lado, carta, Math.min(1, (agoraMs() - seg.inicio) / CARGA_MS));
+    setSegurando((x) => ({ ...x, [lado]: null }));
   };
-  const gladiador = () => {
+  const gladiador = (lado: Lado) => {
     if (pausado) return;
     desbloquear();
-    setE((s) => golpeDoGladiador(s, 'eu'));
+    setE((s) => golpeDoGladiador(s, lado));
   };
-  // Teclado: segure 1 a 4 para carregar e solte para lançar; G ou espaço = golpe do gladiador.
+  // Teclado. Jogador 1: segure 1 a 4 para carregar e solte para lançar; G ou espaço = golpe.
+  // Jogador 2 (no modo 2 jogadores): 7, 8, 9 e 0 para as cartas; H = golpe.
+  const TECLAS_J2 = ['7', '8', '9', '0'];
   useEffect(() => {
     if (pausado) return;
+    const cartaDaTecla = (k: string): [Lado, CartaDuelo] | null => {
+      const n = Number(k);
+      if (n >= 1 && n <= 4 && e.eu.mao[n - 1]) return ['eu', e.eu.mao[n - 1]!];
+      const j = TECLAS_J2.indexOf(k);
+      if (doisJogadores && j >= 0 && e.rival.mao[j]) return ['rival', e.rival.mao[j]!];
+      return null;
+    };
     const desce = (ev: KeyboardEvent) => {
       if (ev.repeat) return;
-      const c = e.eu.mao[Number(ev.key) - 1];
-      if (c && podeJogar(e, 'eu', c.id)) comecarCarga(c);
+      const achou = cartaDaTecla(ev.key);
+      if (achou && podeJogar(e, achou[0], achou[1].id)) comecarCarga(achou[0], achou[1]);
       else if (ev.key === 'g' || ev.key === 'G' || ev.key === ' ') {
         ev.preventDefault();
-        gladiador();
-      }
+        gladiador('eu');
+      } else if (doisJogadores && (ev.key === 'h' || ev.key === 'H')) gladiador('rival');
     };
     const sobe = (ev: KeyboardEvent) => {
-      const c = e.eu.mao[Number(ev.key) - 1];
-      if (c) soltar(c);
+      const achou = cartaDaTecla(ev.key);
+      if (achou) soltar(achou[0], achou[1]);
     };
     window.addEventListener('keydown', desce);
     window.addEventListener('keyup', sobe);
@@ -203,18 +232,94 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
     };
   });
 
-  if (e.fase === 'fim') return <FimDuelo e={e} ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} />;
+  if (e.fase === 'fim') return <FimDuelo e={e} ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} doisJogadores={doisJogadores} />;
 
   const voce = PERSONAGENS[ia];
   const dele = PERSONAGENS[rival];
   const restante = Math.max(0, Math.ceil((duracaoDaRodada(e) - e.tempo) / 1000));
   const extra = prorrogacao(e);
-  const eu = e.eu;
-  const gladiadorPronto = eu.gladiadorProntoEm <= e.tempo;
   const tribunaBatida = (l: Lado) => e.efeitos.some((x) => x.tipo === 'tribuna' && x.lado === l);
   const lados: Record<Lado, LadoDoDebate> = {
     eu: { nome: voce.gladiador, ia: voce.ia, cor: cores.eu.cor, lado: dilema.lados[config.lado].nome, tese: dilema.lados[config.lado].tese },
     rival: { nome: dele.gladiador, ia: dele.ia, cor: cores.rival.cor, lado: dilema.lados[ladoRival].nome, tese: dilema.lados[ladoRival].tese },
+  };
+
+  /**
+   * A ânfora de gotas, as cartas (grandes), a carta na manga e o golpe do gladiador
+   * de um lado. No modo 2 jogadores, o Jogador 2 tem os dele espelhados, à direita.
+   */
+  const controles = (lado: Lado) => {
+    const l = e[lado];
+    const c = cores[lado];
+    const pronto = l.gladiadorProntoEm <= e.tempo;
+    const espelhado = lado === 'rival';
+    const compacto = doisJogadores;
+    const nome = doisJogadores ? (lado === 'eu' ? 'JOGADOR 1' : 'JOGADOR 2') : null;
+    const manga = l.monte[0];
+    return (
+      <div className="flex flex-col gap-1">
+        {nome && (
+          <p className={`font-pixel text-[9px] sm:text-[11px] ${espelhado ? 'text-right' : ''}`} style={{ color: c.cor }}>
+            {nome} · {PERSONAGENS[lado === 'eu' ? ia : rival].gladiador.toUpperCase()}
+          </p>
+        )}
+        <div className={`grid items-stretch gap-2 sm:gap-3 ${espelhado ? 'grid-cols-[auto_1fr_auto] [direction:rtl]' : 'grid-cols-[auto_1fr_auto]'}`}>
+          <div className="[direction:ltr]">
+            <Anfora
+              gotas={l.folego}
+              max={FOLEGO_MAX}
+              cor={doisJogadores ? c.cor : undefined}
+              rotulo={ritmoDoFolego(e, lado) > FOLEGO_POR_SEGUNDO ? (extra ? 'GOTAS EM DOBRO' : 'VIRADA +25%') : undefined}
+            />
+          </div>
+          <section aria-label={lado === 'eu' ? 'Suas cartas' : 'Cartas do Jogador 2'} className={`grid grid-cols-4 gap-2 [direction:ltr] ${compacto ? 'gap-1' : ''}`}>
+            {l.mao.map((carta, i) => (
+              <CartaNaMao
+                key={carta.id}
+                carta={carta}
+                numero={lado === 'eu' ? String(i + 1) : TECLAS_J2[i]!}
+                custo={custoAgora(l, carta.tipo)}
+                pode={podeJogar(e, lado, carta.id) && !pausado}
+                carregando={segurando[lado]?.id === carta.id}
+                cores={c}
+                onSegurar={() => comecarCarga(lado, carta)}
+                onSoltar={() => soltar(lado, carta)}
+                onCancelar={() => setSegurando((x) => ({ ...x, [lado]: null }))}
+                onTocar={() => jogar(lado, carta, 0)}
+              />
+            ))}
+          </section>
+          <div className="flex flex-col items-center justify-around gap-2 [direction:ltr]">
+            {/* A carta na manga: a próxima que entra na mão (no lugar da que for jogada) */}
+            {manga && (
+              <div className="flex flex-col items-center gap-0.5" aria-label={`Carta na manga: ${CARTAS[manga.tipo].nome}`}>
+                <span className="font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">NA MANGA</span>
+                <span className="relative block w-14 pt-2 sm:w-[4.5rem]">
+                  {/* A manga da toga, com a carta saindo dela */}
+                  <span key={manga.id} className="surgir relative z-0 block w-[80%] -rotate-12">
+                    <CartaVisual tipo={manga.tipo} paleta={c.paleta} corNome={c.cor} tamanho="mini" />
+                  </span>
+                  <span
+                    className="absolute -bottom-1 -right-1 z-10 h-[45%] w-[70%] rounded-[50%_50%_40%_40%] border-2 border-[#8a7f6a]"
+                    style={{ background: 'linear-gradient(160deg, #f4efe2, #cfc6b0)', boxShadow: `inset -3px -3px 0 ${c.escura}` }}
+                    aria-hidden
+                  />
+                </span>
+              </div>
+            )}
+            <BotaoRedondo
+              rotulo="GOLPE"
+              icone="🗡️"
+              cor={c.cor}
+              progresso={pronto ? 1 : 1 - (l.gladiadorProntoEm - e.tempo) / GLADIADOR_RECARGA_MS}
+              pronto={pronto && e.fase === 'luta' && !pausado}
+              dica="Golpe do gladiador: ele já bate sozinho em quem entra no círculo de luz; tocando, dá um golpe extra (-1). Recarrega em 8 s."
+              onClick={() => gladiador(lado)}
+            />
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Antes da luta: o tema, com calma, como no Tribunal.
@@ -232,12 +337,13 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
           baralhoEu={baralhos.eu}
           estiloRival={baralhos.rival.estilo}
           paletaEu={cores.eu.paleta}
+          doisJogadores={doisJogadores}
           onPronto={() => {
             desbloquear();
             tocar('start');
             setAbertura('entrada');
             // A partida começou: sair antes do fim conta como derrota.
-            marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: true, dilema: dilema.pergunta });
+            if (!doisJogadores) marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: true, dilema: dilema.pergunta });
           }}
           onComoJogar={tutorial.abrir}
         />
@@ -298,7 +404,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
                 l={e[l]}
                 tempo={e.tempo}
                 golpeando={abertura === 'lutem' || e.efeitos.some((x) => x.tipo === 'golpe' && x.lado === l)}
-                onTocar={l === 'eu' ? gladiador : undefined}
+                onTocar={l === 'eu' || doisJogadores ? () => gladiador(l) : undefined}
               >
                 {l === 'eu' ? <GladiadorEnfeitado ia={ia} parado /> : <GladiadorPixel ia={rival} liga={liga} espelhar />}
               </Gladiador>
@@ -394,59 +500,15 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         )}
       </div>
 
-      {/* A ânfora de gotas, as cartas (grandes) e, ao lado, a carta na manga e o golpe do gladiador */}
-      <div className="grid grid-cols-[auto_1fr_auto] items-stretch gap-2 sm:gap-3">
-        <Anfora
-          gotas={eu.folego}
-          max={FOLEGO_MAX}
-          rotulo={ritmoDoFolego(e, 'eu') > FOLEGO_POR_SEGUNDO ? (extra ? 'GOTAS EM DOBRO' : 'VIRADA +25%') : undefined}
-        />
-        <section aria-label="Suas cartas" className="grid grid-cols-4 gap-2">
-          {eu.mao.map((c, i) => (
-            <CartaNaMao
-              key={c.id}
-              carta={c}
-              numero={i + 1}
-              custo={custoAgora(eu, c.tipo)}
-              pode={podeJogar(e, 'eu', c.id) && !pausado}
-              carregando={segurando?.id === c.id}
-              cores={cores.eu}
-              onSegurar={() => comecarCarga(c)}
-              onSoltar={() => soltar(c)}
-              onCancelar={() => setSegurando(null)}
-              onTocar={() => jogar(c, 0)}
-            />
-          ))}
-        </section>
-        <div className="flex flex-col items-center justify-around gap-2">
-          {/* A carta na manga: a próxima que entra na mão (no lugar da que você jogar) */}
-          {eu.monte[0] && (
-            <div className="flex flex-col items-center gap-0.5" aria-label={`Carta na manga: ${CARTAS[eu.monte[0].tipo].nome}`}>
-              <span className="font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">NA MANGA</span>
-              <span className="relative block w-14 pt-2 sm:w-[4.5rem]">
-                {/* A manga da toga, com a carta saindo dela */}
-                <span key={eu.monte[0].id} className="surgir relative z-0 block w-[80%] -rotate-12">
-                  <CartaVisual tipo={eu.monte[0].tipo} paleta={cores.eu.paleta} corNome={cores.eu.cor} tamanho="mini" />
-                </span>
-                <span
-                  className="absolute -bottom-1 -right-1 z-10 h-[45%] w-[70%] rounded-[50%_50%_40%_40%] border-2 border-[#8a7f6a]"
-                  style={{ background: 'linear-gradient(160deg, #f4efe2, #cfc6b0)', boxShadow: `inset -3px -3px 0 ${cores.eu.escura}` }}
-                  aria-hidden
-                />
-              </span>
-            </div>
-          )}
-          <BotaoRedondo
-            rotulo="GOLPE"
-            icone="🗡️"
-            cor={cores.eu.cor}
-            progresso={gladiadorPronto ? 1 : 1 - (eu.gladiadorProntoEm - e.tempo) / GLADIADOR_RECARGA_MS}
-            pronto={gladiadorPronto && e.fase === 'luta' && !pausado}
-            dica="Golpe do gladiador: ele já bate sozinho em quem entra no círculo de luz; tocando, dá um golpe extra (-1). Recarrega em 8 s."
-            onClick={gladiador}
-          />
+      {doisJogadores ? (
+        // Duas pessoas no mesmo aparelho: Jogador 1 à esquerda, Jogador 2 à direita.
+        <div className="grid gap-3 lg:grid-cols-2">
+          {controles('eu')}
+          {controles('rival')}
         </div>
-      </div>
+      ) : (
+        controles('eu')
+      )}
       <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💧)</p>
     </div>
   );
@@ -473,6 +535,7 @@ function BriefingDuelo({
   paletaEu,
   onPronto,
   onComoJogar,
+  doisJogadores = false,
 }: {
   pergunta: string;
   voce: LadoDoDebate;
@@ -485,6 +548,7 @@ function BriefingDuelo({
   paletaEu: Paleta;
   onPronto: () => void;
   onComoJogar: () => void;
+  doisJogadores?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -504,7 +568,7 @@ function BriefingDuelo({
           </div>
           <div className="min-w-0">
             <p className="font-pixel text-[8px] sm:text-[10px]" style={{ color: voce.cor }}>
-              VOCÊ · {voce.nome.toUpperCase()} · {voce.ia.toUpperCase()}
+              {doisJogadores ? 'JOGADOR 1' : 'VOCÊ'} · {voce.nome.toUpperCase()} · {voce.ia.toUpperCase()}
             </p>
             <p className="mt-1 font-pixel text-base text-white sm:text-2xl" style={{ textShadow: `0 0 10px ${voce.cor}` }}>
               {voce.lado.toUpperCase()}
@@ -519,11 +583,13 @@ function BriefingDuelo({
           </div>
           <div className="min-w-0">
             <p className="font-pixel text-[8px] sm:text-[9px]" style={{ color: dele.cor }}>
-              RIVAL · {dele.nome.toUpperCase()} · {dele.ia.toUpperCase()}
+              {doisJogadores ? 'JOGADOR 2' : 'RIVAL'} · {dele.nome.toUpperCase()} · {dele.ia.toUpperCase()}
             </p>
             <p className="mt-1 font-pixel text-sm text-white sm:text-lg">{dele.lado.toUpperCase()}</p>
             <p className="mt-1 text-xs italic leading-snug text-muted sm:text-sm">"{dele.tese}"</p>
-            <p className="mt-2 font-pixel text-[7px] text-[rgb(242_193_78)] sm:text-[8px]">BARALHO DO RIVAL: ESTILO {ESTILOS[estiloRival].nome.toUpperCase()}</p>
+            <p className="mt-2 font-pixel text-[7px] text-[rgb(242_193_78)] sm:text-[8px]">
+              {doisJogadores ? 'BARALHO' : 'BARALHO DO RIVAL'}: ESTILO {ESTILOS[estiloRival].nome.toUpperCase()}
+            </p>
           </div>
         </section>
       </div>
@@ -558,7 +624,7 @@ function BriefingDuelo({
 
 function CartaNaMao(props: {
   carta: CartaDuelo;
-  numero: number;
+  numero: string;
   custo: number;
   pode: boolean;
   carregando: boolean;
@@ -697,7 +763,23 @@ function VidaTribuna({
   );
 }
 
-function FimDuelo({ e, ia, rival, cores, onDeNovo, onSair }: { e: EstadoDuelo; ia: IaId; rival: IaId; cores: Record<Lado, Cores>; onDeNovo: () => void; onSair: () => void }) {
+function FimDuelo({
+  e,
+  ia,
+  rival,
+  cores,
+  onDeNovo,
+  onSair,
+  doisJogadores = false,
+}: {
+  e: EstadoDuelo;
+  ia: IaId;
+  rival: IaId;
+  cores: Record<Lado, Cores>;
+  onDeNovo: () => void;
+  onSair: () => void;
+  doisJogadores?: boolean;
+}) {
   const r = resultadoFinal(e);
   return (
     <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">
@@ -708,7 +790,17 @@ function FimDuelo({ e, ia, rival, cores, onDeNovo, onSair }: { e: EstadoDuelo; i
       <p className="font-pixel text-[9px] text-[rgb(242_193_78)]">O CÉSAR DECIDIU</p>
       {e.aviso && <p className="font-pixel text-[9px] text-muted">{e.aviso.texto}</p>}
       <h2 className={`pancada neon font-pixel text-3xl sm:text-5xl ${r === 'derrota' ? 'text-accent-2' : 'text-accent'}`}>
-        {r === 'vitoria' ? 'VITÓRIA!' : r === 'derrota' ? 'DERROTA' : 'EMPATE'}
+        {doisJogadores
+          ? r === 'vitoria'
+            ? 'JOGADOR 1 VENCEU!'
+            : r === 'derrota'
+              ? 'JOGADOR 2 VENCEU!'
+              : 'EMPATE'
+          : r === 'vitoria'
+            ? 'VITÓRIA!'
+            : r === 'derrota'
+              ? 'DERROTA'
+              : 'EMPATE'}
       </h2>
       <p className="font-pixel text-[10px] leading-relaxed sm:text-sm">
         VIDA DAS TRIBUNAS
@@ -721,7 +813,7 @@ function FimDuelo({ e, ia, rival, cores, onDeNovo, onSair }: { e: EstadoDuelo; i
           {e.tribunas.rival} {PERSONAGENS[rival].gladiador}
         </span>
       </p>
-      <p className="font-pixel text-[8px] text-muted">PROTÓTIPO · AINDA NÃO VALE TROFÉUS</p>
+      <p className="font-pixel text-[8px] text-muted">{doisJogadores ? 'PARTIDA AMISTOSA · 2 JOGADORES' : 'PROTÓTIPO · AINDA NÃO VALE TROFÉUS'}</p>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" autoFocus onClick={onDeNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
           ↻ JOGAR DE NOVO

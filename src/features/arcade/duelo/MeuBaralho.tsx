@@ -213,9 +213,18 @@ export default function SalaDoDuelo() {
               <span className="neon font-pixel text-xl text-accent sm:text-2xl">▶ JOGAR</span>
               <span className="text-xs text-muted">{completo ? 'Contra uma IA rival' : 'Complete o baralho com 8 cartas'}</span>
             </button>
-            <button type="button" disabled className="pixel-box flex flex-col items-center gap-1 px-4 py-4 opacity-60" aria-label="2 jogadores (em breve)">
+            <button
+              type="button"
+              onClick={() => {
+                desbloquear();
+                tocar('start');
+                navegar('/arena/duelo/2j');
+              }}
+              className="pixel-box pixel-hover flex flex-col items-center gap-1 px-4 py-4"
+              aria-label="2 jogadores no mesmo aparelho"
+            >
               <span className="font-pixel text-sm text-fg">👥 2 JOGADORES</span>
-              <span className="font-pixel text-[8px] text-[rgb(242_193_78)]">EM BREVE · NO MESMO APARELHO</span>
+              <span className="font-pixel text-[8px] text-[rgb(242_193_78)]">NO MESMO APARELHO · AMISTOSO</span>
             </button>
             <p className="text-center text-xs text-muted">Sair no meio de uma partida conta como derrota.</p>
           </aside>

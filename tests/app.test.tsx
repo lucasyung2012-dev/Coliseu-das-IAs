@@ -238,13 +238,24 @@ describe('mapa de troféus na tela', () => {
 });
 
 describe('duelo jogável (protótipo)', () => {
-  it('sala do Duelo: baralho à esquerda, organizar por gotas, Jogar e 2 jogadores (em breve)', () => {
+  it('2 jogadores: o Jogador 2 escolhe a IA e a partida mostra os dois lados', () => {
+    localStorage.setItem('coliseu.tutorial.duelo', '1');
+    abrir('/arena/duelo/2j');
+    fireEvent.click(screen.getAllByRole('button', { name: /Jogador 2 com/ })[0]!);
+    expect(screen.getByText(/JOGADOR 1 ·/)).toBeInTheDocument();
+    expect(screen.getByText(/JOGADOR 2 ·/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /ESTOU PRONTO/ }));
+    expect(screen.getByRole('region', { name: 'Suas cartas' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Cartas do Jogador 2' })).toBeInTheDocument();
+  });
+
+  it('sala do Duelo: baralho à esquerda, organizar por gotas, Jogar e 2 jogadores', () => {
     abrir('/arena/duelo');
     expect(screen.getByRole('region', { name: 'Seu baralho' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('radio', { name: /POR GOTAS/ }));
     expect(screen.getByRole('region', { name: /Do mais barato ao mais caro/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /JOGAR/ })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /2 jogadores/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /2 jogadores/ })).toBeEnabled();
   });
 
   it('tutorial na primeira vez, golpes no toque e no teclado, e o polegar do César no fim das rodadas', () => {

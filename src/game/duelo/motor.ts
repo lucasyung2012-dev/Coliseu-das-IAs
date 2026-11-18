@@ -620,6 +620,8 @@ export interface Contexto {
   acerto: number;
   iaRival: IaId;
   aleatorio: Aleatorio;
+  /** Modo 2 jogadores: o rival é outra pessoa, então a IA não joga por ele. */
+  rivalHumano?: boolean;
 }
 
 /** Vale a pena jogar esta carta agora? (o rival não joga feitiço no vazio) */
@@ -692,7 +694,7 @@ export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   };
 
   s = moverTropas(s);
-  s = vezDoRival(s, ctx);
+  if (!ctx.rivalHumano) s = vezDoRival(s, ctx);
 
   if (s.tribunas.eu <= 0 || s.tribunas.rival <= 0) {
     const caiu: Lado = s.tribunas.eu <= 0 ? 'eu' : 'rival';
