@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { JURADOS, type JuradoId } from '@/game/jurados';
-import { nivelMaestria, useProgresso } from '@/game/progresso';
+import { useProgresso } from '@/game/progresso';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
 import { FALAS_PRETOR, GOSTOS, REACOES, TEMAS } from '@/game/tribunal/temas';
 import type { Carta } from '@/game/tribunal/dilemas';
@@ -38,12 +38,12 @@ interface Props {
 }
 
 export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair }: Props) {
-  const { trofeus, xp } = useProgresso();
+  const { trofeus } = useProgresso();
   const dificuldade = useDificuldade();
   // O modo (valendo troféus ou treino) fica fixo do começo ao fim da partida.
   const [ranqueado] = useState(() => modoRanqueado());
   const [e, setE] = useState<EstadoTribunal>(() =>
-    novaPartida({ ia, rival, jurados, trofeus: trofeus[ia], maestria: nivelMaestria(xp[ia]), acerto: ranqueado ? undefined : ACERTO_TREINO[dificuldade] }),
+    novaPartida({ ia, rival, jurados, trofeus: trofeus[ia], acerto: ranqueado ? undefined : ACERTO_TREINO[dificuldade] }),
   );
   const [comecou, setComecou] = useState(false);
   const [escolhida, setEscolhida] = useState<string | null>(null);

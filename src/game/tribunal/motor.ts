@@ -18,11 +18,6 @@ export const TOTAL_TEMPOS = 3;
 /** Chance de o rival jogar a melhor carta, por liga (Recrutas → Imperadores). */
 export const ACERTO_RIVAL = [0.4, 0.55, 0.7, 0.8, 0.9];
 
-/** Valendo troféus: a liga dá a base e cada nível de Maestria soma 0,3 ponto (até +10). */
-export function acertoValendo(trofeus: number, maestria: number): number {
-  return Math.min(0.95, ACERTO_RIVAL[indiceLiga(trofeus)]! + Math.min(0.1, (maestria - 1) * 0.003));
-}
-
 const limitar = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 const limitarPonteiro = (v: number) => limitar(v, PONTEIRO_MIN, PONTEIRO_MAX);
 
@@ -115,8 +110,6 @@ export interface Inicio {
   trofeus: number;
   /** Modo Treino: chance de o rival acertar, pela dificuldade escolhida (no lugar da liga). */
   acerto?: number;
-  /** Nível de Maestria da IA do jogador: quanto maior, mais esperto o rival (só valendo troféus). */
-  maestria?: number;
   dilema?: Dilema;
   lado?: LadoId;
 }
@@ -130,7 +123,7 @@ export function novaPartida(ini: Inicio, aleatorio: Aleatorio = Math.random): Es
     ia: ini.ia,
     rival: ini.rival,
     jurados: ini.jurados,
-    acertoRival: ini.acerto ?? acertoValendo(ini.trofeus, ini.maestria ?? 1),
+    acertoRival: ini.acerto ?? ACERTO_RIVAL[indiceLiga(ini.trofeus)]!,
     tempo: 0,
     ponteiros: Object.fromEntries(ini.jurados.map((j) => [j, 0])),
     mao: [],
