@@ -96,18 +96,18 @@ export const CARTAS: Record<TipoCarta, InfoCarta> = {
   frase: { nome: 'Frase rápida', icone: '⚔️', custo: 2, papel: 'leve', forca: 2, tropa: 'legionario', jeito: 'Pressiona', dica: 'Rápida e barata: chega primeiro e obriga o rival a responder.', carrega: true },
   exemplos: { nome: 'Exemplos', icone: '👥', custo: 2, papel: 'leve', forca: 1, tropa: 'exemplo', jeito: 'Distrai', dica: 'Dois aprendizes de uma vez: o rival perde tempo batendo um de cada vez.' },
   analogia: { nome: 'Analogia', icone: '🐎', custo: 3, papel: 'leve', forca: 2, tropa: 'cavaleiro', jeito: 'Pula', dica: 'Cavaleiro: o mais rápido. Salta por cima da primeira tropa inimiga.', carrega: true },
-  piada: { nome: 'Piada', icone: '🃏', custo: 1, papel: 'leve', forca: 1, tropa: 'bobo', jeito: 'Faz rir', dica: 'Baratíssima. Quem luta com ela fica 1 s parado de tanto rir.' },
+  piada: { nome: 'Piada', icone: '🃏', custo: 1, papel: 'leve', forca: 1, tropa: 'bobo', jeito: 'Faz rir', dica: 'Baratíssima. Quem luta com ela fica um instante parado de tanto rir.' },
   tese: { nome: 'Tese', icone: '🛡️', custo: 4, papel: 'pesada', forca: 4, tropa: 'centuriao', jeito: 'Firme', dica: 'Centurião lento e resistente. Flechas tiram metade da força dele.', carrega: true },
   discurso: { nome: 'Discurso épico', icone: '🐘', custo: 7, papel: 'pesada', forca: 8, tropa: 'elefante', jeito: 'Empolga', dica: 'Elefante muito lento e muito forte. Enquanto vive, seu fôlego volta mais rápido.', carrega: true },
-  citacao: { nome: 'Citação de autoridade', icone: '🏛️', custo: 5, papel: 'pesada', forca: 3, tropa: 'senador', jeito: 'Lidera', dica: 'Senador: suas tropas perto dele batem mais forte (+1).', carrega: true },
+  citacao: { nome: 'Citação de autoridade', icone: '🏛️', custo: 4, papel: 'pesada', forca: 3, tropa: 'senador', jeito: 'Lidera', dica: 'Senador: suas tropas perto dele batem mais forte (+1).', carrega: true },
   fato: { nome: 'Fato', icone: '🏹', custo: 4, papel: 'longe', forca: 1, tropa: 'arqueiro', jeito: 'De longe', dica: 'Arqueiro: atira por cima da luta, mas cai com um golpe. Máx. 2 em campo.' },
   estatistica: { nome: 'Estatística', icone: '📊', custo: 5, papel: 'longe', forca: 2, tropa: 'balista', jeito: 'Posto fixo', dica: 'Balista parada no seu lado: atira longe 4 vezes (ou 10 s) e some. Máx. 1.' },
   prova: { nome: 'Prova', icone: '🎯', custo: 6, papel: 'longe', forca: 2, tropa: 'catapulta', jeito: 'Cerco', dica: 'Catapulta: ignora as tropas e só ataca a Tribuna, de longe.' },
   muralha: { nome: 'Muralha de lógica', icone: '🧱', custo: 3, papel: 'defesa', forca: 5, tropa: 'barricada', jeito: 'Segura', dica: 'Barricada na frente da sua Tribuna: não ataca, só segura. Some em 12 s.' },
-  contra: { nome: 'Contra-argumento', icone: '🔄', custo: 3, papel: 'defesa', forca: 3, tropa: 'escudeiro', jeito: 'Devolve', dica: 'Hoplita parado na frente da Tribuna: cada golpe que leva, devolve 1.' },
+  contra: { nome: 'Contra-argumento', icone: '🔄', custo: 3, papel: 'defesa', forca: 3, tropa: 'escudeiro', jeito: 'Devolve', dica: 'Hoplita parado na frente da Tribuna: cada golpe que leva, devolve 1. Some em 15 s.' },
   refutacao: { nome: 'Refutação', icone: '❗', custo: 3, papel: 'feitico', forca: 0, jeito: 'Precisa', dica: 'Tira 2 de força da tropa inimiga mais perto da sua Tribuna.' },
   pergunta: { nome: 'Pergunta retórica', icone: '❓', custo: 4, papel: 'feitico', forca: 0, jeito: 'Em área', dica: 'Tira 1 de força de todas as tropas inimigas no grupo mais perto.' },
-  pausa: { nome: 'Pausa dramática', icone: '⏸️', custo: 2, papel: 'feitico', forca: 0, jeito: 'Congela', dica: 'As tropas inimigas ficam paradas por 2 s.' },
+  pausa: { nome: 'Pausa dramática', icone: '⏸️', custo: 3, papel: 'feitico', forca: 0, jeito: 'Congela', dica: 'As tropas inimigas ficam paradas por 2 s.' },
   aplauso: { nome: 'Aplauso', icone: '📣', custo: 3, papel: 'feitico', forca: 0, jeito: 'Empurra', dica: 'Suas tropas em campo andam mais rápido por 4 s.' },
 };
 export const TODAS_AS_CARTAS = Object.keys(CARTAS) as TipoCarta[];
@@ -141,7 +141,7 @@ const TROPA: Record<TipoTropa, InfoTropa> = {
   balista: { velocidade: 0, alcance: 38, tiroMs: 3000, duracao: 10_000, tiros: 4, nasce: 3 },
   catapulta: { velocidade: 3.5, alcance: 40, tiroMs: 3600 },
   barricada: { velocidade: 0, duracao: 12_000, nasce: 10, pacifica: true },
-  escudeiro: { velocidade: 0, nasce: 5 },
+  escudeiro: { velocidade: 0, duracao: 15_000, nasce: 5 },
 };
 // Só 1 Contra-argumento e 1 Muralha por vez: empilhar vários defendia a rodada inteira.
 const MAXIMO_EM_CAMPO: Partial<Record<TipoTropa, number>> = { arqueiro: 2, balista: 1, escudeiro: 1, barricada: 1 };
@@ -529,9 +529,9 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
     somar(alvo.id, forcaDoGolpe);
     // Contra-argumento devolve 1 a quem bate nele de perto.
     if (corpo && alvo.tipo === 'escudeiro') somar(t.id, 1);
-    // Piada: quem apanha dela fica 1 s parado de tanto rir.
+    // Piada: quem apanha dela fica 0,6 s parado de tanto rir (era 1 s: forte demais por 1 gota).
     if (corpo && t.tipo === 'bobo') {
-      parar.set(alvo.id, agora + 1000);
+      parar.set(alvo.id, agora + 600);
       s = efeito(s, 'riso', t.de, alvo.x, 900);
     }
     golpearam.add(t.id);

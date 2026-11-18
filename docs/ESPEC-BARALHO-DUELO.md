@@ -21,7 +21,7 @@
 | 4 | 🃏 Piada | Bobo da corte | 1 | 1 | Baratíssima, para girar o baralho | Qualquer tropa |
 | 5 | 🛡️ Tese | Centurião | 4 | 4 | Lenta e resistente (já existe) | Exemplos, Refutação |
 | 6 | 🐘 Discurso épico | Elefante | 7 | 8 | Muito lenta, aguenta muito | Muralha + tropas baratas |
-| 7 | 🏛️ Citação de autoridade | Senador | 5 | 3 | Suas tropas perto dele ganham +1 de força | Fato, Refutação |
+| 7 | 🏛️ Citação de autoridade | Senador | 4 | 3 | Suas tropas perto dele ganham +1 de força | Fato, Refutação |
 | 8 | 🏹 Fato | Arqueiro | 4 | 1 | Atira de longe (já existe) | Analogia |
 | 9 | 📊 Estatística | Balista | 5 | 2 | Fica parada no seu campo e atira mais longe; some em 15 s | Analogia, Exemplos |
 | 10 | 🎯 Prova | Catapulta | 6 | 2 | Só atira na torre, de longe | Cavaleiro, Frase rápida |
@@ -29,7 +29,7 @@
 | 12 | 🔄 Contra-argumento | Escudeiro | 3 | 3 | Fica na frente da sua torre e luta com quem chega | Fato, Estatística |
 | 13 | ❗ Refutação | (feitiço) | 3 | – | Tira 2 de força da tropa inimiga mais perto da sua torre | Exemplos |
 | 14 | ❓ Pergunta retórica | (feitiço) | 4 | – | Tira 1 de força de todas as tropas inimigas numa área | Tese, Elefante |
-| 15 | ⏸️ Pausa dramática | (feitiço) | 2 | – | As tropas inimigas ficam paradas 2 s | — |
+| 15 | ⏸️ Pausa dramática | (feitiço) | 3 | – | As tropas inimigas ficam paradas 2 s | — |
 | 16 | 📣 Aplauso | (feitiço) | 3 | – | Suas tropas em campo andam mais rápido por 4 s | — |
 
 Números para começar; a gente ajusta jogando.
@@ -50,7 +50,7 @@ A cada partida a IA sorteia um **estilo** e monta 8 cartas daquele estilo, troca
 ## Decisões do Lucas (20/11/2026, depois)
 - **Aprovados:** baralho de 8, nomes, o que cada carta faz, o fôlego de cada uma e os 4 estilos da IA.
 - **Equilíbrio não é só "perde para":** cada carta tem uma **personalidade** que muda a partida:
-  Frase rápida pressiona (chega primeiro) · Exemplos distraem (dois corpos) · Analogia **pula** a primeira tropa inimiga · Piada faz rir (quem luta com ela para 1 s) · Tese é firme (flecha tira metade) · Discurso épico empolga (enquanto vivo, seu fôlego volta mais rápido) · Citação de autoridade lidera (+1 nas suas tropas perto) · Fato atira de longe · Estatística é posto fixo · Prova é cerco (só ataca a torre) · Muralha de lógica segura · Contra-argumento devolve 1 a cada golpe · Refutação é precisa · Pergunta retórica é em área · Pausa dramática congela · Aplauso empurra.
+  Frase rápida pressiona (chega primeiro) · Exemplos distraem (dois corpos) · Analogia **pula** a primeira tropa inimiga · Piada faz rir (quem luta com ela para 0,6 s) · Tese é firme (flecha tira metade) · Discurso épico empolga (enquanto vivo, seu fôlego volta mais rápido) · Citação de autoridade lidera (+1 nas suas tropas perto) · Fato atira de longe · Estatística é posto fixo · Prova é cerco (só ataca a torre) · Muralha de lógica segura · Contra-argumento devolve 1 a cada golpe (some em 15 s) · Refutação é precisa · Pergunta retórica é em área · Pausa dramática congela · Aplauso empurra.
 - **Estatística mais fraca** (o Lucas achou que parada atirando seria forte demais): atira só 4 vezes ou some em 10 s, tem só 2 de vida, máximo 1 em campo, custa 5. *(proposta, aguardando OK)*
 - **Arena continua deitada** (visão de lado = essência própria, não cópia do Clash Royale), mais detalhada e organizada.
 - **Meu baralho:** aba onde se monta as 8 cartas uma vez; fica salvo (progresso e Dropbox) para os próximos duelos.

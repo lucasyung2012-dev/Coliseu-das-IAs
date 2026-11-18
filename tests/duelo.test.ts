@@ -3,6 +3,7 @@ import {
   baralhoDaIa,
   baralhoInicial,
   bonusDaCarga,
+  CARTAS,
   DURACOES_MS,
   ESTILOS,
   FOLEGO_POR_SEGUNDO,
@@ -111,6 +112,20 @@ describe('duelo v7: cartas e personalidades', () => {
     let s = { ...base(), tropas: [tropa('eu', 50, 1, 'bobo'), tropa('rival', 53, 3)] };
     s = passo(s, ctx);
     expect(s.tropas.find((t) => t.de === 'rival')!.paradaAte).toBeGreaterThan(s.tempo);
+  });
+
+  it('equilíbrio de 18/11/2026: Citação 4, Pausa 3, Piada 0,6 s, Contra-argumento some em 15 s', () => {
+    expect(CARTAS.citacao.custo).toBe(4);
+    expect(CARTAS.pausa.custo).toBe(3);
+    let s = { ...base(), tropas: [tropa('eu', 50, 1, 'bobo'), tropa('rival', 53, 3)] };
+    s = passo(s, ctx);
+    const parada = s.tropas.find((t) => t.de === 'rival')!.paradaAte!;
+    expect(parada).toBeGreaterThan(s.tempo);
+    expect(parada).toBeLessThanOrEqual(s.tempo + 600);
+    let c = comMao(base(), 'eu', ['contra', 'frase', 'frase', 'frase'], 10);
+    c = jogarCarta(c, 'eu', c.eu.mao[0]!.id);
+    const hoplita = c.tropas.find((t) => t.tipo === 'escudeiro')!;
+    expect(hoplita.someEm).toBe(c.tempo + 15_000);
   });
 
   it('Tese é firme: flecha tira só metade', () => {
