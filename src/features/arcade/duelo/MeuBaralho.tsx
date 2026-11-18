@@ -92,7 +92,7 @@ export default function SalaDoDuelo() {
                 <p className="font-pixel text-[10px] sm:text-xs" style={{ color: forte }}>
                   🃏 SEU BARALHO · {escolhidas.length}/{TAMANHO_BARALHO}
                 </p>
-                <p className="font-pixel text-[9px] text-muted">FÔLEGO MÉDIO {media.toFixed(1)}</p>
+                <p className="font-pixel text-[9px] text-muted">GOTAS EM MÉDIA {media.toFixed(1)}</p>
               </div>
               <ul className="grid grid-cols-4 gap-2 sm:grid-cols-8">
                 {Array.from({ length: TAMANHO_BARALHO }, (_, i) => {
@@ -133,7 +133,7 @@ export default function SalaDoDuelo() {
               {(
                 [
                   ['classe', 'POR CLASSE'],
-                  ['folego', 'POR FÔLEGO'],
+                  ['folego', 'POR GOTAS'],
                 ] as [Ordem, string][]
               ).map(([o, nome]) => (
                 <button

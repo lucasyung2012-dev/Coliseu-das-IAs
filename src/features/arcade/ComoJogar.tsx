@@ -114,11 +114,10 @@ export default function ComoJogar({ titulo, slides, onFechar }: { titulo: string
 
 export const TUTORIAL_DUELO: Slide[] = [
   { icone: '🏰', titulo: 'DERRUBE A TRIBUNA', texto: 'Cada gladiador fica em cima da sua Tribuna (o palanque dos oradores de Roma). Toda tropa sua que chega na Tribuna do rival tira dela a força que tem. Derrubou: vitória na hora! Se ninguém derrubar, ganha quem tiver mais vida no fim da rodada final.' },
-  { icone: '⚔️', titulo: 'SEU BARALHO', texto: 'São 16 cartas e você leva 8 (monte em MEU BARALHO). Cada uma tem um jeito: a Frase rápida pressiona, a Analogia pula, a Piada faz rir, a Muralha segura… Quando duas tropas se encontram, elas lutam e a que sobrar segue em frente.' },
-  { icone: '💪', titulo: 'SEGURE PARA CARREGAR', texto: 'Tocou rápido: tropa normal. Segure a carta até a barrinha encher: a tropa sai com +1 de força e brilhando, mas custa +1 de fôlego. E o rival não espera!' },
+  { icone: '⚔️', titulo: 'SEU BARALHO', texto: 'São 16 cartas e você leva 8 (monte em SALA DO DUELO). Cada carta custa GOTAS: a ânfora ao lado das cartas enche de água sozinha. A próxima carta fica NA MANGA. Cada uma tem um jeito: a Frase rápida pressiona, a Analogia pula, a Piada faz rir, a Muralha segura… Quando duas tropas se encontram, elas lutam e a que sobrar segue em frente.' },
+  { icone: '💪', titulo: 'SEGURE PARA CARREGAR', texto: 'Tocou rápido: tropa normal. Segure a carta até a barrinha encher: a tropa sai com +1 de força e brilhando, mas custa +1 gota. E o rival não espera!' },
   { icone: '🗡️', titulo: 'SEU GLADIADOR', texto: 'Lá de cima da Tribuna, ele bate sozinho em toda tropa inimiga que entra no círculo de luz do chão (tira 1 de força). Toque nele para um golpe extra; depois ele precisa de 8 s para recarregar.' },
-  { icone: '⭐', titulo: 'HABILIDADE', texto: 'Cada tropa que acerta a Tribuna do rival enche a habilidade da sua IA. Claude: 🛡️ Escudo (bloqueia 2 golpes na Tribuna). ChatGPT: 🃏 Carta grátis. Gemini: ⚡ Raio (tira 3 da tropa mais perto).' },
-  { icone: '⚡', titulo: 'VIRADA E PRORROGAÇÃO', texto: 'Duas rodadas de 1:30 e a final de 30 s. Na final, quem tem menos vida recupera fôlego mais rápido. Se as Tribunas empatarem na vida, vem a prorrogação: 20 s com fôlego em dobro!' },
+  { icone: '⚡', titulo: 'VIRADA E PRORROGAÇÃO', texto: 'Duas rodadas de 1:30 e a final de 30 s. Na final, quem tem menos vida ganha gotas mais rápido. Se as Tribunas empatarem na vida, vem a prorrogação: 20 s com gotas em dobro!' },
 ];
 
 

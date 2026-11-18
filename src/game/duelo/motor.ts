@@ -64,7 +64,8 @@ export const TICK = 100;
 /** Onde as tropas nascem e onde fica a Tribuna de cada lado (em % da largura). */
 export const PONTA = { eu: 20, rival: 80 } as const;
 const ENCOSTO = 4;
-const GOLPE_LUTA_MS = 500;
+/** Lutas mais devagar, para dar tempo de ver e pensar (pedido do Lucas). */
+const GOLPE_LUTA_MS = 800;
 
 /** Segurar e soltar: carga cheia dá +1 de força e custa +1 de fôlego. */
 export const CARGA_MS = 1200;
@@ -128,20 +129,22 @@ interface InfoTropa {
   pacifica?: boolean;
 }
 const TROPA: Record<TipoTropa, InfoTropa> = {
-  legionario: { velocidade: 14 },
-  exemplo: { velocidade: 13 },
-  cavaleiro: { velocidade: 20 },
-  bobo: { velocidade: 15 },
-  centuriao: { velocidade: 6 },
-  elefante: { velocidade: 4 },
-  senador: { velocidade: 7 },
-  arqueiro: { velocidade: 9, alcance: 25, tiroMs: 2000 },
-  balista: { velocidade: 0, alcance: 38, tiroMs: 2500, duracao: 10_000, tiros: 4, nasce: 3 },
-  catapulta: { velocidade: 5, alcance: 40, tiroMs: 3000 },
+  // Tudo ~30% mais devagar que antes (pedido do Lucas: dar tempo de pensar).
+  legionario: { velocidade: 10 },
+  exemplo: { velocidade: 9 },
+  cavaleiro: { velocidade: 14 },
+  bobo: { velocidade: 10.5 },
+  centuriao: { velocidade: 4.2 },
+  elefante: { velocidade: 2.8 },
+  senador: { velocidade: 5 },
+  arqueiro: { velocidade: 6.3, alcance: 25, tiroMs: 2600 },
+  balista: { velocidade: 0, alcance: 38, tiroMs: 3000, duracao: 10_000, tiros: 4, nasce: 3 },
+  catapulta: { velocidade: 3.5, alcance: 40, tiroMs: 3600 },
   barricada: { velocidade: 0, duracao: 12_000, nasce: 10, pacifica: true },
   escudeiro: { velocidade: 0, nasce: 5 },
 };
-const MAXIMO_EM_CAMPO: Partial<Record<TipoTropa, number>> = { arqueiro: 2, balista: 1 };
+// Só 1 Contra-argumento e 1 Muralha por vez: empilhar vários defendia a rodada inteira.
+const MAXIMO_EM_CAMPO: Partial<Record<TipoTropa, number>> = { arqueiro: 2, balista: 1, escudeiro: 1, barricada: 1 };
 
 /** Gladiador: 1 golpe automático a cada 3 s em quem chega perto; toque = golpe na hora (recarga 8 s). */
 const GLADIADOR_AUTO_MS = 3000;
@@ -244,10 +247,12 @@ export interface Lutador {
 
 export interface EfeitoVisual {
   id: number;
-  tipo: 'choque' | 'tribuna' | 'flecha' | 'dardo' | 'pedra' | 'golpe' | 'raio' | 'escudo' | 'super' | 'feitico' | 'pulo' | 'riso' | 'morte';
+  tipo: 'choque' | 'tribuna' | 'flecha' | 'dardo' | 'pedra' | 'golpe' | 'raio' | 'escudo' | 'super' | 'feitico' | 'pulo' | 'riso' | 'morte' | 'dano';
   lado: Lado;
   /** De onde sai o tiro (para a tela animar a flecha voando). */
   x0?: number;
+  /** Quanto de força a tropa perdeu (número que sobe na tela). */
+  valor?: number;
   x?: number;
   icone?: string;
   ate: number;
@@ -410,22 +415,22 @@ function feitico(s0: EstadoDuelo, lado: Lado, tipo: TipoCarta): EstadoDuelo {
   const icone = tipo;
   if (tipo === 'refutacao') {
     if (!perto) return avisar(s, '❗ Ninguém para refutar…', lado, 1000);
-    s = efeito(s, 'feitico', lado, perto.x, 900, icone);
+    s = efeito(s, 'feitico', lado, perto.x, 1400, icone);
     return ferir(s, perto.id, 2);
   }
   if (tipo === 'pergunta') {
     if (!perto) return avisar(s, '❓ Ninguém para perguntar…', lado, 1000);
-    s = efeito(s, 'feitico', lado, perto.x, 900, icone);
+    s = efeito(s, 'feitico', lado, perto.x, 1400, icone);
     for (const t of inimigas.filter((t) => Math.abs(t.x - perto.x) <= 8)) s = ferir(s, t.id, 1);
     return s;
   }
   if (tipo === 'pausa') {
-    s = efeito(s, 'feitico', lado, 50, 1200, icone);
+    s = efeito(s, 'feitico', lado, 50, 1600, icone);
     s = avisar(s, '⏸️ PAUSA DRAMÁTICA!', lado, 1200);
     return { ...s, tropas: s.tropas.map((t) => (t.de !== lado ? { ...t, paradaAte: agora + 2000 } : t)) };
   }
   // aplauso
-  s = efeito(s, 'feitico', lado, 50, 1200, icone);
+  s = efeito(s, 'feitico', lado, 50, 1600, icone);
   s = avisar(s, '📣 APLAUSO! Suas tropas aceleram', lado, 1200);
   return { ...s, tropas: s.tropas.map((t) => (t.de === lado ? { ...t, rapidaAte: agora + 4000 } : t)) };
 }
@@ -457,9 +462,16 @@ function maisPerto(s: EstadoDuelo, de: Lado, x: number): Tropa | undefined {
   return s.tropas.filter((t) => t.de === de).sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
 }
 
+/** O número do dano ("-1") que sobe em cima da tropa. */
+function numeroDeDano(s: EstadoDuelo, t: Tropa, dano: number): EstadoDuelo {
+  return { ...s, seq: s.seq + 1, efeitos: [...s.efeitos, { id: s.seq + 1, tipo: 'dano', lado: t.de, x: t.x, valor: dano, ate: s.tempo + 900 }] };
+}
+
 /** Tira força de uma tropa (pisca na tela; some numa nuvem quando chega a zero). */
 function ferir(s0: EstadoDuelo, id: number, dano: number): EstadoDuelo {
+  const alvo = s0.tropas.find((t) => t.id === id);
   let s: EstadoDuelo = { ...s0, tropas: s0.tropas.map((t) => (t.id === id ? { ...t, forca: t.forca - dano, feridaEm: s0.tempo } : t)) };
+  if (alvo) s = numeroDeDano(s, alvo, dano);
   for (const t of s.tropas.filter((t) => t.forca <= 0.01)) s = efeito(s, 'morte', t.de, t.x, 600);
   return { ...s, tropas: s.tropas.filter((t) => t.forca > 0.01) };
 }
@@ -524,6 +536,11 @@ function moverTropas(s0: EstadoDuelo): EstadoDuelo {
     s = tiro
       ? efeito(s, t.tipo === 'balista' ? 'dardo' : 'flecha', t.de, alvo.x, 450, undefined, t.x)
       : efeito(s, 'choque', t.de, (alvo.x + t.x) / 2, 350);
+  }
+  // O número do dano sobe em cima de cada tropa ferida.
+  for (const t of s.tropas) {
+    const d = dano.get(t.id);
+    if (d) s = numeroDeDano(s, t, d);
   }
   // Quem cai nesta troca some numa nuvem de poeira.
   for (const t of s.tropas.filter((t) => t.forca - (dano.get(t.id) ?? 0) <= 0.01)) s = efeito(s, 'morte', t.de, t.x, 600);
@@ -632,7 +649,7 @@ function vezDoRival(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
   const boas = jogaveis.filter((c) => fazSentido(s, 'rival', c.tipo));
   const lista = boas.length && ctx.aleatorio() < 0.5 + ctx.acerto * 0.5 ? boas : jogaveis;
   const escolhida = lista[Math.floor(ctx.aleatorio() * lista.length)];
-  const ritmo = (3600 - ctx.acerto * 1600 + ctx.aleatorio() * 800) * (prorrogacao(s) ? 0.6 : 1);
+  const ritmo = (3600 - ctx.acerto * 1600 + ctx.aleatorio() * 800) * 1.2 * (prorrogacao(s) ? 0.6 : 1);
   s = { ...s, proximoRival: agora + ritmo };
   if (!escolhida) return s;
   const carga = ctx.aleatorio() < 0.2 + ctx.acerto * 0.5 ? 1 : 0;

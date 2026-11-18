@@ -66,58 +66,65 @@ export function CartaVisual({
   const info = CARTAS[tipo];
   const moldura = corDaCarta(tipo);
   const mini = tamanho === 'mini';
-  const fol = custo ?? info.custo;
+  const gotas = custo ?? info.custo;
+  // Pergaminho romano: papel envelhecido, com os rolos de madeira em cima e embaixo.
+  const rolo = 'block h-1.5 w-full rounded-full sm:h-2';
   return (
     <span
-      className="relative flex h-full w-full flex-col items-stretch overflow-hidden rounded-md border-2 text-center"
+      className="relative flex h-full w-full flex-col items-stretch overflow-hidden rounded-sm text-center"
       style={{
-        borderColor: moldura,
-        background: `linear-gradient(180deg, color-mix(in srgb, ${moldura} 30%, #1a1226) 0%, #140e1e 70%)`,
-        boxShadow: `inset 0 0 0 1px rgb(0 0 0 / 0.6), 0 3px 0 rgb(0 0 0 / 0.5)`,
+        background: 'linear-gradient(180deg, #f3e6c4 0%, #e6d2a0 55%, #d8bf86 100%)',
+        boxShadow: `0 0 0 2px ${moldura}, inset 0 0 12px rgb(120 80 30 / 0.45), 0 3px 0 rgb(0 0 0 / 0.5)`,
       }}
     >
-      {/* Faixa da classe */}
+      <span className={rolo} style={{ background: 'linear-gradient(180deg, #8a5a2e, #5e3a1a)' }} />
+      {/* Faixa da classe, na cor dela */}
       {!mini && (
         <span className="block py-0.5 font-pixel text-[6px] tracking-wider text-black sm:text-[8px]" style={{ background: moldura }}>
           {PAPEIS[info.papel].toUpperCase()}
         </span>
       )}
-      {/* Joia de fôlego */}
+      {/* Gota com o custo */}
       <span
-        className={`absolute left-1 z-10 grid place-items-center rounded-full border-2 border-black font-pixel text-white [text-shadow:1px_1px_0_#000] ${mini ? 'top-1 h-5 w-5 text-[8px]' : 'top-4 h-6 w-6 text-[9px] sm:top-5 sm:h-8 sm:w-8 sm:text-xs'}`}
-        style={{ background: fol === 0 ? '#f2c14e' : 'radial-gradient(circle at 35% 35%, #ff9be6, #b02ab8 70%)' }}
-        title="Fôlego"
+        className={`absolute left-1 z-10 grid place-items-center ${mini ? 'top-2 h-5 w-5' : 'top-5 h-6 w-6 sm:top-6 sm:h-8 sm:w-8'}`}
+        title={`Custa ${gotas} gotas`}
       >
-        {fol}
+        <span
+          className="absolute inset-0 rotate-45 rounded-[50%_0_50%_50%] border-2 border-[#0b2a5c]"
+          style={{ background: gotas === 0 ? '#f2c14e' : 'radial-gradient(circle at 35% 35%, #bfe6ff, #2f86ff 70%)' }}
+        />
+        <span className={`relative font-pixel text-white [text-shadow:1px_1px_0_#0b2a5c] ${mini ? 'text-[8px]' : 'text-[9px] sm:text-xs'}`}>{gotas}</span>
       </span>
       {/* Janela da arte */}
       <span
-        className={`mx-1 mt-1 flex items-end justify-center rounded-sm ${mini ? 'py-1' : 'py-1.5'}`}
-        style={{ background: `radial-gradient(ellipse at 50% 80%, color-mix(in srgb, ${moldura} 45%, transparent), rgb(0 0 0 / 0.35) 75%)` }}
+        className={`mx-1.5 mt-1 flex items-end justify-center rounded-sm border border-[#8a5a2e]/60 ${mini ? 'py-1' : 'py-1.5'}`}
+        style={{ background: `radial-gradient(ellipse at 50% 80%, color-mix(in srgb, ${moldura} 55%, #2a1a10), #2a1a10 80%)` }}
       >
         <Arte tipo={tipo} paleta={paleta} pequena={mini} grande={tamanho === 'mao'} />
       </span>
-      {/* Placa do nome */}
-      <span className={`mx-1 mt-1 rounded-sm bg-black/60 px-0.5 py-0.5 font-pixel leading-snug ${mini ? 'text-[5px] sm:text-[6px]' : 'text-[7px] sm:text-[10px]'}`} style={{ color: corNome }}>
+      {/* Nome escrito no pergaminho */}
+      <span
+        className={`mx-1 mt-1 px-0.5 font-pixel leading-snug text-[#3a2410] ${mini ? 'text-[5px] sm:text-[6px]' : 'text-[7px] sm:text-[10px]'}`}
+        style={{ textShadow: `0 0 1px ${corNome}` }}
+      >
         {info.nome.toUpperCase()}
       </span>
       {!mini && (
         <>
-          {/* Fita da personalidade e a força */}
-          <span className="mt-1 flex items-center justify-center gap-1 px-1">
-            <span className="rounded-sm px-1 py-0.5 font-pixel text-[6px] text-black sm:text-[8px]" style={{ background: '#f2c14e' }}>
+          {/* Personalidade e força, escritas por extenso */}
+          <span className="mt-1 flex flex-wrap items-center justify-center gap-1 px-1">
+            <span className="rounded-sm px-1 py-0.5 font-pixel text-[6px] text-black sm:text-[8px]" style={{ background: moldura }}>
               ★ {info.jeito.toUpperCase()}
             </span>
             {info.forca > 0 && (
-              <span className="rounded-sm bg-black/60 px-1 py-0.5 font-pixel text-[6px] text-white sm:text-[8px]" title="Força">
-                ⚔{info.forca}
-              </span>
+              <span className="rounded-sm bg-[#3a2410] px-1 py-0.5 font-pixel text-[6px] text-[#f3e6c4] sm:text-[8px]">FORÇA {info.forca}</span>
             )}
           </span>
-          {mostrarDica && <span className="mt-1 px-1.5 pb-1.5 text-[10px] leading-snug text-white/75 sm:text-[11px]">{info.dica}</span>}
+          {mostrarDica && <span className="mt-1 px-1.5 text-[10px] leading-snug text-[#3a2410] sm:text-[11px]">{info.dica}</span>}
         </>
       )}
       {rodape}
+      <span className={`${rolo} mt-auto`} style={{ background: 'linear-gradient(180deg, #8a5a2e, #5e3a1a)' }} />
     </span>
   );
 }

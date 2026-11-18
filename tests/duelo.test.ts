@@ -78,7 +78,7 @@ describe('duelo v7: baralho', () => {
 describe('duelo v7: cartas e personalidades', () => {
   it('Frase rápida chega e tira da Tribuna o que sobrou depois do gladiador', () => {
     let s = jogar(base(), 'frase');
-    s = avancar(s, 5500);
+    s = avancar(s, 6500);
     expect(s.tribunas).toEqual({ eu: TRIBUNA_VIDA, rival: TRIBUNA_VIDA - 1 });
     expect(s.eu.carga).toBe(1);
   });
@@ -114,7 +114,7 @@ describe('duelo v7: cartas e personalidades', () => {
 
   it('Tese é firme: flecha tira só metade', () => {
     let s = { ...base(), tropas: [tropa('eu', 50, 4, 'centuriao'), tropa('rival', 70, 1, 'arqueiro')] };
-    s = avancar(s, 2100);
+    s = avancar(s, 2800);
     expect(s.tropas.find((t) => t.tipo === 'centuriao')!.forca).toBeCloseTo(3);
   });
 
@@ -141,7 +141,7 @@ describe('duelo v7: cartas e personalidades', () => {
 
   it('Prova (catapulta) para de longe e só ataca a Tribuna', () => {
     let s = jogar(base(), 'prova');
-    s = avancar(s, 7500);
+    s = avancar(s, 9600);
     expect(s.tribunas.rival).toBe(TRIBUNA_VIDA - 2);
     expect(s.tropas.find((t) => t.tipo === 'catapulta')!.x).toBeCloseTo(40, 0);
   });
@@ -239,5 +239,14 @@ describe('duelo v9: mão e baralho inicial', () => {
     expect(baralhoInicial('claude')).toEqual(ESTILOS.muralha.cartas);
     expect(baralhoInicial('chatgpt')).toEqual(ESTILOS.pressa.cartas);
     expect(validarBaralho(undefined, baralhoInicial('gemini'))).toEqual(ESTILOS.artilharia.cartas);
+  });
+});
+
+describe('duelo v10: equilíbrio', () => {
+  it('só 1 Contra-argumento e 1 Muralha em campo por vez', () => {
+    let s = comMao(base(), 'eu', ['contra', 'contra', 'muralha', 'muralha'], 20);
+    s = jogarCarta(jogarCarta(s, 'eu', 'eu0'), 'eu', 'eu2');
+    expect(jogarCarta(s, 'eu', 'eu1')).toBe(s);
+    expect(jogarCarta(s, 'eu', 'eu3')).toBe(s);
   });
 });

@@ -780,3 +780,8 @@
 .fumaca span:nth-child(4) { --dx: 120%; --dy: 50%; }
 .fumaca span:nth-child(5) { --dx: 0%; --dy: -150%; }
 @keyframes fumaca { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(1.8); opacity: 0; } }
+
+/* ===== Duelo v10: a gota caindo na ânfora ===== */
+.gota-caindo { animation: gota-caindo 1.1s ease-in infinite; }
+@keyframes gota-caindo { from { transform: translate(-50%, -120%); opacity: 0; } 30% { opacity: 1; } to { transform: translate(-50%, 260%); opacity: 0; } }
+.menos-movimento .gota-caindo { animation: none; }

@@ -238,10 +238,10 @@ describe('mapa de troféus na tela', () => {
 });
 
 describe('duelo jogável (protótipo)', () => {
-  it('sala do Duelo: baralho à esquerda, organizar por fôlego, Jogar e 2 jogadores (em breve)', () => {
+  it('sala do Duelo: baralho à esquerda, organizar por gotas, Jogar e 2 jogadores (em breve)', () => {
     abrir('/arena/duelo');
     expect(screen.getByRole('region', { name: 'Seu baralho' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('radio', { name: /POR FÔLEGO/ }));
+    fireEvent.click(screen.getByRole('radio', { name: /POR GOTAS/ }));
     expect(screen.getByRole('region', { name: /Do mais barato ao mais caro/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /JOGAR/ })).toBeEnabled();
     expect(screen.getByRole('button', { name: /2 jogadores/ })).toBeDisabled();
