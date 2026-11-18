@@ -47,7 +47,7 @@ import { Faiscas } from '../cenas/Palco';
 import { GladiadorPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
-import { EFEITOS, LARGURA_TROPA, MANGA, PALETA_EFEITOS, paletaTropa, TRIBUNA, TROPAS } from '@/ui/pixel/tropas';
+import { EFEITOS, LARGURA_TROPA, PALETA_EFEITOS, paletaTropa, TRIBUNA, TROPAS } from '@/ui/pixel/tropas';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { PretorDestaque } from '../tribunal/visual';
 import ComoJogar, { BotaoComoJogar, TUTORIAL_DUELO, useTutorial } from '../ComoJogar';
@@ -294,14 +294,13 @@ export default function PartidaDuelo({
             {manga && (
               <div className="flex flex-col items-center gap-0.5" aria-label={`Carta na manga: ${CARTAS[manga.tipo].nome}`}>
                 <span className="font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">NA MANGA</span>
-                <span className="relative block w-16 pb-[45%] sm:w-20">
-                  {/* A carta saindo da manga, inclinada */}
-                  <span key={manga.id} className="surgir relative z-0 block w-[64%] -rotate-12">
+                {/* Versão limpa (o braço em pixel não ficou bom): a carta inclinada numa dobra de tecido de toga, com a barra na cor do lado. */}
+                <span
+                  className="block w-14 rounded-md p-1 sm:w-16"
+                  style={{ background: 'linear-gradient(160deg, #f4efe2, #cfc6b0)', boxShadow: `inset 0 -3px 0 ${c.cor}, 0 2px 0 rgb(0 0 0 / 0.5)` }}
+                >
+                  <span key={manga.id} className="surgir block -rotate-6">
                     <CartaVisual tipo={manga.tipo} paleta={c.paleta} corNome={c.cor} tamanho="mini" />
-                  </span>
-                  {/* A manga da toga em pixel: o braço, as dobras, o punho na cor do lado e a mão segurando a carta */}
-                  <span className="absolute bottom-0 right-[-8%] z-10 block w-[80%]" aria-hidden>
-                    <Sprite grade={MANGA} paleta={c.paleta} />
                   </span>
                 </span>
               </div>
