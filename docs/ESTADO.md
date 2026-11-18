@@ -2,6 +2,10 @@
 
 Leia este arquivo primeiro em qualquer conversa nova sobre o Coliseu das IAs.
 
+## Ideias guardadas (para fazer depois)
+- **Voz do Pretor Supremo** (ideia do Lucas, 20/11/2026): no Tribunal, o Pretor **fala de verdade, com voz**. No veredito ele conta os votos em voz alta, um a um, e no fim anuncia quem venceu. Caminho sem custo: a voz do próprio navegador (Web Speech API, `speechSynthesis` em pt-BR), com tom mais grave e devagar; respeita o botão de som. Só guardado, nada construído.
+- **Combos e eventos da arena no Duelo**: o Lucas vai reelaborar (saíram no v3).
+
 ## Estado da conversa (2026-11-15)
 - Pasta local criada (`C:\Users\mauricio.yung\coliseu-das-ias`), git iniciado, sem commit e **sem repositório no GitHub** (o Lucas vai criar).
 - Dilemas do Lovable extraídos em `docs/referencia/dilemas-lovable.json`.
