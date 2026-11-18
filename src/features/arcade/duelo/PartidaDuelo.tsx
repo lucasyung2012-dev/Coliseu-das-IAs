@@ -415,6 +415,195 @@ export default function PartidaDuelo({
     );
   }
 
+  /**
+   * O placar e a arena. `inv` desenha a mesma luta com os lados trocados (a Tribuna
+   * do Jogador 2 à esquerda): no modo 2 jogadores frente a frente, essa cópia fica
+   * girada para o Jogador 2, então cada um vê a arena reta e a sua Tribuna à esquerda.
+   */
+  const cena = (inv: boolean) => {
+    const meu: Lado = inv ? 'rival' : 'eu';
+    const outro: Lado = inv ? 'eu' : 'rival';
+    const px = (x: number) => (inv ? 100 - x : x);
+    // Este lado aparece à esquerda nesta arena?
+    const naEsquerda = (l: Lado) => (l === 'eu') !== inv;
+    const nomeDe = (l: Lado) => (l === 'eu' ? voce : dele).gladiador;
+    return (
+      <>
+        {/* Placar: a vida das duas Tribunas, a rodada e o relógio */}
+        <div className="pixel-box grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2">
+          <VidaTribuna nome={nomeDe(meu)} cor={cores[meu].cor} vida={e.tribunas[meu]} lado={lados[meu].lado} batida={tribunaBatida(meu)} minha />
+          <p className="text-center font-pixel text-[8px] leading-relaxed text-muted sm:text-[10px]">
+            {extra ? <span className="piscar text-[rgb(242_193_78)]">⚡ PRORROGAÇÃO</span> : `RODADA ${e.rodada}/${RODADAS}`}
+            <br />
+            <span className={`tabular-nums ${restante <= 10 ? 'piscar text-accent-2' : 'text-accent'}`}>⏱ {restante}</span>
+          </p>
+          <VidaTribuna nome={nomeDe(outro)} cor={cores[outro].cor} vida={e.tribunas[outro]} lado={lados[outro].lado} batida={tribunaBatida(outro)} direita />
+        </div>
+
+        {/* A arena (no modo 2 jogadores, mais baixa, para caberem as duas na tela) */}
+        <div className={`pixel-box relative w-full overflow-hidden ${doisJogadores ? 'aspect-[4/1]' : 'aspect-[16/9] sm:aspect-[5/2]'}`}>
+          <CenaColiseu corA={cores[meu].cor} corB={cores[outro].cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} />
+
+          <p className="absolute inset-x-0 top-[3%] z-10 truncate px-3 text-center text-[9px] text-white/80 [text-shadow:1px_1px_0_#000] sm:text-xs">
+            {dilema.pergunta}{' '}
+            <span style={{ color: cores[meu].cor }}>
+              {doisJogadores ? (inv ? 'Jogador 2' : 'Jogador 1') : 'Você'}: {lados[meu].lado.toUpperCase()}
+            </span>
+          </p>
+
+          {/* Alcance do gladiador: um círculo de luz no chão */}
+          {(['eu', 'rival'] as Lado[]).map((l) => (
+            <div
+              key={`alcance-${l}`}
+              className="alcance-luz pointer-events-none absolute bottom-[0%] h-[16%] rounded-[50%]"
+              style={{
+                left: `${px(PONTA[l]) - GLADIADOR_ALCANCE}%`,
+                width: `${GLADIADOR_ALCANCE * 2}%`,
+                background: `radial-gradient(ellipse at center, color-mix(in srgb, ${cores[l].cor} 45%, transparent) 0%, color-mix(in srgb, ${cores[l].cor} 18%, transparent) 55%, transparent 72%)`,
+                boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${cores[l].cor} 35%, transparent)`,
+              }}
+            />
+          ))}
+
+          {/* As Tribunas, com o gladiador em cima */}
+          {(['eu', 'rival'] as Lado[]).map((l) => {
+            const esq = naEsquerda(l);
+            return (
+              <div key={`tribuna-${l}`} className={`absolute bottom-0 w-[15%] ${esq ? 'left-[5%]' : 'right-[5%]'}`}>
+                {/* Na entrada, o gladiador chega andando pela arena e sobe na Tribuna */}
+                <div className={abertura === 'entrada' ? (esq ? 'chegar-esq' : 'chegar-dir') : ''}>
+                  <Gladiador
+                    lado={esq ? 'eu' : 'rival'}
+                    l={e[l]}
+                    tempo={e.tempo}
+                    golpeando={abertura === 'lutem' || e.efeitos.some((x) => x.tipo === 'golpe' && x.lado === l)}
+                    // Cada um só toca no próprio gladiador, na arena que é dele.
+                    onTocar={l === meu && (l === 'eu' || doisJogadores) ? () => gladiador(l) : undefined}
+                  >
+                    {l === 'eu' ? (
+                      <div style={{ transform: esq ? undefined : 'scaleX(-1)' }}>
+                        <GladiadorEnfeitado ia={ia} parado />
+                      </div>
+                    ) : (
+                      <GladiadorPixel ia={rival} liga={liga} espelhar={!esq} />
+                    )}
+                  </Gladiador>
+                </div>
+                <div className={`relative ${tribunaBatida(l) ? 'tremer' : ''}`} role="img" aria-label={`Tribuna ${l === meu ? 'sua' : 'do rival'} (${lados[l].lado}): ${e.tribunas[l]} de vida`}>
+                  <Sprite grade={TRIBUNA} paleta={cores[l].paleta} />
+                  {/* Placa com o lado do debate */}
+                  <span
+                    className="absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap border-2 bg-black/80 px-1 py-0.5 font-pixel text-[6px] text-white sm:text-[10px]"
+                    style={{ borderColor: cores[l].cor, textShadow: `0 0 6px ${cores[l].cor}` }}
+                  >
+                    {lados[l].lado.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* As tropas */}
+          {e.tropas.map((t) => {
+            const parada = (t.paradaAte ?? 0) > e.tempo;
+            const correndo = (t.rapidaAte ?? 0) > e.tempo;
+            const saltando = t.puloEm !== undefined && e.tempo - t.puloEm < 600;
+            const estocada = t.golpeouEm !== undefined && e.tempo - t.golpeouEm < 250;
+            const ferida = t.feridaEm !== undefined && e.tempo - t.feridaEm < 160;
+            // Para que lado a tropa anda NESTA arena.
+            const paraDireita = naEsquerda(t.de);
+            const atras = paraDireita ? -1 : 1;
+            // Movimento da tropa: salta em arco, dá estocada quando golpeia, marcha quando anda.
+            const pose = saltando ? 'saltar' : estocada ? (paraDireita ? 'estocada-dir' : 'estocada-esq') : parada ? '' : 'marchar';
+            const filtros = [
+              t.carregada ? `drop-shadow(0 0 4px ${OURO})` : '',
+              // Aplauso: rastro de velocidade atrás da tropa.
+              correndo ? `drop-shadow(${atras * 6}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 55%, transparent)) drop-shadow(${atras * 12}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 25%, transparent))` : '',
+              // Parada (Piada ou Pausa): fica azulada, congelada.
+              parada ? 'saturate(0.4) brightness(1.25) hue-rotate(170deg)' : '',
+              // Levou golpe: pisca branco.
+              ferida ? 'brightness(2.6)' : '',
+            ].join(' ');
+            return (
+              <div
+                key={t.id}
+                className="tropa absolute bottom-[4%] z-10 -translate-x-1/2"
+                style={{ left: `${px(t.x)}%`, width: `${LARGURA_TROPA[t.tipo]}%`, transition: saltando ? 'left 550ms ease-out' : undefined }}
+                aria-hidden
+              >
+                <span
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 rounded bg-black/80 px-1 font-pixel text-[7px] sm:-top-5 sm:text-[11px]"
+                  style={{ color: t.carregada ? OURO : cores[t.de].cor }}
+                >
+                  {Math.ceil(t.forca)}
+                </span>
+                {parada && !((t.congeladaAte ?? 0) > e.tempo) && (
+                  <span className="girar-estrelas absolute -top-6 left-1/2 -translate-x-1/2 font-pixel text-[8px] text-[rgb(255_224_102)] sm:-top-9 sm:text-sm">✦ ✦</span>
+                )}
+                <div className={pose} style={{ filter: filtros.trim() || undefined, opacity: t.someEm !== undefined && t.someEm - e.tempo < 2000 ? 0.6 : undefined }}>
+                  <Sprite grade={TROPAS[t.tipo]} paleta={cores[t.de].paleta} espelhar={!paraDireita} />
+                </div>
+                {/* Pausa dramática: a tropa fica presa num bloco de gelo */}
+                {(t.congeladaAte ?? 0) > e.tempo && (
+                  <span
+                    className="pointer-events-none absolute -inset-x-[12%] -bottom-[4%] -top-[8%] rounded-sm border-2 border-[#d8f6ff]"
+                    style={{
+                      background: 'linear-gradient(135deg, rgb(200 240 255 / 0.55), rgb(120 200 240 / 0.35) 50%, rgb(200 240 255 / 0.5))',
+                      boxShadow: 'inset 3px 3px 0 rgb(255 255 255 / 0.7), 0 0 10px #9fe8ff',
+                    }}
+                    aria-hidden
+                  />
+                )}
+              </div>
+            );
+          })}
+
+          {/* Efeitos (na arena invertida, com as posições trocadas) */}
+          {e.efeitos.map((x) => (
+            <EfeitoNaArena
+              key={x.id}
+              x={inv ? { ...x, x: x.x === undefined ? undefined : px(x.x), x0: x.x0 === undefined ? undefined : px(x.x0) } : x}
+              cor={cores[x.lado].cor}
+              espelhado={!naEsquerda(x.lado)}
+            />
+          ))}
+
+          {e.aviso && e.fase === 'luta' && (
+            <p
+              key={e.aviso.texto + e.aviso.ate}
+              className="pancada neon absolute left-1/2 top-[16%] z-20 -translate-x-1/2 whitespace-nowrap bg-black/60 px-2 py-1 font-pixel text-[9px] sm:text-sm"
+              style={{ color: e.aviso.lado ? cores[e.aviso.lado].cor : OURO }}
+            >
+              {e.aviso.texto}
+            </p>
+          )}
+
+          {e.fase === 'intervalo' && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/70 text-center">
+              <p className="pancada neon font-pixel text-sm text-accent sm:text-2xl">{e.aviso?.texto ?? 'FIM DA RODADA'}</p>
+              <p className="font-pixel text-[9px] text-muted sm:text-xs">
+                TRIBUNAS {e.tribunas[meu]} × {e.tribunas[outro]} · {e.rodada >= RODADAS ? 'PREPARE-SE PARA A PRORROGAÇÃO' : `PREPARE-SE PARA A RODADA ${e.rodada + 1}`}
+              </p>
+            </div>
+          )}
+
+          {abertura === 'entrada' && (
+            <p className="pancada neon absolute left-1/2 top-[18%] z-40 w-max max-w-[90%] -translate-x-1/2 bg-black/60 px-3 py-1 text-center font-pixel text-[8px] leading-relaxed text-[rgb(242_193_78)] sm:text-base">
+              OS GLADIADORES ENTRAM NA ARENA!
+            </p>
+          )}
+          {abertura !== null && abertura !== 'entrada' && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60">
+              <p key={String(abertura)} className="contagem neon font-pixel text-4xl text-accent sm:text-7xl">
+                {abertura === 'lutem' ? 'LUTEM!' : abertura}
+              </p>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-3">
       {tutorial.aberto && <ComoJogar titulo="DUELO" slides={TUTORIAL_DUELO} onFechar={tutorial.fechar} />}
@@ -422,166 +611,19 @@ export default function PartidaDuelo({
         <BotaoComoJogar onClick={tutorial.abrir} />
       </div>
 
-      {/* 2 jogadores frente a frente: o iPad fica na mesa entre os dois e o painel do
-          Jogador 2 fica no topo, de cabeça para baixo, virado para quem senta do outro lado. */}
-      {doisJogadores && <div className="rotate-180">{controles('rival')}</div>}
+      {/* 2 jogadores frente a frente: o iPad fica na mesa entre os dois. O Jogador 2 tem
+          a SUA arena (a mesma luta, com a Tribuna dele à esquerda) e o seu painel, tudo
+          girado para o lado dele; o Jogador 1 fica embaixo, do jeito normal. */}
+      {doisJogadores && (
+        <div className="flex rotate-180 flex-col gap-3 border-t-4 border-dashed border-white/15 pt-3">
+          {cena(true)}
+          {controles('rival')}
+        </div>
+      )}
 
-      {/* Placar: a vida das duas Tribunas, a rodada e o relógio */}
-      <div className="pixel-box grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 py-2">
-        <VidaTribuna nome={voce.gladiador} cor={cores.eu.cor} vida={e.tribunas.eu} lado={lados.eu.lado} batida={tribunaBatida('eu')} minha />
-        <p className="text-center font-pixel text-[8px] leading-relaxed text-muted sm:text-[10px]">
-          {extra ? <span className="piscar text-[rgb(242_193_78)]">⚡ PRORROGAÇÃO</span> : `RODADA ${e.rodada}/${RODADAS}`}
-          <br />
-          <span className={`tabular-nums ${restante <= 10 ? 'piscar text-accent-2' : 'text-accent'}`}>⏱ {restante}</span>
-        </p>
-        <VidaTribuna nome={dele.gladiador} cor={cores.rival.cor} vida={e.tribunas.rival} lado={lados.rival.lado} batida={tribunaBatida('rival')} direita />
-      </div>
+      {cena(false)}
 
-      {/* A arena, mais comprida */}
-      <div className="pixel-box relative aspect-[16/9] w-full overflow-hidden sm:aspect-[5/2]">
-        <CenaColiseu corA={cores.eu.cor} corB={cores.rival.cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} />
-
-        <p className="absolute inset-x-0 top-[3%] z-10 truncate px-3 text-center text-[9px] text-white/80 [text-shadow:1px_1px_0_#000] sm:text-xs">
-          {dilema.pergunta}{' '}
-          <span style={{ color: cores.eu.cor }}>
-            Você: {dilema.lados[config.lado].nome.toUpperCase()}
-          </span>
-        </p>
-
-        {/* Alcance do gladiador: um círculo de luz no chão */}
-        {(['eu', 'rival'] as Lado[]).map((l) => (
-          <div
-            key={`alcance-${l}`}
-            className="alcance-luz pointer-events-none absolute bottom-[0%] h-[16%] rounded-[50%]"
-            style={{
-              left: `${PONTA[l] - GLADIADOR_ALCANCE}%`,
-              width: `${GLADIADOR_ALCANCE * 2}%`,
-              background: `radial-gradient(ellipse at center, color-mix(in srgb, ${cores[l].cor} 45%, transparent) 0%, color-mix(in srgb, ${cores[l].cor} 18%, transparent) 55%, transparent 72%)`,
-              boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${cores[l].cor} 35%, transparent)`,
-            }}
-          />
-        ))}
-
-        {/* As Tribunas, com o gladiador em cima */}
-        {(['eu', 'rival'] as Lado[]).map((l) => (
-          <div key={`tribuna-${l}`} className={`absolute bottom-0 w-[15%] ${l === 'eu' ? 'left-[5%]' : 'right-[5%]'}`}>
-            {/* Na entrada, o gladiador chega andando pela arena e sobe na Tribuna */}
-            <div className={abertura === 'entrada' ? (l === 'eu' ? 'chegar-esq' : 'chegar-dir') : ''}>
-              <Gladiador
-                lado={l}
-                l={e[l]}
-                tempo={e.tempo}
-                golpeando={abertura === 'lutem' || e.efeitos.some((x) => x.tipo === 'golpe' && x.lado === l)}
-                onTocar={l === 'eu' || doisJogadores ? () => gladiador(l) : undefined}
-              >
-                {l === 'eu' ? <GladiadorEnfeitado ia={ia} parado /> : <GladiadorPixel ia={rival} liga={liga} espelhar />}
-              </Gladiador>
-            </div>
-            <div className={`relative ${tribunaBatida(l) ? 'tremer' : ''}`} role="img" aria-label={`Tribuna ${l === 'eu' ? 'sua' : 'do rival'} (${lados[l].lado}): ${e.tribunas[l]} de vida`}>
-              <Sprite grade={TRIBUNA} paleta={cores[l].paleta} />
-              {/* Placa com o lado do debate */}
-              <span
-                className="absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap border-2 bg-black/80 px-1 py-0.5 font-pixel text-[6px] text-white sm:text-[10px]"
-                style={{ borderColor: cores[l].cor, textShadow: `0 0 6px ${cores[l].cor}` }}
-              >
-                {lados[l].lado.toUpperCase()}
-              </span>
-            </div>
-          </div>
-        ))}
-
-        {/* As tropas */}
-        {e.tropas.map((t) => {
-          const parada = (t.paradaAte ?? 0) > e.tempo;
-          const correndo = (t.rapidaAte ?? 0) > e.tempo;
-          const saltando = t.puloEm !== undefined && e.tempo - t.puloEm < 600;
-          const estocada = t.golpeouEm !== undefined && e.tempo - t.golpeouEm < 250;
-          const ferida = t.feridaEm !== undefined && e.tempo - t.feridaEm < 160;
-          const atras = t.de === 'eu' ? -1 : 1;
-          // Movimento da tropa: salta em arco, dá estocada quando golpeia, marcha quando anda.
-          const pose = saltando ? 'saltar' : estocada ? (t.de === 'eu' ? 'estocada-dir' : 'estocada-esq') : parada ? '' : 'marchar';
-          const filtros = [
-            t.carregada ? `drop-shadow(0 0 4px ${OURO})` : '',
-            // Aplauso: rastro de velocidade atrás da tropa.
-            correndo ? `drop-shadow(${atras * 6}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 55%, transparent)) drop-shadow(${atras * 12}px 0 0 color-mix(in srgb, ${cores[t.de].cor} 25%, transparent))` : '',
-            // Parada (Piada ou Pausa): fica azulada, congelada.
-            parada ? 'saturate(0.4) brightness(1.25) hue-rotate(170deg)' : '',
-            // Levou golpe: pisca branco.
-            ferida ? 'brightness(2.6)' : '',
-          ].join(' ');
-          return (
-            <div
-              key={t.id}
-              className="tropa absolute bottom-[4%] z-10 -translate-x-1/2"
-              style={{ left: `${t.x}%`, width: `${LARGURA_TROPA[t.tipo]}%`, transition: saltando ? 'left 550ms ease-out' : undefined }}
-              aria-hidden
-            >
-              <span
-                className="absolute -top-3 left-1/2 -translate-x-1/2 rounded bg-black/80 px-1 font-pixel text-[7px] sm:-top-5 sm:text-[11px]"
-                style={{ color: t.carregada ? OURO : cores[t.de].cor }}
-              >
-                {Math.ceil(t.forca)}
-              </span>
-              {parada && !((t.congeladaAte ?? 0) > e.tempo) && (
-                <span className="girar-estrelas absolute -top-6 left-1/2 -translate-x-1/2 font-pixel text-[8px] text-[rgb(255_224_102)] sm:-top-9 sm:text-sm">✦ ✦</span>
-              )}
-              <div className={pose} style={{ filter: filtros.trim() || undefined, opacity: t.someEm !== undefined && t.someEm - e.tempo < 2000 ? 0.6 : undefined }}>
-                <Sprite grade={TROPAS[t.tipo]} paleta={cores[t.de].paleta} espelhar={t.de === 'rival'} />
-              </div>
-              {/* Pausa dramática: a tropa fica presa num bloco de gelo */}
-              {(t.congeladaAte ?? 0) > e.tempo && (
-                <span
-                  className="pointer-events-none absolute -inset-x-[12%] -bottom-[4%] -top-[8%] rounded-sm border-2 border-[#d8f6ff]"
-                  style={{
-                    background: 'linear-gradient(135deg, rgb(200 240 255 / 0.55), rgb(120 200 240 / 0.35) 50%, rgb(200 240 255 / 0.5))',
-                    boxShadow: 'inset 3px 3px 0 rgb(255 255 255 / 0.7), 0 0 10px #9fe8ff',
-                  }}
-                  aria-hidden
-                />
-              )}
-            </div>
-          );
-        })}
-
-        {/* Efeitos */}
-        {e.efeitos.map((x) => (
-          <EfeitoNaArena key={x.id} x={x} cor={cores[x.lado].cor} />
-        ))}
-
-        {e.aviso && e.fase === 'luta' && (
-          <p
-            key={e.aviso.texto + e.aviso.ate}
-            className="pancada neon absolute left-1/2 top-[16%] z-20 -translate-x-1/2 whitespace-nowrap bg-black/60 px-2 py-1 font-pixel text-[9px] sm:text-sm"
-            style={{ color: e.aviso.lado ? cores[e.aviso.lado].cor : OURO }}
-          >
-            {e.aviso.texto}
-          </p>
-        )}
-
-        {e.fase === 'intervalo' && (
-          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/70 text-center">
-            <p className="pancada neon font-pixel text-sm text-accent sm:text-2xl">{e.aviso?.texto ?? 'FIM DA RODADA'}</p>
-            <p className="font-pixel text-[9px] text-muted sm:text-xs">
-              TRIBUNAS {e.tribunas.eu} × {e.tribunas.rival} · {e.rodada >= RODADAS ? 'PREPARE-SE PARA A PRORROGAÇÃO' : `PREPARE-SE PARA A RODADA ${e.rodada + 1}`}
-            </p>
-          </div>
-        )}
-
-        {abertura === 'entrada' && (
-          <p className="pancada neon absolute left-1/2 top-[18%] z-40 w-max max-w-[90%] -translate-x-1/2 bg-black/60 px-3 py-1 text-center font-pixel text-[8px] leading-relaxed text-[rgb(242_193_78)] sm:text-base">
-            OS GLADIADORES ENTRAM NA ARENA!
-          </p>
-        )}
-        {abertura !== null && abertura !== 'entrada' && (
-          <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60">
-            <p key={String(abertura)} className="contagem neon font-pixel text-4xl text-accent sm:text-7xl">
-              {abertura === 'lutem' ? 'LUTEM!' : abertura}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* O Jogador 1 joga do lado de baixo (o Jogador 2, no modo frente a frente, fica em cima). */}
+      {/* O Jogador 1 joga do lado de baixo. */}
       {controles('eu')}
       <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💧)</p>
     </div>
@@ -939,7 +981,7 @@ function BotaoRedondo({
 }
 
 /** Cada efeito da luta em pixel: flechas e pedras voando, cortes, raios, feitiços, risadas. */
-function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
+function EfeitoNaArena({ x, cor, espelhado = false }: { x: EfeitoVisual; cor: string; espelhado?: boolean }) {
   const paleta = { ...PALETA_EFEITOS, C: cor };
   const alvo = x.x ?? 50;
   const voo = (largura: number, ms: number, base: string, filho: ReactNode, arco = false) => (
@@ -966,14 +1008,14 @@ function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
         <>
           <Faiscas x={alvo} y={86} cor="#ffffff" />
           <div className="pancada pointer-events-none absolute bottom-[10%] z-20 w-[6%] -translate-x-1/2" style={{ left: `${alvo}%` }} aria-hidden>
-            <Sprite grade={EFEITOS.corte} paleta={paleta} espelhar={x.lado === 'rival'} />
+            <Sprite grade={EFEITOS.corte} paleta={paleta} espelhar={espelhado} />
           </div>
         </>
       );
     case 'golpe':
       return (
         <div className="pancada pointer-events-none absolute bottom-[10%] z-20 w-[9%] -translate-x-1/2" style={{ left: `${alvo}%`, filter: `drop-shadow(0 0 8px ${OURO})` }} aria-hidden>
-          <Sprite grade={EFEITOS.corte} paleta={{ ...paleta, W: OURO }} espelhar={x.lado === 'rival'} />
+          <Sprite grade={EFEITOS.corte} paleta={{ ...paleta, W: OURO }} espelhar={espelhado} />
         </div>
       );
     case 'raio':
@@ -983,7 +1025,7 @@ function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
         </div>
       );
     case 'tribuna':
-      return <Faiscas x={x.lado === 'eu' ? 12 : 88} y={55} cor={cor} />;
+      return <Faiscas x={espelhado ? 88 : 12} y={55} cor={cor} />;
     case 'super':
       return <div className="clarao pointer-events-none absolute inset-0 z-20" style={{ background: `color-mix(in srgb, ${cor} 45%, transparent)` }} />;
     case 'escudo':
@@ -999,7 +1041,7 @@ function EfeitoNaArena({ x, cor }: { x: EfeitoVisual; cor: string }) {
     case 'morte':
       // A tropa caiu: some numa nuvem de poeira em pixel.
       return (
-        <div className="fumaca pointer-events-none absolute bottom-[6%] z-20 aspect-square w-[6%] -translate-x-1/2" style={{ left: `%` }} aria-hidden>
+        <div className="fumaca pointer-events-none absolute bottom-[6%] z-20 aspect-square w-[6%] -translate-x-1/2" style={{ left: `${alvo}%` }} aria-hidden>
           {[0, 1, 2, 3, 4].map((i) => (
             <span key={i} />
           ))}
