@@ -1,4 +1,7 @@
 import type { Tema } from './temas';
+import { MEDICINA, ROBOS, FACIAL } from './conteudo/saude-e-tecnologia';
+import { JOGOS, PROJETOS, PUBLICIDADE } from './conteudo/escola-e-internet';
+import { ANIMAIS, ESPACO, QUATRO_DIAS } from './conteudo/cidade-e-mundo';
 
 export interface Carta {
   id: string;
@@ -28,7 +31,7 @@ function cartas(prefixo: string, lista: [string, string, Carta['temas']][]): Car
   return lista.map(([titulo, texto, temas], i) => ({ id: `${prefixo}-${i + 1}`, titulo, texto, temas }));
 }
 
-// Textos escritos à mão (decisão D6). Os outros 9 dilemas entram depois que o Lucas aprovar a partida.
+// Textos escritos à mão (decisão D6). O 1º dilema está aqui; os outros 9 ficam em conteudo/.
 export const DILEMAS: Dilema[] = [
   {
     id: 'celulares',
@@ -96,4 +99,13 @@ export const DILEMAS: Dilema[] = [
       },
     },
   },
+  ROBOS,
+  MEDICINA,
+  PROJETOS,
+  ESPACO,
+  JOGOS,
+  QUATRO_DIAS,
+  ANIMAIS,
+  PUBLICIDADE,
+  FACIAL,
 ];

@@ -48,6 +48,12 @@ describe('efeito de uma carta no jurado', () => {
 });
 
 describe('conteúdo', () => {
+  it('tem 10 dilemas, com ids e perguntas diferentes', () => {
+    expect(DILEMAS).toHaveLength(10);
+    expect(new Set(DILEMAS.map((d) => d.id)).size).toBe(10);
+    expect(new Set(DILEMAS.map((d) => d.pergunta)).size).toBe(10);
+  });
+
   it('cada dilema tem 6 cartas por tempo nos dois lados, com temas válidos e ids únicos', () => {
     for (const d of DILEMAS) {
       const ids = new Set<string>();
