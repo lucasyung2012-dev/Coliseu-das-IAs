@@ -94,14 +94,15 @@ export default function SalaDoDuelo() {
                 </p>
                 <p className="font-pixel text-[9px] text-muted">GOTAS EM MÉDIA {media.toFixed(1)}</p>
               </div>
-              <ul className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+              {/* As 8 cartas do baralho, grandes (2 fileiras de 4) para dar para ler */}
+              <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {Array.from({ length: TAMANHO_BARALHO }, (_, i) => {
                   const c = escolhidas[i];
                   return (
-                    <li key={c ?? `vazio-${i}`} className="aspect-[3/4]">
+                    <li key={c ?? `vazio-${i}`} className="min-h-[9rem]">
                       {c ? (
                         <button type="button" onClick={() => alternar(c)} aria-label={`Tirar ${CARTAS[c].nome}`} className="surgir h-full w-full transition hover:-translate-y-1">
-                          <CartaVisual tipo={c} paleta={paleta} corNome={forte} tamanho="mini" />
+                          <CartaVisual tipo={c} paleta={paleta} corNome={forte} />
                         </button>
                       ) : (
                         <div className="flex h-full items-center justify-center rounded-md border-2 border-dashed border-white/20 font-pixel text-xs text-white/30">+</div>

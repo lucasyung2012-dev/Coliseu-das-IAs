@@ -26,7 +26,22 @@ export type NomeSom =
   | 'jurado'
   | 'martelo'
   | 'vitoria'
-  | 'derrota';
+  | 'derrota'
+  // Duelo: um som para cada tipo de carta
+  | 'leve'
+  | 'pesada'
+  | 'galope'
+  | 'trombeta'
+  | 'arco'
+  | 'catapulta'
+  | 'pedra'
+  | 'escudoMetal'
+  | 'risada'
+  | 'senador'
+  | 'gelo'
+  | 'palmas'
+  | 'pergunta'
+  | 'refuta';
 
 const CHAVE = 'coliseu.som.desligado';
 const CHAVE_VOLUME = 'coliseu.som.volume';
@@ -256,6 +271,60 @@ const SONS: Record<NomeSom, (c: AudioContext) => void> = {
       tom(c, { freq: 320, dur: 0.04, tipo: 'square', vol: 0.15, atraso: a });
       ruido(c, { dur: 0.1, vol: 0.2, filtro: 'lowpass', freq: 800, atraso: a });
     });
+  },
+  // ---------- Duelo: um som para cada tipo de carta ----------
+  // tropa leve: passinhos rápidos
+  leve: (c) => [0, 0.08, 0.16].forEach((a) => ruido(c, { dur: 0.05, vol: 0.18, filtro: 'bandpass', freq: 1800, atraso: a })),
+  // tropa pesada: tambor grave
+  pesada: (c) => {
+    tom(c, { freq: 110, ate: 50, dur: 0.35, tipo: 'sine', vol: 0.55 });
+    ruido(c, { dur: 0.15, vol: 0.2, filtro: 'lowpass', freq: 400 });
+  },
+  // cavalo: galope (ta-ca-tum)
+  galope: (c) => [0, 0.1, 0.2, 0.36, 0.46, 0.56].forEach((a) => tom(c, { freq: 220, ate: 120, dur: 0.06, tipo: 'triangle', vol: 0.3, atraso: a })),
+  // elefante: trombeta
+  trombeta: (c) => {
+    tom(c, { freq: 300, ate: 520, dur: 0.5, tipo: 'sawtooth', vol: 0.2 });
+    tom(c, { freq: 520, ate: 380, dur: 0.4, tipo: 'sawtooth', vol: 0.15, atraso: 0.45 });
+  },
+  // arqueiro: a corda do arco
+  arco: (c) => tom(c, { freq: 180, ate: 90, dur: 0.18, tipo: 'triangle', vol: 0.3 }),
+  // catapulta e balista: rangido e estrondo
+  catapulta: (c) => {
+    tom(c, { freq: 80, ate: 160, dur: 0.25, tipo: 'sawtooth', vol: 0.15 });
+    ruido(c, { dur: 0.35, vol: 0.35, filtro: 'lowpass', freq: 500, atraso: 0.2 });
+  },
+  // muralha: bloco de pedra caindo
+  pedra: (c) => {
+    tom(c, { freq: 70, ate: 40, dur: 0.3, tipo: 'sine', vol: 0.6 });
+    ruido(c, { dur: 0.25, vol: 0.3, filtro: 'lowpass', freq: 300 });
+  },
+  // contra-argumento: escudo de metal
+  escudoMetal: (c) => {
+    tom(c, { freq: 900, ate: 700, dur: 0.25, tipo: 'square', vol: 0.12 });
+    tom(c, { freq: 1350, dur: 0.2, tipo: 'triangle', vol: 0.1 });
+  },
+  // piada: risadinha (ha-ha-ha)
+  risada: (c) => [0, 0.12, 0.24].forEach((a, i) => tom(c, { freq: 520 - i * 40, ate: 420 - i * 40, dur: 0.1, tipo: 'square', vol: 0.15, atraso: a })),
+  // citação de autoridade: pequena fanfarra solene
+  senador: (c) => melodia(c, [N.G4, N.C5, N.E5], 0.12, { vol: 0.15, tipo: 'triangle' }),
+  // pausa dramática: gelo estalando e congelando
+  gelo: (c) => {
+    [0, 0.05, 0.11, 0.18].forEach((a, i) => tom(c, { freq: 2600 - i * 300, ate: 1800 - i * 200, dur: 0.12, tipo: 'sine', vol: 0.12, atraso: a }));
+    ruido(c, { dur: 0.5, vol: 0.12, filtro: 'highpass', freq: 5000, freqAte: 2000 });
+  },
+  // aplauso: palmas batendo
+  palmas: (c) =>
+    [0, 0.11, 0.2, 0.32, 0.41, 0.53, 0.62].forEach((a) => ruido(c, { dur: 0.05, vol: 0.35, filtro: 'bandpass', freq: 1400 + Math.random() * 600, atraso: a })),
+  // pergunta retórica: "hmm?" subindo
+  pergunta: (c) => {
+    tom(c, { freq: 300, dur: 0.18, tipo: 'triangle', vol: 0.2 });
+    tom(c, { freq: 300, ate: 600, dur: 0.25, tipo: 'triangle', vol: 0.2, atraso: 0.2 });
+  },
+  // refutação: "BUM" seco de discordância
+  refuta: (c) => {
+    tom(c, { freq: 150, ate: 60, dur: 0.3, tipo: 'square', vol: 0.25 });
+    ruido(c, { dur: 0.2, vol: 0.3, filtro: 'lowpass', freq: 600 });
   },
   vitoria: (c) => {
     melodia(c, [N.C5, N.E5, N.G5, N.C6], 0.1, { vol: 0.18 });

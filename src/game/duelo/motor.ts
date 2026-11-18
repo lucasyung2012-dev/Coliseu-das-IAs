@@ -231,6 +231,8 @@ export interface Tropa {
   puloEm?: number;
   /** Quando levou golpe (a tela faz piscar). */
   feridaEm?: number;
+  /** Congelada pela Pausa dramática (a tela mostra um bloco de gelo). */
+  congeladaAte?: number;
 }
 
 export interface Lutador {
@@ -427,7 +429,7 @@ function feitico(s0: EstadoDuelo, lado: Lado, tipo: TipoCarta): EstadoDuelo {
   if (tipo === 'pausa') {
     s = efeito(s, 'feitico', lado, 50, 1600, icone);
     s = avisar(s, '⏸️ PAUSA DRAMÁTICA!', lado, 1200);
-    return { ...s, tropas: s.tropas.map((t) => (t.de !== lado ? { ...t, paradaAte: agora + 2000 } : t)) };
+    return { ...s, tropas: s.tropas.map((t) => (t.de !== lado ? { ...t, paradaAte: agora + 2000, congeladaAte: agora + 2000 } : t)) };
   }
   // aplauso
   s = efeito(s, 'feitico', lado, 50, 1600, icone);

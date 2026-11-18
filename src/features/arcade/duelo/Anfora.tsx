@@ -43,7 +43,7 @@ const PALETA = {
   L: '#a8dcff',
 };
 
-export default function Anfora({ gotas, max, rotulo, cor }: { gotas: number; max: number; rotulo?: string; cor?: string }) {
+export default function Anfora({ gotas, max, rotulo, cor, pequena = false }: { gotas: number; max: number; rotulo?: string; cor?: string; pequena?: boolean }) {
   const nivel = Math.round((Math.max(0, Math.min(max, gotas)) / max) * LINHAS_DENTRO.length);
   const primeiraComAgua = LINHAS_DENTRO.length - nivel;
   const grade = FORMA.map((linha, y) => {
@@ -57,7 +57,7 @@ export default function Anfora({ gotas, max, rotulo, cor }: { gotas: number; max
   const cheias = Math.floor(gotas);
   return (
     <div className="flex flex-col items-center gap-1" role="meter" aria-label="Gotas" aria-valuenow={cheias} aria-valuemin={0} aria-valuemax={max}>
-      <div className="relative w-14 sm:w-20" style={{ filter: gotas >= max ? 'drop-shadow(0 0 8px #2f86ff)' : undefined }}>
+      <div className={`relative ${pequena ? 'w-9 sm:w-12' : 'w-14 sm:w-20'}`} style={{ filter: gotas >= max ? 'drop-shadow(0 0 8px #2f86ff)' : undefined }}>
         <Sprite grade={grade} paleta={PALETA} />
         {/* Uma gota caindo na boca da ânfora enquanto ela enche */}
         {gotas < max && <span className="gota-caindo absolute left-1/2 top-[-8%] h-[6%] w-[6%] -translate-x-1/2 rounded-full bg-[#a8dcff]" aria-hidden />}

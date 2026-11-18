@@ -38,6 +38,7 @@ import {
   type Lado,
   type TipoCarta,
   type Lutador,
+  type TipoTropa,
 } from '@/game/duelo/motor';
 import { Link } from 'react-router-dom';
 import { Arte, CartaVisual } from './CartaVisual';
@@ -75,6 +76,23 @@ function embaralhar<T>(lista: T[]): T[] {
   }
   return a;
 }
+
+/** O som de cada tropa e de cada feitiço (pedido do Lucas: todas as cartas com som). */
+const SOM_TROPA: Record<TipoTropa, NomeSom> = {
+  legionario: 'leve',
+  exemplo: 'leve',
+  cavaleiro: 'galope',
+  bobo: 'risada',
+  centuriao: 'pesada',
+  elefante: 'trombeta',
+  senador: 'senador',
+  arqueiro: 'arco',
+  balista: 'catapulta',
+  catapulta: 'catapulta',
+  barricada: 'pedra',
+  escudeiro: 'escudoMetal',
+};
+const SOM_FEITICO: Record<string, NomeSom> = { refutacao: 'refuta', pergunta: 'pergunta', pausa: 'gelo', aplauso: 'palmas' };
 
 const agoraMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
@@ -157,12 +175,21 @@ export default function PartidaDuelo({
       if (x.tipo === 'super' || x.tipo === 'raio') novos.push('fanfarra');
       if (x.tipo === 'golpe') novos.push('passos');
       if (x.tipo === 'flecha') novos.push('roleta');
-      if (x.tipo === 'feitico') novos.push('selecionar');
+      if (x.tipo === 'feitico') novos.push(SOM_FEITICO[x.icone ?? ''] ?? 'selecionar');
       if (x.tipo === 'riso' || x.tipo === 'pulo') novos.push('clique');
     }
     visto.current = Math.max(visto.current, ...e.efeitos.map((x) => x.id));
     [...new Set(novos)].forEach((s) => tocar(s));
   }, [e.efeitos]);
+
+  // Cada tropa nova que entra na arena (sua ou do rival) toca o som do tipo dela.
+  const vistoTropa = useRef(0);
+  useEffect(() => {
+    const novas = e.tropas.filter((t) => t.id > vistoTropa.current);
+    if (!novas.length) return;
+    vistoTropa.current = Math.max(vistoTropa.current, ...novas.map((t) => t.id));
+    [...new Set(novas.map((t) => SOM_TROPA[t.tipo]))].forEach((s) => tocar(s));
+  }, [e.tropas]);
 
   useEffect(() => {
     if (e.fase === 'intervalo') tocar('martelo');
@@ -181,7 +208,7 @@ export default function PartidaDuelo({
   const jogar = (lado: Lado, carta: CartaDuelo, carga: number) => {
     if (pausado) return;
     desbloquear();
-    tocar(carga >= 1 ? 'start' : 'selecionar');
+    if (carga >= 1) tocar('start');
     setE((s) => jogarCarta(s, lado, carta.id, carga));
   };
   const comecarCarga = (lado: Lado, carta: CartaDuelo) => {
@@ -253,70 +280,89 @@ export default function PartidaDuelo({
     const c = cores[lado];
     const pronto = l.gladiadorProntoEm <= e.tempo;
     const espelhado = lado === 'rival';
-    const compacto = doisJogadores;
-    const nome = doisJogadores ? (lado === 'eu' ? 'JOGADOR 1' : 'JOGADOR 2') : null;
     const manga = l.monte[0];
-    return (
-      <div className="flex flex-col gap-1">
-        {nome && (
-          <p className={`font-pixel text-[9px] sm:text-[11px] ${espelhado ? 'text-right' : ''}`} style={{ color: c.cor }}>
-            {nome} · {PERSONAGENS[lado === 'eu' ? ia : rival].gladiador.toUpperCase()}
-          </p>
-        )}
-        <div className={`grid items-stretch gap-2 sm:gap-3 ${espelhado ? 'grid-cols-[auto_1fr_auto] [direction:rtl]' : 'grid-cols-[auto_1fr_auto]'}`}>
-          <div className="[direction:ltr]">
-            <Anfora
-              gotas={l.folego}
-              max={FOLEGO_MAX}
-              cor={doisJogadores ? c.cor : undefined}
-              rotulo={ritmoDoFolego(e, lado) > FOLEGO_POR_SEGUNDO ? (extra ? 'GOTAS EM DOBRO' : 'VIRADA +25%') : undefined}
-            />
-          </div>
-          <section aria-label={lado === 'eu' ? 'Suas cartas' : 'Cartas do Jogador 2'} className={`grid grid-cols-4 gap-2 [direction:ltr] ${compacto ? 'gap-1' : ''}`}>
-            {l.mao.map((carta, i) => (
-              <CartaNaMao
-                key={carta.id}
-                carta={carta}
-                numero={lado === 'eu' ? String(i + 1) : TECLAS_J2[i]!}
-                custo={custoAgora(l, carta.tipo)}
-                pode={podeJogar(e, lado, carta.id) && !pausado}
-                carregando={segurando[lado]?.id === carta.id}
-                cores={c}
-                onSegurar={() => comecarCarga(lado, carta)}
-                onSoltar={() => soltar(lado, carta)}
-                onCancelar={() => setSegurando((x) => ({ ...x, [lado]: null }))}
-                onTocar={() => jogar(lado, carta, 0)}
-              />
-            ))}
-          </section>
-          <div className="flex flex-col items-center justify-around gap-2 [direction:ltr]">
-            {/* A carta na manga: a próxima que entra na mão (no lugar da que for jogada) */}
-            {manga && (
-              <div className="flex flex-col items-center gap-0.5" aria-label={`Carta na manga: ${CARTAS[manga.tipo].nome}`}>
-                <span className="font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">NA MANGA</span>
-                {/* Versão limpa (o braço em pixel não ficou bom): a carta inclinada numa dobra de tecido de toga, com a barra na cor do lado. */}
-                <span
-                  className="block w-14 rounded-md p-1 sm:w-16"
-                  style={{ background: 'linear-gradient(160deg, #f4efe2, #cfc6b0)', boxShadow: `inset 0 -3px 0 ${c.cor}, 0 2px 0 rgb(0 0 0 / 0.5)` }}
-                >
-                  <span key={manga.id} className="surgir block -rotate-6">
-                    <CartaVisual tipo={manga.tipo} paleta={c.paleta} corNome={c.cor} tamanho="mini" />
-                  </span>
-                </span>
-              </div>
-            )}
-            <BotaoRedondo
-              rotulo="GOLPE"
-              icone="🗡️"
-              cor={c.cor}
-              progresso={pronto ? 1 : 1 - (l.gladiadorProntoEm - e.tempo) / GLADIADOR_RECARGA_MS}
-              pronto={pronto && e.fase === 'luta' && !pausado}
-              dica="Golpe do gladiador: ele já bate sozinho em quem entra no círculo de luz; tocando, dá um golpe extra (-1). Recarrega em 8 s."
-              onClick={() => gladiador(lado)}
-            />
+    const anfora = (
+      <Anfora
+        gotas={l.folego}
+        max={FOLEGO_MAX}
+        cor={doisJogadores ? c.cor : undefined}
+        pequena={doisJogadores}
+        rotulo={ritmoDoFolego(e, lado) > FOLEGO_POR_SEGUNDO ? (extra ? 'GOTAS EM DOBRO' : 'VIRADA +25%') : undefined}
+      />
+    );
+    // A carta na manga: a próxima que entra na mão, reta e inteira, com o nome em cima.
+    const naManga = manga && (
+      <div className={`flex flex-col items-center gap-1 ${doisJogadores ? 'w-14 sm:w-16' : 'w-16 sm:w-20'}`} aria-label={`Carta na manga: ${CARTAS[manga.tipo].nome}`}>
+        <span className="w-full text-center font-pixel text-[6px] text-[rgb(242_193_78)] sm:text-[8px]">NA MANGA</span>
+        <span key={manga.id} className="surgir block w-full opacity-90">
+          <CartaVisual tipo={manga.tipo} paleta={c.paleta} corNome={c.cor} tamanho="mini" />
+        </span>
+      </div>
+    );
+    const golpe = (
+      <BotaoRedondo
+        rotulo="GOLPE"
+        icone="🗡️"
+        cor={c.cor}
+        progresso={pronto ? 1 : 1 - (l.gladiadorProntoEm - e.tempo) / GLADIADOR_RECARGA_MS}
+        pronto={pronto && e.fase === 'luta' && !pausado}
+        dica="Golpe do gladiador: ele já bate sozinho em quem entra no círculo de luz; tocando, dá um golpe extra (-1). Recarrega em 8 s."
+        onClick={() => gladiador(lado)}
+      />
+    );
+    const cartas = (
+      <section aria-label={lado === 'eu' ? 'Suas cartas' : 'Cartas do Jogador 2'} className={`grid grid-cols-4 ${doisJogadores ? 'gap-1.5' : 'gap-2'}`}>
+        {l.mao.map((carta, i) => (
+          <CartaNaMao
+            key={carta.id}
+            carta={carta}
+            numero={lado === 'eu' ? String(i + 1) : TECLAS_J2[i]!}
+            custo={custoAgora(l, carta.tipo)}
+            pode={podeJogar(e, lado, carta.id) && !pausado}
+            carregando={segurando[lado]?.id === carta.id}
+            cores={c}
+            compacto={doisJogadores}
+            onSegurar={() => comecarCarga(lado, carta)}
+            onSoltar={() => soltar(lado, carta)}
+            onCancelar={() => setSegurando((x) => ({ ...x, [lado]: null }))}
+            onTocar={() => jogar(lado, carta, 0)}
+          />
+        ))}
+      </section>
+    );
+
+    if (!doisJogadores) {
+      return (
+        <div className="grid grid-cols-[auto_1fr_auto] items-stretch gap-2 sm:gap-3">
+          {anfora}
+          {cartas}
+          <div className="flex flex-col items-center justify-around gap-2">
+            {naManga}
+            {golpe}
           </div>
         </div>
-      </div>
+      );
+    }
+    // 2 jogadores: cada um com o seu painel, na cor dele, bem separado do outro.
+    return (
+      <section
+        aria-label={lado === 'eu' ? 'Jogador 1' : 'Jogador 2'}
+        className="flex flex-col gap-2 rounded-md border-2 p-2 sm:p-3"
+        style={{ borderColor: c.cor, background: `color-mix(in srgb, ${c.cor} 10%, rgb(20 14 30))` }}
+      >
+        <div className={`flex items-center justify-between gap-2 ${espelhado ? 'flex-row-reverse' : ''}`}>
+          <p className="font-pixel text-[10px] sm:text-sm" style={{ color: c.cor }}>
+            {lado === 'eu' ? 'JOGADOR 1' : 'JOGADOR 2'}
+            <span className="block text-[7px] text-muted sm:text-[9px]">{PERSONAGENS[lado === 'eu' ? ia : rival].gladiador.toUpperCase()}</span>
+          </p>
+          <div className={`flex items-end gap-3 ${espelhado ? 'flex-row-reverse' : ''}`}>
+            {anfora}
+            {naManga}
+            {golpe}
+          </div>
+        </div>
+        {cartas}
+      </section>
     );
   };
 
@@ -452,10 +498,23 @@ export default function PartidaDuelo({
               >
                 {Math.ceil(t.forca)}
               </span>
-              {parada && <span className="girar-estrelas absolute -top-6 left-1/2 -translate-x-1/2 font-pixel text-[8px] text-[rgb(159_232_255)] sm:-top-9 sm:text-sm">✦ ✦</span>}
+              {parada && !((t.congeladaAte ?? 0) > e.tempo) && (
+                <span className="girar-estrelas absolute -top-6 left-1/2 -translate-x-1/2 font-pixel text-[8px] text-[rgb(255_224_102)] sm:-top-9 sm:text-sm">✦ ✦</span>
+              )}
               <div className={pose} style={{ filter: filtros.trim() || undefined, opacity: t.someEm !== undefined && t.someEm - e.tempo < 2000 ? 0.6 : undefined }}>
                 <Sprite grade={TROPAS[t.tipo]} paleta={cores[t.de].paleta} espelhar={t.de === 'rival'} />
               </div>
+              {/* Pausa dramática: a tropa fica presa num bloco de gelo */}
+              {(t.congeladaAte ?? 0) > e.tempo && (
+                <span
+                  className="pointer-events-none absolute -inset-x-[12%] -bottom-[4%] -top-[8%] rounded-sm border-2 border-[#d8f6ff]"
+                  style={{
+                    background: 'linear-gradient(135deg, rgb(200 240 255 / 0.55), rgb(120 200 240 / 0.35) 50%, rgb(200 240 255 / 0.5))',
+                    boxShadow: 'inset 3px 3px 0 rgb(255 255 255 / 0.7), 0 0 10px #9fe8ff',
+                  }}
+                  aria-hidden
+                />
+              )}
             </div>
           );
         })}
@@ -500,7 +559,7 @@ export default function PartidaDuelo({
 
       {doisJogadores ? (
         // Duas pessoas no mesmo aparelho: Jogador 1 à esquerda, Jogador 2 à direita.
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {controles('eu')}
           {controles('rival')}
         </div>
@@ -627,6 +686,8 @@ function CartaNaMao(props: {
   pode: boolean;
   carregando: boolean;
   cores: Cores;
+  /** 2 jogadores: carta um pouco menor, para caberem as duas mãos. */
+  compacto?: boolean;
   onSegurar: () => void;
   onSoltar: () => void;
   onCancelar: () => void;
@@ -669,7 +730,7 @@ function CartaNaMao(props: {
         paleta={cores.paleta}
         corNome={cores.cor}
         custo={custo}
-        tamanho="mao"
+        tamanho={props.compacto ? 'colecao' : 'mao'}
         rodape={
           <>
             <span className="mt-auto hidden pb-0.5 font-pixel text-[7px] text-muted sm:block">[{numero}]</span>

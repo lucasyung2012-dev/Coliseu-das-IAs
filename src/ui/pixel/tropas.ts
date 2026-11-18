@@ -209,14 +209,31 @@ const SENADOR: Passo[] = [
 
 /** Estatística: balista. */
 const BALISTA: Passo[] = [
-  ['B', 2, 6, 12, 2], // base
-  ['C', 4, 6, 4, 1],
-  ['B', 4, 8, 1, 2],
-  ['B', 11, 8, 1, 2],
-  ['B', 7, 3, 2, 3], // poste
-  ['M', 10, 0, 1, 8], // arco
-  ['W', 3, 3, 11, 1], // dardo
-  ['M', 14, 3],
+  // carreta de madeira com rodas
+  ['B', 1, 8, 15, 2],
+  ['C', 6, 8, 5, 1], // placa na cor do lado
+  ['K', 2, 10, 3, 3], // rodas
+  ['M', 3, 11],
+  ['K', 11, 10, 3, 3],
+  ['M', 12, 11],
+  // suporte e trilho
+  ['B', 7, 5, 3, 3],
+  ['B', 2, 4, 14, 1],
+  // molas de corda torcida (de onde vem a força)
+  ['N', 9, 1, 2, 4],
+  ['G', 9, 1, 2, 1],
+  // braços do arco, puxados para trás
+  ['B', 8, 0],
+  ['B', 7, 1],
+  ['B', 11, 0],
+  ['B', 12, 1],
+  ['W', 5, 1, 2, 1], // corda
+  ['W', 13, 1, 1, 1],
+  // o dardo pronto para sair
+  ['W', 3, 3, 13, 1],
+  ['M', 16, 2, 1, 3],
+  ['M', 17, 3],
+  ['C', 3, 2], // pena do dardo
 ];
 
 /** Prova: catapulta com pedra. */
@@ -317,10 +334,12 @@ export const EFEITOS: Record<'flecha' | 'dardo' | 'pedra' | 'corte' | 'raio' | '
   raio: ['...YYY', '..YYY.', '.YYY..', 'YYYYYY', '..YYY.', '.YYY..', 'YYY...', 'YY....'],
   refutacao: ['.RRR.', '.RRR.', '.RRR.', '.RRR.', '..R..', '.....', '.RRR.', '.RRR.'],
   pergunta: ['.GGGG.', 'GG..GG', '....GG', '...GG.', '..GG..', '......', '..GG..', '..GG..'],
-  pausa: ['.I...I.', '..I.I..', 'IIIIIII', '..I.I..', '.I...I.', '...I...', '..III..'],
-  aplauso: ['G.G.G', '.GGG.', 'GGGGG', '.GGG.', 'G.G.G'],
+  // Pausa dramática: um cristal de gelo.
+  pausa: ['....I....', '.I..I..I.', '..IiIiI..', '..iWWWi..', 'IIIWWWIII', '..iWWWi..', '..IiIiI..', '.I..I..I.', '....I....'],
+  // Aplauso: duas mãos batendo palmas, com risquinhos de impacto.
+  aplauso: ['G...........G', '.G..SS.SS..G.', '...SSS.SSS...', '..SSSS.SSSS..', '..SSSS.SSSS..', '...SSSSSSS...', '....SSSSS....', '....CC.CC....', '....CC.CC....'],
 };
-export const PALETA_EFEITOS = { W: '#ffffff', G: '#f2c14e', Y: '#ffe066', R: '#ff3b4a', I: '#9fe8ff', B: '#7a4a2a', M: '#b9c2dc', P: '#9a8a78', p: '#6a5c50' };
+export const PALETA_EFEITOS = { W: '#ffffff', G: '#f2c14e', Y: '#ffe066', R: '#ff3b4a', I: '#9fe8ff', i: '#4fb0e0', S: '#e9b48a', C: '#f2c14e', B: '#7a4a2a', M: '#b9c2dc', P: '#9a8a78', p: '#6a5c50' };
 
 export const TROPAS: Record<TipoTropa, string[]> = {
   legionario: desenhar(14, 15, LEGIONARIO),
@@ -331,7 +350,7 @@ export const TROPAS: Record<TipoTropa, string[]> = {
   elefante: desenhar(25, 18, ELEFANTE),
   senador: desenhar(12, 16, SENADOR),
   arqueiro: desenhar(14, 15, ARQUEIRO),
-  balista: desenhar(17, 12, BALISTA),
+  balista: desenhar(20, 15, BALISTA),
   catapulta: desenhar(16, 15, CATAPULTA),
   barricada: desenhar(12, 15, BARRICADA),
   escudeiro: desenhar(16, 17, HOPLITA),
