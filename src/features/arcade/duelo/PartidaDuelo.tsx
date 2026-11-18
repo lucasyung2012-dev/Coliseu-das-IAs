@@ -380,7 +380,7 @@ export default function PartidaDuelo({ ia, rival, onDeNovo, onSair }: { ia: IaId
         )}
 
         {abertura === 'entrada' && (
-          <p className="pancada neon absolute left-1/2 top-[18%] z-40 -translate-x-1/2 whitespace-nowrap bg-black/60 px-3 py-1 font-pixel text-[9px] text-[rgb(242_193_78)] sm:text-base">
+          <p className="pancada neon absolute left-1/2 top-[18%] z-40 w-max max-w-[90%] -translate-x-1/2 bg-black/60 px-3 py-1 text-center font-pixel text-[8px] leading-relaxed text-[rgb(242_193_78)] sm:text-base">
             OS GLADIADORES ENTRAM NA ARENA!
           </p>
         )}
