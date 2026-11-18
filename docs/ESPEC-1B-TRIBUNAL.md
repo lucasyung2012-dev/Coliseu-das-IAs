@@ -1,6 +1,6 @@
 # Etapa 1b: Tribunal (especificação para revisar)
 
-**Atualizado: 2026-11-18** · Status: **proposta, aguardando revisão do Lucas**. Nada disto foi construído ainda.
+**Atualizado: 2026-11-18** · Status: **aprovada pelo Lucas em 18/11/2026**, em construção.
 
 ## 1. A partida em uma frase
 Você defende um lado de um dilema contra uma IA rival, em 3 tempos. Cada carta que você joga puxa os jurados para o seu lado ou para o lado do rival. Ganha quem tiver mais jurados no fim.
@@ -67,7 +67,7 @@ Cada jurado **ama** um tema (+2), **gosta** de outro (+1) e **não gosta** de um
 
 ## 8. Habilidade da IA (uma vez por partida)
 - **Claude, Diplomacia:** escolhe um jurado que está do lado do rival e o traz de volta ao meio (0).
-- **ChatGPT, Improviso:** troca a sua mão inteira por 4 cartas novas.
+- **ChatGPT, Improviso:** troca **1 carta** da mão por uma nova (decidido pelo Lucas em 18/11/2026).
 - **Gemini, Visão:** vê a carta do rival **antes** de escolher a sua, neste tempo.
 
 ## 9. O rival (IA do jogo)

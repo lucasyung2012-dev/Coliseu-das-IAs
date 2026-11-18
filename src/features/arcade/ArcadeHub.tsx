@@ -245,7 +245,7 @@ function Historico({ partidas }: { partidas: Partida[] }) {
             <li key={pt.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
               <span className="min-w-0 truncate">
                 {pt.modo === 'duelo' ? '⚔' : '⚖'} {PERSONAGENS[pt.ia].gladiador} vs {PERSONAGENS[pt.rival].gladiador} ·{' '}
-                <span className={pt.venceu ? 'text-accent' : 'text-accent-2'}>{pt.venceu ? 'Vitória' : 'Derrota'}</span>
+                <span className={pt.empate ? 'text-muted' : pt.venceu ? 'text-accent' : 'text-accent-2'}>{pt.empate ? 'Empate' : pt.venceu ? 'Vitória' : 'Derrota'}</span>
               </span>
               <span className="shrink-0 font-pixel text-[10px] tabular-nums text-muted">
                 {pt.trofeus > 0 ? `+${pt.trofeus}` : pt.trofeus} 🏆

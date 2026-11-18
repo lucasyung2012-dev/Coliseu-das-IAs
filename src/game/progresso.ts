@@ -9,6 +9,8 @@ export interface Partida {
   ia: IaId;
   rival: IaId;
   venceu: boolean;
+  /** Empate no Tribunal: sem troféus e metade do XP da vitória. */
+  empate?: boolean;
   trofeus: number;
   xp: number;
   dilema: string;
@@ -29,6 +31,7 @@ export const NIVEL_MAXIMO = 100;
 // XP de Maestria vem de todas as partidas (decisão D4).
 const XP_VITORIA = 40;
 const XP_DERROTA = 20;
+const XP_EMPATE = 20;
 
 const zerado = (): Record<IaId, number> => ({ claude: 0, chatgpt: 0, gemini: 0 });
 
@@ -88,10 +91,10 @@ export function nivelMaestria(xp: number): number {
 }
 
 /** Registra o resultado e devolve a partida com a variação de troféus e XP aplicada. */
-export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 'venceu' | 'dilema'>): Partida {
+export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 'venceu' | 'empate' | 'dilema'>): Partida {
   const p = obter();
-  const trofeus = variacaoTrofeus(dados.modo, p.trofeus[dados.ia], dados.venceu);
-  const xp = dados.venceu ? XP_VITORIA : XP_DERROTA;
+  const trofeus = dados.empate ? 0 : variacaoTrofeus(dados.modo, p.trofeus[dados.ia], dados.venceu);
+  const xp = dados.empate ? XP_EMPATE : dados.venceu ? XP_VITORIA : XP_DERROTA;
   const partida: Partida = {
     ...dados,
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,

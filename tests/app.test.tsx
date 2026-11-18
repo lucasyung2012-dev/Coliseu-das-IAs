@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '@/App';
 
@@ -74,5 +74,56 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
     expect(screen.getByRole('list', { name: 'Jurados desta sessão' }).children).toHaveLength(5);
     expect(screen.getByText('A SESSÃO ESTÁ ABERTA')).toBeInTheDocument();
+  });
+
+  it('joga um Tribunal inteiro: briefing, 3 tempos, veredito e histórico', () => {
+    vi.useFakeTimers();
+    try {
+      abrir('/arena/tribunal');
+      fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+      fireEvent.click(screen.getByRole('button', { name: /ENTRAR NA SESSÃO/ }));
+      expect(screen.getByRole('region', { name: 'O que cada jurado gosta' })).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: /COMEÇAR/ }));
+
+      for (let t = 1; t <= 3; t++) {
+        expect(screen.getByText(new RegExp(`TEMPO ${t}/3`))).toBeInTheDocument();
+        const mao = within(screen.getByRole('region', { name: 'Sua mão' })).getAllByRole('button');
+        expect(mao).toHaveLength(4);
+        fireEvent.click(mao[0]!);
+        fireEvent.click(screen.getByRole('button', { name: /APRESENTAR CARTA/ }));
+        fireEvent.click(screen.getByRole('button', { name: t < 3 ? new RegExp(`TEMPO ${t + 1}`) : /OUVIR O VEREDITO/ }));
+      }
+
+      expect(screen.getByRole('list', { name: 'Votos do júri' }).children).toHaveLength(5);
+      // Os votos aparecem um a um: cada voto agenda o próximo, então o relógio anda em passos.
+      for (let i = 0; i < 8; i++) {
+        act(() => {
+          vi.advanceTimersByTime(1000);
+        });
+      }
+      expect(screen.getByRole('heading', { name: /VITÓRIA!|DERROTA|EMPATE/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /REVANCHE/ })).toBeInTheDocument();
+      const salvo = JSON.parse(localStorage.getItem('coliseu.progresso.v1')!);
+      expect(salvo.partidas[0].modo).toBe('tribunal');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('o tempo esgotado joga uma carta pelo jogador', () => {
+    vi.useFakeTimers();
+    try {
+      abrir('/arena/tribunal');
+      fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+      fireEvent.click(screen.getByRole('button', { name: /ENTRAR NA SESSÃO/ }));
+      fireEvent.click(screen.getByRole('button', { name: /COMEÇAR/ }));
+      act(() => {
+        vi.advanceTimersByTime(91_000);
+      });
+      expect(screen.getByText(/Silêncio não é argumento/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /TEMPO 2/ })).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
