@@ -225,15 +225,22 @@ describe('duelo v7: gladiador, habilidades e Tribuna', () => {
     expect(resultadoFinal(s)).toBe('vitoria');
   });
 
-  it('duas rodadas de 1:30 e depois sempre a Prorrogação de 20 s com gotas +25%', () => {
+  it('duas rodadas de 1:30; quem tem mais vida no fim da 2ª vence na hora', () => {
     expect([...DURACOES_MS]).toEqual([90_000, 90_000]);
-    expect(PRORROGACAO_BONUS).toBe(1.25);
     let s = { ...base(), tribunas: { eu: 20, rival: 20 } };
     s = passo({ ...s, tempo: 90_000 - TICK }, ctx);
     expect(s.fase).toBe('intervalo');
     s = avancar(s, INTERVALO_MS + TICK);
     expect(s).toMatchObject({ fase: 'luta', rodada: 2, tribunas: { eu: 20, rival: 20 } });
     s = passo({ ...s, tribunas: { eu: 25, rival: 20 }, tempo: 90_000 - TICK, proximoRival: SEM_RIVAL }, ctx);
+    expect(s.fase).toBe('fim');
+    expect(resultadoFinal(s)).toBe('vitoria');
+  });
+
+  it('empate na vida no fim da 2ª rodada: Prorrogação de 20 s com gotas +25%', () => {
+    expect(PRORROGACAO_BONUS).toBe(1.25);
+    let s = { ...base(), rodada: 2, tribunas: { eu: 20, rival: 20 } };
+    s = passo({ ...s, tempo: 90_000 - TICK, proximoRival: SEM_RIVAL }, ctx);
     expect(s.fase).toBe('intervalo');
     s = avancar(s, INTERVALO_MS + TICK);
     expect(s.rodada).toBe(3);

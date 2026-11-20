@@ -55,5 +55,5 @@ A cada partida a IA sorteia um **estilo** e monta 8 cartas daquele estilo, troca
 - **Arena continua deitada** (visão de lado = essência própria, não cópia do Clash Royale), mais detalhada e organizada.
 - **Meu baralho:** aba onde se monta as 8 cartas uma vez; fica salvo (progresso e Dropbox) para os próximos duelos.
 - **Estatística: aprovada** (4 tiros ou 10 s, 2 de vida, máx. 1 em campo, 5 de fôlego).
-- **Rodadas (decisão do Lucas, revista):** 2 rodadas de 1 min 30 s e depois sempre a **Prorrogação**: 20 s com gotas +25% para os dois. Não existe mais a "virada" (quem perdia ganhava +25% na rodada final). Empate na vida no fim = empate.
+- **Rodadas (decisão do Lucas, revista):** 2 rodadas de 1 min 30 s; **Prorrogação só se as Tribunas empatarem na vida**: 20 s com gotas +25% para os dois. Não existe mais a "virada" (quem perdia ganhava +25% na rodada final). Empate na vida no fim = empate.
 - **Trocar a torre** (não existia no Coliseu): opções Rostra (tribuna dos oradores, recomendada: combina com debate), Águia da legião (estandarte) ou Portão do Coliseu. Aguardando a escolha do Lucas.

@@ -5,8 +5,7 @@
  * romano). Cada carta vira uma tropa (ou um feitiço) do debate; tropas inimigas
  * que se encontram lutam e a que sobra segue; a que chega à Tribuna inimiga tira
  * dela a força que tem. Tribuna no chão = derrota na hora. Rodadas: 1 min 30 s,
- * 1 min 30 s e a Prorrogação (20 s, gotas +25%, sempre acontece; antes era em
- * dobro). Funções puras: a tela chama `passo` a cada tick e as ações no toque.
+ * 1 min 30 s e a Prorrogação só no empate (20 s, gotas +25%). Funções puras: a tela chama `passo` a cada tick e as ações no toque.
  * Especificação: docs/ESPEC-BARALHO-DUELO.md.
  */
 import type { IaId } from '../personagens';
@@ -51,10 +50,10 @@ export const FOLEGO_POR_SEGUNDO = 0.7;
 export const PRORROGACAO_BONUS = 1.25;
 /** Discurso épico vivo: o fôlego de quem jogou volta 30% mais rápido. */
 const EMPOLGA_BONUS = 1.3;
-/** Duração de cada rodada (decisão do Lucas): duas de 1 min 30 s; depois sempre vem a Prorrogação. */
+/** Duração de cada rodada (decisão do Lucas): duas de 1 min 30 s; empate na vida = Prorrogação. */
 export const DURACOES_MS = [90_000, 90_000] as const;
 export const RODADAS = DURACOES_MS.length;
-/** Prorrogação (a 3ª e última parte, sempre acontece): 20 s com gotas +25%. */
+/** Prorrogação (só se as Tribunas empatarem na vida): 20 s com gotas +25%. */
 export const PRORROGACAO_MS = 20_000;
 export const INTERVALO_MS = 2_500;
 export const TAMANHO_MAO = 4;
@@ -701,9 +700,11 @@ export function passo(s0: EstadoDuelo, ctx: Contexto): EstadoDuelo {
     return avisar(s, caiu === 'eu' ? 'SUA TRIBUNA CAIU!' : 'A TRIBUNA DO RIVAL CAIU!', outro(caiu), 3000);
   }
   if (tempo >= duracaoDaRodada(s)) {
-    const acabou = prorrogacao(s);
+    // Prorrogação só se as Tribunas empatarem na vida no fim da 2ª rodada (decisão do Lucas).
+    const empate = s.tribunas.eu === s.tribunas.rival;
+    const acabou = prorrogacao(s) || (s.rodada >= RODADAS && !empate);
     s = { ...s, tropas: [], fase: acabou ? 'fim' : 'intervalo', fimIntervalo: tempo + INTERVALO_MS };
-    s = avisar(s, acabou ? 'FIM DO DUELO!' : s.rodada >= RODADAS ? "FIM DA RODADA 2 · VEM A PRORROGAÇÃO" : `FIM DA RODADA ${s.rodada}`, null, INTERVALO_MS);
+    s = avisar(s, acabou ? 'FIM DO DUELO!' : s.rodada >= RODADAS ? "EMPATE NA VIDA! VAI PARA A PRORROGAÇÃO" : `FIM DA RODADA ${s.rodada}`, null, INTERVALO_MS);
   }
   return s;
 }

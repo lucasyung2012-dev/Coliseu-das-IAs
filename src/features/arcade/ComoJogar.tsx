@@ -113,11 +113,11 @@ export default function ComoJogar({ titulo, slides, onFechar }: { titulo: string
 }
 
 export const TUTORIAL_DUELO: Slide[] = [
-  { icone: '🏰', titulo: 'DERRUBE A TRIBUNA', texto: 'Cada gladiador fica em cima da sua Tribuna (o palanque dos oradores de Roma). Toda tropa sua que chega na Tribuna do rival tira dela a força que tem. Derrubou: vitória na hora! Se ninguém derrubar, ganha quem tiver mais vida no fim da Prorrogação.' },
+  { icone: '🏰', titulo: 'DERRUBE A TRIBUNA', texto: 'Cada gladiador fica em cima da sua Tribuna (o palanque dos oradores de Roma). Toda tropa sua que chega na Tribuna do rival tira dela a força que tem. Derrubou: vitória na hora! Se ninguém derrubar, ganha quem tiver mais vida no fim da 2ª rodada (empate: Prorrogação).' },
   { icone: '⚔️', titulo: 'SEU BARALHO', texto: 'São 16 cartas e você leva 8 (monte em SALA DO DUELO). Cada carta custa GOTAS: a ânfora ao lado das cartas enche de água sozinha. A próxima carta fica NA MANGA. Cada uma tem um jeito: a Frase rápida pressiona, a Analogia pula, a Piada faz rir, a Muralha segura… Quando duas tropas se encontram, elas lutam e a que sobrar segue em frente.' },
   { icone: '💪', titulo: 'SEGURE PARA CARREGAR', texto: 'Tocou rápido: tropa normal. Segure a carta até a barrinha encher: a tropa sai com +1 de força e brilhando, mas custa +1 gota. E o rival não espera!' },
   { icone: '🗡️', titulo: 'SEU GLADIADOR', texto: 'Lá de cima da Tribuna, ele bate sozinho em toda tropa inimiga que entra no círculo de luz do chão (tira 1 de força). Toque nele para um golpe extra; depois ele precisa de 8 s para recarregar.' },
-  { icone: '⚡', titulo: 'RODADAS E PRORROGAÇÃO', texto: 'Duas rodadas de 1:30 e depois a Prorrogação: 20 s em que as gotas dos dois enchem 25% mais rápido. A vida da Tribuna passa de uma rodada para a outra; no fim, vence quem tiver mais vida.' },
+  { icone: '⚡', titulo: 'RODADAS E PRORROGAÇÃO', texto: 'Duas rodadas de 1:30. A vida da Tribuna passa de uma rodada para a outra e, no fim, vence quem tiver mais vida. Se as duas Tribunas empatarem, vem a Prorrogação: 20 s em que as gotas dos dois enchem 25% mais rápido.' },
 ];
 
 export const TUTORIAL_TRIBUNAL: Slide[] = [
