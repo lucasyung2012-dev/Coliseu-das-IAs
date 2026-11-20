@@ -307,7 +307,7 @@ function ArteDuelo({ ia }: { ia: IaId }) {
   const { arena } = useColiseu(ia);
   return (
     <>
-      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} arena={arena} />
+      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} arena={arena} tema={ia} />
       <div className="absolute bottom-[4%] left-[22%] w-[17%]">
         <GladiadorPixel ia={ia} />
       </div>

@@ -159,7 +159,7 @@ export function recordeDe(p: Progresso, ia: IaId): number {
 
 /** O visual do Coliseu em uso por esta IA. */
 export function coliseuDe(p: Progresso, ia: IaId): VisualColiseu {
-  return coliseuEmUso(recordeDe(p, ia), p.coliseu?.[ia]);
+  return coliseuEmUso(ia, recordeDe(p, ia), p.coliseu?.[ia]);
 }
 
 export function useColiseu(ia: IaId): VisualColiseu {
@@ -194,7 +194,7 @@ export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 
   const recordeAntes = recordeDe(p, dados.ia);
   const recordeDepois = Math.max(recordeAntes, p.trofeus[dados.ia] + trofeus);
   const escolha: EscolhaColiseu = { ...p.coliseu?.[dados.ia] };
-  for (const premio of premiosNovos(recordeAntes, recordeDepois)) delete escolha[premio.tipo];
+  for (const premio of premiosNovos(dados.ia, recordeAntes, recordeDepois)) delete escolha[premio.tipo];
   salvar({
     ...p,
     trofeus: { ...p.trofeus, [dados.ia]: p.trofeus[dados.ia] + trofeus },

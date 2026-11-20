@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { coliseuDe, escolherPremio, recordeDe, useProgresso } from '@/game/progresso';
-import { PREMIOS, premioLiberado, type ArenaId, type EstandarteId, type TipoPremio } from '@/game/coliseu';
+import { premiosDe, premioLiberado, type ArenaId, type EstandarteId, type TipoPremio } from '@/game/coliseu';
 import { CenaColiseu } from './cenas/Cenarios';
 import { Estandarte } from '@/ui/pixel/estandartes';
 import { caminhoSvg, ligasCruzadas, PARADAS, posicaoNoMapa } from '@/game/mapa';
@@ -163,7 +163,7 @@ export default function MapaTrofeus() {
                   ...(pa.x > L / 2 ? { right: `${((L - pa.x + (pa.liga ? 28 : 14)) / L) * 100}%` } : { left: `${((pa.x + (pa.liga ? 28 : 14)) / L) * 100}%` }),
                 }}
               >
-                {pa.liga ? `${pa.liga.toUpperCase()} · ${pa.trofeus}` : pa.trofeus} {PREMIOS.find((pr) => pr.trofeus === pa.trofeus)?.icone}
+                {pa.liga ? `${pa.liga.toUpperCase()} · ${pa.trofeus}` : pa.trofeus} {premiosDe(id).find((pr) => pr.trofeus === pa.trofeus)?.icone}
               </p>
             ))}
 
@@ -221,7 +221,7 @@ function PremiosDoCaminho({ ia }: { ia: IaId }) {
     <section aria-label="Prêmios do caminho" className="pixel-box flex flex-col gap-2 p-3 sm:p-4">
       <h2 className="font-pixel text-[10px] text-accent sm:text-xs">🎁 PRÊMIOS DO CAMINHO</h2>
       <ul className="flex flex-col gap-2">
-        {PREMIOS.map((pr) => {
+        {premiosDe(ia).map((pr) => {
           const ganho = premioLiberado(pr, recorde);
           const usando = emUso[pr.tipo] === pr.id;
           return (
@@ -233,7 +233,7 @@ function PremiosDoCaminho({ ia }: { ia: IaId }) {
               {/* Prévia do prêmio */}
               <div className="relative aspect-[16/9] w-20 shrink-0 overflow-hidden rounded-sm bg-black/40 sm:w-24">
                 {pr.tipo === 'arena' ? (
-                  <CenaColiseu corA={cor} corB="#f2c14e" arena={pr.id as ArenaId} />
+                  <CenaColiseu corA={cor} corB="#f2c14e" arena={pr.id as ArenaId} tema={ia} />
                 ) : pr.tipo === 'estandarte' ? (
                   <div className="mx-auto h-full w-[30%] py-1">
                     <Estandarte id={pr.id as EstandarteId} cor={cor} />

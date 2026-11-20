@@ -52,7 +52,7 @@ export default function VereditoTribunal({
         dilema: e.dilema.pergunta,
       }),
     );
-    setPremios(premiosNovos(antes, recordeDe(obterProgresso(), e.ia)));
+    setPremios(premiosNovos(e.ia, antes, recordeDe(obterProgresso(), e.ia)));
     tocar('martelo');
   }, []);
 

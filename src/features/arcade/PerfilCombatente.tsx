@@ -4,12 +4,10 @@ import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { indiceLiga, LIGAS, ligaDe, PATENTES, patenteDe, proximaLiga } from '@/game/ligas';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { coliseuDe, nivelMaestria, totalPartidas, useProgresso, XP_POR_NIVEL, type PlacarModo } from '@/game/progresso';
-import { PREMIOS } from '@/game/coliseu';
+import { nomeDoPremio, premiosDe } from '@/game/coliseu';
 import { Estandarte } from '@/ui/pixel/estandartes';
 import { CenaColiseu } from './cenas/Cenarios';
 
-/** Nome do prêmio em uso (ou "nenhum" para quem ainda não ganhou estandarte/comemoração). */
-const nomePremio = (id: string) => (PREMIOS.find((pr) => pr.id === id)?.nome ?? 'nenhum ainda').toUpperCase();
 import { proximoTitulo, recompensasDe, tituloDoNivel, titulosDe } from '@/game/maestria';
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { tocar } from '@/ui/som';
@@ -181,9 +179,9 @@ export default function PerfilCombatente() {
           <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr]">
             <div>
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm">
-                <CenaColiseu corA={`rgb(${pers.cor})`} corB="#f2c14e" arena={coliseu.arena} />
+                <CenaColiseu corA={`rgb(${pers.cor})`} corB="#f2c14e" arena={coliseu.arena} tema={id} />
               </div>
-              <p className="mt-1 font-pixel text-[8px] text-muted">ARENA · {nomePremio(coliseu.arena)}</p>
+              <p className="mt-1 font-pixel text-[8px] text-muted">ARENA · {nomeDoPremio(id, coliseu.arena).toUpperCase()}</p>
             </div>
             <div className="flex flex-col items-center justify-end">
               {coliseu.estandarte === 'nenhum' ? (
@@ -193,11 +191,11 @@ export default function PerfilCombatente() {
                   <Estandarte id={coliseu.estandarte} cor={`rgb(${pers.cor})`} />
                 </div>
               )}
-              <p className="mt-1 text-center font-pixel text-[8px] text-muted">ESTANDARTE · {nomePremio(coliseu.estandarte)}</p>
+              <p className="mt-1 text-center font-pixel text-[8px] text-muted">ESTANDARTE · {nomeDoPremio(id, coliseu.estandarte).toUpperCase()}</p>
             </div>
             <div className="flex flex-col items-center justify-end">
-              <p className="text-2xl">{PREMIOS.find((pr) => pr.id === coliseu.comemoracao)?.icone ?? '🎉'}</p>
-              <p className="mt-1 text-center font-pixel text-[8px] text-muted">COMEMORAÇÃO · {nomePremio(coliseu.comemoracao)}</p>
+              <p className="text-2xl">{premiosDe(id).find((pr) => pr.id === coliseu.comemoracao)?.icone ?? '🎉'}</p>
+              <p className="mt-1 text-center font-pixel text-[8px] text-muted">COMEMORAÇÃO · {nomeDoPremio(id, coliseu.comemoracao).toUpperCase()}</p>
             </div>
           </div>
           <Link

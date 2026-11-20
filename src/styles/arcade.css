@@ -967,3 +967,99 @@
     opacity: 0;
   }
 }
+
+/* Comemorações de cada combatente (prêmios do mapa) */
+.comemora-subir {
+  animation: comemora-subir 3s linear infinite both;
+}
+@keyframes comemora-subir {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-420px);
+    opacity: 0;
+  }
+}
+.comemora-desenrolar {
+  animation: comemora-desenrolar 0.8s steps(6) both;
+}
+@keyframes comemora-desenrolar {
+  from {
+    clip-path: inset(0 50% 0 50%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.comemora-balancar {
+  animation: comemora-balancar 0.5s ease-in-out infinite alternate;
+  transform-origin: 50% 0;
+}
+@keyframes comemora-balancar {
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(18deg);
+  }
+}
+.comemora-hastear {
+  animation: comemora-hastear 0.9s ease-out both;
+}
+@keyframes comemora-hastear {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.comemora-cadente {
+  animation: comemora-cadente 1.6s ease-in infinite both;
+}
+@keyframes comemora-cadente {
+  from {
+    transform: translate(-40px, -20px) rotate(25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(140px, 70px) rotate(25deg);
+    opacity: 0;
+  }
+}
+.comemora-aurora {
+  background: linear-gradient(90deg, rgb(64 220 170 / 0.5), rgb(110 150 255 / 0.5), rgb(200 100 255 / 0.45), rgb(64 220 170 / 0.5));
+  background-size: 300% 100%;
+  filter: blur(6px);
+  animation: comemora-aurora 4s linear infinite;
+}
+@keyframes comemora-aurora {
+  to {
+    background-position: 300% 0;
+  }
+}
+.comemora-eclipse {
+  animation: comemora-eclipse 2.4s ease-in-out both;
+}
+@keyframes comemora-eclipse {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: scale(0.82);
+  }
+}
+.menos-movimento .comemora-subir,
+.menos-movimento .comemora-balancar,
+.menos-movimento .comemora-cadente,
+.menos-movimento .comemora-aurora {
+  animation: none;
+}

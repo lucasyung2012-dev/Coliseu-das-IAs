@@ -13,11 +13,25 @@ const ESCALA_POR_LIGA = [0.82, 0.88, 0.94, 1, 1.08];
 export const TROFEUS_IMPERADOR = 7000;
 
 /**
- * Coroa radiada do Imperador (prêmio da liga Imperadores no mapa): pontas de ouro
- * como raios de sol e pedras vermelhas na faixa, a coroa dos imperadores nas
- * moedas romanas. Diferente da coroa de louros do Mestre (Maestria 100).
+ * Coroa dos Imperadores (prêmio da liga Imperadores no mapa), uma de cada combatente,
+ * todas coroas romanas de verdade e diferentes dos louros da Maestria 100:
+ * Cassius = coroa cívica de carvalho (com bolotas), Octavius = coroa naval (com
+ * proas de navio), Helios = coroa radiada (pontas como raios de sol).
  */
-const COROA_RADIADA = ['..Y...Y...Y..', '.YY..YYY..YY.', 'YYYYYYYYYYYYY', 'YRYYRYYYRYYRY', 'DDDDDDDDDDDDD'];
+const COROAS: Record<IaId, { grade: string[]; paleta: Record<string, string> }> = {
+  claude: {
+    grade: ['.G.G..G..G.G.', 'GGGGGGGGGGGGG', 'GBGGGBGBGGGBG', 'DDDDDDDDDDDDD'],
+    paleta: { G: '#4a8a3a', B: '#c8862a', D: '#2e5a24' },
+  },
+  chatgpt: {
+    grade: ['.Y...Y...Y...', 'YYY.YYY.YYY..', 'YYYYYYYYYYYYY', 'YAYYAYYAYYAYY', 'DDDDDDDDDDDDD'],
+    paleta: { Y: '#f2c14e', A: '#2a6aa0', D: '#b07a1e' },
+  },
+  gemini: {
+    grade: ['..Y...Y...Y..', '.YY..YYY..YY.', 'YYYYYYYYYYYYY', 'YRYYRYYYRYYRY', 'DDDDDDDDDDDDD'],
+    paleta: { Y: '#f2c14e', R: '#e0283c', D: '#b07a1e' },
+  },
+};
 
 /** Liga, visual de Maestria e se a IA já chegou aos Imperadores (recorde), pelo progresso salvo. */
 export function useAparencia(ia: IaId): { liga: number; visual: Visual; imperador: boolean } {
@@ -50,7 +64,7 @@ export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado }:
       </div>
       {imperador ? (
         <div className="pointer-events-none absolute left-1/2 top-[-6%] w-[40%] -translate-x-1/2 drop-shadow-[0_0_4px_#f2c14e]" aria-hidden>
-          <Sprite grade={COROA_RADIADA} paleta={{ Y: '#f2c14e', R: '#e0283c', D: '#b07a1e' }} />
+          <Sprite grade={COROAS[ia].grade} paleta={COROAS[ia].paleta} />
         </div>
       ) : visual.coroa && (
         <div className="pointer-events-none absolute left-1/2 top-[-4%] flex w-[46%] -translate-x-1/2 justify-center gap-[4%]" aria-hidden>

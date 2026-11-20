@@ -42,7 +42,7 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   return (
     <div className="flex flex-col gap-5">
       <Palco rodando={fase < PRONTO} onPular={pular} className={fase === 4 ? 'tremer' : ''}>
-        <CenaColiseu corA={cor(ia)} corB={cor(rival)} arena={arena} />
+        <CenaColiseu corA={cor(ia)} corB={cor(rival)} arena={arena} tema={ia} />
 
         {fase >= 2 && (
           <>

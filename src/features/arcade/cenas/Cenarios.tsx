@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { ArenaId } from '@/game/coliseu';
+import type { IaId } from '@/game/personagens';
 
 // Cenários em pixel art desenhados em 160 × 90 e ampliados sem suavizar (crispEdges),
 // para ficarem com cara de fliperama em qualquer tamanho de tela.
@@ -65,14 +66,24 @@ export function CenaColiseu({
   viva = false,
   festa = false,
   arena = 'estatuas',
+  tema,
 }: {
   corA: string;
   corB: string;
   viva?: boolean;
   festa?: boolean;
   arena?: ArenaId;
+  /** De quem é esta arena: cada combatente tem as suas (pedido do Lucas). */
+  tema?: IaId;
 }) {
-  const a = ARENAS[arena];
+  const base = ARENAS[arena];
+  // Ajustes de cor de alguns temas (amanhecer da colina de Helios, Templo do Sol dourado).
+  const a =
+    tema === 'gemini' && arena === 'madeira'
+      ? { ...base, ceu: ['#3a2a6a', '#c86a9a', '#ffb08a'] as [string, string, string] }
+      : tema === 'gemini' && arena === 'marmore'
+        ? { ...base, muro: '#f0dca0', friso: '#f2c14e', ceu: ['#2a1a50', '#8a3a6a', '#e07a4a'] as [string, string, string], estrelas: false }
+        : base;
   const arcos = Array.from({ length: 16 }, (_, i) => i * 10 + 2);
   const madeira = arena === 'madeira';
   const imperial = arena === 'imperial';
@@ -115,6 +126,7 @@ export function CenaColiseu({
           <rect x={66} y={12} width={28} height={2} fill="#ffb03a" />
         </g>
       )}
+      {tema && <CeuDoTema tema={tema} arena={arena} />}
       {/* arquibancada com plateia */}
       <rect y={14} width={160} height={14} fill={a.arquibancada} />
       {madeira && [16, 19, 22, 25].map((y) => <rect key={y} y={y} width={160} height={1} fill="#4a2e18" />)}
@@ -194,6 +206,7 @@ export function CenaColiseu({
           {imperial && <rect x={b.x} y={30} width={5} height={1} fill="#f2c14e" />}
         </g>
       ))}
+      {tema && <FrenteDoTema tema={tema} arena={arena} />}
       {/* arena */}
       <rect y={62} width={160} height={1} fill={imperial ? '#f2c14e' : madeira ? '#5a3418' : '#ff40c8'} />
       <rect y={63} width={160} height={27} fill={a.areia} />
@@ -249,4 +262,254 @@ export function CenaTribunal() {
       ))}
     </svg>
   );
+}
+
+/** Pedaços de céu de cada tema (desenhados antes da arquibancada; aparece o alto do céu). */
+function CeuDoTema({ tema, arena }: { tema: IaId; arena: ArenaId }) {
+  if (tema === 'claude' && arena === 'estatuas') {
+    // lua crescente sobre a Biblioteca
+    return (
+      <g fill="#f4ecd0">
+        <rect x={140} y={2} width={4} height={6} />
+        <rect x={139} y={3} width={1} height={4} />
+        <rect x={142} y={2} width={3} height={5} fill="#0b0620" />
+      </g>
+    );
+  }
+  if (tema === 'chatgpt' && arena === 'pedra') {
+    // o mar do Porto de Óstia, com dois navios no horizonte
+    return (
+      <g>
+        <rect y={10} width={160} height={4} fill="#2a5a90" />
+        <rect y={10} width={160} height={1} fill="#ffb04a" opacity={0.6} />
+        {[24, 118].map((x) => (
+          <g key={x}>
+            <rect x={x} y={9} width={10} height={2} fill="#4a2a18" />
+            <rect x={x + 4} y={2} width={1} height={7} fill="#4a2a18" />
+            <rect x={x + 1} y={3} width={3} height={5} fill="#f0e0c0" />
+            <rect x={x + 5} y={4} width={3} height={4} fill="#f0e0c0" />
+          </g>
+        ))}
+      </g>
+    );
+  }
+  if (tema === 'gemini' && arena === 'madeira') {
+    // o sol nascendo atrás da colina
+    return (
+      <g>
+        <rect x={116} y={8} width={14} height={6} fill="#ffcf6a" />
+        <rect x={119} y={6} width={8} height={2} fill="#ffcf6a" />
+      </g>
+    );
+  }
+  if (tema === 'gemini' && arena === 'estatuas') {
+    // constelações: estrelas ligadas por linhas finas
+    const pontos: [number, number][] = [
+      [20, 3],
+      [28, 6],
+      [36, 4],
+      [44, 9],
+      [100, 2],
+      [108, 7],
+      [118, 5],
+      [126, 10],
+    ];
+    const linhas = [0, 1, 2, 4, 5, 6].map((i) => [pontos[i]!, pontos[i + 1]!] as const);
+    return (
+      <g>
+        {linhas.map(([p1, p2], i) => (
+          <line key={i} x1={p1[0]} y1={p1[1]} x2={p2[0]} y2={p2[1]} stroke="#9fb8ff" strokeWidth={0.4} opacity={0.7} />
+        ))}
+        {pontos.map(([x, y]) => (
+          <rect key={x * 100 + y} x={x} y={y} width={1} height={1} fill="#ffffff" />
+        ))}
+      </g>
+    );
+  }
+  if (tema === 'gemini' && arena === 'marmore') {
+    // o grande disco do sol sobre o Templo
+    return (
+      <g fill="#ffd04a">
+        <rect x={72} y={2} width={16} height={12} />
+        <rect x={74} y={0} width={12} height={2} />
+        <rect x={70} y={4} width={2} height={8} />
+        <rect x={88} y={4} width={2} height={8} />
+      </g>
+    );
+  }
+  if (tema === 'gemini' && arena === 'imperial') {
+    // eclipse: a lua escura na frente do sol, com o anel de ouro
+    return (
+      <g>
+        <rect x={72} y={1} width={16} height={12} fill="#f2c14e" />
+        <rect x={74} y={3} width={12} height={8} fill="#14061e" />
+      </g>
+    );
+  }
+  return null;
+}
+
+/** Enfeites de cada tema na frente da muralha (acima da areia, para não atrapalhar a luta). */
+function FrenteDoTema({ tema, arena }: { tema: IaId; arena: ArenaId }) {
+  if (tema === 'claude') {
+    if (arena === 'madeira')
+      // oliveiras na frente da paliçada
+      return (
+        <g>
+          {[6, 46, 106, 146].map((x) => (
+            <g key={x}>
+              <rect x={x + 3} y={50} width={2} height={12} fill="#6a4a2a" />
+              <rect x={x} y={40} width={8} height={10} fill="#5a7a30" />
+              <rect x={x + 1} y={38} width={6} height={2} fill="#5a7a30" />
+              <rect x={x + 2} y={42} width={2} height={2} fill="#8aaa4a" />
+              <rect x={x + 5} y={45} width={1} height={1} fill="#2a2a3a" />
+            </g>
+          ))}
+        </g>
+      );
+    if (arena === 'pedra')
+      // colunas brancas do Fórum
+      return (
+        <g>
+          {[14, 54, 98, 138].map((x) => (
+            <g key={x}>
+              <rect x={x - 1} y={29} width={7} height={2} fill="#f4ecd8" />
+              <rect x={x} y={31} width={5} height={29} fill="#e8dcc0" />
+              <rect x={x + 1} y={31} width={1} height={29} fill="#c8b898" />
+              <rect x={x + 3} y={31} width={1} height={29} fill="#c8b898" />
+              <rect x={x - 1} y={60} width={7} height={2} fill="#f4ecd8" />
+            </g>
+          ))}
+        </g>
+      );
+    if (arena === 'estatuas')
+      // pergaminhos guardados nos arcos de cima (a Biblioteca)
+      return (
+        <g>
+          {[22, 42, 62, 82, 112, 132].map((x) => (
+            <g key={x}>
+              {[35, 38, 41].map((y) => (
+                <rect key={y} x={x + 1} y={y} width={4} height={1.5} fill="#f0dcae" />
+              ))}
+            </g>
+          ))}
+        </g>
+      );
+    if (arena === 'marmore')
+      // a estátua de Minerva com a coruja no ombro
+      return (
+        <g>
+          <rect x={76} y={31} width={8} height={3} fill="#cfc8b8" />
+          <rect x={77} y={30} width={6} height={1} fill="#e04030" />
+          <rect x={77} y={34} width={6} height={4} fill="#f4f0e8" />
+          <rect x={75} y={38} width={10} height={22} fill="#ece6da" />
+          <rect x={86} y={34} width={1} height={26} fill="#a08a60" />
+          <rect x={73} y={36} width={3} height={3} fill="#c8962a" />
+          <rect x={73} y={60} width={14} height={2} fill="#d8d0c0" />
+        </g>
+      );
+    if (arena === 'imperial')
+      // a coruja de ouro ao lado do camarote
+      return (
+        <g fill="#f2c14e">
+          <rect x={94} y={17} width={5} height={6} />
+          <rect x={94} y={16} width={1} height={1} />
+          <rect x={98} y={16} width={1} height={1} />
+          <rect x={95} y={18} width={1} height={1} fill="#14061e" />
+          <rect x={97} y={18} width={1} height={1} fill="#14061e" />
+        </g>
+      );
+    return null;
+  }
+  if (tema === 'chatgpt') {
+    if (arena === 'madeira')
+      // tendas do acampamento
+      return (
+        <g>
+          {[8, 50, 102, 144].map((x) => (
+            <g key={x}>
+              {[0, 1, 2, 3, 4, 5].map((k) => (
+                <rect key={k} x={x + 5 - k} y={50 + k * 2} width={2 + k * 2} height={2} fill={k % 2 ? '#c8b480' : '#d8c8a0'} />
+              ))}
+              <rect x={x + 5} y={56} width={2} height={6} fill="#4a3418" />
+            </g>
+          ))}
+        </g>
+      );
+    if (arena === 'estatuas')
+      // o mapa de batalha pendurado no Quartel
+      return (
+        <g>
+          <rect x={64} y={31} width={32} height={13} fill="#e8d4a0" />
+          <rect x={64} y={31} width={32} height={1} fill="#7a4a22" />
+          <rect x={64} y={43} width={32} height={1} fill="#7a4a22" />
+          <rect x={68} y={35} width={10} height={1} fill="#c0283c" />
+          <rect x={77} y={35} width={1} height={5} fill="#c0283c" />
+          <rect x={78} y={39} width={12} height={1} fill="#c0283c" />
+          <rect x={70} y={34} width={2} height={2} fill="#2a6aa0" />
+          <rect x={88} y={38} width={2} height={2} fill="#2a6aa0" />
+        </g>
+      );
+    if (arena === 'imperial')
+      // âncoras de ouro no Palácio
+      return (
+        <g fill="#f2c14e">
+          {[40, 116].map((x) => (
+            <g key={x}>
+              <rect x={x + 2} y={33} width={1} height={8} />
+              <rect x={x} y={34} width={5} height={1} />
+              <rect x={x} y={40} width={1} height={1} />
+              <rect x={x + 4} y={40} width={1} height={1} />
+              <rect x={x} y={41} width={5} height={1} />
+            </g>
+          ))}
+        </g>
+      );
+    return null;
+  }
+  if (arena === 'madeira')
+    // Helios: flores do campo na colina
+    return (
+      <g>
+        {[12, 30, 58, 90, 120, 148].map((x, i) => (
+          <rect key={x} x={x} y={59 + (i % 2)} width={1} height={1} fill={i % 2 ? '#ffd04a' : '#ff8ac8'} />
+        ))}
+      </g>
+    );
+  if (arena === 'pedra')
+    // Helios: a torre do observatório com a luneta
+    return (
+      <g>
+        <rect x={4} y={30} width={16} height={32} fill="#8a6a4a" />
+        <rect x={4} y={30} width={16} height={2} fill="#c8a478" />
+        <rect x={6} y={26} width={12} height={4} fill="#b8b0c8" />
+        <rect x={8} y={24} width={8} height={2} fill="#b8b0c8" />
+        <rect x={16} y={22} width={6} height={2} fill="#3a3448" />
+        <rect x={10} y={40} width={4} height={6} fill="#2a1810" />
+      </g>
+    );
+  if (arena === 'marmore')
+    // Helios: o sol de ouro gravado na muralha do Templo
+    return (
+      <g fill="#f2c14e">
+        <rect x={75} y={33} width={10} height={10} />
+        <rect x={79} y={30} width={2} height={2} />
+        <rect x={79} y={44} width={2} height={2} />
+        <rect x={72} y={37} width={2} height={2} />
+        <rect x={86} y={37} width={2} height={2} />
+      </g>
+    );
+  if (arena === 'imperial')
+    // Helios: estrelas de ouro na muralha
+    return (
+      <g fill="#f2c14e">
+        {[30, 60, 100, 130].map((x) => (
+          <g key={x}>
+            <rect x={x} y={35} width={3} height={1} />
+            <rect x={x + 1} y={34} width={1} height={3} />
+          </g>
+        ))}
+      </g>
+    );
+  return null;
 }
