@@ -5,6 +5,7 @@ import EmConstrucao from './features/home/EmConstrucao';
 import ArcadeHub from './features/arcade/ArcadeHub';
 import EntradaCombate from './features/arcade/EntradaCombate';
 import BotaoSom from './ui/BotaoSom';
+import AvisoSemInternet from './ui/AvisoSemInternet';
 import Configuracoes from './features/config/Configuracoes';
 import PerfilCombatente from './features/arcade/PerfilCombatente';
 import MapaTrofeus from './features/arcade/MapaTrofeus';
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="*" element={<Home />} />
       </Routes>
       <BotaoSom />
+      <AvisoSemInternet />
       {abertura && <AberturaApp onFim={() => setAbertura(false)} />}
     </>
   );

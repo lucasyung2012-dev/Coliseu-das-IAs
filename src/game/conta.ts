@@ -155,6 +155,8 @@ export function iniciarConta() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void sincronizar();
   });
+  // A internet voltou: manda o que foi jogado sem conexão.
+  window.addEventListener('online', () => void sincronizar());
 }
 
 // ---------- Dificuldade do Modo Treino ----------
