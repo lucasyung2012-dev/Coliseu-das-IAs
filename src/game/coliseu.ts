@@ -33,7 +33,7 @@ export const PREMIOS: Premio[] = [
   { trofeus: 3500, tipo: 'arena', id: 'marmore', nome: 'Arena de mármore', descricao: 'Mármore branco e bandeiras na cor da sua IA.', icone: '🏟️' },
   { trofeus: 4500, tipo: 'estandarte', id: 'aguia', nome: 'Águia de ouro', descricao: 'A águia de ouro de Roma na sua Tribuna.', icone: '🚩' },
   { trofeus: 5800, tipo: 'comemoracao', id: 'fogos', nome: 'Fogos no Coliseu', descricao: 'Na vitória, fogos sobre o Coliseu.', icone: '🎆' },
-  { trofeus: 7000, tipo: 'arena', id: 'imperial', nome: 'Coliseu do Imperador', descricao: 'Ouro, púrpura, camarote imperial e coroa de louros.', icone: '👑' },
+  { trofeus: 7000, tipo: 'arena', id: 'imperial', nome: 'Coliseu do Imperador', descricao: 'Ouro, púrpura, camarote imperial e a coroa radiada do Imperador no gladiador.', icone: '👑' },
 ];
 
 export interface VisualColiseu {

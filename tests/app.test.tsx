@@ -214,11 +214,17 @@ describe('perfil do combatente', () => {
     expect(link).toHaveAttribute('href', '/arena/perfil/claude');
     abrir('/arena/perfil/gemini');
     expect(screen.getByRole('heading', { level: 1, name: 'HELIOS' })).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: 'Títulos de Maestria' }).children).toHaveLength(8);
-    expect(screen.getByRole('list', { name: 'Ligas' }).children).toHaveLength(5);
-    expect(screen.getByRole('list', { name: 'Recompensas de Maestria' }).children).toHaveLength(12);
-    expect(screen.getByRole('list', { name: 'Evolução por liga' }).children).toHaveLength(5);
+    // Perfil em abas: GERAL abre primeiro; cada aba mostra o seu assunto.
     expect(screen.getByRole('region', { name: 'ESTATÍSTICAS' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: /TROFÉUS/ }));
+    expect(screen.getByRole('list', { name: 'Ligas' }).children).toHaveLength(5);
+    expect(screen.getByRole('list', { name: 'Evolução por liga' }).children).toHaveLength(5);
+    expect(screen.getByRole('region', { name: 'MEU COLISEU' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: /MAESTRIA/ }));
+    expect(screen.getByRole('list', { name: 'Títulos de Maestria' }).children).toHaveLength(8);
+    expect(screen.getByRole('list', { name: 'Recompensas de Maestria' }).children).toHaveLength(12);
+    fireEvent.click(screen.getByRole('tab', { name: /HISTÓRIA/ }));
+    expect(screen.getByRole('region', { name: /QUEM É HELIOS/ })).toBeInTheDocument();
   });
 
   it('um endereço de perfil inválido volta para o Arcade', () => {

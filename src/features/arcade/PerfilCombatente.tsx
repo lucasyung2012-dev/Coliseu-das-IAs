@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { indiceLiga, LIGAS, ligaDe, PATENTES, patenteDe, proximaLiga } from '@/game/ligas';
@@ -14,10 +14,20 @@ import { proximoTitulo, RECOMPENSAS, tituloDoNivel, TITULOS } from '@/game/maest
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { tocar } from '@/ui/som';
 
-/** Perfil do combatente: troféus e liga, Maestria detalhada, estatísticas e últimas partidas. */
+/** As abas do perfil (pedido do Lucas: estava bagunçado, tudo numa página só). */
+type Aba = 'geral' | 'trofeus' | 'maestria' | 'historia';
+const ABAS: [Aba, string][] = [
+  ['geral', '📊 GERAL'],
+  ['trofeus', '🏆 TROFÉUS'],
+  ['maestria', '⭐ MAESTRIA'],
+  ['historia', '📖 HISTÓRIA'],
+];
+
+/** Perfil do combatente: a ficha no topo e, em abas, números, troféus, Maestria e história. */
 export default function PerfilCombatente() {
   const { ia } = useParams();
   const p = useProgresso();
+  const [aba, setAba] = useState<Aba>('geral');
   if (!ia || !IAS.includes(ia as IaId)) return <Navigate to="/arena" replace />;
   const id = ia as IaId;
   const pers = PERSONAGENS[id];
@@ -61,9 +71,38 @@ export default function PerfilCombatente() {
             </p>
             <p className="mt-3 inline-block bg-[rgb(var(--ia))] px-2 py-1 font-pixel text-[9px] text-black">★ {titulo.nome.toUpperCase()}</p>
             <p className="mt-3 text-sm italic">"{pers.ficha.frase}"</p>
+            {/* Resumo rápido: troféus, Maestria e vitórias */}
+            <div className="mt-3 flex flex-wrap gap-2 font-pixel text-[9px]">
+              <span className="pixel-box px-2 py-1">
+                🏆 {trofeus} · {ligaDe(trofeus).nome.toUpperCase()}
+              </span>
+              <span className="pixel-box px-2 py-1">⭐ NÍVEL {nivel}</span>
+              <span className="pixel-box px-2 py-1">⚔ {total ? `${Math.round((vitorias / total) * 100)}% VITÓRIAS` : 'SEM PARTIDAS'}</span>
+            </div>
           </div>
         </section>
 
+        {/* Abas: cada assunto no seu lugar */}
+        <div role="tablist" aria-label="Partes do perfil" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {ABAS.map(([a, nome]) => (
+            <button
+              key={a}
+              type="button"
+              role="tab"
+              aria-selected={aba === a}
+              onClick={() => {
+                tocar('clique');
+                setAba(a);
+              }}
+              className={`px-2 py-2 font-pixel text-[9px] sm:text-[10px] ${aba === a ? 'bg-[rgb(var(--ia))] text-black' : 'pixel-box pixel-hover text-muted'}`}
+            >
+              {nome}
+            </button>
+          ))}
+        </div>
+
+        {aba === 'historia' && (
+          <>
         <Bloco titulo="📖 QUEM É {NOME}" nome={pers.gladiador.toUpperCase()}>
           <p className="text-sm leading-relaxed">{pers.ficha.historia}</p>
           <p className="text-sm">
@@ -90,17 +129,17 @@ export default function PerfilCombatente() {
         </Bloco>
 
         <Bloco titulo={`★ HABILIDADE: ${pers.habilidade.nome.toUpperCase()}`}>
-          <p className="text-sm">Uma vez por partida, na hora que você escolher.</p>
-          <p className="text-sm">
-            <strong>⚖ No Tribunal:</strong> {pers.habilidade.tribunal}
-          </p>
-          <p className="text-sm">
-            <strong>⚔ No Duelo:</strong> {pers.habilidade.duelo}
-          </p>
+          <p className="text-sm">Só no Tribunal: uma vez por partida, na hora que você escolher.</p>
+          <p className="text-sm">{pers.habilidade.tribunal}</p>
           <p className="pixel-box p-3 text-sm" style={{ borderLeft: '4px solid rgb(var(--ia))' }}>
             💡 <strong>Dica:</strong> {pers.habilidade.dica}
           </p>
         </Bloco>
+          </>
+        )}
+
+        {aba === 'trofeus' && (
+          <>
 
         {/* Troféus e liga */}
         <Bloco titulo="🏆 TROFÉUS E LIGA">
@@ -170,6 +209,28 @@ export default function PerfilCombatente() {
           </Link>
         </Bloco>
 
+        <Bloco titulo="🛡 EVOLUÇÃO PELOS TROFÉUS">
+          <p className="text-sm text-muted">A cada liga, {pers.gladiador} muda de patente, cresce e ganha equipamento novo.</p>
+          <ol className="grid grid-cols-5 items-end gap-1.5" aria-label="Evolução por liga">
+            {PATENTES.map((pat, i) => {
+              const chegou = indiceLiga(trofeus) >= i;
+              return (
+                <li key={pat} className={`flex flex-col items-center text-center ${chegou ? '' : 'opacity-40'}`}>
+                  <div style={{ width: `${56 + i * 9}%` }}>
+                    <GladiadorPixel ia={id} liga={i} />
+                  </div>
+                  <p className="mt-1 font-pixel text-[6px] sm:text-[8px]">{pat.toUpperCase()}</p>
+                  <p className="text-[10px] text-muted">{LIGAS[i]!.min}+</p>
+                </li>
+              );
+            })}
+          </ol>
+        </Bloco>
+          </>
+        )}
+
+        {aba === 'maestria' && (
+          <>
         {/* Maestria */}
         <Bloco titulo="⭐ MAESTRIA">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -226,24 +287,11 @@ export default function PerfilCombatente() {
           </ol>
         </Bloco>
 
-        <Bloco titulo="🛡 EVOLUÇÃO PELOS TROFÉUS">
-          <p className="text-sm text-muted">A cada liga, {pers.gladiador} muda de patente, cresce e ganha equipamento novo.</p>
-          <ol className="grid grid-cols-5 items-end gap-1.5" aria-label="Evolução por liga">
-            {PATENTES.map((pat, i) => {
-              const chegou = indiceLiga(trofeus) >= i;
-              return (
-                <li key={pat} className={`flex flex-col items-center text-center ${chegou ? '' : 'opacity-40'}`}>
-                  <div style={{ width: `${56 + i * 9}%` }}>
-                    <GladiadorPixel ia={id} liga={i} />
-                  </div>
-                  <p className="mt-1 font-pixel text-[6px] sm:text-[8px]">{pat.toUpperCase()}</p>
-                  <p className="text-[10px] text-muted">{LIGAS[i]!.min}+</p>
-                </li>
-              );
-            })}
-          </ol>
-        </Bloco>
+          </>
+        )}
 
+        {aba === 'geral' && (
+          <>
         {/* Estatísticas */}
         <Bloco titulo="📊 ESTATÍSTICAS">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -277,6 +325,8 @@ export default function PerfilCombatente() {
             </ul>
           )}
         </Bloco>
+          </>
+        )}
       </div>
     </main>
   );

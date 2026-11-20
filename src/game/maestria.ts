@@ -52,7 +52,7 @@ export const RECOMPENSAS: Recompensa[] = [
   { nivel: 50, tipo: 'armadura', nome: 'Armadura dourada', descricao: 'Armadura toda de ouro.', icone: '🟨' },
   { nivel: 50, tipo: 'moldura', nome: 'Moldura de ouro', descricao: 'A moldura do retrato vira ouro.', icone: '🖼️' },
   { nivel: 75, tipo: 'aura', nome: 'Aura de raios', descricao: 'Raios elétricos em volta do gladiador.', icone: '🌩️' },
-  { nivel: 100, tipo: 'coroa', nome: 'Coroa de louros', descricao: 'Coroa de louros dourada e estandarte imperial no Mapa de troféus.', icone: '👑' },
+  { nivel: 100, tipo: 'coroa', nome: 'Coroa de louros do Mestre', descricao: 'Coroa de folhas de louro douradas e estandarte imperial no Mapa de troféus.', icone: '🌿' },
 ];
 
 export interface Visual {
