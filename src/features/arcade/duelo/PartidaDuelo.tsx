@@ -805,8 +805,25 @@ function CartaNaMao(props: {
       onContextMenu={(ev) => ev.preventDefault()}
       aria-label={`${info.nome}, ${info.forca ? `força ${info.forca}, ` : ''}custa ${custo}`}
       title={info.dica}
-      className="relative block h-full w-full select-none transition-transform duration-200 ease-out [-webkit-touch-callout:none] enabled:hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-40"
+      className={`relative block h-full w-full select-none transition-transform duration-200 ease-out [-webkit-touch-callout:none] enabled:hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-40 ${carregando ? 'z-20 -translate-y-2 scale-105' : ''}`}
+      style={carregando ? { filter: `drop-shadow(0 0 8px ${OURO})` } : undefined}
     >
+      {/* Selo nas cartas que dá para carregar: avisa que segurar dá +1 de força */}
+      {carrega && !carregando && (
+        <span className="pointer-events-none absolute -top-2 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-sm border-2 border-black bg-[rgb(242_193_78)] px-1 font-pixel text-[6px] text-black sm:text-[8px]" aria-hidden>
+          ✊ SEGURE +1
+        </span>
+      )}
+      {/* Enquanto segura: o "+1 FORÇA" aparece quando a barra enche */}
+      {carregando && (
+        <span
+          className="carga-pronta pointer-events-none absolute -top-5 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap font-pixel text-[9px] text-[rgb(242_193_78)] [text-shadow:2px_2px_0_#000] sm:text-sm"
+          style={{ animationDelay: `${CARGA_MS}ms` }}
+          aria-hidden
+        >
+          +1 FORÇA!
+        </span>
+      )}
       <CartaVisual
         tipo={carta.tipo}
         paleta={cores.paleta}
@@ -818,8 +835,11 @@ function CartaNaMao(props: {
             <span className="mt-auto hidden pb-0.5 font-pixel text-[7px] text-muted sm:block">[{numero}]</span>
             {/* Barra de carga: cheia = +1 de força (custa +1 gota) */}
             {carrega && (
-              <span className="relative mt-auto block h-1.5 w-full bg-black/60" aria-hidden>
+              <span className="relative mt-auto block h-3 w-full border border-black bg-black/60 sm:h-4" aria-hidden>
                 {carregando && <span className="carga-enchendo absolute inset-y-0 left-0" style={{ animationDuration: `${CARGA_MS}ms` } as CSSProperties} />}
+                <span className="absolute inset-0 grid place-items-center font-pixel text-[5px] text-white [text-shadow:1px_1px_0_#000] sm:text-[7px]">
+                  {carregando ? 'SEGURANDO…' : '+1 FORÇA · +1 💧'}
+                </span>
               </span>
             )}
           </>

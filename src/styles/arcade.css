@@ -1063,3 +1063,22 @@
 .menos-movimento .comemora-aurora {
   animation: none;
 }
+
+/* Carga do Duelo: o "+1 FORÇA!" aparece quando a barra enche */
+.carga-pronta {
+  opacity: 0;
+  animation: carga-pronta 0.5s steps(3) both;
+}
+@keyframes carga-pronta {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.6);
+  }
+  1% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.15);
+  }
+}
