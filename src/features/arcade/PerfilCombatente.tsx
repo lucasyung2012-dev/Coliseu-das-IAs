@@ -10,7 +10,7 @@ import { CenaColiseu } from './cenas/Cenarios';
 
 /** Nome do prêmio em uso (ou "nenhum" para quem ainda não ganhou estandarte/comemoração). */
 const nomePremio = (id: string) => (PREMIOS.find((pr) => pr.id === id)?.nome ?? 'nenhum ainda').toUpperCase();
-import { proximoTitulo, RECOMPENSAS, tituloDoNivel, TITULOS } from '@/game/maestria';
+import { proximoTitulo, recompensasDe, tituloDoNivel, titulosDe } from '@/game/maestria';
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { tocar } from '@/ui/som';
 
@@ -35,8 +35,8 @@ export default function PerfilCombatente() {
   const prox = proximaLiga(trofeus);
   const xp = p.xp[id];
   const nivel = nivelMaestria(xp);
-  const titulo = tituloDoNivel(nivel);
-  const proxTitulo = proximoTitulo(nivel);
+  const titulo = tituloDoNivel(nivel, id);
+  const proxTitulo = proximoTitulo(nivel, id);
   const est = p.estatisticas[id];
   const total = totalPartidas(est);
   const vitorias = est.duelo.vitorias + est.tribunal.vitorias;
@@ -253,7 +253,7 @@ export default function PerfilCombatente() {
             </p>
           )}
           <ol className="mt-1 grid grid-cols-2 gap-1.5 sm:grid-cols-4" aria-label="Títulos de Maestria">
-            {TITULOS.map((t) => {
+            {titulosDe(id).map((t) => {
               const ganho = nivel >= t.nivel;
               return (
                 <li key={t.nivel} className={`pixel-box p-2 text-xs ${ganho ? '' : 'opacity-45'}`}>
@@ -271,7 +271,7 @@ export default function PerfilCombatente() {
         <Bloco titulo="🎁 RECOMPENSAS DE MAESTRIA">
           <p className="text-sm text-muted">Só visual: deixam o gladiador mais estiloso, nunca mais forte.</p>
           <ol className="grid gap-1.5 sm:grid-cols-2" aria-label="Recompensas de Maestria">
-            {RECOMPENSAS.map((r) => {
+            {recompensasDe(id).map((r) => {
               const ganha = nivel >= r.nivel;
               return (
                 <li key={r.nome} className={`pixel-box flex items-start gap-2 p-2 text-xs ${ganha ? '' : 'opacity-45'}`}>

@@ -42,7 +42,7 @@ export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado }:
   const { liga, visual, imperador } = useAparencia(ia);
   const corpo = (
     <div className="relative">
-      {visual.aura !== 'nenhuma' && <div className={`aura-${visual.aura} pointer-events-none absolute inset-[-12%] rounded-full`} aria-hidden />}
+      {visual.aura !== 'nenhuma' && <div className={`aura-${visual.aura} aura-${ia} pointer-events-none absolute inset-[-12%] rounded-full`} aria-hidden />}
       <div style={{ transform: `scale(${ESCALA_POR_LIGA[liga]})`, transformOrigin: '50% 100%' }}>
         <div className={parado ? '' : 'respirar'}>
           <GladiadorPixel ia={ia} liga={liga} armadura={visual.armadura} espelhar={espelhar} />

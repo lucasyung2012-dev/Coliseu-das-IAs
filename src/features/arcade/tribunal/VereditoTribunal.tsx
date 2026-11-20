@@ -193,7 +193,7 @@ function Conquistas({ e, partida, venceu }: { e: EstadoTribunal; partida: Partid
   const antes = nivelMaestria(xpDepois - partida.xp);
   const depois = nivelMaestria(xpDepois);
   const visual = visualDoNivel(depois);
-  const novas = recompensasNovas(antes, depois);
+  const novas = recompensasNovas(antes, depois, e.ia);
   return (
     <>
       {venceu && (visual.pose || visual.fala) && (

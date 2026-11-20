@@ -1,4 +1,5 @@
-import { recompensasNovas, RECOMPENSAS, tituloDoNivel, visualDoNivel } from '@/game/maestria';
+import { recompensasDe, recompensasNovas, tituloDoNivel, titulosDe, visualDoNivel } from '@/game/maestria';
+import { IAS } from '@/game/personagens';
 import { patenteDe } from '@/game/ligas';
 import { gradeGladiador } from '@/ui/pixel/sprites';
 
@@ -12,13 +13,25 @@ describe('recompensas de Maestria', () => {
   });
 
   it('avisa as recompensas novas ao subir de nível', () => {
-    expect(recompensasNovas(4, 5).map((r) => r.tipo)).toEqual(['titulo', 'fala']);
-    expect(recompensasNovas(1, 100)).toHaveLength(RECOMPENSAS.length);
-    expect(recompensasNovas(6, 7)).toEqual([]);
+    expect(recompensasNovas(4, 5, 'claude').map((r) => r.tipo)).toEqual(['titulo', 'fala']);
+    expect(recompensasNovas(1, 100, 'gemini')).toHaveLength(recompensasDe('gemini').length);
+    expect(recompensasNovas(6, 7, 'chatgpt')).toEqual([]);
   });
 
-  it('o primeiro título é Novato, para não confundir com a patente Recruta', () => {
-    expect(tituloDoNivel(1).nome).toBe('Novato');
+  it('cada combatente tem os seus títulos e recompensas (nos mesmos níveis), nenhum igual ao dos outros', () => {
+    expect(tituloDoNivel(1, 'claude').nome).toBe('Aluno da Ágora');
+    expect(tituloDoNivel(100, 'chatgpt').nome).toBe('Almirante Eterno');
+    expect(tituloDoNivel(60, 'gemini').nome).toBe('Mestre das Constelações');
+    const titulos = IAS.flatMap((ia) => titulosDe(ia).map((t) => t.nome));
+    expect(new Set(titulos).size).toBe(24);
+    const recompensas = IAS.flatMap((ia) => recompensasDe(ia).map((r) => r.nome));
+    expect(new Set(recompensas).size).toBeGreaterThanOrEqual(30);
+    for (const ia of IAS) {
+      expect(titulosDe(ia).map((t) => t.nivel)).toEqual(titulosDe('claude').map((t) => t.nivel));
+      expect(recompensasDe(ia).map((r) => r.tipo)).toEqual(recompensasDe('claude').map((r) => r.tipo));
+      // O primeiro título não pode ser "Recruta" (é a patente da liga).
+      expect(titulosDe(ia)[0]!.nome).not.toMatch(/Recruta/);
+    }
   });
 });
 

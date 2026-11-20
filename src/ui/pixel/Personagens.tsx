@@ -20,7 +20,7 @@ function grade(ia: IaId, liga: number) {
 /** Gladiador em pixel. `liga` (0 a 4) muda o equipamento; `armadura` vem da Maestria. */
 export function GladiadorPixel({ ia, armadura, liga = 0, ...resto }: Base & { ia: IaId; armadura?: Armadura; liga?: number }) {
   const p = PERSONAGENS[ia];
-  return <Sprite grade={grade(ia, liga)} paleta={paletaGladiador(p.cor, armadura)} titulo={`${p.gladiador} (${p.ia})`} {...resto} />;
+  return <Sprite grade={grade(ia, liga)} paleta={paletaGladiador(p.cor, armadura, ia)} titulo={`${p.gladiador} (${p.ia})`} {...resto} />;
 }
 
 export function JuradoPixel({ jurado, ...resto }: Base & { jurado: JuradoId }) {

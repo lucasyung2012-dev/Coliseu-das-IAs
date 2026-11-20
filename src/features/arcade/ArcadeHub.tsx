@@ -145,7 +145,7 @@ export default function ArcadeHub() {
             <p className="mt-1 text-xs text-muted">{prox ? `Faltam ${prox.faltam} troféus para ${prox.liga.nome}` : 'Liga máxima: Imperadores'}</p>
 
             <p className="mt-3 font-pixel text-[10px]">
-              MAESTRIA {nivelMaestria(p.xp[ia])} · {tituloDoNivel(nivelMaestria(p.xp[ia])).nome.toUpperCase()} <span className="text-muted">· {xpNivel}/{XP_POR_NIVEL} XP</span>
+              MAESTRIA {nivelMaestria(p.xp[ia])} · {tituloDoNivel(nivelMaestria(p.xp[ia]), ia).nome.toUpperCase()} <span className="text-muted">· {xpNivel}/{XP_POR_NIVEL} XP</span>
             </p>
             <Barra valor={xpNivel / XP_POR_NIVEL} rotulo="Progresso de Maestria" fina />
 

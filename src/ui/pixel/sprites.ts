@@ -397,9 +397,16 @@ function escurecer(hex: string, fator = 0.7): string {
 /** Armadura: a padrão (metal), a da cor da IA (Maestria 10) ou a dourada (Maestria 50). */
 export type Armadura = 'padrao' | 'cor' | 'ouro';
 
-export function paletaGladiador(corIa: string, armadura: Armadura = 'padrao'): Paleta {
+/** Armadura da Maestria 50, uma de cada combatente: bronze antigo, almirante e ouro solar. */
+const OURO_DA_IA: Record<string, Paleta> = {
+  claude: { M: '#b8733a', W: '#f0b070' },
+  chatgpt: { M: '#24407a', W: '#f2c14e' },
+  gemini: { M: '#f5c030', W: '#fff6c0' },
+};
+
+export function paletaGladiador(corIa: string, armadura: Armadura = 'padrao', ia?: string): Paleta {
   const metal: Paleta =
-    armadura === 'ouro' ? { M: '#e8b84a', W: '#fff1b0' } : armadura === 'cor' ? { M: rgb(corIa, 0.85), W: rgb(corIa, 1.25) } : {};
+    armadura === 'ouro' ? ((ia && OURO_DA_IA[ia]) || { M: '#e8b84a', W: '#fff1b0' }) : armadura === 'cor' ? { M: rgb(corIa, 0.85), W: rgb(corIa, 1.25) } : {};
   return { ...BASE, C: rgb(corIa), D: rgb(corIa, 0.55), H: '#3a2414', ...metal };
 }
 

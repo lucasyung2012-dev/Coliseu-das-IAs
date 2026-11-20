@@ -906,3 +906,64 @@
 .menos-movimento .comemora-cair, .menos-movimento .comemora-erguer, .menos-movimento .comemora-soprar, .menos-movimento .comemora-fogo {
   animation: none;
 }
+
+/* Auras de Maestria de cada combatente (pedido do Lucas: tudo personalizado).
+   Cassius: folhas de oliveira (nível 15) e luz de lamparina (75).
+   Octavius: engrenagens (15) e tempestade do mar (75).
+   Helios: poeira de estrelas (15, a dourada) e raios de sol (75). */
+.aura-faiscas.aura-claude {
+  border: 4px dotted rgb(130 190 80 / 0.9);
+}
+.aura-faiscas.aura-claude::after {
+  border-color: rgb(190 230 120 / 0.75);
+}
+.aura-faiscas.aura-chatgpt {
+  border: 5px dashed rgb(64 220 170 / 0.8);
+  animation-duration: 9s;
+}
+.aura-faiscas.aura-chatgpt::after {
+  border: 3px dashed rgb(180 255 230 / 0.6);
+}
+.aura-raios.aura-claude {
+  background: radial-gradient(circle, rgb(255 190 100 / 0.4), transparent 65%);
+  box-shadow: 0 0 24px 6px rgb(255 170 80 / 0.55), inset 0 0 18px rgb(255 220 160 / 0.6);
+  animation: lamparina 1.4s ease-in-out infinite alternate;
+}
+@keyframes lamparina {
+  to {
+    opacity: 0.6;
+    transform: scale(1.04);
+  }
+}
+.aura-raios.aura-chatgpt {
+  background: radial-gradient(circle, rgb(60 140 255 / 0.35), transparent 65%);
+  box-shadow: 0 0 22px 4px rgb(64 200 220 / 0.6), inset 0 0 18px rgb(160 240 255 / 0.6);
+}
+.aura-raios.aura-gemini {
+  background:
+    radial-gradient(circle, rgb(255 220 120 / 0.45), transparent 60%),
+    repeating-conic-gradient(rgb(255 200 60 / 0.35) 0 8deg, transparent 8deg 22deg);
+  box-shadow: 0 0 26px 6px rgb(255 200 80 / 0.5);
+  animation: girar 12s linear infinite;
+}
+
+/* Entradas especiais (Maestria 30) de cada um. */
+.raio-entrada.entrada-chatgpt {
+  background: linear-gradient(rgb(255 255 255 / 0), rgb(120 240 210 / 0.85) 60%, rgb(255 255 255 / 0));
+}
+.pergaminho-voando {
+  animation: pergaminho-voando 1.1s ease-out both;
+}
+@keyframes pergaminho-voando {
+  from {
+    transform: translate(0, 40px) rotate(0deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), -60px) rotate(var(--giro));
+    opacity: 0;
+  }
+}

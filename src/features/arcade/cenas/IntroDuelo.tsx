@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
@@ -22,11 +22,15 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   const roleta = useRoleta(ia, rival, fase === 0);
   // O rival luta na mesma liga do jogador; o jogador entra com tudo o que conquistou.
   const { liga, visual } = useAparencia(ia);
-  const titulo = tituloDoNivel(nivelMaestria(useProgresso().xp[ia])).nome;
+  const titulo = tituloDoNivel(nivelMaestria(useProgresso().xp[ia]), ia).nome;
   const { arena } = useColiseu(ia);
   useSonsDaFase(fase, {
     1: 'portao',
-    2: 'passos',
+    // Entrada com tambores (Maestria 30 de Octavius): três batidas no lugar dos passos.
+    2: () => {
+      if (visual.entrada && ia === 'chatgpt') [0, 260, 520].forEach((ms) => window.setTimeout(() => tocar('martelo'), ms));
+      else tocar('passos');
+    },
     3: 'vs',
     4: () => {
       tocar('espadas');
@@ -43,11 +47,26 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
         {fase >= 2 && (
           <>
             {visual.entrada && fase === 2 && (
-              // Entrada especial (Maestria 30): um raio de luz cai sobre o seu gladiador.
-              <>
-                <div className="raio-entrada absolute bottom-[6%] left-[16%] top-0 w-[11%]" aria-hidden />
-                <Faiscas x={21} y={70} />
-              </>
+              // Entrada especial (Maestria 30), uma de cada: Cassius com pergaminhos voando,
+              // Octavius com tambores (luz verde e as batidas), Helios com o raio de luz do céu.
+              ia === 'claude' ? (
+                <>
+                  {[-30, -14, 2, 18, 34, -22, 26].map((dx, i) => (
+                    <div
+                      key={i}
+                      className="pergaminho-voando absolute bottom-[20%] left-[20%] h-[6%] w-[3%] rounded-sm border border-[#7a4a22] bg-[#f0dcae]"
+                      style={{ animationDelay: `${i * 90}ms`, '--dx': `${dx}px`, '--giro': `${dx * 6}deg` } as CSSProperties}
+                      aria-hidden
+                    />
+                  ))}
+                  <Faiscas x={21} y={70} />
+                </>
+              ) : (
+                <>
+                  <div className={`raio-entrada entrada-${ia} absolute bottom-[6%] left-[16%] top-0 w-[11%]`} aria-hidden />
+                  <Faiscas x={21} y={70} />
+                </>
+              )
             )}
             <div className="entrar-esq absolute bottom-[6%] left-[12%] w-[19%]">
               <div className={fase >= 4 ? 'investida-esq' : ''}>
