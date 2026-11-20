@@ -816,7 +816,7 @@ function CartaNaMao(props: {
         rodape={
           <>
             <span className="mt-auto hidden pb-0.5 font-pixel text-[7px] text-muted sm:block">[{numero}]</span>
-            {/* Barra de carga: cheia = +1 de força (custa +1 de fôlego) */}
+            {/* Barra de carga: cheia = +1 de força (custa +1 gota) */}
             {carrega && (
               <span className="relative mt-auto block h-1.5 w-full bg-black/60" aria-hidden>
                 {carregando && <span className="carga-enchendo absolute inset-y-0 left-0" style={{ animationDuration: `${CARGA_MS}ms` } as CSSProperties} />}

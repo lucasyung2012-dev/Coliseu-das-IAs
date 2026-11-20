@@ -149,7 +149,7 @@ export default function ArcadeHub() {
             </p>
             <Barra valor={xpNivel / XP_POR_NIVEL} rotulo="Progresso de Maestria" fina />
 
-            <p className="mt-4 font-pixel text-[10px] text-[rgb(var(--ia))]">★ HABILIDADE: {pers.habilidade.nome.toUpperCase()}</p>
+            <p className="mt-4 font-pixel text-[10px] text-[rgb(var(--ia))]">★ HABILIDADE NO TRIBUNAL: {pers.habilidade.nome.toUpperCase()}</p>
             <Link
               to={`/arena/perfil/${ia}`}
               onClick={() => {
