@@ -12,7 +12,7 @@ import type { LadoId } from '../tribunal/dilemas';
 import type { EstadoDuelo, TipoCarta } from './motor';
 
 /** Muda quando as mensagens mudarem: aparelhos com versões diferentes não se misturam. */
-export const VERSAO_ONLINE = 1;
+export const VERSAO_ONLINE = 2;
 
 export interface CartaoCombatente {
   versao: number;
@@ -23,6 +23,8 @@ export interface CartaoCombatente {
   imperador: boolean;
   coliseu: VisualColiseu;
   baralho: TipoCarta[];
+  /** Confirmou o baralho na sala (o COMEÇAR só libera com os dois prontos). */
+  pronto: boolean;
   /** Impressão digital da conta (sem nome nem e-mail); null = jogando sem conta. */
   conta: string | null;
 }

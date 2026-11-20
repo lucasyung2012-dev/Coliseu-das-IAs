@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
-import { coliseuDe, nivelMaestria, recordeDe, useProgresso } from '@/game/progresso';
+import { coliseuDe, escolherBaralho, nivelMaestria, recordeDe, useProgresso } from '@/game/progresso';
 import { impressaoDaConta } from '@/game/conta';
 import { indiceLiga, PATENTES } from '@/game/ligas';
 import { visualDoNivel } from '@/game/maestria';
-import { baralhoInicial, novoDuelo, validarBaralho, type EstadoDuelo } from '@/game/duelo/motor';
+import { baralhoInicial, CARTAS, novoDuelo, TAMANHO_BARALHO, TODAS_AS_CARTAS, validarBaralho, type EstadoDuelo, type TipoCarta } from '@/game/duelo/motor';
+import { paletaTropa } from '@/ui/pixel/tropas';
+import { CartaVisual } from './CartaVisual';
 import { mesmaConta, normalizarCodigo, novoCodigo, VERSAO_ONLINE, type CartaoCombatente } from '@/game/duelo/online';
 import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import { criarSala, entrarNaSala, ErroSala, type Sala } from '@/services/sala';
@@ -47,6 +49,9 @@ export default function DueloOnline() {
   const [minhaIa, setMinhaIa] = useState<IaId>(p.iaAtual);
   const [conta, setConta] = useState<string | null>(null);
   const [cartaoRival, setCartaoRival] = useState<CartaoCombatente | null>(null);
+  // Baralho confirmado na sala (pedido do Lucas: os dois confirmam antes de começar).
+  const [pronto, setPronto] = useState(false);
+  const [editando, setEditando] = useState(false);
   const sala = useRef<Sala | null>(null);
   const saindo = useRef(false);
 
@@ -63,13 +68,19 @@ export default function DueloOnline() {
     imperador: recordeDe(p, minhaIa) >= TROFEUS_IMPERADOR,
     coliseu: coliseuDe(p, minhaIa),
     baralho: validarBaralho(p.baralhoDuelo, baralhoInicial(minhaIa)),
+    pronto,
     conta,
   };
 
-  // Sempre que o meu cartão mudar (troquei de IA, a conta chegou), mando de novo.
+  // Sempre que o meu cartão mudar (troquei de IA ou de baralho, confirmei, a conta chegou), mando de novo.
   useEffect(() => {
     if (sala.current && (fase.tipo === 'sala' || fase.tipo === 'esperando')) sala.current.enviar({ t: 'ola', cartao: meuCartao });
-  }, [minhaIa, conta, fase.tipo]);
+  }, [minhaIa, conta, fase.tipo, pronto, p.baralhoDuelo?.join()]);
+
+  // Voltou para a sala (revanche): os dois confirmam o baralho de novo.
+  useEffect(() => {
+    if (fase.tipo === 'sala') setPronto(false);
+  }, [fase.tipo]);
 
   // Fechou a tela: fecha a sala.
   useEffect(
@@ -149,7 +160,7 @@ export default function DueloOnline() {
   const iaRepetida = !!cartaoRival && cartaoRival.ia === minhaIa;
 
   const comecar = () => {
-    if (!sala.current || !cartaoRival || contaRepetida || iaRepetida) return;
+    if (!sala.current || !cartaoRival || contaRepetida || iaRepetida || !pronto || !cartaoRival.pronto) return;
     desbloquear();
     tocar('start');
     const config = { lado: (Math.random() < 0.5 ? 'favor' : 'contra') as LadoId, dilema: Math.floor(Math.random() * DILEMAS.length) };
@@ -259,6 +270,35 @@ export default function DueloOnline() {
                   {cartaoRival ? <CartaoNaSala titulo="SEU AMIGO" cartao={cartaoRival} /> : <p className="pixel-box piscar grid place-items-center p-6 font-pixel text-[9px] text-muted">CONECTANDO…</p>}
                 </div>
 
+                {/* O seu baralho: dá para mudar aqui mesmo; depois, confirmar. */}
+                {!contaRepetida && (
+                  <BaralhoNaSala
+                    ia={minhaIa}
+                    baralho={meuCartao.baralho}
+                    pronto={pronto}
+                    onMudar={() => {
+                      tocar('clique');
+                      setEditando(true);
+                    }}
+                    onConfirmar={() => {
+                      desbloquear();
+                      tocar(pronto ? 'clique' : 'selecionar');
+                      setPronto(!pronto);
+                    }}
+                  />
+                )}
+                {editando && (
+                  <EditorDeBaralho
+                    ia={minhaIa}
+                    inicial={meuCartao.baralho}
+                    onFechar={(novo) => {
+                      if (novo) escolherBaralho(novo);
+                      setPronto(false);
+                      setEditando(false);
+                    }}
+                  />
+                )}
+
                 {contaRepetida ? (
                   <p role="alert" className="pixel-box p-4 text-center font-pixel text-[10px] leading-relaxed text-accent-2">
                     🚫 VOCÊ NÃO PODE JOGAR CONTRA VOCÊ MESMO. OS DOIS APARELHOS ESTÃO COM A MESMA CONTA.
@@ -274,6 +314,7 @@ export default function DueloOnline() {
                           onClick={() => {
                             tocar('selecionar');
                             setMinhaIa(x);
+                            setPronto(false);
                           }}
                           className="pixel-box pixel-hover px-3 py-2 font-pixel text-[10px]"
                           style={{ color: `rgb(${PERSONAGENS[x].cor})` }}
@@ -285,18 +326,21 @@ export default function DueloOnline() {
                   </div>
                 ) : iaRepetida ? (
                   <p className="piscar text-center font-pixel text-[9px] text-muted">OS DOIS ESTÃO COM A MESMA IA: O SEU AMIGO ESTÁ ESCOLHENDO OUTRA…</p>
+                ) : !pronto || !cartaoRival?.pronto ? (
+                  <p className="text-center font-pixel text-[9px] leading-relaxed text-muted">
+                    {!pronto ? 'CONFIRME O SEU BARALHO PARA COMEÇAR.' : 'ESPERANDO O SEU AMIGO CONFIRMAR O BARALHO…'}
+                  </p>
                 ) : anfitriao ? (
                   <button
                     type="button"
-                    disabled={!cartaoRival}
                     onClick={comecar}
-                    className="pixel-box pixel-hover mx-auto px-6 py-4 font-pixel text-lg text-accent disabled:opacity-40"
+                    className="pixel-box pixel-hover mx-auto px-6 py-4 font-pixel text-lg text-accent"
                     style={{ boxShadow: '0 0 0 3px #f2c14e, 0 0 28px -6px #f2c14e' }}
                   >
                     ⚔ COMEÇAR O DUELO
                   </button>
                 ) : (
-                  <p className="piscar text-center font-pixel text-[9px] text-muted">ESPERANDO QUEM CRIOU A SALA COMEÇAR…</p>
+                  <p className="piscar text-center font-pixel text-[9px] text-muted">OS DOIS ESTÃO PRONTOS! ESPERANDO QUEM CRIOU A SALA COMEÇAR…</p>
                 )}
               </section>
             )}
@@ -331,6 +375,106 @@ function CartaoNaSala({ titulo, cartao, meu = false }: { titulo: string; cartao:
         </p>
         <p className="mt-1 font-pixel text-[8px] text-[rgb(242_193_78)]">{PATENTES[cartao.liga]?.toUpperCase()}</p>
         <p className="mt-1 text-xs text-muted">Baralho de {cartao.baralho.length} cartas · {cartao.conta ? 'com conta' : 'sem conta'}</p>
+        <p className={`mt-1 font-pixel text-[8px] ${cartao.pronto ? 'text-[rgb(242_193_78)]' : 'text-muted'}`}>{cartao.pronto ? '✔ BARALHO CONFIRMADO' : 'ESCOLHENDO O BARALHO…'}</p>
+      </div>
+    </div>
+  );
+}
+
+/** As cores das cartas são as da IA (igual à Sala do Duelo). */
+function coresDe(ia: IaId) {
+  const [r, g, b] = PERSONAGENS[ia].cor.split(' ').map(Number) as [number, number, number];
+  const forte = `rgb(${r} ${g} ${b})`;
+  return { forte, paleta: paletaTropa(forte, `rgb(${Math.round(r * 0.55)} ${Math.round(g * 0.55)} ${Math.round(b * 0.55)})`) };
+}
+
+/** O seu baralho na sala: as 8 cartas, MUDAR e CONFIRMAR (pedido do Lucas). */
+function BaralhoNaSala({ ia, baralho, pronto, onMudar, onConfirmar }: { ia: IaId; baralho: TipoCarta[]; pronto: boolean; onMudar: () => void; onConfirmar: () => void }) {
+  const { forte, paleta } = coresDe(ia);
+  return (
+    <section aria-label="Seu baralho na sala" className="pixel-box flex flex-col gap-3 p-4" style={pronto ? { boxShadow: '0 0 0 3px #f2c14e' } : undefined}>
+      <p className="font-pixel text-[10px]" style={{ color: forte }}>
+        🃏 SEU BARALHO {pronto && <span className="text-[rgb(242_193_78)]">· ✔ CONFIRMADO</span>}
+      </p>
+      <ul className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+        {baralho.map((c) => (
+          <li key={c}>
+            <CartaVisual tipo={c} paleta={paleta} corNome={forte} tamanho="mini" />
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap justify-center gap-3">
+        <button type="button" disabled={pronto} onClick={onMudar} className="pixel-box pixel-hover px-3 py-2 font-pixel text-[10px] text-muted disabled:opacity-40">
+          ✏️ MUDAR BARALHO
+        </button>
+        <button
+          type="button"
+          onClick={onConfirmar}
+          className={`px-4 py-2 font-pixel text-[10px] ${pronto ? 'pixel-box pixel-hover text-muted' : 'bg-[rgb(242_193_78)] text-black'}`}
+        >
+          {pronto ? '↺ DESFAZER' : '✔ CONFIRMAR BARALHO'}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+/** Trocar as cartas do baralho dentro da sala (salva para os próximos duelos também). */
+function EditorDeBaralho({ ia, inicial, onFechar }: { ia: IaId; inicial: TipoCarta[]; onFechar: (novo: TipoCarta[] | null) => void }) {
+  const { forte, paleta } = coresDe(ia);
+  const [escolhidas, setEscolhidas] = useState<TipoCarta[]>(inicial);
+  const completo = escolhidas.length === TAMANHO_BARALHO;
+  const alternar = (c: TipoCarta) => {
+    if (escolhidas.includes(c)) {
+      tocar('clique');
+      setEscolhidas((l) => l.filter((x) => x !== c));
+    } else if (!completo) {
+      tocar('selecionar');
+      setEscolhidas((l) => [...l, c]);
+    } else tocar('falha');
+  };
+  return (
+    <div role="dialog" aria-label="Mudar baralho" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3">
+      <div className="pixel-box flex max-h-full w-full max-w-3xl flex-col gap-3 overflow-y-auto p-4">
+        <p className="font-pixel text-xs" style={{ color: forte }}>
+          ✏️ MUDAR BARALHO · {escolhidas.length}/{TAMANHO_BARALHO}
+        </p>
+        <p className="text-xs text-muted">Toque numa carta para pôr ou tirar. O baralho fica salvo para os próximos duelos.</p>
+        <ul className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+          {TODAS_AS_CARTAS.map((c) => {
+            const no = escolhidas.includes(c);
+            return (
+              <li key={c}>
+                <button
+                  type="button"
+                  onClick={() => alternar(c)}
+                  aria-pressed={no}
+                  aria-label={CARTAS[c].nome}
+                  className="block w-full rounded-sm transition"
+                  style={no ? { boxShadow: `0 0 0 3px ${forte}`, transform: 'translateY(-3px)' } : { opacity: completo ? 0.4 : 0.8 }}
+                >
+                  <CartaVisual tipo={c} paleta={paleta} corNome={forte} tamanho="mini" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="flex flex-wrap justify-center gap-3">
+          <button type="button" onClick={() => onFechar(null)} className="pixel-box pixel-hover px-3 py-2 font-pixel text-[10px] text-muted">
+            ✖ CANCELAR
+          </button>
+          <button
+            type="button"
+            disabled={!completo}
+            onClick={() => {
+              tocar('start');
+              onFechar(escolhidas);
+            }}
+            className="bg-[rgb(242_193_78)] px-4 py-2 font-pixel text-[10px] text-black disabled:opacity-40"
+          >
+            {completo ? '✔ SALVAR BARALHO' : `FALTAM ${TAMANHO_BARALHO - escolhidas.length}`}
+          </button>
+        </div>
       </div>
     </div>
   );

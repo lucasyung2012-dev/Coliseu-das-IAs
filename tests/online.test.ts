@@ -9,6 +9,7 @@ const cartao = (conta: string | null, ia: CartaoCombatente['ia'] = 'claude'): Ca
   imperador: false,
   coliseu: { arena: 'madeira', estandarte: 'nenhum', comemoracao: 'nenhuma' },
   baralho: ['frase', 'tese'],
+  pronto: false,
   conta,
 });
 
