@@ -39,7 +39,7 @@ describe('Duelo online', () => {
 
   it('só aceita mensagens conhecidas e cartões da mesma versão', () => {
     expect(lerMensagem({ t: 'ola', cartao: cartao(null) })).not.toBeNull();
-    expect(lerMensagem({ t: 'ola', cartao: { ...cartao(null), versao: 999 } })).toBeNull();
+    expect(lerMensagem({ t: 'ola', cartao: { ...cartao(null), versao: 999 } })).toEqual({ t: 'versao-diferente' });
     expect(lerMensagem({ t: 'ola', cartao: { ...cartao(null), ia: 'hal9000' } })).toBeNull();
     expect(lerMensagem({ t: 'acao', acao: { tipo: 'golpe' } })).not.toBeNull();
     expect(lerMensagem({ t: 'hackear' })).toBeNull();

@@ -37,7 +37,9 @@ export type MensagemOnline =
   | { t: 'acao'; acao: AcaoOnline }
   | { t: 'estado'; e: EstadoDuelo }
   | { t: 'revanche' }
-  | { t: 'sair' };
+  | { t: 'sair' }
+  /** Só local: o outro aparelho está com outra versão do jogo (precisa recarregar). */
+  | { t: 'versao-diferente' };
 
 // Palavras do Coliseu para o código da sala (sem acento, fáceis de ditar).
 const PALAVRAS = ['LEAO', 'AGUIA', 'LOBA', 'TOURO', 'CORUJA', 'URSO', 'FALCAO', 'JAVALI', 'ELMO', 'ESCUDO', 'LANCA', 'TOCHA'];
@@ -76,6 +78,7 @@ export function lerMensagem(bruto: unknown): MensagemOnline | null {
   const m = bruto as { t?: unknown };
   if (m.t === 'ola') {
     const c = (bruto as { cartao?: Partial<CartaoCombatente> }).cartao;
+    if (c && typeof c.versao === 'number' && c.versao !== VERSAO_ONLINE) return { t: 'versao-diferente' };
     if (!c || c.versao !== VERSAO_ONLINE || !['claude', 'chatgpt', 'gemini'].includes(c.ia as string) || !Array.isArray(c.baralho)) return null;
     return bruto as MensagemOnline;
   }

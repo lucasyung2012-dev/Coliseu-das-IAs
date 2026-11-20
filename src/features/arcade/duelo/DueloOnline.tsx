@@ -96,6 +96,7 @@ export default function DueloOnline() {
     sala.current = s;
     s.ouvir((m) => {
       if (m.t === 'ola') setCartaoRival(m.cartao);
+      if (m.t === 'versao-diferente') setErro('Os dois aparelhos estão com versões diferentes do jogo. Feche o jogo e abra de novo nos dois (ou recarregue a página) e crie outra sala.');
       if (m.t === 'comecar') setFase((f) => ({ tipo: 'jogando', config: m.config, inicial: m.inicial, rodada: f.tipo === 'jogando' ? f.rodada + 1 : 1 }));
       if (m.t === 'revanche') setFase({ tipo: 'sala' });
       if (m.t === 'sair') {
