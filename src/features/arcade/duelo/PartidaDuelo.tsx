@@ -7,6 +7,8 @@ import { coliseuDe, marcarPartidaAberta, obterProgresso, recordeDe, registrarAba
 import { premiosNovos, type ComemoracaoId, type Premio } from '@/game/coliseu';
 import { Estandarte } from '@/ui/pixel/estandartes';
 import Comemoracao from '../Comemoracao';
+import { resultadoDe, type CartaoCombatente } from '@/game/duelo/online';
+import type { Sala } from '@/services/sala';
 import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import {
   baralhoDaIa,
@@ -110,6 +112,7 @@ export default function PartidaDuelo({
   onDeNovo,
   onSair,
   doisJogadores = false,
+  online,
 }: {
   ia: IaId;
   rival: IaId;
@@ -117,7 +120,20 @@ export default function PartidaDuelo({
   onSair: () => void;
   /** Modo 2 jogadores no mesmo aparelho: o "rival" é o Jogador 2. */
   doisJogadores?: boolean;
+  /**
+   * Duelo online: quem criou a sala é o juiz (lado "eu" do motor) e roda a partida;
+   * o convidado (lado "rival") só manda as jogadas e desenha o que o juiz manda.
+   */
+  online?: {
+    papel: 'anfitriao' | 'convidado';
+    sala: Sala;
+    config: { lado: LadoId; dilema: number };
+    inicial: EstadoDuelo;
+    cartaoRival: CartaoCombatente;
+  };
 }) {
+  const meuLado: Lado = online?.papel === 'convidado' ? 'rival' : 'eu';
+  const convidado = online?.papel === 'convidado';
   const p = useProgresso();
   const dificuldade = useDificuldade();
   const { liga } = useAparencia(ia);
@@ -130,7 +146,9 @@ export default function PartidaDuelo({
   const visEu = coliseuDe(p, ia);
   const visRival = coliseuDe(p, rival);
   const [acerto] = useState(() => (ranqueado ? ACERTO_RIVAL[indiceLiga(p.trofeus[ia])]! : ACERTO_TREINO[dificuldade]));
-  const [config] = useState(() => ({ lado: (Math.random() < 0.5 ? 'favor' : 'contra') as LadoId, dilema: Math.floor(Math.random() * DILEMAS.length) }));
+  const [config] = useState(() => online?.config ?? { lado: (Math.random() < 0.5 ? 'favor' : 'contra') as LadoId, dilema: Math.floor(Math.random() * DILEMAS.length) });
+  /** Os prêmios do mapa de cada lado: no online, os do outro jogador vêm do cartão dele. */
+  const visDe = (l: Lado) => (online && l !== meuLado ? online.cartaoRival.coliseu : l === 'eu' ? visEu : visRival);
   const dilema = DILEMAS[config.dilema]!;
   const ladoRival: LadoId = config.lado === 'favor' ? 'contra' : 'favor';
   const cores = useMemo<Record<Lado, Cores>>(() => ({ eu: coresDaIa(ia), rival: coresDaIa(rival) }), [ia, rival]);
@@ -141,6 +159,7 @@ export default function PartidaDuelo({
     rival: doisJogadores ? { estilo: ESTILO_PREFERIDO[rival], cartas: baralhoInicial(rival) } : baralhoDaIa(rival),
   }));
   const [e, setE] = useState<EstadoDuelo>(() =>
+    online?.inicial ??
     novoDuelo({
       frasesEu: embaralhar(dilema.lados[config.lado].tempos.flat().map((c) => c.titulo)),
       frasesRival: embaralhar(dilema.lados[ladoRival].tempos.flat().map((c) => c.titulo)),
@@ -152,8 +171,10 @@ export default function PartidaDuelo({
   const [segurando, setSegurando] = useState<Record<Lado, { id: string; inicio: number } | null>>({ eu: null, rival: null });
   // Carta que acabou de ser jogada, voando da mão para a arena (por lugar na mão).
   const [saindo, setSaindo] = useState<Record<string, { tipo: TipoCarta; id: string }>>({});
-  const [abertura, setAbertura] = useState<Abertura>('tema');
-  const pausado = tutorial.aberto || abertura !== null;
+  // Online: os dois já leram o tema na sala; começa direto na entrada dos gladiadores.
+  const [abertura, setAbertura] = useState<Abertura>(online ? 'entrada' : 'tema');
+  // Online, o tutorial de um não pode parar a luta do outro.
+  const pausado = (!online && tutorial.aberto) || abertura !== null;
 
   // A contagem anda sozinha; o tema espera o jogador ler com calma e apertar ESTOU PRONTO.
   useEffect(() => {
@@ -170,11 +191,28 @@ export default function PartidaDuelo({
   }, [abertura, tutorial.aberto]);
 
   useEffect(() => {
-    if (pausado) return;
-    const ctx = { acerto, iaRival: rival, aleatorio: Math.random, rivalHumano: doisJogadores };
+    // Online, só o juiz roda a partida; o convidado desenha o que chega.
+    if (pausado || convidado) return;
+    const ctx = { acerto, iaRival: rival, aleatorio: Math.random, rivalHumano: doisJogadores || !!online };
     const id = window.setInterval(() => setE((s) => passo(s, ctx)), TICK);
     return () => window.clearInterval(id);
   }, [acerto, rival, pausado]);
+
+  // Online. Juiz: manda o estado a cada mudança e aplica as jogadas do convidado.
+  // Convidado: recebe o estado.
+  useEffect(() => {
+    if (online?.papel === 'anfitriao') online.sala.enviar({ t: 'estado', e });
+  }, [e]);
+  useEffect(() => {
+    if (!online) return;
+    return online.sala.ouvir((m) => {
+      if (online.papel === 'convidado' && m.t === 'estado') setE(m.e);
+      if (online.papel === 'anfitriao' && m.t === 'acao') {
+        const a = m.acao;
+        setE((s) => (a.tipo === 'golpe' ? golpeDoGladiador(s, 'rival') : podeJogar(s, 'rival', a.id) ? jogarCarta(s, 'rival', a.id, a.carga) : s));
+      }
+    });
+  }, []);
 
   // Sons: cada efeito novo toca uma vez (um de cada tipo por vez).
   const visto = useRef(0);
@@ -210,7 +248,8 @@ export default function PartidaDuelo({
       tocar(r === 'vitoria' ? 'vitoria' : r === 'derrota' ? 'derrota' : 'martelo');
       // Com conta, o Duelo vale troféus e XP de Maestria, como o Tribunal.
       // A partida de 2 jogadores é amistosa: não entra no histórico.
-      if (!doisJogadores) {
+      // A online também é amistosa.
+      if (!doisJogadores && !online) {
         const antes = recordeDe(obterProgresso(), ia);
         setRegistrada(registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: !ranqueado, dilema: dilema.pergunta }));
         setPremios(premiosNovos(ia, antes, recordeDe(obterProgresso(), ia)));
@@ -229,7 +268,9 @@ export default function PartidaDuelo({
     const vaga = `${lado}-${e[lado].mao.findIndex((x) => x.id === carta.id)}`;
     setSaindo((x) => ({ ...x, [vaga]: { tipo: carta.tipo, id: carta.id } }));
     window.setTimeout(() => setSaindo((x) => (x[vaga]?.id === carta.id ? Object.fromEntries(Object.entries(x).filter(([k]) => k !== vaga)) : x)), 650);
-    setE((s) => jogarCarta(s, lado, carta.id, carga));
+    // Convidado online: a jogada vai para o juiz, que devolve o estado novo.
+    if (convidado) online!.sala.enviar({ t: 'acao', acao: { tipo: 'carta', id: carta.id, carga } });
+    else setE((s) => jogarCarta(s, lado, carta.id, carga));
   };
   const comecarCarga = (lado: Lado, carta: CartaDuelo) => {
     desbloquear();
@@ -244,7 +285,8 @@ export default function PartidaDuelo({
   const gladiador = (lado: Lado) => {
     if (pausado) return;
     desbloquear();
-    setE((s) => golpeDoGladiador(s, lado));
+    if (convidado) online!.sala.enviar({ t: 'acao', acao: { tipo: 'golpe' } });
+    else setE((s) => golpeDoGladiador(s, lado));
   };
   // Teclado. Jogador 1: segure 1 a 4 para carregar e solte para lançar; G ou espaço = golpe.
   // Jogador 2 (no modo 2 jogadores): 7, 8, 9 e 0 para as cartas; H = golpe.
@@ -253,7 +295,7 @@ export default function PartidaDuelo({
     if (pausado) return;
     const cartaDaTecla = (k: string): [Lado, CartaDuelo] | null => {
       const n = Number(k);
-      if (n >= 1 && n <= 4 && e.eu.mao[n - 1]) return ['eu', e.eu.mao[n - 1]!];
+      if (n >= 1 && n <= 4 && e[meuLado].mao[n - 1]) return [meuLado, e[meuLado].mao[n - 1]!];
       const j = TECLAS_J2.indexOf(k);
       if (doisJogadores && j >= 0 && e.rival.mao[j]) return ['rival', e.rival.mao[j]!];
       return null;
@@ -264,7 +306,7 @@ export default function PartidaDuelo({
       if (achou && podeJogar(e, achou[0], achou[1].id)) comecarCarga(achou[0], achou[1]);
       else if (ev.key === 'g' || ev.key === 'G' || ev.key === ' ') {
         ev.preventDefault();
-        gladiador('eu');
+        gladiador(meuLado);
       } else if (doisJogadores && (ev.key === 'h' || ev.key === 'H')) gladiador('rival');
     };
     const sobe = (ev: KeyboardEvent) => {
@@ -279,12 +321,32 @@ export default function PartidaDuelo({
     };
   });
 
-  if (e.fase === 'fim') return <FimDuelo
+  if (e.fase === 'fim') {
+    // Quem venceu (lado do motor) e a comemoração dele: no online, a do vencedor, venha de onde vier.
+    const r = resultadoFinal(e);
+    const vencedor: Lado | null = r === 'vitoria' ? 'eu' : r === 'derrota' ? 'rival' : null;
+    const comemora =
+      vencedor === null
+        ? null
+        : online || doisJogadores || vencedor === 'eu'
+          ? { tipo: visDe(vencedor).comemoracao, ia: vencedor === 'eu' ? ia : rival }
+          : null;
+    return (
+      <FimDuelo
         e={e}
         partida={registrada}
         premios={premios}
-        comemoracao={resultadoFinal(e) === 'vitoria' ? { tipo: visEu.comemoracao, ia } : doisJogadores && resultadoFinal(e) === 'derrota' ? { tipo: visRival.comemoracao, ia: rival } : null}
-        ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} doisJogadores={doisJogadores} />;
+        comemoracao={comemora}
+        papel={online?.papel}
+        ia={ia}
+        rival={rival}
+        cores={cores}
+        onDeNovo={onDeNovo}
+        onSair={onSair}
+        doisJogadores={doisJogadores}
+      />
+    );
+  }
 
   const voce = PERSONAGENS[ia];
   const dele = PERSONAGENS[rival];
@@ -337,7 +399,7 @@ export default function PartidaDuelo({
       />
     );
     const cartas = (
-      <section aria-label={lado === 'eu' ? 'Suas cartas' : 'Cartas do Jogador 2'} className={`grid grid-cols-4 ${doisJogadores ? 'gap-1.5' : 'gap-2'}`}>
+      <section aria-label={lado === meuLado ? 'Suas cartas' : 'Cartas do Jogador 2'} className={`grid grid-cols-4 ${doisJogadores ? 'gap-1.5' : 'gap-2'}`}>
         {l.mao.map((carta, i) => {
           const voando = saindo[`${lado}-${i}`];
           return (
@@ -352,7 +414,7 @@ export default function PartidaDuelo({
               <div key={carta.id} className="entrar-da-manga h-full">
                 <CartaNaMao
                   carta={carta}
-                  numero={lado === 'eu' ? String(i + 1) : TECLAS_J2[i]!}
+                  numero={lado === meuLado ? String(i + 1) : TECLAS_J2[i]!}
                   custo={custoAgora(l, carta.tipo)}
                   pode={podeJogar(e, lado, carta.id) && !pausado}
                   carregando={segurando[lado]?.id === carta.id}
@@ -426,7 +488,7 @@ export default function PartidaDuelo({
             tocar('start');
             setAbertura('entrada');
             // A partida começou: sair antes do fim conta como derrota.
-            if (!doisJogadores) marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: !ranqueado, dilema: dilema.pergunta });
+            if (!doisJogadores && !online) marcarPartidaAberta({ modo: 'duelo', ia, rival, treino: !ranqueado, dilema: dilema.pergunta });
           }}
           onComoJogar={tutorial.abrir}
         />
@@ -497,11 +559,12 @@ export default function PartidaDuelo({
                     tempo={e.tempo}
                     golpeando={abertura === 'lutem' || e.efeitos.some((x) => x.tipo === 'golpe' && x.lado === l)}
                     // Cada um só toca no próprio gladiador, na arena que é dele.
-                    onTocar={l === meu && (l === 'eu' || doisJogadores) ? () => gladiador(l) : undefined}
+                    onTocar={l === meu && (l === 'eu' || doisJogadores || !!online) ? () => gladiador(l) : undefined}
                   >
-                    {l === 'eu' ? (
+                    {l === 'eu' || online ? (
+                      // Online, o gladiador do outro jogador vem com as conquistas dele (cartão).
                       <div style={{ transform: esq ? undefined : 'scaleX(-1)' }}>
-                        <GladiadorEnfeitado ia={ia} parado />
+                        <GladiadorEnfeitado ia={l === 'eu' ? ia : rival} parado aparencia={online && l !== meuLado ? online.cartaoRival : undefined} />
                       </div>
                     ) : (
                       <GladiadorPixel ia={rival} liga={liga} espelhar={!esq} />
@@ -512,7 +575,7 @@ export default function PartidaDuelo({
                   <Sprite grade={TRIBUNA} paleta={cores[l].paleta} />
                   {/* Estandarte (prêmio do mapa) pendurado do lado de fora da Tribuna */}
                   <div className={`pointer-events-none absolute top-[8%] w-[34%] ${esq ? '-left-[30%]' : '-right-[30%]'}`}>
-                    <Estandarte id={l === 'eu' ? visEu.estandarte : doisJogadores ? visRival.estandarte : 'nenhum'} cor={cores[l].cor} />
+                    <Estandarte id={online ? visDe(l).estandarte : l === 'eu' ? visEu.estandarte : doisJogadores ? visRival.estandarte : 'nenhum'} cor={cores[l].cor} />
                   </div>
                   {/* Placa com o lado do debate */}
                   <span
@@ -644,10 +707,10 @@ export default function PartidaDuelo({
         </div>
       )}
 
-      {cena(false)}
+      {cena(meuLado === 'rival')}
 
       {/* O Jogador 1 joga do lado de baixo. */}
-      {controles('eu')}
+      {controles(meuLado)}
       <p className="text-center text-[10px] text-muted sm:text-xs">Toque para lançar · segure até a barrinha encher: +1 de força (custa +1 💧)</p>
     </div>
   );
@@ -929,6 +992,7 @@ function FimDuelo({
   partida,
   premios,
   comemoracao,
+  papel,
   ia,
   rival,
   cores,
@@ -940,6 +1004,8 @@ function FimDuelo({
   partida: Partida | null;
   premios: Premio[];
   comemoracao: { tipo: ComemoracaoId; ia: IaId } | null;
+  /** Duelo online: de que lado está quem olha (o convidado vê o resultado ao contrário). */
+  papel?: 'anfitriao' | 'convidado';
   ia: IaId;
   rival: IaId;
   cores: Record<Lado, Cores>;
@@ -947,7 +1013,7 @@ function FimDuelo({
   onSair: () => void;
   doisJogadores?: boolean;
 }) {
-  const r = resultadoFinal(e);
+  const r = papel ? resultadoDe(papel, resultadoFinal(e)) : resultadoFinal(e);
   return (
     <div className="pixel-box relative isolate flex flex-col items-center gap-4 overflow-hidden p-5 text-center">
       {comemoracao && <Comemoracao tipo={comemoracao.tipo} ia={comemoracao.ia} />}
@@ -986,7 +1052,9 @@ function FimDuelo({
           {e.tribunas.rival} {PERSONAGENS[rival].gladiador}
         </span>
       </p>
-      <p className="font-pixel text-[8px] text-muted">{doisJogadores
+      <p className="font-pixel text-[8px] text-muted">{papel
+          ? 'PARTIDA ONLINE · AMISTOSA'
+          : doisJogadores
           ? 'PARTIDA AMISTOSA · 2 JOGADORES'
           : !partida || partida.treino
             ? 'TREINO · CONECTE A CONTA PARA VALER TROFÉUS'

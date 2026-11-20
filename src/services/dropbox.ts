@@ -144,11 +144,11 @@ export async function tokenDeAcesso(chave: string, renovacao: string): Promise<s
   return j.access_token!;
 }
 
-export async function quemSou(token: string): Promise<{ email: string; nome: string }> {
+export async function quemSou(token: string): Promise<{ email: string; nome: string; id: string }> {
   const r = await fetch(`${API}/users/get_current_account`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
   if (!r.ok) throw new Error(`dbx conta ${r.status}`);
-  const j = (await r.json()) as { email?: string; name?: { display_name?: string } };
-  return { email: j.email ?? '', nome: j.name?.display_name ?? '' };
+  const j = (await r.json()) as { account_id?: string; email?: string; name?: { display_name?: string } };
+  return { email: j.email ?? '', nome: j.name?.display_name ?? '', id: j.account_id ?? '' };
 }
 
 /** Lê um arquivo de texto da pasta do app; null se ele ainda não existe. */

@@ -243,6 +243,20 @@ export default function SalaDoDuelo() {
               <span className="font-pixel text-sm text-fg">👥 2 JOGADORES</span>
               <span className="font-pixel text-[8px] text-[rgb(242_193_78)]">NO MESMO APARELHO · AMISTOSO</span>
             </button>
+            <button
+              type="button"
+              disabled={!completo}
+              onClick={() => {
+                desbloquear();
+                tocar('start');
+                navegar('/arena/duelo/online');
+              }}
+              className="pixel-box pixel-hover flex flex-col items-center gap-1 px-4 py-4 disabled:opacity-40"
+              aria-label="Duelo online com um amigo"
+            >
+              <span className="font-pixel text-sm text-fg">🌐 ONLINE</span>
+              <span className="font-pixel text-[8px] text-[rgb(242_193_78)]">CADA UM NO SEU APARELHO · AMISTOSO</span>
+            </button>
             <p className="text-center text-xs text-muted">Sair no meio de uma partida conta como derrota.</p>
           </aside>
         </div>

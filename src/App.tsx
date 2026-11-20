@@ -11,6 +11,7 @@ import PerfilCombatente from './features/arcade/PerfilCombatente';
 import MapaTrofeus from './features/arcade/MapaTrofeus';
 import SalaDoDuelo from './features/arcade/duelo/MeuBaralho';
 import DoisJogadores from './features/arcade/duelo/DoisJogadores';
+import DueloOnline from './features/arcade/duelo/DueloOnline';
 import { registrarAbandono } from './game/progresso';
 import AberturaApp, { precisaAbertura } from './features/abertura/AberturaApp';
 
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/arena/duelo" element={<SalaDoDuelo />} />
         <Route path="/arena/duelo/jogar" element={<EntradaCombate modo="duelo" />} />
         <Route path="/arena/duelo/2j" element={<DoisJogadores />} />
+        <Route path="/arena/duelo/online" element={<DueloOnline />} />
         <Route path="/arena/tribunal" element={<EntradaCombate modo="tribunal" />} />
         <Route path="/arena/baralho" element={<Navigate to="/arena/duelo" replace />} />
         <Route path="/arena/mapa/:ia" element={<MapaTrofeus />} />

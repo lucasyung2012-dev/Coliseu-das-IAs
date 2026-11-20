@@ -74,6 +74,26 @@ export function modoRanqueado(e: EstadoConta = estado): boolean {
   return !contaConfigurada() || e.conta !== null;
 }
 
+/**
+ * "Impressão digital" da conta para o Duelo online: um código que identifica a conta
+ * sem mostrar nome nem e-mail (para a mesma conta não jogar contra ela mesma).
+ * null = sem conta (ou sem internet para conferir).
+ */
+export async function impressaoDaConta(): Promise<string | null> {
+  if (!estado.conta) return null;
+  try {
+    const { id } = await quemSou(await tokenDeAcesso(DROPBOX_APP_KEY, estado.conta.renovacao));
+    if (!id) return null;
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`coliseu:${id}`));
+    return [...new Uint8Array(hash)]
+      .slice(0, 8)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    return null;
+  }
+}
+
 // ---------- Login ----------
 
 export async function entrarNoDropbox(modo: ModoLogin) {

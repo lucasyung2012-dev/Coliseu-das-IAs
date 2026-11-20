@@ -262,6 +262,16 @@ describe('duelo jogável (protótipo)', () => {
     expect(screen.getByRole('region', { name: /Do mais barato ao mais caro/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /JOGAR/ })).toBeEnabled();
     expect(screen.getByRole('button', { name: /2 jogadores/ })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Duelo online/ })).toBeEnabled();
+  });
+
+  it('Duelo online: a sala abre com CRIAR SALA e ENTRAR NA SALA, e avisa código errado', () => {
+    abrir('/arena/duelo/online');
+    expect(screen.getByRole('heading', { name: /DUELO ONLINE/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /CRIAR SALA/ })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/ENTRAR NA SALA/), { target: { value: '42' } });
+    fireEvent.click(screen.getByRole('button', { name: /ENTRAR ▶/ }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/LEAO-42/);
   });
 
   it('tutorial na primeira vez, golpes no toque e no teclado, e o polegar do César no fim das rodadas', () => {

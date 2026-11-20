@@ -46,14 +46,17 @@ interface Props {
   espelhar?: boolean;
   /** Sem a "respiração" (quando o pai já anima o gladiador). */
   parado?: boolean;
+  /** Aparência de outro jogador (Duelo online): no lugar da que está salva neste aparelho. */
+  aparencia?: { liga: number; visual: Visual; imperador: boolean };
 }
 
 /**
  * O gladiador com tudo o que ele conquistou: equipamento e tamanho da liga
  * (troféus) e armadura, aura, moldura e coroa da Maestria.
  */
-export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado }: Props) {
-  const { liga, visual, imperador } = useAparencia(ia);
+export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado, aparencia }: Props) {
+  const daqui = useAparencia(ia);
+  const { liga, visual, imperador } = aparencia ?? daqui;
   const corpo = (
     <div className="relative">
       {visual.aura !== 'nenhuma' && <div className={`aura-${visual.aura} aura-${ia} pointer-events-none absolute inset-[-12%] rounded-full`} aria-hidden />}
