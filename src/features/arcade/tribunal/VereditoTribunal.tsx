@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { PERSONAGENS } from '@/game/personagens';
 import { JURADOS } from '@/game/jurados';
-import { nivelMaestria, obterProgresso, registrarPartida, type Partida } from '@/game/progresso';
+import { nivelMaestria, obterProgresso, recordeDe, registrarPartida, useColiseu, type Partida } from '@/game/progresso';
+import { premiosNovos, type Premio } from '@/game/coliseu';
+import Comemoracao from '../Comemoracao';
 import { FALAS_VITORIA, recompensasNovas, visualDoNivel } from '@/game/maestria';
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { FALAS_PRETOR } from '@/game/tribunal/temas';
@@ -29,6 +31,8 @@ export default function VereditoTribunal({
   const v = veredito(e);
   const [revelados, setRevelados] = useState(() => (prefereMenosMovimento() ? e.jurados.length : 0));
   const [partida, setPartida] = useState<Partida | null>(null);
+  const [premios, setPremios] = useState<Premio[]>([]);
+  const { comemoracao } = useColiseu(e.ia);
   const registrada = useRef(false);
   const fim = revelados >= e.jurados.length;
 
@@ -36,6 +40,7 @@ export default function VereditoTribunal({
   useEffect(() => {
     if (registrada.current) return;
     registrada.current = true;
+    const antes = recordeDe(obterProgresso(), e.ia);
     setPartida(
       registrarPartida({
         modo: 'tribunal',
@@ -47,6 +52,7 @@ export default function VereditoTribunal({
         dilema: e.dilema.pergunta,
       }),
     );
+    setPremios(premiosNovos(antes, recordeDe(obterProgresso(), e.ia)));
     tocar('martelo');
   }, []);
 
@@ -102,8 +108,14 @@ export default function VereditoTribunal({
       </ul>
 
       {fim && (
-        <section className="pixel-box relative flex flex-col items-center gap-3 overflow-hidden p-5 text-center" aria-live="polite">
+        <section className="pixel-box relative isolate flex flex-col items-center gap-3 overflow-hidden p-5 text-center" aria-live="polite">
+          {v.resultado === 'vitoria' && <Comemoracao tipo={comemoracao} ia={e.ia} />}
           {v.resultado === 'vitoria' && <Faiscas x={50} y={20} />}
+          {premios.map((pr) => (
+            <p key={pr.id} className="pancada relative bg-[rgb(242_193_78)] px-3 py-1 font-pixel text-[9px] text-black sm:text-xs">
+              🎁 PRÊMIO NOVO NO MAPA: {pr.nome.toUpperCase()}
+            </p>
+          ))}
           <h2
             className={`pancada neon font-pixel text-3xl sm:text-5xl ${v.resultado === 'derrota' ? 'text-accent-2' : 'text-accent'}`}
           >

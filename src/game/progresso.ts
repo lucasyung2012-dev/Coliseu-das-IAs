@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { IAS, type IaId } from './personagens';
 import { variacaoTrofeus, type Modo } from './ligas';
+import { coliseuEmUso, premiosNovos, type EscolhaColiseu, type TipoPremio, type VisualColiseu } from './coliseu';
 
 export interface Partida {
   id: string;
@@ -44,6 +45,10 @@ export interface Progresso {
   partidas: Partida[];
   /** Meu baralho do Duelo: as 8 cartas escolhidas (ids). Conferido pelo motor do Duelo. */
   baralhoDuelo?: string[];
+  /** Maior número de troféus que cada IA já teve: libera os prêmios do mapa (cair não tira). */
+  recorde?: Partial<Record<IaId, number>>;
+  /** Prêmios do mapa escolhidos por IA (arena, estandarte, comemoração). */
+  coliseu?: Partial<Record<IaId, EscolhaColiseu>>;
   /** Quando o progresso mudou pela última vez (ISO). Decide qual cópia vale ao sincronizar. */
   atualizadoEm?: string;
 }
@@ -147,6 +152,26 @@ export function escolherBaralho(cartas: string[]) {
   salvar({ ...obterProgresso(), baralhoDuelo: [...cartas] });
 }
 
+/** Recorde de troféus da IA (nunca menor que os troféus de agora). */
+export function recordeDe(p: Progresso, ia: IaId): number {
+  return Math.max(p.recorde?.[ia] ?? 0, p.trofeus[ia]);
+}
+
+/** O visual do Coliseu em uso por esta IA. */
+export function coliseuDe(p: Progresso, ia: IaId): VisualColiseu {
+  return coliseuEmUso(recordeDe(p, ia), p.coliseu?.[ia]);
+}
+
+export function useColiseu(ia: IaId): VisualColiseu {
+  return coliseuDe(useProgresso(), ia);
+}
+
+/** Escolhe no mapa um prêmio já ganho para usar (vale só para esta IA). */
+export function escolherPremio(ia: IaId, tipo: TipoPremio, id: string) {
+  const p = obterProgresso();
+  salvar({ ...p, coliseu: { ...p.coliseu, [ia]: { ...p.coliseu?.[ia], [tipo]: id } } });
+}
+
 export function nivelMaestria(xp: number): number {
   return Math.min(NIVEL_MAXIMO, Math.floor(xp / XP_POR_NIVEL) + 1);
 }
@@ -165,9 +190,16 @@ export function registrarPartida(dados: Pick<Partida, 'modo' | 'ia' | 'rival' | 
     trofeus,
     xp,
   };
+  // Recorde novo: os prêmios novos entram sozinhos (tira a escolha antiga daquele tipo).
+  const recordeAntes = recordeDe(p, dados.ia);
+  const recordeDepois = Math.max(recordeAntes, p.trofeus[dados.ia] + trofeus);
+  const escolha: EscolhaColiseu = { ...p.coliseu?.[dados.ia] };
+  for (const premio of premiosNovos(recordeAntes, recordeDepois)) delete escolha[premio.tipo];
   salvar({
     ...p,
     trofeus: { ...p.trofeus, [dados.ia]: p.trofeus[dados.ia] + trofeus },
+    recorde: { ...p.recorde, [dados.ia]: recordeDepois },
+    coliseu: { ...p.coliseu, [dados.ia]: escolha },
     xp: { ...p.xp, [dados.ia]: p.xp[dados.ia] + xp },
     estatisticas: dados.treino ? p.estatisticas : { ...p.estatisticas, [dados.ia]: somarResultado(p.estatisticas[dados.ia], dados) },
     partidas: [partida, ...p.partidas].slice(0, MAX_HISTORICO),
@@ -214,6 +246,7 @@ export function juntarProgresso(local: Progresso, nuvem: Progresso, primeiraVez:
     ...maisNovo,
     trofeus: maior(local.trofeus, nuvem.trofeus),
     xp: maior(local.xp, nuvem.xp),
+    recorde: Object.fromEntries(IAS.map((ia) => [ia, Math.max(recordeDe(local, ia), recordeDe(nuvem, ia))])) as Record<IaId, number>,
     // Estatísticas: fica a cópia com mais partidas jogadas de cada IA.
     estatisticas: Object.fromEntries(
       IAS.map((ia) => [ia, totalPartidas(nuvem.estatisticas[ia]) > totalPartidas(local.estatisticas[ia]) ? nuvem.estatisticas[ia] : local.estatisticas[ia]]),

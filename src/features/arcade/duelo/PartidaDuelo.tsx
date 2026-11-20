@@ -3,7 +3,10 @@ import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { ACERTO_RIVAL } from '@/game/tribunal/motor';
 import { indiceLiga } from '@/game/ligas';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
-import { marcarPartidaAberta, registrarAbandono, registrarPartida, useProgresso, type Partida } from '@/game/progresso';
+import { coliseuDe, marcarPartidaAberta, obterProgresso, recordeDe, registrarAbandono, registrarPartida, useProgresso, type Partida } from '@/game/progresso';
+import { premiosNovos, type ComemoracaoId, type Premio } from '@/game/coliseu';
+import { Estandarte } from '@/ui/pixel/estandartes';
+import Comemoracao from '../Comemoracao';
 import { DILEMAS, type LadoId } from '@/game/tribunal/dilemas';
 import {
   baralhoDaIa,
@@ -122,6 +125,10 @@ export default function PartidaDuelo({
   // O modo (valendo troféus ou treino) fica fixo do começo ao fim da partida.
   const [ranqueado] = useState(() => modoRanqueado());
   const [registrada, setRegistrada] = useState<Partida | null>(null);
+  const [premios, setPremios] = useState<Premio[]>([]);
+  // Prêmios do mapa de troféus de cada IA: arena, estandarte da Tribuna e comemoração.
+  const visEu = coliseuDe(p, ia);
+  const visRival = coliseuDe(p, rival);
   const [acerto] = useState(() => (ranqueado ? ACERTO_RIVAL[indiceLiga(p.trofeus[ia])]! : ACERTO_TREINO[dificuldade]));
   const [config] = useState(() => ({ lado: (Math.random() < 0.5 ? 'favor' : 'contra') as LadoId, dilema: Math.floor(Math.random() * DILEMAS.length) }));
   const dilema = DILEMAS[config.dilema]!;
@@ -203,7 +210,11 @@ export default function PartidaDuelo({
       tocar(r === 'vitoria' ? 'vitoria' : r === 'derrota' ? 'derrota' : 'martelo');
       // Com conta, o Duelo vale troféus e XP de Maestria, como o Tribunal.
       // A partida de 2 jogadores é amistosa: não entra no histórico.
-      if (!doisJogadores) setRegistrada(registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: !ranqueado, dilema: dilema.pergunta }));
+      if (!doisJogadores) {
+        const antes = recordeDe(obterProgresso(), ia);
+        setRegistrada(registrarPartida({ modo: 'duelo', ia, rival, venceu: r === 'vitoria', empate: r === 'empate', treino: !ranqueado, dilema: dilema.pergunta }));
+        setPremios(premiosNovos(antes, recordeDe(obterProgresso(), ia)));
+      }
     }
   }, [e.fase]);
 
@@ -268,7 +279,12 @@ export default function PartidaDuelo({
     };
   });
 
-  if (e.fase === 'fim') return <FimDuelo e={e} partida={registrada} ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} doisJogadores={doisJogadores} />;
+  if (e.fase === 'fim') return <FimDuelo
+        e={e}
+        partida={registrada}
+        premios={premios}
+        comemoracao={resultadoFinal(e) === 'vitoria' ? { tipo: visEu.comemoracao, ia } : doisJogadores && resultadoFinal(e) === 'derrota' ? { tipo: visRival.comemoracao, ia: rival } : null}
+        ia={ia} rival={rival} cores={cores} onDeNovo={onDeNovo} onSair={onSair} doisJogadores={doisJogadores} />;
 
   const voce = PERSONAGENS[ia];
   const dele = PERSONAGENS[rival];
@@ -445,7 +461,7 @@ export default function PartidaDuelo({
 
         {/* A arena (no modo 2 jogadores, mais baixa, para caberem as duas na tela) */}
         <div className={`pixel-box relative w-full overflow-hidden ${doisJogadores ? 'aspect-[4/1]' : 'aspect-[16/9] sm:aspect-[5/2]'}`}>
-          <CenaColiseu corA={cores[meu].cor} corB={cores[outro].cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} />
+          <CenaColiseu corA={cores[meu].cor} corB={cores[outro].cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} arena={(inv ? visRival : visEu).arena} />
 
           <p className="absolute inset-x-0 top-[3%] z-10 truncate px-3 text-center text-[9px] text-white/80 [text-shadow:1px_1px_0_#000] sm:text-xs">
             {dilema.pergunta}{' '}
@@ -494,6 +510,10 @@ export default function PartidaDuelo({
                 </div>
                 <div className={`relative ${tribunaBatida(l) ? 'tremer' : ''}`} role="img" aria-label={`Tribuna ${l === meu ? 'sua' : 'do rival'} (${lados[l].lado}): ${e.tribunas[l]} de vida`}>
                   <Sprite grade={TRIBUNA} paleta={cores[l].paleta} />
+                  {/* Estandarte (prêmio do mapa) pendurado do lado de fora da Tribuna */}
+                  <div className={`pointer-events-none absolute top-[8%] w-[34%] ${esq ? '-left-[30%]' : '-right-[30%]'}`}>
+                    <Estandarte id={l === 'eu' ? visEu.estandarte : doisJogadores ? visRival.estandarte : 'nenhum'} cor={cores[l].cor} />
+                  </div>
                   {/* Placa com o lado do debate */}
                   <span
                     className="absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap border-2 bg-black/80 px-1 py-0.5 font-pixel text-[6px] text-white sm:text-[10px]"
@@ -887,6 +907,8 @@ function VidaTribuna({
 function FimDuelo({
   e,
   partida,
+  premios,
+  comemoracao,
   ia,
   rival,
   cores,
@@ -896,6 +918,8 @@ function FimDuelo({
 }: {
   e: EstadoDuelo;
   partida: Partida | null;
+  premios: Premio[];
+  comemoracao: { tipo: ComemoracaoId; ia: IaId } | null;
   ia: IaId;
   rival: IaId;
   cores: Record<Lado, Cores>;
@@ -905,7 +929,13 @@ function FimDuelo({
 }) {
   const r = resultadoFinal(e);
   return (
-    <div className="pixel-box flex flex-col items-center gap-4 p-5 text-center">
+    <div className="pixel-box relative isolate flex flex-col items-center gap-4 overflow-hidden p-5 text-center">
+      {comemoracao && <Comemoracao tipo={comemoracao.tipo} ia={comemoracao.ia} />}
+      {premios.map((pr) => (
+        <p key={pr.id} className="pancada relative bg-[rgb(242_193_78)] px-3 py-1 font-pixel text-[9px] text-black sm:text-xs">
+          🎁 PRÊMIO NOVO NO MAPA: {pr.nome.toUpperCase()}
+        </p>
+      ))}
       <div className="relative w-24 sm:w-32">
         <PretorPixel />
         <span className="pancada absolute -right-10 top-1/3 text-5xl sm:text-6xl">{r === 'vitoria' ? '👍' : r === 'derrota' ? '👎' : '✋'}</span>

@@ -4,7 +4,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import { PATENTES } from '@/game/ligas';
 import { tituloDoNivel } from '@/game/maestria';
-import { nivelMaestria, useProgresso } from '@/game/progresso';
+import { nivelMaestria, useColiseu, useProgresso } from '@/game/progresso';
 import { useSequencia } from '@/ui/movimento';
 import { tocar } from '@/ui/som';
 import { useSonsDaFase } from '@/ui/BotaoSom';
@@ -23,6 +23,7 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   // O rival luta na mesma liga do jogador; o jogador entra com tudo o que conquistou.
   const { liga, visual } = useAparencia(ia);
   const titulo = tituloDoNivel(nivelMaestria(useProgresso().xp[ia])).nome;
+  const { arena } = useColiseu(ia);
   useSonsDaFase(fase, {
     1: 'portao',
     2: 'passos',
@@ -37,7 +38,7 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   return (
     <div className="flex flex-col gap-5">
       <Palco rodando={fase < PRONTO} onPular={pular} className={fase === 4 ? 'tremer' : ''}>
-        <CenaColiseu corA={cor(ia)} corB={cor(rival)} />
+        <CenaColiseu corA={cor(ia)} corB={cor(rival)} arena={arena} />
 
         {fase >= 2 && (
           <>

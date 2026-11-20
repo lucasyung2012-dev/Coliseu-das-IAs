@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
-import { useProgresso } from '@/game/progresso';
+import { coliseuDe, escolherPremio, recordeDe, useProgresso } from '@/game/progresso';
+import { PREMIOS, premioLiberado, type ArenaId, type EstandarteId, type TipoPremio } from '@/game/coliseu';
+import { CenaColiseu } from './cenas/Cenarios';
+import { Estandarte } from '@/ui/pixel/estandartes';
 import { caminhoSvg, ligasCruzadas, PARADAS, posicaoNoMapa } from '@/game/mapa';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import { prefereMenosMovimento } from '@/ui/movimento';
@@ -160,7 +163,7 @@ export default function MapaTrofeus() {
                   ...(pa.x > L / 2 ? { right: `${((L - pa.x + (pa.liga ? 28 : 14)) / L) * 100}%` } : { left: `${((pa.x + (pa.liga ? 28 : 14)) / L) * 100}%` }),
                 }}
               >
-                {pa.liga ? `${pa.liga.toUpperCase()} · ${pa.trofeus}` : pa.trofeus}
+                {pa.liga ? `${pa.liga.toUpperCase()} · ${pa.trofeus}` : pa.trofeus} {PREMIOS.find((pr) => pr.trofeus === pa.trofeus)?.icone}
               </p>
             ))}
 
@@ -195,9 +198,80 @@ export default function MapaTrofeus() {
             </div>
           )}
         </div>
-        <p className="text-center text-xs text-muted">As recompensas de cada parada do mapa ainda vão ser definidas.</p>
+        <PremiosDoCaminho ia={id} />
+        <p className="text-center text-xs text-muted">Os prêmios são só visuais: deixam o seu Coliseu mais bonito, mas não dão vantagem na partida.</p>
       </div>
     </main>
   );
 }
 
+
+const NOME_TIPO: Record<TipoPremio, string> = { arena: 'ARENA', estandarte: 'ESTANDARTE', comemoracao: 'COMEMORAÇÃO' };
+
+/**
+ * Os prêmios das 13 paradas (só visuais). O mais novo entra sozinho; aqui dá para
+ * escolher outro já ganho (USAR). Cada IA tem a sua linha, pelo recorde de troféus.
+ */
+function PremiosDoCaminho({ ia }: { ia: IaId }) {
+  const p = useProgresso();
+  const recorde = recordeDe(p, ia);
+  const emUso = coliseuDe(p, ia);
+  const cor = `rgb(${PERSONAGENS[ia].cor})`;
+  return (
+    <section aria-label="Prêmios do caminho" className="pixel-box flex flex-col gap-2 p-3 sm:p-4">
+      <h2 className="font-pixel text-[10px] text-accent sm:text-xs">🎁 PRÊMIOS DO CAMINHO</h2>
+      <ul className="flex flex-col gap-2">
+        {PREMIOS.map((pr) => {
+          const ganho = premioLiberado(pr, recorde);
+          const usando = emUso[pr.tipo] === pr.id;
+          return (
+            <li
+              key={pr.id}
+              className={`flex items-center gap-3 rounded-sm border-2 p-2 ${ganho ? '' : 'opacity-50'}`}
+              style={{ borderColor: usando ? '#f2c14e' : 'rgb(255 255 255 / 0.12)' }}
+            >
+              {/* Prévia do prêmio */}
+              <div className="relative aspect-[16/9] w-20 shrink-0 overflow-hidden rounded-sm bg-black/40 sm:w-24">
+                {pr.tipo === 'arena' ? (
+                  <CenaColiseu corA={cor} corB="#f2c14e" arena={pr.id as ArenaId} />
+                ) : pr.tipo === 'estandarte' ? (
+                  <div className="mx-auto h-full w-[30%] py-1">
+                    <Estandarte id={pr.id as EstandarteId} cor={cor} />
+                  </div>
+                ) : (
+                  <span className="grid h-full place-items-center text-2xl">{pr.icone}</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-pixel text-[7px] text-muted">
+                  {NOME_TIPO[pr.tipo]} · 🏆 {pr.trofeus}
+                </p>
+                <p className="font-pixel text-[9px] sm:text-[10px]">{pr.nome.toUpperCase()}</p>
+                <p className="text-xs text-muted">{pr.descricao}</p>
+              </div>
+              {!ganho ? (
+                <span className="font-pixel text-[9px]" aria-label="Ainda não ganho">
+                  🔒
+                </span>
+              ) : usando ? (
+                <span className="font-pixel text-[8px] text-[rgb(242_193_78)]">EM USO</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    tocar('selecionar');
+                    escolherPremio(ia, pr.tipo, pr.id);
+                  }}
+                  aria-label={`Usar ${pr.nome}`}
+                  className="pixel-box pixel-hover px-2 py-1 font-pixel text-[8px] text-accent"
+                >
+                  USAR
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}

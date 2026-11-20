@@ -2,7 +2,7 @@ import { useCallback, useState, type CSSProperties, type ReactNode } from 'react
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { indiceLiga, ligaDe, patenteDe, proximaLiga, variacaoTrofeus } from '@/game/ligas';
-import { escolherIa, nivelMaestria, useProgresso, XP_POR_NIVEL, type Partida } from '@/game/progresso';
+import { escolherIa, nivelMaestria, useColiseu, useProgresso, XP_POR_NIVEL, type Partida } from '@/game/progresso';
 import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { CenaColiseu, CenaTribunal } from './cenas/Cenarios';
@@ -304,9 +304,10 @@ function CartaoModo(props: {
 /** Arte do cartão do Duelo: o Coliseu com o seu gladiador encarando um rival. */
 function ArteDuelo({ ia }: { ia: IaId }) {
   const rival = IAS.find((x) => x !== ia)!;
+  const { arena } = useColiseu(ia);
   return (
     <>
-      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} />
+      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} arena={arena} />
       <div className="absolute bottom-[4%] left-[22%] w-[17%]">
         <GladiadorPixel ia={ia} />
       </div>
