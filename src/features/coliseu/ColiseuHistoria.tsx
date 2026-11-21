@@ -47,6 +47,7 @@ export default function ColiseuHistoria() {
   const saves = [...(p.historia ?? [])].sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm));
   const [tela, setTela] = useState<Tela>({ tipo: 'saves' });
   const [apagando, setApagando] = useState<string | null>(null);
+  const [abaSaves, setAbaSaves] = useState<'historias' | 'mapa'>('historias');
   // Chegou pela tela inicial: os portões de pedra (fechados lá) se abrem aqui.
   const veioPeloPortao = !!(useLocation().state as { portao?: boolean } | null)?.portao;
   const [portao, setPortao] = useState(veioPeloPortao);
@@ -176,6 +177,36 @@ export default function ColiseuHistoria() {
               )}
             </header>
 
+            {/* As duas abas: as suas histórias e o mapa de Roma (pedido do Lucas: cada coisa no seu lugar) */}
+            <div role="tablist" aria-label="Partes do modo História" className="grid grid-cols-2 gap-2">
+              {(
+                [
+                  ['historias', 'SUAS HISTÓRIAS'],
+                  ['mapa', 'MAPA DE ROMA'],
+                ] as const
+              ).map(([a, nome]) => (
+                <button
+                  key={a}
+                  type="button"
+                  role="tab"
+                  aria-selected={abaSaves === a}
+                  onClick={() => {
+                    desbloquear();
+                    tocar('pagina');
+                    setAbaSaves(a);
+                  }}
+                  className={`pixel-box py-3 font-pixel text-[10px] sm:text-xs ${abaSaves === a ? 'aba-ativa text-[#f2c14e]' : 'text-[#f4e2b4]/70'}`}
+                >
+                  {nome}
+                  {a === 'historias' && saves.length > 0 && ` (${saves.length})`}
+                </button>
+              ))}
+            </div>
+
+            {abaSaves === 'mapa' && <LinhaDoTempo saves={p.historia ?? []} segredos={p.historiaSegredos} />}
+
+            {abaSaves === 'historias' && (
+            <>
             <button
               type="button"
               onClick={() => {
@@ -185,12 +216,12 @@ export default function ColiseuHistoria() {
               }}
               className="pixel-box pixel-hover flex items-center justify-center gap-3 py-4 font-pixel text-sm text-[#f2c14e] sm:text-base"
             >
-              ➕ NOVA HISTÓRIA
+              + NOVA HISTÓRIA
             </button>
 
+            {saves.length === 0 && <p className="text-center text-sm text-muted">Nenhuma história ainda. Comece uma nova e escolha o seu condenado.</p>}
             {saves.length > 0 && (
               <>
-                <h2 className="font-pixel text-[10px] text-muted sm:text-xs">📜 SUAS HISTÓRIAS ({saves.length})</h2>
                 <ul className="grid gap-3 sm:grid-cols-2">
                   {saves.map((s) => (
                     <CartaoSave
@@ -214,9 +245,8 @@ export default function ColiseuHistoria() {
                 </ul>
               </>
             )}
-
-            {/* A linha do tempo: os três caminhos lado a lado, onde se cruzam, e o final de verdade */}
-            <LinhaDoTempo saves={p.historia ?? []} segredos={p.historiaSegredos} />
+            </>
+            )}
           </section>
         )}
 
