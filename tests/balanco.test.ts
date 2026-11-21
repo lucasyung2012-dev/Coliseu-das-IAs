@@ -1,6 +1,7 @@
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, novaLuta, passoLuta, type AtributosLuta, type DefInimigo, type EstadoLuta } from '@/game/historia/luta';
 import { CAPITULOS } from '@/game/historia/roteiro';
+import { CAP_SECRETO, equipeDoSecreto } from '@/game/historia/roteiro4';
 
 /**
  * Balanço das lutas da História (21/11/2026: o Lucas não conseguia vencer a Fornalha).
@@ -81,5 +82,22 @@ describe('balanço das lutas da História', () => {
     ['censor-tita', 7],
   ] as const)('só apertar GOLPE perde para o chefão %s', (id, cap) => {
     expect(soGolpe(INIMIGOS[id]!, ATRIBUTOS[cap]!).fim).not.toBe('vitoria');
+  });
+});
+
+describe('balanço do capítulo secreto (Os Três)', () => {
+  // O robô luta só com o Cassius veterano, sem trocar: no jogo, trocar ainda ajuda.
+  const cassius = equipeDoSecreto([]).cassius;
+  const secretas = CAP_SECRETO.cenas.flatMap((c) => (c.tipo === 'luta' ? [c.inimigo] : []));
+  it('tem as cinco lutas: as três sombras, o Guardião e o Núcleo', () => {
+    expect(secretas).toEqual(['sombra-cassius', 'sombra-octavius', 'sombra-helios', 'guardiao-nucleo', 'nucleo']);
+  });
+  it.each(secretas)('um bom jogador vence: %s', (inimigo) => {
+    const def = INIMIGOS[inimigo]!;
+    const fim = bomJogador(def, cassius);
+    expect(fim.fim, `${inimigo}: terminou com ${Math.round(fim.jogador.vida)} de vida, inimigo com ${Math.round(fim.inimigo.vida)}/${def.vida}`).toBe('vitoria');
+  });
+  it('só apertar GOLPE perde para o Núcleo', () => {
+    expect(soGolpe(INIMIGOS.nucleo!, cassius).fim).not.toBe('vitoria');
   });
 });

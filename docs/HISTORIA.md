@@ -277,3 +277,23 @@ Nada mexe em troféus, Maestria ou XP. São coisas que **mudam bastante o visual
 - Os nomes estão bons? (Censor, Brutus, Lívia, Fornalha, Pretor de Aço, Leão Mecânico...)
 - O destino do Censor (perde o poder e volta a cuidar da Biblioteca; no capítulo secreto, ajuda os três): gostou, ou prefere outro (exilado, por exemplo)?
 - Algum lugar, personagem ou chefão que você quer que tenha e não tem?
+
+## Capítulo secreto: Os Três (21/11/2026)
+
+Canônico, mas escondido. Ideia do Lucas: depois dos três caminhos, controlar os três juntos.
+
+- **Como abre:** no epílogo de cada caminho há um ponto opcional "✨ Brilho" com um pedaço da chave (Cassius: a página rasgada com um olho; Octavius: a moeda de bronze do olho riscado; Helios: o pedaço de mapa que o Lumen cospe). Os pedaços valem para a conta (`historiaSegredos` no Progresso). Com os três, aparece uma grade pulsando no título da tela dos saves; três toques abrem o capítulo (um save dourado, `secreto: true`).
+- **História:** o Censor era só a mão. No Hipogeu, debaixo da arena, dorme o Núcleo, a máquina que escreveu a Resposta Única. Ele manda sombras dos três; os três descem juntos, leem os murais, vencem o Guardião e enfrentam o Núcleo com o Censor de olho azul do lado deles. Final no Coliseu Livre.
+- **Cenas (21):** abertura, conversa, Ludus de madrugada, trio (controlando os três), descida, explorar o Hipogeu, Sombra do Cassius (escudo gigante), conversa, comporta (ritmo), Sombra do Octavius (fintas), murais, Sombra do Helios (escuro e ilusões), porta do Núcleo, plano, Guardião do Núcleo, o Núcleo acorda, o Censor azul, **o Núcleo** (fase 1 escudo gigante, fase 2 escuro, fase 3 ilusões; aliado: o Censor), desfecho, Coliseu Livre e créditos.
+- **Luta em equipe:** troca de gladiador no meio da luta (teclas 1, 2 e 3 ou os retratos). Cada um com os atributos do melhor save que terminou o caminho, nunca abaixo de um veterano.
+
+## Prêmios da História no Império Arcade
+
+O Arcade é "onde as lendas do Coliseu ganham vida" (o novo subtítulo). Quem termina um caminho ganha para aquele gladiador: a arena do final, um companheiro e um título. Quem termina o capítulo secreto ganha para os três: o Coliseu Livre, a comemoração "Os Três" (os outros dois entram na vitória) e o título "Os Três" com moldura de ouro. Ficam no perfil, bloco "Lendas do Coliseu", e só entram em uso com USAR.
+
+| Caminho | Arena | Companheiro | Título |
+|---|---|---|---|
+| Cassius | A Biblioteca em Chamas | Páginas salvas (voando) | Guardião dos Livros |
+| Octavius | A Galé na Tempestade | Gaivota Sete no ombro | Capitão do Plano B |
+| Helios | O Coliseu do Eclipse | Lumen no ombro | Vidente das Três Estrelas |
+| Secreto (os três) | O Coliseu Livre | comemoração Os Três | Os Três (moldura de ouro) |

@@ -3,7 +3,7 @@ import { PERSONAGENS, type IaId } from '@/game/personagens';
 import { ACERTO_RIVAL } from '@/game/tribunal/motor';
 import { indiceLiga } from '@/game/ligas';
 import { ACERTO_TREINO, modoRanqueado, useDificuldade } from '@/game/conta';
-import { coliseuDe, marcarPartidaAberta, obterProgresso, recordeDe, registrarAbandono, registrarPartida, useProgresso, type Partida } from '@/game/progresso';
+import { coliseuDe, historiaDe, marcarPartidaAberta, obterProgresso, recordeDe, registrarAbandono, registrarPartida, useProgresso, type Partida } from '@/game/progresso';
 import { premiosNovos, type ComemoracaoId, type Premio } from '@/game/coliseu';
 import { Estandarte } from '@/ui/pixel/estandartes';
 import Comemoracao from '../Comemoracao';
@@ -523,7 +523,7 @@ export default function PartidaDuelo({
 
         {/* A arena (no modo 2 jogadores, mais baixa, para caberem as duas na tela) */}
         <div className={`pixel-box relative w-full overflow-hidden ${doisJogadores ? 'aspect-[4/1]' : 'aspect-[16/9] sm:aspect-[5/2]'}`}>
-          <CenaColiseu corA={cores[meu].cor} corB={cores[outro].cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} arena={(inv ? visRival : visEu).arena} tema={inv ? rival : ia} />
+          <CenaColiseu corA={cores[meu].cor} corB={cores[outro].cor} viva festa={tribunaBatida('eu') || tribunaBatida('rival')} arena={(inv ? visRival : visEu).arena} tema={inv ? rival : ia} historia={online && inv ? undefined : historiaDe(p, inv ? rival : ia).arena} />
 
           <p className="absolute inset-x-0 top-[3%] z-10 truncate px-3 text-center text-[9px] text-white/80 [text-shadow:1px_1px_0_#000] sm:text-xs">
             {dilema.pergunta}{' '}

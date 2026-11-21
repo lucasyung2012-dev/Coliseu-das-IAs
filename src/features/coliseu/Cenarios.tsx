@@ -5,6 +5,8 @@ import { desenhoCapitulo2 } from './cenarios/capitulos2';
 import { desenhoCapitulo3 } from './cenarios/capitulos3';
 import { desenhoCapitulo4 } from './cenarios/capitulos4';
 import { desenhoCapitulo5 } from './cenarios/capitulos5';
+import { desenhoCapitulo6 } from './cenarios/capitulos6';
+import { NUCLEO, paletaNucleo } from '@/ui/pixel/historia6';
 import { desenhoPrologo } from './cenarios/prologo';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
@@ -28,6 +30,7 @@ import {
   PALETA_SUCATA,
   paletaCensor,
   PRETORIANO,
+  PRETORIANO_BATEDOR,
 } from '@/ui/pixel/historia';
 import {
   ALMIRANTE_FERRUGEM,
@@ -45,7 +48,7 @@ import {
   paletaLeao,
   PRETOR_DE_ACO,
 } from '@/ui/pixel/historia2';
-import { COBRADOR, COZINHEIRO_BORDO, FEITOR_TAMBOR, GAIVOTA, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GAIVOTA, PALETA_PISTAO, paletaCobrador, PISTAO } from '@/ui/pixel/historia3';
+import { CAPATAZ, COBRADOR, COZINHEIRO_BORDO, FEITOR_TAMBOR, GAIVOTA, PALETA_CAPATAZ, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GAIVOTA, PALETA_PISTAO, paletaCobrador, PISTAO } from '@/ui/pixel/historia3';
 import { CAIO, IMEDIATO_FERRO, PALETA_CAIO, PALETA_IMEDIATO } from '@/ui/pixel/historia4';
 import { CACADOR_SOMBRAS, GUARDIAO_AQUEDUTO, LUMEN, PALETA_CACADOR, PALETA_LUMEN, PALETA_SACERDOTE, PALETA_SIBILA, paletaGuardiaoAqueduto, SACERDOTE_BRONZE, SIBILA } from '@/ui/pixel/historia5';
 
@@ -60,7 +63,7 @@ export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
   // A Grande Arena dos Jogos da Resposta Única: a arena imperial, lotada e em festa.
   if (lugar === 'coliseu-noite') return <CenaColiseu corA="#f08c50" corB="#c0283c" arena="imperial" viva festa />;
   // Os cenários novos, em 320 × 180 (o dobro de detalhe).
-  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar) ?? desenhoCapitulo4(lugar) ?? desenhoCapitulo5(lugar);
+  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar) ?? desenhoCapitulo4(lugar) ?? desenhoCapitulo5(lugar) ?? desenhoCapitulo6(lugar);
   if (hd)
     return (
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
@@ -437,8 +440,22 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={ECO} paleta={PALETA_ECO} espelhar={espelhar} />;
     case 'crianca':
       return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
+    case 'sargento':
+      return <Sprite grade={PRETORIANO_BATEDOR} paleta={{ ...PALETA_PRETORIANO, R: '#5a3a6a', C: '#3a2a4a', S: '#c8b070' }} espelhar={espelhar} />;
+    case 'capataz':
+      return <Sprite grade={CAPATAZ} paleta={PALETA_CAPATAZ} espelhar={espelhar} />;
+    case 'contramestre':
+      return <Sprite grade={MARINHEIRO_FERRO} paleta={{ ...PALETA_MARINHEIRO, E: '#ffd04a' }} espelhar={espelhar} />;
+    case 'feirante':
+      // A feirante cansada da Subura: o mesmo desenho do Copista, com capuz vermelho e avental claro.
+      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#a83a2a', h: '#7a2418', B: '#c8a878' }} espelhar={espelhar} />;
+    case 'zelador':
+      // O velho zelador do aqueduto: capuz azul de água.
+      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#3a6a9a', h: '#24466a', B: '#2a3a4a' }} espelhar={espelhar} />;
     case 'sibila':
       return <Sprite grade={SIBILA} paleta={PALETA_SIBILA} espelhar={espelhar} />;
+    case 'nucleo':
+      return <Sprite grade={NUCLEO} paleta={paletaNucleo(azul ? 2 : 0)} espelhar={espelhar} />;
     case 'lumen':
       return <Sprite grade={LUMEN} paleta={PALETA_LUMEN} espelhar={espelhar} />;
     case 'cacador':

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
-import { agir, usarPlano, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
-import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
+import { agir, modoDaLuta, usarPlano, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
+import { NOMES, type Fala, type Falante, type Lugar } from '@/game/historia/roteiro';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import {
   CAPITAO_INCINERADOR,
@@ -115,6 +115,9 @@ import {
   SACERDOTE_BRONZE,
   SIBILA_CORROMPIDA,
 } from '@/ui/pixel/historia5';
+import { GUARDIAO_NUCLEO, NUCLEO, PALETA_GUARDIAO_NUCLEO, paletaNucleo } from '@/ui/pixel/historia6';
+import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import type { IaId } from '@/game/personagens';
 import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
@@ -204,8 +207,10 @@ const VISUAL: Record<string, { grade: string[]; paleta: Paleta; largura: number 
   'campeao-sombrio': { grade: CACADOR_SOMBRAS, paleta: { ...PALETA_CACADOR, E: '#ff3a3a' }, largura: 21 },
 };
 
+const SOMBRAS: Record<string, IaId> = { 'sombra-cassius': 'claude', 'sombra-octavius': 'chatgpt', 'sombra-helios': 'gemini' };
+
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */
-const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, 'censor-tita-helios': 38, eclipse: 26, 'guardiao-aqueduto': 26, 'sibila-corrompida': 20, 'gigante-sombras': 32, cobrador: 22, leviata: 34, 'almirante-aco': 24 };
+const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, 'censor-tita-helios': 38, eclipse: 26, 'guardiao-aqueduto': 26, 'sibila-corrompida': 20, 'gigante-sombras': 32, cobrador: 22, leviata: 34, 'almirante-aco': 24, nucleo: 40, 'guardiao-nucleo': 24, 'sombra-cassius': 14, 'sombra-octavius': 14, 'sombra-helios': 14 };
 
 function SpriteInimigo({ e }: { e: EstadoLuta }) {
   const sinalFogo = e.inimigo.estado === 'sinal' && ataqueAtual(e).tipo === 'fogo';
@@ -220,6 +225,11 @@ function SpriteInimigo({ e }: { e: EstadoLuta }) {
   if (e.def.id === 'cobrador') return <Sprite grade={COBRADOR} paleta={paletaCobrador(e.inimigo.fase > 0 || sinalFogo)} espelhar />;
   if (e.def.id === 'leviata') return <Sprite grade={LEVIATA} paleta={paletaLeviata(e.inimigo.fase)} espelhar />;
   if (e.def.id === 'almirante-aco') return <Sprite grade={ALMIRANTE_ACO} paleta={paletaAlmiranteAco(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'nucleo') return <Sprite grade={NUCLEO} paleta={paletaNucleo(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'guardiao-nucleo') return <Sprite grade={GUARDIAO_NUCLEO} paleta={PALETA_GUARDIAO_NUCLEO} espelhar />;
+  // As sombras dos três (capítulo secreto): o próprio gladiador, escuro e de olho vermelho.
+  const sombra = SOMBRAS[e.def.id];
+  if (sombra) return <div className="sombra-heroi"><GladiadorPixel ia={sombra} espelhar /></div>;
   const v = VISUAL[e.def.id] ?? VISUAL.incinerador!;
   return <Sprite grade={v.grade} paleta={v.paleta} espelhar />;
 }
@@ -305,13 +315,14 @@ function Impacto({ x, cor, corte = false, grande = false }: { x: string; cor: st
 export function LutaHistoria({
   lugar,
   inimigo,
-  heroi,
+  heroi: heroiInicial,
   antes,
   depois,
   onFim,
-  atributos = ATRIBUTOS_INICIAIS,
+  atributos: atributosDoHeroi = ATRIBUTOS_INICIAIS,
   treino,
   onVitoria,
+  equipe,
 }: {
   lugar: Lugar;
   inimigo: string;
@@ -325,28 +336,45 @@ export function LutaHistoria({
   treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
   /** Venceu: recebe as peças de máquina que o inimigo deixou. */
   onVitoria?: (pecas: number) => void;
+  /** Capítulo secreto: os três lutam juntos e dá para TROCAR de gladiador no meio da luta. */
+  equipe?: Partial<Record<Falante, AtributosLuta>>;
 }) {
   const def = INIMIGOS[inimigo]!;
+  const [heroi, setHeroi] = useState<Falante>(heroiInicial);
+  const atributos = equipe?.[heroi] ?? atributosDoHeroi;
+  // O relógio da luta e o teclado leem sempre o gladiador que está lutando agora.
+  const atributosRef = useRef(atributos);
+  atributosRef.current = atributos;
   const noColiseu = lugar === 'coliseu-arena' || lugar === 'coliseu-noite';
   // O Octavius luta com PLANOS: coisas do cenário que aparecem e dá para usar.
   const comPlanos = heroi === 'octavius' && !treino;
   const [planosUsados, setPlanosUsados] = useState<number[]>([]);
   // Luta no escuro (Helios): só se vê o sinal com a LUZ (dura 4 s e recarrega em 5,5 s).
-  const escuro = !!def.escuro;
   const [luzAte, setLuzAte] = useState(0);
   const [luzPronta, setLuzPronta] = useState(0);
   const acenderRef = useRef<() => void>(() => undefined);
+  // Trocar de gladiador (capítulo secreto): o novo entra no lugar, com a vida e o fôlego de agora.
+  const trocarRef = useRef<(q: Falante) => void>(() => undefined);
+  trocarRef.current = (q: Falante) => {
+    if (fase !== 'luta' || q === heroi) return;
+    desbloquear();
+    tocar('selecionar');
+    setHeroi(q);
+    setLuzAte(0);
+  };
   const [feitos, setFeitos] = useState(0);
   const [fase, setFase] = useState<'antes' | 'luta' | 'depois' | 'derrota'>(antes?.length ? 'antes' : 'luta');
   const [e, setE] = useState<EstadoLuta>(() => novaLuta(def, atributos));
   const [tentativas, setTentativas] = useState(1);
+  const modo = modoDaLuta(e);
+  const escuro = modo.escuro;
   const visto = useRef(0);
   // Golpes seguidos sem apanhar (o COMBO na tela).
   const [combo, setCombo] = useState(0);
 
   useEffect(() => {
     if (fase !== 'luta') return;
-    const id = window.setInterval(() => setE((s) => passoLuta(s, atributos)), TICK_LUTA);
+    const id = window.setInterval(() => setE((s) => passoLuta(s, atributosRef.current)), TICK_LUTA);
     return () => window.clearInterval(id);
   }, [fase]);
 
@@ -381,7 +409,7 @@ export function LutaHistoria({
   const apertar = (acao: 'golpe' | 'escudo' | 'esquiva' | 'especial') => {
     if (fase !== 'luta') return;
     desbloquear();
-    setE((s) => agir(s, acao, atributos));
+    setE((s) => agir(s, acao, atributosRef.current));
   };
 
   useEffect(() => {
@@ -393,6 +421,10 @@ export function LutaHistoria({
       else if (k === 'k' || k === 'arrowdown') apertar('escudo');
       else if (k === 'l' || k === 'arrowleft') apertar('esquiva');
       else if (k === 'u') acenderRef.current();
+      else if (equipe && (k === '1' || k === '2' || k === '3')) {
+        const q = (Object.keys(equipe) as Falante[])[Number(k) - 1];
+        if (q) trocarRef.current(q);
+      }
       else if (k === ' ') {
         ev.preventDefault();
         apertar('especial');
@@ -416,7 +448,7 @@ export function LutaHistoria({
   const atacou = e.eventos.some((ev) => (ev.tipo === 'dano' || ev.tipo === 'bloqueio' || ev.tipo === 'esquiva') && ev.ate - e.tempo > 450);
   const vencido = e.fim === 'vitoria';
   // O Arquivista: nas fintas, quem treme são as cópias falsas; a verdadeira fica parada.
-  const ilusao = !!def.ilusoes && sinal && at.tipo === 'finta';
+  const ilusao = modo.ilusoes && sinal && at.tipo === 'finta';
   // No escuro, o sinal do inimigo só aparece com a LUZ acesa.
   const aceso = !escuro || e.tempo < luzAte;
   const podeLuz = escuro && fase === 'luta' && e.tempo >= luzPronta;
@@ -528,7 +560,7 @@ export function LutaHistoria({
         </div>
 
         {/* As cópias falsas do Arquivista: nas fintas, são elas que tremem e brilham */}
-        {def.ilusoes && !vencido &&
+        {modo.ilusoes && !vencido &&
           [52, 88].map((x) => (
             <div
               key={x}
@@ -544,10 +576,10 @@ export function LutaHistoria({
         {quemAjuda && aliado && (
           <div key={aliado.id} className="pointer-events-none absolute inset-0 z-20" aria-hidden>
             <div className="entra-esq absolute bottom-[14%] left-[44%] w-[13%] -translate-x-1/2">
-              <Retrato quem={quemAjuda} />
+              <Retrato quem={quemAjuda} azul={quemAjuda === 'censor'} />
             </div>
             <span className="lute-entra absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap font-pixel text-xs text-[#f2c14e] [text-shadow:2px_2px_0_#000] sm:text-xl">
-              {quemAjuda === 'octavius' ? '⚓ OCTAVIUS: CARGA EM EQUIPE!' : quemAjuda === 'helios' ? '☀️ HELIOS: RAIO DE SOL!' : '📚 CASSIUS: ESCUDO DE LIVROS!'}
+              {quemAjuda === 'octavius' ? '⚓ OCTAVIUS: CARGA EM EQUIPE!' : quemAjuda === 'helios' ? '☀️ HELIOS: RAIO DE SOL!' : quemAjuda === 'censor' ? '🔵 O CENSOR: A LUZ AZUL!' : '📚 CASSIUS: ESCUDO DE LIVROS!'}
             </span>
           </div>
         )}
@@ -704,6 +736,30 @@ export function LutaHistoria({
           </button>
         ))}
       </div>
+      {/* Capítulo secreto: trocar de gladiador no meio da luta (teclas 1, 2 e 3) */}
+      {equipe && (
+        <div className="grid grid-cols-3 gap-2">
+          {(Object.keys(equipe) as Falante[]).map((q, k) => (
+            <button
+              key={q}
+              type="button"
+              disabled={fase !== 'luta' || q === heroi}
+              onPointerDown={(ev) => {
+                ev.preventDefault();
+                trocarRef.current(q);
+              }}
+              className="pixel-box flex select-none items-center justify-center gap-2 py-2 font-pixel text-[8px] disabled:opacity-100 sm:text-[10px]"
+              style={{ boxShadow: q === heroi ? '0 0 0 3px #f2c14e' : '0 0 0 1px #555', opacity: q === heroi ? 1 : 0.75 }}
+              aria-label={`Trocar para ${NOMES[q]}`}
+            >
+              <span className="w-6 sm:w-8" aria-hidden>
+                <Retrato quem={q} />
+              </span>
+              {q === heroi ? `▶ ${NOMES[q].toUpperCase()}` : `${k + 1}: ${NOMES[q].toUpperCase()}`}
+            </button>
+          ))}
+        </div>
+      )}
       {/* Helios no escuro: a LUZ mostra o sinal do inimigo por alguns segundos */}
       {escuro && (
         <button

@@ -215,7 +215,7 @@ describe('configurações', () => {
   it('o Arcade leva às Configurações e mostra o subtítulo novo', () => {
     sessionStorage.setItem('coliseu.boot.vista', '1');
     abrir('/arena');
-    expect(screen.getByText('TODOS OS CAMINHOS LEVAM À ARENA')).toBeInTheDocument();
+    expect(screen.getByText('ONDE AS LENDAS DO COLISEU GANHAM VIDA')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Configurações' })).toHaveAttribute('href', '/configuracoes');
   });
 });

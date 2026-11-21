@@ -1,10 +1,15 @@
-import { useProgresso, nivelMaestria, recordeDe } from '@/game/progresso';
+import { lazy, Suspense } from 'react';
+import { useProgresso, nivelMaestria, recordeDe, useHistoriaVisual } from '@/game/progresso';
 import { indiceLiga } from '@/game/ligas';
 import { visualDoNivel, type Visual } from '@/game/maestria';
 import type { IaId } from '@/game/personagens';
+import type { VisualHistoria } from '@/game/premiosHistoria';
 import { GladiadorPixel } from './Personagens';
 import Sprite from './Sprite';
 import { LOUROS, PALETA_OURO } from './sprites';
+
+// O companheiro da História (Gaivota, Lumen ou as páginas): carregado só quando está em uso.
+const Companheiro = lazy(() => import('./Companheiro'));
 
 /** Tamanho do gladiador em cada liga: ele cresce conforme sobe (Recrutas → Imperadores). */
 const ESCALA_POR_LIGA = [0.82, 0.88, 0.94, 1, 1.08];
@@ -57,6 +62,9 @@ interface Props {
 export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado, aparencia }: Props) {
   const daqui = useAparencia(ia);
   const { liga, visual, imperador } = aparencia ?? daqui;
+  // Prêmios da História (só deste aparelho: no Duelo online, o rival não mostra os dele).
+  const historia = useHistoriaVisual(ia);
+  const hist: VisualHistoria = aparencia ? {} : historia;
   const corpo = (
     <div className="relative">
       {visual.aura !== 'nenhuma' && <div className={`aura-${visual.aura} aura-${ia} pointer-events-none absolute inset-[-12%] rounded-full`} aria-hidden />}
@@ -65,6 +73,11 @@ export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado, a
           <GladiadorPixel ia={ia} liga={liga} armadura={visual.armadura} espelhar={espelhar} />
         </div>
       </div>
+      {hist.companheiro && (
+        <Suspense fallback={null}>
+          <Companheiro qual={hist.companheiro} espelhar={espelhar} />
+        </Suspense>
+      )}
       {imperador ? (
         <div className="pointer-events-none absolute left-1/2 top-[-6%] w-[40%] -translate-x-1/2 drop-shadow-[0_0_4px_#f2c14e]" aria-hidden>
           <Sprite grade={COROAS[ia].grade} paleta={COROAS[ia].paleta} />
@@ -81,6 +94,8 @@ export default function GladiadorEnfeitado({ ia, comMoldura, espelhar, parado, a
       )}
     </div>
   );
+  // O título secreto "Os Três" dá a moldura de ouro com brilho.
+  if (comMoldura && hist.molduraOuro) return <div className="moldura-ouro moldura-tres p-2">{corpo}</div>;
   if (!comMoldura || visual.moldura === 'nenhuma') return corpo;
   return <div className={`moldura-${visual.moldura} p-2`}>{corpo}</div>;
 }

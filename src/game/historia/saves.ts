@@ -27,6 +27,8 @@ export interface SaveHistoria {
   equipamento?: Equipamento[];
   /** O que o jogador escolheu nas ESCOLHAS do capítulo (ex.: a rota no Mercado das Engrenagens). */
   escolhas?: Record<string, string>;
+  /** O capítulo secreto, Os Três (os três gladiadores juntos; o `gladiador` é só quem começa). */
+  secreto?: boolean;
 }
 
 export type Treino = 'forca' | 'defesa' | 'vida' | 'carisma';
@@ -52,6 +54,11 @@ export const NOME_DO_CAMINHO: Record<IaId, string> = {
 export function criarSave(gladiador: IaId, agora = new Date()): SaveHistoria {
   const quando = agora.toISOString();
   return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando };
+}
+
+/** O save do capítulo secreto: abre pela grade escondida, com os três pedaços da chave. */
+export function criarSaveSecreto(agora = new Date()): SaveHistoria {
+  return { ...criarSave('claude', agora), secreto: true };
 }
 
 /** Avança o save para uma cena (ou para o próximo capítulo, marcando o atual como concluído). */

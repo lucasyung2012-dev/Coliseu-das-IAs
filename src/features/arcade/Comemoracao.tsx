@@ -1,6 +1,8 @@
 import { useEffect, type CSSProperties, type ReactNode } from 'react';
 import type { ComemoracaoId } from '@/game/coliseu';
-import type { IaId } from '@/game/personagens';
+import { IAS, type IaId } from '@/game/personagens';
+import { useHistoriaVisual } from '@/game/progresso';
+import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
 import { tocar } from '@/ui/som';
 
@@ -51,17 +53,35 @@ function Explosao({ x, y, cor, atraso }: { x: number; y: number; cor: string; at
   );
 }
 
-export default function Comemoracao({ tipo }: { tipo: ComemoracaoId; ia?: IaId }) {
+export default function Comemoracao({ tipo, ia }: { tipo: ComemoracaoId; ia?: IaId }) {
+  // Prêmio secreto da História: na vitória, os outros dois gladiadores entram para comemorar junto.
+  const historia = useHistoriaVisual(ia ?? 'claude');
+  const osTres = !!ia && !!historia.osTres;
   useEffect(() => {
-    if (tipo === 'nenhuma') return;
+    if (tipo === 'nenhuma') {
+      if (osTres) tocar('fanfarra');
+      return;
+    }
     if (tipo === 'tambores' || tipo === 'sinos') [0, 300, 600].forEach((ms) => window.setTimeout(() => tocar('martelo'), ms));
     else if (tipo === 'folhas' || tipo === 'moedas' || tipo === 'luz') tocar('plateia');
     else tocar('fanfarra');
   }, [tipo]);
 
-  if (tipo === 'nenhuma') return null;
+  if (tipo === 'nenhuma' && !osTres) return null;
   return (
     <div className={`pointer-events-none absolute inset-0 -z-10 overflow-hidden ${tipo === 'tambores' ? 'tremer' : ''}`} aria-hidden>
+      {osTres && ia && (
+        <>
+          <Caindo n={20} largura="h-1.5 w-1.5 sm:h-2 sm:w-2">
+            {(i) => <span className="block h-full w-full" style={{ background: ['#f2c14e', '#7ad0ff', '#ffffff'][i % 3] }} />}
+          </Caindo>
+          {IAS.filter((x) => x !== ia).map((x, k) => (
+            <div key={x} className={`comemora-tres absolute bottom-0 w-[11%] sm:w-[8%] ${k === 0 ? 'left-[4%]' : 'right-[4%]'}`} style={{ animationDelay: `${k * 250}ms` }}>
+              <GladiadorPixel ia={x} espelhar={k === 1} />
+            </div>
+          ))}
+        </>
+      )}
       {/* ---- Cassius ---- */}
       {tipo === 'folhas' && <Caindo n={18}>{() => <Sprite grade={FOLHA} paleta={{ G: '#7aa040' }} />}</Caindo>}
       {tipo === 'pergaminho' && (

@@ -3,7 +3,8 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { indiceLiga, LIGAS, ligaDe, PATENTES, patenteDe, proximaLiga } from '@/game/ligas';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
-import { coliseuDe, nivelMaestria, totalPartidas, useProgresso, XP_POR_NIVEL, type PlacarModo } from '@/game/progresso';
+import { coliseuDe, historiaDe, nivelMaestria, totalPartidas, usarPremioHistoria, useProgresso, XP_POR_NIVEL, type PlacarModo } from '@/game/progresso';
+import { premiosHistoriaDe, terminados } from '@/game/premiosHistoria';
 import { nomeDoPremio, premiosDe } from '@/game/coliseu';
 import { Estandarte } from '@/ui/pixel/estandartes';
 import { CenaColiseu } from './cenas/Cenarios';
@@ -41,6 +42,7 @@ export default function PerfilCombatente() {
   const minhas = p.partidas.filter((pt) => pt.ia === id).slice(0, 5);
   const estilo = { '--ia': pers.cor } as CSSProperties;
   const coliseu = coliseuDe(p, id);
+  const hist = historiaDe(p, id);
 
   return (
     <main data-area="arcade" className="fundo-arcade relative min-h-screen text-fg" style={estilo}>
@@ -67,7 +69,7 @@ export default function PerfilCombatente() {
             <p className="mt-1 text-sm text-muted">
               {pers.titulo} · {pers.lema}
             </p>
-            <p className="mt-3 inline-block bg-[rgb(var(--ia))] px-2 py-1 font-pixel text-[9px] text-black">★ {titulo.nome.toUpperCase()}</p>
+            <p className="mt-3 inline-block bg-[rgb(var(--ia))] px-2 py-1 font-pixel text-[9px] text-black">★ {(hist.titulo ?? titulo.nome).toUpperCase()}</p>
             <p className="mt-3 text-sm italic">"{pers.ficha.frase}"</p>
             {/* Resumo rápido: troféus, Maestria e vitórias */}
             <div className="mt-3 flex flex-wrap gap-2 font-pixel text-[9px]">
@@ -179,9 +181,11 @@ export default function PerfilCombatente() {
           <div className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr]">
             <div>
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm">
-                <CenaColiseu corA={`rgb(${pers.cor})`} corB="#f2c14e" arena={coliseu.arena} tema={id} />
+                <CenaColiseu corA={`rgb(${pers.cor})`} corB="#f2c14e" arena={coliseu.arena} tema={id} historia={hist.arena} />
               </div>
-              <p className="mt-1 font-pixel text-[8px] text-muted">ARENA · {nomeDoPremio(id, coliseu.arena).toUpperCase()}</p>
+              <p className="mt-1 font-pixel text-[8px] text-muted">
+                ARENA · {(hist.arena ? (premiosHistoriaDe(id).find((pr) => pr.valor === hist.arena)?.nome ?? '') : nomeDoPremio(id, coliseu.arena)).toUpperCase()}
+              </p>
             </div>
             <div className="flex flex-col items-center justify-end">
               {coliseu.estandarte === 'nenhum' ? (
@@ -206,6 +210,8 @@ export default function PerfilCombatente() {
             🎁 TROCAR NO MAPA DE TROFÉUS
           </Link>
         </Bloco>
+
+        <PremiosDaHistoria ia={id} />
 
         <Bloco titulo="🛡 EVOLUÇÃO PELOS TROFÉUS">
           <p className="text-sm text-muted">A cada liga, {pers.gladiador} muda de patente, cresce e ganha equipamento novo.</p>
@@ -370,5 +376,53 @@ function Placar({ nome, placar }: { nome: string; placar: PlacarModo }) {
         <span className="text-accent-2">{placar.derrotas}D</span>
       </span>
     </div>
+  );
+}
+
+/**
+ * Lendas do Coliseu: os prêmios da História para este gladiador (o caminho dele e o
+ * segredo). Trancados mostram o que fazer; ganhos têm USAR (e TIRAR, se em uso).
+ */
+function PremiosDaHistoria({ ia }: { ia: IaId }) {
+  const p = useProgresso();
+  const feitos = terminados(p.historia);
+  const uso = p.historiaUso?.[ia] ?? {};
+  const nome = PERSONAGENS[ia].gladiador;
+  return (
+    <Bloco titulo="📖 LENDAS DO COLISEU">
+      <p className="text-sm text-muted">Prêmios do modo História: termine o caminho de {nome} no Coliseu para ganhar. Só visual.</p>
+      <ul className="grid gap-2 sm:grid-cols-3">
+        {premiosHistoriaDe(ia).map((pr) => {
+          const ganho = feitos.has(pr.requer);
+          const segredo = pr.requer === 'secreto';
+          const emUso = uso[pr.tipo] === pr.id;
+          return (
+            <li
+              key={pr.id}
+              className={`pixel-box flex flex-col gap-1 p-2 text-xs ${ganho ? '' : 'opacity-50'}`}
+              style={emUso ? { boxShadow: `0 0 0 3px ${segredo ? '#f2c14e' : 'rgb(var(--ia))'}` } : undefined}
+            >
+              <span className="text-xl">{ganho ? pr.icone : segredo ? '❓' : '🔒'}</span>
+              <span className={`font-semibold ${ganho ? (segredo ? 'text-[#f2c14e]' : 'text-[rgb(var(--ia))]') : ''}`}>{ganho || !segredo ? pr.nome : '???'}</span>
+              <span className="text-muted">
+                {ganho ? pr.descricao : segredo ? 'Dizem que debaixo da arena existe um segredo...' : `Termine o caminho de ${nome} no modo História.`}
+              </span>
+              {ganho && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    tocar('selecionar');
+                    usarPremioHistoria(ia, pr.tipo, emUso ? null : pr.id);
+                  }}
+                  className={`mt-1 px-2 py-1 font-pixel text-[8px] ${emUso ? 'bg-[rgb(var(--ia))] text-black' : 'pixel-box pixel-hover text-accent'}`}
+                >
+                  {emUso ? '✓ EM USO (TIRAR)' : 'USAR'}
+                </button>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </Bloco>
   );
 }

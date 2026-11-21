@@ -1,4 +1,5 @@
 import type { AtaqueInimigo, DefInimigo } from './luta';
+import { INIMIGOS_SECRETOS } from './inimigosSecretos';
 
 /**
  * Os inimigos do modo História. Dificuldade revista em 21/11/2026 (o Lucas achou
@@ -967,4 +968,6 @@ export const INIMIGOS: Record<string, DefInimigo> = {
       { ataques: [fogo('O OLHO: raio da Resposta Única', 800, 30, 1300), golpe('Desmoronar', 500, 10, 950, 4, 270), finta(450), fogo('Raio duplo', 650, 20, 1100, 2, 420)], pausaMs: [550, 850] },
     ],
   },
+  // ---------- O capítulo secreto: Os Três ----------
+  ...INIMIGOS_SECRETOS,
 };

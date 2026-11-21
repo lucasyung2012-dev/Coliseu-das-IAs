@@ -1203,3 +1203,74 @@
 .portao-titulo.abre { animation: portao-titulo-sai 0.5s ease both; }
 @keyframes portao-titulo-sai { from { opacity: 1; } to { opacity: 0; } }
 .menos-movimento .portao-esq, .menos-movimento .portao-dir, .menos-movimento .portao-titulo { animation: none; display: none; }
+
+/* O segredo: a grade escondida no título do modo História (com os três pedaços da chave). */
+.grade-secreta {
+  filter: drop-shadow(0 0 2px #f2c14e);
+  animation: grade-brilho 1.6s ease-in-out infinite;
+}
+.grade-tremendo {
+  animation: grade-brilho 0.8s ease-in-out infinite, grade-treme 0.25s linear 2;
+}
+@keyframes grade-brilho {
+  0%, 100% { filter: drop-shadow(0 0 1px #f2c14e); opacity: 0.75; }
+  50% { filter: drop-shadow(0 0 6px #f2c14e); opacity: 1; }
+}
+@keyframes grade-treme {
+  0%, 100% { margin-left: 0; }
+  25% { margin-left: -2px; }
+  75% { margin-left: 2px; }
+}
+.cartao-secreto {
+  animation: cartao-secreto-brilho 2.4s ease-in-out infinite;
+}
+@keyframes cartao-secreto-brilho {
+  0%, 100% { filter: none; }
+  50% { filter: drop-shadow(0 0 6px rgba(242, 193, 78, 0.55)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grade-secreta, .grade-tremendo, .cartao-secreto { animation: none; }
+}
+
+/* As sombras dos três (capítulo secreto): o gladiador escuro, roxo, com brilho vermelho. */
+.sombra-heroi {
+  filter: brightness(0.28) saturate(0.4) sepia(0.3) hue-rotate(220deg) drop-shadow(0 0 3px #ff3a5a);
+}
+
+/* Prêmios da História no Arcade: páginas voando, companheiro no ombro e a moldura de Os Três. */
+.pagina-voando {
+  animation: pagina-voa 2.6s ease-in-out infinite;
+}
+@keyframes pagina-voa {
+  0%, 100% { translate: 0 0; rotate: -8deg; }
+  50% { translate: 0 -10%; rotate: 8deg; }
+}
+.companheiro-ombro {
+  animation: companheiro-pula 1.8s ease-in-out infinite;
+}
+@keyframes companheiro-pula {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6%; }
+}
+.moldura-tres {
+  box-shadow: 0 0 0 3px #f2c14e, 0 0 16px 2px rgba(242, 193, 78, 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pagina-voando, .companheiro-ombro { animation: none; }
+}
+
+/* Comemoração "Os Três": os outros dois gladiadores pulam para dentro da tela. */
+.comemora-tres {
+  animation: comemora-tres-pula 0.9s ease-out both, comemora-tres-festa 0.6s ease-in-out 0.9s infinite alternate;
+}
+@keyframes comemora-tres-pula {
+  from { translate: 0 120%; }
+  to { translate: 0 0; }
+}
+@keyframes comemora-tres-festa {
+  from { translate: 0 0; }
+  to { translate: 0 -12%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .comemora-tres { animation: none; }
+}

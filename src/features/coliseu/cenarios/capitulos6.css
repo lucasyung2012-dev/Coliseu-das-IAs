@@ -1,0 +1,462 @@
+/*
+ * Animações de ambiente dos cenários do sexto bloco de capítulos (320 × 180): o capítulo secreto
+ * "Os Três", com o Hipogeu, a câmara do Núcleo e o Coliseu livre depois da queda do Censor.
+ * Toda classe e todo keyframe começam com "c6-" para não colidir com o resto do jogo.
+ * Atenção: animar opacity num elemento sobrescreve o atributo opacity dele;
+ * por isso as classes que mexem em opacity vão em grupos (<g>) ou em retângulos sem opacity própria.
+ * Nos elementos de SVG, px nas transformações vale como unidade do desenho.
+ */
+
+/* Halo de luz e livro azul respirando devagar */
+.c6-pulsar {
+  animation: c6-pulsar 2.6s ease-in-out infinite alternate;
+}
+@keyframes c6-pulsar {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Luz vermelha do Núcleo batendo como um coração */
+.c6-pulso {
+  animation: c6-pulso 1.6s ease-in-out infinite;
+}
+@keyframes c6-pulso {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  15% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.6;
+  }
+  45% {
+    opacity: 0.95;
+  }
+}
+
+/* A câmara inteira pulsando em vermelho, no mesmo ritmo */
+.c6-pulso-sala {
+  animation: c6-pulso-sala 1.6s ease-in-out infinite;
+}
+@keyframes c6-pulso-sala {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  15% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.4;
+  }
+  45% {
+    opacity: 0.85;
+  }
+}
+
+/* Luz de tocha tremendo */
+.c6-tremor {
+  animation: c6-tremor 0.9s steps(3) infinite alternate;
+}
+@keyframes c6-tremor {
+  0% {
+    opacity: 0.7;
+  }
+  40% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.95;
+  }
+}
+
+/* Labareda da tocha */
+.c6-chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c6-chama 0.45s steps(2) infinite alternate;
+}
+@keyframes c6-chama {
+  from {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9, 1.25);
+    opacity: 0.85;
+  }
+}
+
+/* Olho (vermelho no fundo do túnel, azul no estandarte) brilhando */
+.c6-olho {
+  animation: c6-olho 2.4s steps(3) infinite alternate;
+}
+@keyframes c6-olho {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Engrenagens, roldanas e anéis girando (a origem vem no estilo, em unidades do desenho) */
+.c6-gira {
+  animation: c6-gira 12s steps(48) infinite;
+}
+@keyframes c6-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Vapor saindo dos canos: sobe rápido e some */
+.c6-vapor {
+  opacity: 0;
+  animation: c6-vapor 3s steps(15) infinite;
+}
+@keyframes c6-vapor {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(3px, -18px);
+    opacity: 0;
+  }
+}
+
+/* Cabine e contrapeso do elevador subindo e descendo (o contrapeso usa a direção ao contrário) */
+.c6-elevador {
+  animation: c6-elevador 7s steps(22) infinite alternate;
+}
+@keyframes c6-elevador {
+  0%,
+  12% {
+    transform: translateY(0);
+  }
+  88%,
+  100% {
+    transform: translateY(44px);
+  }
+}
+
+/* Brilho dos cabos vermelhos */
+.c6-cabo {
+  animation: c6-cabo 1.6s ease-in-out infinite;
+}
+@keyframes c6-cabo {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0.5;
+  }
+}
+
+/* Sinal correndo pelo cabo em direção ao Núcleo; --dx (no estilo) é a distância */
+.c6-sinal {
+  opacity: 0;
+  animation: c6-sinal 2.4s steps(24) infinite;
+}
+@keyframes c6-sinal {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--dx));
+    opacity: 0;
+  }
+}
+
+/* Feixes de luz da arena entrando pelos alçapões */
+.c6-luz {
+  animation: c6-luz 5s ease-in-out infinite alternate;
+}
+@keyframes c6-luz {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Areia caindo dos alçapões */
+.c6-poeira {
+  opacity: 0;
+  animation: c6-poeira 4s steps(20) infinite;
+}
+@keyframes c6-poeira {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(2px, 118px);
+    opacity: 0;
+  }
+}
+
+/* Faísca que salta para a direita e cai apagando */
+.c6-faisca {
+  opacity: 0;
+  animation: c6-faisca 1.6s steps(10) infinite;
+}
+@keyframes c6-faisca {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(4px, -5px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(9px, 14px);
+    opacity: 0;
+  }
+}
+
+/* Faísca que salta para a esquerda */
+.c6-faisca-volta {
+  opacity: 0;
+  animation: c6-faisca-volta 1.8s steps(10) infinite;
+}
+@keyframes c6-faisca-volta {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(-4px, -6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-8px, 16px);
+    opacity: 0;
+  }
+}
+
+/* Brilho em cruz que acende de vez em quando */
+.c6-brilho {
+  opacity: 0;
+  animation: c6-brilho 3.2s steps(1) infinite;
+}
+@keyframes c6-brilho {
+  0%,
+  70% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.5;
+  }
+  90%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Confete caindo, balançando, e sumindo antes de chegar aos personagens */
+.c6-confete {
+  opacity: 0;
+  animation: c6-confete 7s steps(28) infinite;
+}
+@keyframes c6-confete {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  35% {
+    transform: translate(4px, 30px);
+  }
+  65% {
+    transform: translate(-3px, 58px);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(2px, 80px);
+    opacity: 0;
+  }
+}
+
+/* Estandartes compridos balançando com o vento, presos pelo alto */
+.c6-bandeira {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c6-bandeira 2.8s steps(3) infinite alternate;
+}
+@keyframes c6-bandeira {
+  from {
+    transform: skewX(-3deg);
+  }
+  to {
+    transform: skewX(3deg);
+  }
+}
+
+/* Flâmulas dos mastros do velário tremulando, presas no mastro */
+.c6-flamula {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: c6-flamula 0.8s steps(2) infinite alternate;
+}
+@keyframes c6-flamula {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(0.8, 1.3);
+  }
+}
+
+/* Bandeirinhas agitadas pela plateia */
+.c6-aceno {
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+  animation: c6-aceno 0.5s steps(2) infinite alternate;
+}
+@keyframes c6-aceno {
+  from {
+    transform: skewY(-12deg);
+  }
+  to {
+    transform: skewY(12deg);
+  }
+}
+
+/* Plateia pulando de alegria */
+.c6-multidao {
+  animation: c6-multidao 1s steps(1) infinite;
+}
+@keyframes c6-multidao {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Pomba atravessando o céu da esquerda para a direita */
+.c6-pomba {
+  animation: c6-pomba 16s linear infinite;
+}
+@keyframes c6-pomba {
+  from {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(180px, -6px);
+  }
+  to {
+    transform: translate(370px, 4px);
+  }
+}
+
+/* Asa da pomba batendo */
+.c6-asa {
+  animation: c6-asa 0.4s steps(1) infinite;
+}
+@keyframes c6-asa {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* Nuvens andando devagar */
+.c6-nuvem {
+  animation: c6-nuvem 40s steps(30) infinite alternate;
+}
+@keyframes c6-nuvem {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-24px);
+  }
+}
+
+/* Menos movimento: tudo parado */
+.menos-movimento .c6-pulsar,
+.menos-movimento .c6-pulso,
+.menos-movimento .c6-pulso-sala,
+.menos-movimento .c6-tremor,
+.menos-movimento .c6-chama,
+.menos-movimento .c6-olho,
+.menos-movimento .c6-gira,
+.menos-movimento .c6-vapor,
+.menos-movimento .c6-elevador,
+.menos-movimento .c6-cabo,
+.menos-movimento .c6-sinal,
+.menos-movimento .c6-luz,
+.menos-movimento .c6-poeira,
+.menos-movimento .c6-faisca,
+.menos-movimento .c6-faisca-volta,
+.menos-movimento .c6-brilho,
+.menos-movimento .c6-confete,
+.menos-movimento .c6-bandeira,
+.menos-movimento .c6-flamula,
+.menos-movimento .c6-aceno,
+.menos-movimento .c6-multidao,
+.menos-movimento .c6-pomba,
+.menos-movimento .c6-asa,
+.menos-movimento .c6-nuvem {
+  animation: none;
+}
+.menos-movimento .c6-vapor {
+  opacity: 0.5;
+}
+.menos-movimento .c6-cabo {
+  opacity: 0.4;
+}
+.menos-movimento .c6-sinal,
+.menos-movimento .c6-poeira,
+.menos-movimento .c6-faisca,
+.menos-movimento .c6-faisca-volta,
+.menos-movimento .c6-brilho,
+.menos-movimento .c6-pomba {
+  opacity: 0;
+}
+.menos-movimento .c6-confete {
+  opacity: 1;
+}

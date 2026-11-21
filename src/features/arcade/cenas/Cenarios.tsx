@@ -1,5 +1,10 @@
-import type { CSSProperties } from 'react';
+import { lazy, Suspense, type CSSProperties } from 'react';
 import type { ArenaId } from '@/game/coliseu';
+import type { ArenaHistoria } from '@/game/premiosHistoria';
+
+// A arena da História (prêmio de quem termina um caminho): o próprio cenário do modo
+// História, carregado só quando alguém usa (para o Arcade não ficar pesado).
+const CenarioHistoria = lazy(() => import('@/features/coliseu/Cenarios').then((m) => ({ default: m.CenarioHistoria })));
 import type { IaId } from '@/game/personagens';
 
 // Cenários em pixel art desenhados em 160 × 90 e ampliados sem suavizar (crispEdges),
@@ -67,6 +72,7 @@ export function CenaColiseu({
   festa = false,
   arena = 'estatuas',
   tema,
+  historia,
 }: {
   corA: string;
   corB: string;
@@ -75,7 +81,15 @@ export function CenaColiseu({
   arena?: ArenaId;
   /** De quem é esta arena: cada combatente tem as suas (pedido do Lucas). */
   tema?: IaId;
+  /** Prêmio da História em uso: desenha o cenário do final no lugar da arena. */
+  historia?: ArenaHistoria;
 }) {
+  if (historia)
+    return (
+      <Suspense fallback={<CenaColiseu corA={corA} corB={corB} viva={viva} festa={festa} arena={arena} tema={tema} />}>
+        <CenarioHistoria lugar={historia} />
+      </Suspense>
+    );
   const base = ARENAS[arena];
   // Ajustes de cor de alguns temas (amanhecer da colina de Helios, Templo do Sol dourado).
   const a =

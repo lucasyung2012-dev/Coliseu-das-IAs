@@ -3,6 +3,7 @@ import { IAS, type IaId } from './personagens';
 import { variacaoTrofeus, type Modo } from './ligas';
 import { coliseuEmUso, premiosNovos, type EscolhaColiseu, type TipoPremio, type VisualColiseu } from './coliseu';
 import type { SaveHistoria } from './historia/saves';
+import { historiaEmUso, type TipoPremioHistoria, type UsoHistoria, type VisualHistoria } from './premiosHistoria';
 
 export interface Partida {
   id: string;
@@ -52,6 +53,10 @@ export interface Progresso {
   coliseu?: Partial<Record<IaId, EscolhaColiseu>>;
   /** Saves do modo História (Coliseu). */
   historia?: SaveHistoria[];
+  /** Os pedaços da chave do Hipogeu (um no final de cada caminho) e outros segredos da História. */
+  historiaSegredos?: string[];
+  /** Prêmios da História em uso no Arcade, por IA (arena, companheiro, título, comemoração). */
+  historiaUso?: Partial<Record<IaId, UsoHistoria>>;
   /** Quando o progresso mudou pela última vez (ISO). Decide qual cópia vale ao sincronizar. */
   atualizadoEm?: string;
 }
@@ -169,7 +174,24 @@ export function useColiseu(ia: IaId): VisualColiseu {
   return coliseuDe(useProgresso(), ia);
 }
 
-/** Escolhe no mapa um prêmio já ganho para usar (vale só para esta IA). */
+/** Os prêmios da História em uso por esta IA (arena, companheiro, título, Os Três). */
+export function historiaDe(p: Progresso, ia: IaId): VisualHistoria {
+  return historiaEmUso(ia, p.historia, p.historiaUso?.[ia]);
+}
+
+export function useHistoriaVisual(ia: IaId): VisualHistoria {
+  return historiaDe(useProgresso(), ia);
+}
+
+/** USAR (ou tirar, com null) um prêmio da História nesta IA. */
+export function usarPremioHistoria(ia: IaId, tipo: TipoPremioHistoria, id: string | null) {
+  const p = obterProgresso();
+  const atual = { ...p.historiaUso?.[ia] };
+  if (id) atual[tipo] = id;
+  else delete atual[tipo];
+  salvar({ ...p, historiaUso: { ...p.historiaUso, [ia]: atual } });
+}
+
 /** Grava (cria ou atualiza) um save do modo História. */
 export function gravarSaveHistoria(s: SaveHistoria) {
   const p = obterProgresso();
@@ -178,12 +200,20 @@ export function gravarSaveHistoria(s: SaveHistoria) {
   salvar({ ...p, historia: existe ? lista.map((x) => (x.id === s.id ? s : x)) : [...lista, s] });
 }
 
+/** Guarda um segredo da História (vale para a conta toda, não para um save só). */
+export function ganharSegredoHistoria(id: string) {
+  const p = obterProgresso();
+  if ((p.historiaSegredos ?? []).includes(id)) return;
+  salvar({ ...p, historiaSegredos: [...(p.historiaSegredos ?? []), id] });
+}
+
 /** Apaga um save do modo História (a tela pede confirmação antes). */
 export function apagarSaveHistoria(id: string) {
   const p = obterProgresso();
   salvar({ ...p, historia: (p.historia ?? []).filter((x) => x.id !== id) });
 }
 
+/** Escolhe no mapa um prêmio já ganho para usar (vale só para esta IA). */
 export function escolherPremio(ia: IaId, tipo: TipoPremio, id: string) {
   const p = obterProgresso();
   salvar({ ...p, coliseu: { ...p.coliseu, [ia]: { ...p.coliseu?.[ia], [tipo]: id } } });
@@ -264,6 +294,8 @@ export function juntarProgresso(local: Progresso, nuvem: Progresso, primeiraVez:
     trofeus: maior(local.trofeus, nuvem.trofeus),
     xp: maior(local.xp, nuvem.xp),
     recorde: Object.fromEntries(IAS.map((ia) => [ia, Math.max(recordeDe(local, ia), recordeDe(nuvem, ia))])) as Record<IaId, number>,
+    // Segredos da História: junta os dos dois aparelhos.
+    historiaSegredos: [...new Set([...(nuvem.historiaSegredos ?? []), ...(local.historiaSegredos ?? [])])],
     // Saves da História: junta os dos dois aparelhos; o mesmo save fica com a versão mais nova.
     historia: Object.values(
       Object.fromEntries(

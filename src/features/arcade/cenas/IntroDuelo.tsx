@@ -4,7 +4,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import { PATENTES } from '@/game/ligas';
 import { tituloDoNivel } from '@/game/maestria';
-import { nivelMaestria, useColiseu, useProgresso } from '@/game/progresso';
+import { historiaDe, nivelMaestria, useColiseu, useProgresso } from '@/game/progresso';
 import { useSequencia } from '@/ui/movimento';
 import { tocar } from '@/ui/som';
 import { useSonsDaFase } from '@/ui/BotaoSom';
@@ -22,7 +22,10 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   const roleta = useRoleta(ia, rival, fase === 0);
   // O rival luta na mesma liga do jogador; o jogador entra com tudo o que conquistou.
   const { liga, visual } = useAparencia(ia);
-  const titulo = tituloDoNivel(nivelMaestria(useProgresso().xp[ia]), ia).nome;
+  const prog = useProgresso();
+  // O título da História (prêmio de quem terminou um caminho) vale mais que o da Maestria.
+  const hist = historiaDe(prog, ia);
+  const titulo = hist.titulo ?? tituloDoNivel(nivelMaestria(prog.xp[ia]), ia).nome;
   const { arena } = useColiseu(ia);
   useSonsDaFase(fase, {
     1: 'portao',
@@ -42,7 +45,7 @@ export default function IntroDuelo({ ia, rival, fim }: { ia: IaId; rival: IaId; 
   return (
     <div className="flex flex-col gap-5">
       <Palco rodando={fase < PRONTO} onPular={pular} className={fase === 4 ? 'tremer' : ''}>
-        <CenaColiseu corA={cor(ia)} corB={cor(rival)} arena={arena} tema={ia} />
+        <CenaColiseu corA={cor(ia)} corB={cor(rival)} arena={arena} tema={ia} historia={hist.arena} />
 
         {fase >= 2 && (
           <>

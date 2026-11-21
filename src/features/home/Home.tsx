@@ -116,6 +116,7 @@ function PortalArcade({ rota, frase }: { rota: string; frase: string }) {
       <div className="relative flex flex-col items-center gap-4 text-center">
         <p className="font-pixel text-[9px] tracking-[0.3em] text-accent-2 sm:text-[10px]">★ 1 OU 2 JOGADORES ★</p>
         <h2 className="neon letreiro font-pixel text-2xl leading-snug text-accent sm:text-4xl">Imperium Arcade</h2>
+        <p className="-mt-2 font-pixel text-[8px] tracking-[0.2em] text-[rgb(242_193_78)] sm:text-[10px]">ONDE AS LENDAS DO COLISEU GANHAM VIDA</p>
         <div className="flex items-end gap-4 sm:gap-10">
           {IAS.map((id, i) => (
             <div key={id} className="w-12 transition-transform duration-200 group-hover:-translate-y-2 sm:w-20" style={{ transitionDelay: `${i * 60}ms` }}>

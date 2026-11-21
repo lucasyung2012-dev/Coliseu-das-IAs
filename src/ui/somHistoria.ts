@@ -400,6 +400,13 @@ const VOZES: Partial<Record<Falante, Voz>> = {
   feitor: { base: 75, varia: 0.05, tipo: 'sawtooth', dur: 0.1, vol: 0.09, corte: 500 },
   cozinheiro: { base: 260, varia: 0.4, tipo: 'square', dur: 0.05, vol: 0.05, corte: 1600 },
   nina: { base: 620, varia: 0.3, tipo: 'triangle', dur: 0.04, vol: 0.08 },
+  sargento: { base: 125, varia: 0.05, tipo: 'square', dur: 0.06, vol: 0.06, corte: 900 },
+  capataz: { base: 100, varia: 0.1, tipo: 'sawtooth', dur: 0.08, vol: 0.08, corte: 650 },
+  contramestre: { base: 120, varia: 0.08, tipo: 'square', dur: 0.06, vol: 0.06, corte: 850 },
+  feirante: { base: 330, varia: 0.3, tipo: 'triangle', dur: 0.05, vol: 0.1 },
+  zelador: { base: 210, varia: 0.15, tipo: 'triangle', dur: 0.08, vol: 0.1, vibrato: 4 },
+  // O Núcleo: grave, eletrônico, com eco de muitas vozes.
+  nucleo: { base: 55, varia: 0.02, tipo: 'square', dur: 0.14, vol: 0.09, corte: 420, coro: 40, vibrato: 3 },
 };
 
 /**

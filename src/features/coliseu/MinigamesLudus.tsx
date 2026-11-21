@@ -508,9 +508,14 @@ const PAPEL: Record<'cassius' | 'octavius' | 'helios', { acao: string; icone: st
 const ORDEM: ('cassius' | 'octavius' | 'helios')[] = ['cassius', 'octavius', 'helios'];
 const BONECOS_TRIO = 18;
 
-export function MinigameTrio({ lugar, antes, depois, onFim, heroi }: Base & { heroi: Falante }) {
+/**
+ * `todos`: no capítulo secreto, você controla os TRÊS (uma faixa para cada botão).
+ */
+export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false }: Base & { heroi: Falante; todos?: boolean }) {
   const meu = (ORDEM as Falante[]).includes(heroi) ? (heroi as 'cassius' | 'octavius' | 'helios') : 'cassius';
   const faixa = ORDEM.indexOf(meu);
+  const minha = (f: number) => todos || f === faixa;
+  const meta = todos ? Math.round(BONECOS_TRIO * 0.75) : BONECOS_TRIO / 2;
   const [fase, setFase] = useState<Fase>(antes?.length ? 'antes' : 'jogo');
   const [bonecos, setBonecos] = useState<{ id: number; faixa: number; nasceu: number }[]>([]);
   const [agora, setAgora] = useState(0);
@@ -538,18 +543,18 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi }: Base & { he
     if (t >= proximo.current) {
       seq.current += 1;
       // Metade dos bonecos vem na sua faixa; os outros dois cuidam do resto sozinhos.
-      const f = seq.current % 2 === 0 ? faixa : [0, 1, 2].filter((x) => x !== faixa)[seq.current % 4 < 2 ? 0 : 1]!;
+      const f = todos ? (seq.current * 7) % 3 : seq.current % 2 === 0 ? faixa : [0, 1, 2].filter((x) => x !== faixa)[seq.current % 4 < 2 ? 0 : 1]!;
       setBonecos((b) => [...b, { id: seq.current, faixa: f, nasceu: t }]);
       proximo.current = t + Math.max(600, 1200 - seq.current * 25);
     }
     for (const b of bonecos) {
       const p = (t - b.nasceu) / ANDA;
       // Os aliados derrubam o boneco deles quando chega na linha.
-      if (b.faixa !== faixa && p >= 0.75) {
+      if (!minha(b.faixa) && p >= 0.75) {
         setBonecos((x) => x.filter((y) => y.id !== b.id));
         tocar('clique');
       }
-      if (b.faixa === faixa && p >= 1) {
+      if (minha(b.faixa) && p >= 1) {
         setBonecos((x) => x.filter((y) => y.id !== b.id));
         tocar('falha');
         if (vidas <= 1) {
@@ -559,16 +564,16 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi }: Base & { he
         setVidas((v) => v - 1);
       }
     }
-    if (derrubados >= BONECOS_TRIO / 2) {
+    if (derrubados >= meta) {
       tocar('fanfarra');
       setFase('ok');
     }
   });
 
-  const agir = () => {
+  const agir = (lane: number = faixa) => {
     if (fase !== 'jogo') return;
-    // Derruba o boneco da sua faixa que estiver na zona (perto da linha).
-    const alvo = bonecos.find((b) => b.faixa === faixa && (agora - b.nasceu) / ANDA >= 0.55);
+    // Derruba o boneco daquela faixa que estiver na zona (perto da linha).
+    const alvo = bonecos.find((b) => b.faixa === lane && (agora - b.nasceu) / ANDA >= 0.55);
     if (alvo) {
       tocar('espadas');
       setBonecos((x) => x.filter((y) => y.id !== alvo.id));
@@ -581,19 +586,19 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi }: Base & { he
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🤝 OS TRÊS CONTRA A MURALHA: cuide da SUA faixa. {Math.min(derrubados, BONECOS_TRIO / 2)}/{BONECOS_TRIO / 2}
+          🤝 OS TRÊS CONTRA A MURALHA: cuide da SUA faixa. {Math.min(derrubados, meta)}/{meta}
         </p>
         <Vidas n={vidas} max={3} icone="🧱" />
       </div>
       <Palco lugar={lugar}>
         {ORDEM.map((q, k) => (
           <div key={q} className="absolute inset-x-0 z-[6]" style={{ top: `${22 + k * 24}%`, height: '22%' }} aria-hidden>
-            <div className="absolute inset-0" style={{ background: k === faixa ? `${PAPEL[q].cor}33` : 'transparent', borderTop: `2px dashed ${PAPEL[q].cor}66` }} />
+            <div className="absolute inset-0" style={{ background: minha(k) ? `${PAPEL[q].cor}33` : 'transparent', borderTop: `2px dashed ${PAPEL[q].cor}66` }} />
             <div className="absolute left-[3%] top-0 h-full w-[9%]">
               <Retrato quem={q} />
             </div>
             {/* a zona de acertar */}
-            {k === faixa && <div className="absolute inset-y-0 left-[16%] w-[22%] border-x-2 border-white/40" />}
+            {minha(k) && <div className="absolute inset-y-0 left-[16%] w-[22%] border-x-2 border-white/40" />}
           </div>
         ))}
         {fase === 'jogo' &&
@@ -615,9 +620,19 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi }: Base & { he
         {fase === 'perdeu' && <Perdeu titulo="A MURALHA PASSOU" dica="Aperte quando o boneco da SUA faixa entrar na zona branca, perto do seu gladiador." onDeNovo={comecar} />}
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
-      <BotaoGrande disabled={fase !== 'jogo'} onApertar={agir} cor={papel.cor}>
-        {papel.icone} {papel.acao}!
-      </BotaoGrande>
+      {todos ? (
+        <div className="grid grid-cols-3 gap-2">
+          {ORDEM.map((q, k) => (
+            <BotaoGrande key={q} disabled={fase !== 'jogo'} onApertar={() => agir(k)} cor={PAPEL[q].cor}>
+              {PAPEL[q].icone} {PAPEL[q].acao}
+            </BotaoGrande>
+          ))}
+        </div>
+      ) : (
+        <BotaoGrande disabled={fase !== 'jogo'} onApertar={() => agir()} cor={papel.cor}>
+          {papel.icone} {papel.acao}!
+        </BotaoGrande>
+      )}
     </div>
   );
 }

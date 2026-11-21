@@ -2,7 +2,7 @@ import { useCallback, useState, type CSSProperties, type ReactNode } from 'react
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { indiceLiga, ligaDe, patenteDe, proximaLiga, variacaoTrofeus } from '@/game/ligas';
-import { escolherIa, nivelMaestria, useColiseu, useProgresso, XP_POR_NIVEL, type Partida } from '@/game/progresso';
+import { escolherIa, historiaDe, nivelMaestria, useColiseu, useHistoriaVisual, useProgresso, XP_POR_NIVEL, type Partida } from '@/game/progresso';
 import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado from '@/ui/pixel/GladiadorEnfeitado';
 import { CenaColiseu, CenaTribunal } from './cenas/Cenarios';
@@ -87,7 +87,7 @@ export default function ArcadeHub() {
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} />
           <div>
             <h1 className="neon letreiro font-pixel text-xl leading-snug text-accent sm:text-3xl">Imperium Arcade</h1>
-            <p className="mt-2 font-pixel text-[9px] tracking-[0.25em] text-accent-2 sm:text-[10px]">TODOS OS CAMINHOS LEVAM À ARENA</p>
+            <p className="mt-2 font-pixel text-[9px] tracking-[0.25em] text-accent-2 sm:text-[10px]">ONDE AS LENDAS DO COLISEU GANHAM VIDA</p>
           </div>
           <Sprite grade={LOUROS} paleta={PALETA_OURO} escala={4} espelhar />
         </header>
@@ -145,7 +145,7 @@ export default function ArcadeHub() {
             <p className="mt-1 text-xs text-muted">{prox ? `Faltam ${prox.faltam} troféus para ${prox.liga.nome}` : 'Liga máxima: Imperadores'}</p>
 
             <p className="mt-3 font-pixel text-[10px]">
-              MAESTRIA {nivelMaestria(p.xp[ia])} · {tituloDoNivel(nivelMaestria(p.xp[ia]), ia).nome.toUpperCase()} <span className="text-muted">· {xpNivel}/{XP_POR_NIVEL} XP</span>
+              MAESTRIA {nivelMaestria(p.xp[ia])} · {(historiaDe(p, ia).titulo ?? tituloDoNivel(nivelMaestria(p.xp[ia]), ia).nome).toUpperCase()} <span className="text-muted">· {xpNivel}/{XP_POR_NIVEL} XP</span>
             </p>
             <Barra valor={xpNivel / XP_POR_NIVEL} rotulo="Progresso de Maestria" fina />
 
@@ -316,10 +316,11 @@ function CartaoModo(props: {
 /** Arte do cartão do Duelo: o Coliseu com o seu gladiador encarando um rival. */
 function ArteDuelo({ ia }: { ia: IaId }) {
   const rival = IAS.find((x) => x !== ia)!;
+  const historia = useHistoriaVisual(ia).arena;
   const { arena } = useColiseu(ia);
   return (
     <>
-      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} arena={arena} tema={ia} />
+      <CenaColiseu corA={`rgb(${PERSONAGENS[ia].cor})`} corB={`rgb(${PERSONAGENS[rival].cor})`} arena={arena} tema={ia} historia={historia} />
       <div className="absolute bottom-[4%] left-[22%] w-[17%]">
         <GladiadorPixel ia={ia} />
       </div>

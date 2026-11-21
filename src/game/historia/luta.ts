@@ -43,6 +43,10 @@ export interface AtaqueInimigo {
 }
 
 export interface FaseInimigo {
+  /** A fase pode mudar o jeito da luta (o Núcleo: escudo gigante, escuro, ilusões). */
+  escudoGigante?: boolean;
+  escuro?: boolean;
+  ilusoes?: boolean;
   ataques: AtaqueInimigo[];
   /** Espera entre um ataque e outro (o jogo sorteia dentro do intervalo). */
   pausaMs: [number, number];
@@ -197,7 +201,8 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
       return ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a);
     }
     // Escudo gigante: só entra golpe cheio com a guarda quebrada (tonto).
-    const muralha = s.def.escudoGigante ? (i.estado === 'atordoado' ? 1 : 0.3) : 1;
+    const gigante = s.def.escudoGigante || s.def.fases[i.fase]?.escudoGigante;
+    const muralha = gigante ? (i.estado === 'atordoado' ? 1 : 0.3) : 1;
     // Aberto ou atordoado: golpe cheio (e mais Ânimo). Em guarda: ele defende quase tudo.
     if (i.estado === 'aberto' || i.estado === 'atordoado') {
       return ganharAnimo(bater({ ...r, inimigo: { ...i, guardas: 0 } }, (i.estado === 'atordoado' ? base * 1.5 : base) * muralha), 5, a);
@@ -205,7 +210,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     if (i.estado === 'sinal') return ganharAnimo(bater(r, base * 0.5 * muralha), 2, a);
     // Na guarda: quase nada entra, e na terceira vez seguida ele contra-ataca.
     const guardas = i.guardas + 1;
-    let g = evento(bater(r, s.def.escudoGigante ? 0 : 1), 'guarda', 'inimigo');
+    let g = evento(bater(r, gigante ? 0 : 1), 'guarda', 'inimigo');
     if (g.fim) return g;
     // QUEBRA-GUARDA (aprendido no Ludus): a terceira pancada seguida arrebenta a guarda.
     if (guardas >= GUARDAS_ATE_CONTRA && sabe('quebra-guarda')) {
@@ -325,4 +330,14 @@ export function usarPlano(s: EstadoLuta, a: AtributosLuta = ATRIBUTOS_INICIAIS):
   const r = bater({ ...s, inimigo: { ...s.inimigo, guardas: 0 } }, 12 * (1 + (a.forca - 1) * 0.2));
   if (r.fim) return evento(r, 'plano', 'inimigo');
   return ganharAnimo(evento({ ...r, inimigo: { ...r.inimigo, estado: 'atordoado', estadoAte: s.tempo + 1000, combo: 0, contra: false } }, 'plano', 'inimigo'), 10, a);
+}
+
+/** O jeito da luta agora (vale o da fase, se a fase tiver; senão, o do inimigo). */
+export function modoDaLuta(s: EstadoLuta): { escuro: boolean; ilusoes: boolean; escudoGigante: boolean } {
+  const f = s.def.fases[s.inimigo.fase];
+  return {
+    escuro: !!(f?.escuro ?? s.def.escuro),
+    ilusoes: !!(f?.ilusoes ?? s.def.ilusoes),
+    escudoGigante: !!(f?.escudoGigante ?? s.def.escudoGigante),
+  };
 }

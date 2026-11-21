@@ -222,12 +222,15 @@ export function Explorar({
   pontos,
   heroi,
   onFim,
+  onPonto,
 }: {
   lugar: Lugar;
   objetivo: string;
   pontos: PontoExplorar[];
   heroi: Falante;
   onFim: () => void;
+  /** Chamado quando a conversa de um ponto termina (usado pelos segredos). */
+  onPonto?: (p: PontoExplorar) => void;
 }) {
   const [x, setX] = useState(6);
   const [vistos, setVistos] = useState<string[]>([]);
@@ -296,6 +299,7 @@ export function Explorar({
             falas={falando.falas}
             onFim={() => {
               setVistos((v) => (v.includes(falando.id) ? v : [...v, falando.id]));
+              onPonto?.(falando);
               setFalando(null);
             }}
           />

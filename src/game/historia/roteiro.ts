@@ -50,7 +50,13 @@ export type Falante =
   | 'lumen'
   | 'cacador'
   | 'guardiao'
-  | 'sacerdote';
+  | 'sacerdote'
+  | 'sargento'
+  | 'capataz'
+  | 'contramestre'
+  | 'feirante'
+  | 'zelador'
+  | 'nucleo';
 
 export interface Fala {
   quem: Falante;
@@ -105,7 +111,10 @@ export type Lugar =
   | 'aqueduto'
   | 'templo-apolo'
   | 'templo-oraculo'
-  | 'coliseu-eclipse';
+  | 'coliseu-eclipse'
+  | 'hipogeu'
+  | 'nucleo-camara'
+  | 'coliseu-livre';
 
 /** Um personagem em cena numa cutscene. */
 export interface EmCena {
@@ -147,6 +156,8 @@ export interface PontoExplorar {
   obrigatorio?: boolean;
   /** Um personagem fica de pé ali (mostra o boneco). */
   personagem?: Falante;
+  /** Pedaço da chave do capítulo secreto: guardado na conta quando a conversa termina. */
+  segredo?: string;
 }
 
 /** Cena que só acontece se, numa ESCOLHA anterior do capítulo, o jogador escolheu `valor`. */
@@ -263,6 +274,12 @@ export const NOMES: Record<Falante, string> = {
   cacador: 'O Caçador de Sombras',
   guardiao: 'O Guardião do Aqueduto',
   sacerdote: 'Sacerdote de Bronze',
+  sargento: 'Sargento da Patrulha',
+  capataz: 'O Capataz das Galés',
+  contramestre: 'Contramestre de Ferro',
+  feirante: 'Feirante',
+  zelador: 'Zelador do Aqueduto',
+  nucleo: 'O Núcleo',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -363,7 +380,7 @@ export const PROLOGO: Quadro[] = [
     efeito: 'zoom',
     som: 'passos',
     personagens: [{ quem: 'cassius', de: 112, x: 50 }],
-    texto: 'Mas, nesta noite, três IAs vão desobedecer ao mesmo tempo.',
+    texto: 'Um ano depois, numa noite sem lua, três IAs vão desobedecer ao mesmo tempo.',
   },
   {
     lugar: 'biblioteca-porta',
@@ -600,7 +617,7 @@ const CAP1_CASSIUS: Capitulo = {
           lugar: 'biblioteca-chamas',
           quem: 'cassius',
           personagens: [{ quem: 'cassius', de: -12, x: 40, efeito: 'tremer' }],
-          texto: 'Mil anos de perguntas virando fumaça. O Guardião Zero, lá no meio do salão, olha tudo sem piscar.',
+          texto: 'Mil anos de perguntas virando fumaça. A estátua do Guardião Zero, no meio do salão, olha tudo sem piscar.',
         },
         {
           lugar: 'biblioteca-chamas',
@@ -617,7 +634,7 @@ const CAP1_CASSIUS: Capitulo = {
     {
       tipo: 'luta',
       id: 'c1-luta5',
-      lugar: 'biblioteca-salao',
+      lugar: 'biblioteca-chamas',
       inimigo: 'capitao-incinerador',
       antes: [
         { quem: 'capitao', texto: 'IA Guardiã da Biblioteca. Pela Lei da Resposta Única, entregue os livros e desligue-se.' },
@@ -633,7 +650,7 @@ const CAP1_CASSIUS: Capitulo = {
         { lugar: 'biblioteca-chamas', efeito: 'tremor', som: 'pesada', texto: 'A parede do salão explode.' },
         { lugar: 'biblioteca-chamas', efeito: 'fogo', texto: 'Pelo buraco entra uma forma enorme de bronze, soltando fumaça pela chaminé.' },
         { lugar: 'biblioteca-chamas', efeito: 'fogo', som: 'catapulta', texto: 'A FORNALHA: a máquina que o Censor usa para queimar tudo o que ele não quer que exista.' },
-        { lugar: 'biblioteca-chamas', quem: 'cassius', personagens: [{ quem: 'cassius', x: 30, efeito: 'brilhar' }], texto: 'Lívia, feche o alçapão. Não importa o que você ouvir aqui em cima.' },
+        { lugar: 'biblioteca-chamas', quem: 'cassius', personagens: [{ quem: 'cassius', x: 30, efeito: 'brilhar' }], texto: '(Ele joga o Livro das Mil Perguntas pelo alçapão.) Lívia, PEGUE! E feche o alçapão. Não importa o que você ouvir aqui em cima.' },
       ],
     },
     {
@@ -923,7 +940,7 @@ const CAP2_CASSIUS: Capitulo = {
           lugar: 'rua-mercado',
           quem: 'fio',
           personagens: [{ quem: 'fio', x: 58, tamanho: 8, efeito: 'tremer' }],
-          texto: 'Eu não vou cantar as músicas da Eco até te ver de novo. Promessa de Fio.',
+          texto: 'Eu vou cantar as músicas da Eco por todos os canos de Roma. Quando você ouvir, sou eu chegando. Promessa de Fio.',
         },
         { lugar: 'coliseu-tunel', efeito: 'escuro', som: 'portao', texto: 'Horas depois. O túnel por baixo do Coliseu. O barulho da multidão lá em cima, abafado.' },
         {

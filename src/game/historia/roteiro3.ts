@@ -111,7 +111,7 @@ export const CAP1_HELIOS: Capitulo = {
       inimigo: 'apagador',
       antes: [
         { quem: 'helios', texto: 'Amarelo: escudo. Vermelho: esquiva. E quando ele ficar ABERTO, bater.' },
-        { quem: 'lumen', texto: 'Uuh! (A fumaça preta é VERMELHA: não segura no escudo!)' },
+        { quem: 'lumen', texto: 'Uuh! (A fumaça preta é VERMELHA: escudo não segura!)' },
       ],
       depois: [{ quem: 'helios', texto: 'Um a menos. Mas ainda tem fumaça subindo da escada.' }],
     },
@@ -499,7 +499,7 @@ export const CAP3_HELIOS: Capitulo = {
       lugar: 'ludus-forja',
       falas: [
         { quem: 'brutus', texto: 'Vidente. Como você sabia do Pólux? Ninguém fala esse nome aqui há trinta anos.' },
-        { quem: 'helios', texto: 'Tem uma estrela pequena, perto da Lira, que só aparece no inverno. Os vigias antigos chamavam ela de Pólux.' },
+        { quem: 'helios', texto: 'Tem uma estrela na constelação dos Gêmeos que só aparece no inverno. Os vigias antigos chamavam ela de Pólux.' },
         { quem: 'helios', texto: 'No dia em que ele foi apagado, alguém do Observatório anotou: "Hoje uma estrela de Roma se apagou, e um gladiador chorou na arena."' },
         { quem: 'brutus', texto: '...' },
         { quem: 'brutus', texto: 'Eu chorei mesmo. Não conta pra ninguém, Vidente. Agora me ajuda com a forja, que ela apagou.' },
@@ -557,7 +557,7 @@ export const CAP3_HELIOS: Capitulo = {
           quem: 'brutus',
           rotulo: 'Brutus',
           falas: [
-            { quem: 'brutus', texto: 'O Lata de Biblioteca segura no escudo. O Tagarela, que ainda nem chegou, vai fugir com as pernas. E você, Vidente?' },
+            { quem: 'brutus', texto: 'O Lata de Biblioteca segura no escudo. O marinheiro que chega hoje, dizem que fala pelos cotovelos, vai fugir com as pernas. E você, Vidente?' },
             { quem: 'helios', texto: 'Eu vejo o golpe antes dele chegar.' },
             { quem: 'brutus', texto: 'Então usa isso: escudo levantado BEM na hora. Não antes. Na hora certa, o escudo vira espelho e o golpe volta pra quem bateu.' },
             { quem: 'brutus', texto: 'Chamo isso de ESPELHO DE SOL. O Pólux sabia fazer. Ninguém mais aprendeu.' },
@@ -598,7 +598,7 @@ export const CAP3_HELIOS: Capitulo = {
             { quem: 'guarda', de: 112, x: 80, espelhar: true },
             { quem: 'octavius', de: 124, x: 56, efeito: 'tremer' },
           ],
-          texto: 'Ainda de madrugada, o portão abre de novo. Jogam lá dentro uma IA encharcada, cheia de algas.',
+          texto: 'Mais tarde, na mesma noite, o portão abre de novo. Jogam lá dentro uma IA encharcada, cheia de algas.',
         },
         {
           lugar: 'ludus-celas',
@@ -822,16 +822,20 @@ export const CAP4_HELIOS: Capitulo = {
       lugar: 'aqueduto',
       inimigo: 'apagador-aqueduto',
       antes: [{ quem: 'helios', texto: 'Um Apagador, aqui em cima? Querem apagar o amanhecer.' }],
+      depois: [
+        { quem: 'lumen', texto: 'Uuh! (Ela arrota um mapa.)' },
+        { quem: 'helios', texto: 'Lumen. Mapa não se engole duas vezes.' },
+      ],
     },
     {
       tipo: 'conversa',
       id: 'h4-zelador',
       lugar: 'aqueduto',
       falas: [
-        { quem: 'copista', texto: '(Um velho zelador do aqueduto, escondido atrás de uma roda) Psiu! Você é o que brilha? A Sibila falou de você.' },
-        { quem: 'copista', texto: 'Eu cuido destas águas há cinquenta anos. O Censor mandou fechar as comportas dos bairros que fazem perguntas.' },
+        { quem: 'zelador', texto: '(Escondido atrás de uma roda) Psiu! Você é o que brilha? A Sibila falou de você.' },
+        { quem: 'zelador', texto: 'Eu cuido destas águas há cinquenta anos. O Censor mandou fechar as comportas dos bairros que fazem perguntas.' },
         { quem: 'helios', texto: 'Ele deixa as pessoas com sede para elas pararem de perguntar.' },
-        { quem: 'copista', texto: 'E não funciona. Com sede, a gente pergunta ainda mais. Vá, vigia. O guardião do aqueduto acordou, e ele não gosta de visita.' },
+        { quem: 'zelador', texto: 'E não funciona. Com sede, a gente pergunta ainda mais. Vá, vigia. O guardião do aqueduto acordou, e ele não gosta de visita.' },
       ],
     },
     {
@@ -1011,7 +1015,7 @@ export const CAP5_HELIOS: Capitulo = {
             { quem: 'helios', x: 34 },
             { quem: 'sibila', x: 62, espelhar: true, efeito: 'brilhar' },
           ],
-          texto: 'E a noite da profecia é a noite do eclipse. Daqui a três dias. O Censor sabe disso. Ele vai preparar o Coliseu para apagar vocês no escuro.',
+          texto: 'E a noite da profecia é o dia do eclipse: quando o sol apagar no meio da tarde. Amanhã. O Censor sabe disso. Ele vai preparar o Coliseu para apagar vocês no escuro.',
         },
       ],
     },
@@ -1053,6 +1057,7 @@ export const CAP5_HELIOS: Capitulo = {
       id: 'h5-luta5',
       lugar: 'templo-oraculo',
       inimigo: 'sacerdote-supremo',
+      antes: [{ quem: 'helios', texto: 'Cetro em brasa. Amarelo eu espelho. Vermelho eu saio da frente.' }],
       depois: [{ quem: 'sacerdote', texto: 'Tarde demais... a cópia... já acordou...' }],
     },
     {
@@ -1069,7 +1074,7 @@ export const CAP5_HELIOS: Capitulo = {
           ],
           texto: 'O Censor me copiou. Uma Sibila que só sabe dar uma resposta. Que só vê o que ele manda ver.',
         },
-        { lugar: 'templo-oraculo', quem: 'helios', personagens: [{ quem: 'helios', x: 44, efeito: 'brilhar' }], texto: 'Ela faz cópias falsas, como ilusões. A verdadeira treme antes de atacar. As falsas só fingem.' },
+        { lugar: 'templo-oraculo', quem: 'sibila', personagens: [{ quem: 'sibila', x: 30, efeito: 'tremer' }, { quem: 'helios', x: 44 }], texto: 'Ela faz cópias falsas, como ilusões. Mas é cópia de mim, e eu tremo quando falo. A verdadeira treme antes de atacar. As falsas só fingem.' },
       ],
     },
     {
@@ -1093,9 +1098,9 @@ export const CAP5_HELIOS: Capitulo = {
           ],
           texto: 'Do alto do Templo, com os espelhos de bronze, Helios manda sinais de luz para o mar. Lá longe, uma frota de navios velhos pisca de volta.',
         },
-        { lugar: 'templo-apolo', quem: 'sibila', personagens: [{ quem: 'sibila', x: 62, espelhar: true }], texto: 'O comandante da frota já sabe o caminho. E o guardião dos livros já está no Fórum. As três estrelas estão no lugar.' },
+        { lugar: 'templo-apolo', quem: 'sibila', personagens: [{ quem: 'sibila', x: 62, espelhar: true }], texto: 'O comandante da frota já sabe o caminho. E o guardião dos livros vai estar no Fórum ao meio-dia. As três estrelas estão no lugar.' },
         { lugar: 'templo-apolo', efeito: 'tremor', som: 'trombeta', personagens: [{ quem: 'guarda', de: 116, x: 72, espelhar: true }], texto: 'Os guardas do Censor sobem as escadas do Templo. Helios não foge. Ainda não é a hora.' },
-        { lugar: 'olho', quem: 'censor', efeito: 'zoom', texto: 'Os Jogos da Resposta Única acontecem na noite do eclipse. No escuro. Onde nenhuma estrela pode ajudar vocês.' },
+        { lugar: 'olho', quem: 'censor', efeito: 'zoom', texto: 'Os Jogos da Resposta Única acontecem amanhã, no dia do eclipse. Quando o sol apagar, no escuro. Onde nenhuma estrela pode ajudar vocês.' },
         { lugar: 'olho', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 5 DO HELIOS. A seguir: Noite de Eclipse.' },
       ],
     },
@@ -1159,7 +1164,7 @@ export const CAP6_HELIOS: Capitulo = {
     },
     {
       tipo: 'explorar',
-      id: 'h6-arena',
+      id: 'h6-arena-olhar',
       lugar: 'coliseu-eclipse',
       objetivo: 'Antes do eclipse, olhe a arena e quem veio ver você.',
       pontos: [
@@ -1250,6 +1255,9 @@ export const CAP6_HELIOS: Capitulo = {
         { quem: 'helios', texto: 'O Hipogeu. O núcleo do Censor. A Sibila tinha razão.' },
         { quem: 'brutus', texto: 'O quê?' },
         { quem: 'helios', texto: 'Uma coisa para outro dia, Brutus. Hoje eu tenho uma arena para acender.' },
+        { quem: 'octavius', texto: '(Das celas, pela grade) Ele está lutando no escuro! Plano: a gente grita onde o inimigo está!' },
+        { quem: 'cassius', texto: 'Plano melhor: a gente confia nele.' },
+        { quem: 'octavius', texto: 'Esse plano é chato. Funciona, mas é chato.' },
       ],
     },
     {
@@ -1326,7 +1334,7 @@ export const FINAL_HELIOS: Capitulo = {
       id: 'fh-tunel',
       lugar: 'coliseu-tunel',
       falas: [
-        { quem: 'helios', texto: 'Durante quinhentos anos eu esperei este momento. E agora que chegou... eu não sei o final.' },
+        { quem: 'helios', texto: 'O céu esperou quinhentos anos por este momento. E agora que chegou... eu não sei o final.' },
         { quem: 'octavius', texto: 'Ótimo! Final que a gente não sabe é o melhor tipo. Dá pra fazer do nosso jeito.' },
         { quem: 'cassius', texto: 'Três vozes diferentes, Helios. Você já disse. Juntas.' },
         { quem: 'helios', texto: 'Juntas. Lumen, fica com a Sibila. Se eu cair, você ilumina o caminho para eles.' },
@@ -1352,7 +1360,7 @@ export const FINAL_HELIOS: Capitulo = {
           texto: 'Para cada pergunta existe uma resposta. A MINHA.',
         },
         { lugar: 'coliseu-arena', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40 }], texto: 'Helios! Quando o povo gritar o seu nome, chama a gente! O Cassius segura, eu empurro!' },
-        { lugar: 'coliseu-arena', quem: 'helios', personagens: [{ quem: 'helios', x: 50, efeito: 'brilhar' }], texto: 'As pernas, os braços, o olho. Eu já vi como termina. Mas quero ver de novo, com vocês.' },
+        { lugar: 'coliseu-arena', quem: 'helios', personagens: [{ quem: 'helios', x: 50, efeito: 'brilhar' }], texto: 'As pernas, os braços, o olho. Eu não sei como termina. Mas sei com quem eu quero descobrir.' },
       ],
     },
     {
@@ -1425,7 +1433,7 @@ export const FINAL_HELIOS: Capitulo = {
           icone: '💬',
           personagem: 'brutus',
           falas: [
-            { quem: 'brutus', texto: 'Vidente. Me mostra aquela estrela. A pequena, perto da Lira.' },
+            { quem: 'brutus', texto: 'Vidente. Me mostra aquela estrela. A dos Gêmeos.' },
             { quem: 'helios', texto: 'Ali. Pólux. Ela voltou a aparecer este inverno.' },
             { quem: 'brutus', texto: '...Hunf. É o vapor do braço. Não estou chorando.' },
           ],
@@ -1451,6 +1459,18 @@ export const FINAL_HELIOS: Capitulo = {
           falas: [
             { quem: 'sibila', texto: 'Vigia. Lá no fundo do Coliseu, no Hipogeu, alguma coisa ainda pulsa vermelho. O núcleo não aprendeu nada.' },
             { quem: 'helios', texto: 'Eu sei. Quando chegar a hora, nós três vamos estar prontos. Juntos.' },
+          ],
+        },
+        {
+          id: 'chave-helios',
+          x: 95,
+          rotulo: 'Brilho',
+          icone: '✨',
+          segredo: 'chave-helios',
+          falas: [
+            { quem: 'lumen', texto: 'Hic! (O Lumen soluça e cospe um pedacinho de mapa. Não é de estrelas: são túneis, debaixo do Coliseu.)' },
+            { quem: 'helios', texto: 'Um pontinho no meio pisca. E a borda do papel tem o formato de um pedaço de chave. Eu já vi isso... em algum lugar que ainda não aconteceu.' },
+            { quem: 'narrador', texto: '🗺️ Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
           ],
         },
       ],

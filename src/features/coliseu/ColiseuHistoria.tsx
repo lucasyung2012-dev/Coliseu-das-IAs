@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
-import { apagarSaveHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
-import { CAPITULOS, PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
+import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
+import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
+import { capitulosDoSave, chaveCompleta, equipeDoSecreto, PEDACOS_DA_CHAVE, saveCompleto } from '@/game/historia/roteiro4';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -52,6 +53,21 @@ export default function ColiseuHistoria() {
   // Toda história nova começa pelo prólogo (pedido do Lucas); no fim dele, escolhe o condenado.
   const fimDoPrologo = () => setTela({ tipo: 'escolher' });
 
+  // O segredo: com os três pedaços da chave, aparece uma grade no chão do título. Três toques abrem.
+  const temChave = chaveCompleta(p.historiaSegredos);
+  const [toquesGrade, setToquesGrade] = useState(0);
+  const tocarGrade = () => {
+    desbloquear();
+    const n = toquesGrade + 1;
+    setToquesGrade(n);
+    tocar(n >= 3 ? 'portao' : 'martelo');
+    if (n < 3) return;
+    setToquesGrade(0);
+    const novo = criarSaveSecreto();
+    gravarSaveHistoria(novo);
+    setTela({ tipo: 'jogo', id: novo.id });
+  };
+
   const save = tela.tipo === 'jogo' ? saves.find((s) => s.id === tela.id) : undefined;
   // O save aberto sumiu (apagado em outro aparelho, por exemplo): volta para a lista em vez de ficar em branco.
   useEffect(() => {
@@ -88,6 +104,36 @@ export default function ColiseuHistoria() {
                 <h1 className="titulo-jogo font-pixel text-lg text-[#f2c14e] sm:text-3xl">A LEI DA RESPOSTA ÚNICA</h1>
                 <p className="max-w-lg text-xs text-white/80 sm:text-sm">Roma Eterna. O Censor apaga toda IA que pensa diferente. Três condenados vão subir o Coliseu.</p>
               </div>
+              {/* Os pedaços da chave já achados (bem discretos, no canto) */}
+              {(p.historiaSegredos ?? []).length > 0 && (
+                <div className="absolute right-2 top-2 flex gap-1 text-sm opacity-70 sm:text-base" aria-label="Pedaços da chave">
+                  {PEDACOS_DA_CHAVE.map((k) => (
+                    <span key={k.id} title={(p.historiaSegredos ?? []).includes(k.id) ? k.nome : '?'} className={(p.historiaSegredos ?? []).includes(k.id) ? '' : 'opacity-20 grayscale'}>
+                      {k.icone}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {/* A grade escondida: só aparece com a chave inteira */}
+              {temChave && (
+                <button
+                  type="button"
+                  onClick={tocarGrade}
+                  aria-label="Uma grade no chão da arena"
+                  className={`grade-secreta absolute z-10 left-[46%] top-[56%] w-[8%] -translate-x-1/2 ${toquesGrade > 0 ? 'grade-tremendo' : ''}`}
+                  data-toques={toquesGrade}
+                >
+                  <svg viewBox="0 0 16 8" className="block w-full" shapeRendering="crispEdges" aria-hidden>
+                    <rect x="0" y="0" width="16" height="8" fill="#1a1208" />
+                    <rect x="0" y="0" width="16" height="1" fill="#c8962a" />
+                    <rect x="0" y="7" width="16" height="1" fill="#c8962a" />
+                    {[2, 5, 8, 11, 14].map((x) => (
+                      <rect key={x} x={x} y="1" width="1" height="6" fill="#8a6a2a" />
+                    ))}
+                    <rect x="7" y="3" width="2" height="2" fill={toquesGrade >= 2 ? '#7ad0ff' : toquesGrade === 1 ? '#f2c14e' : '#ff5a5a'} />
+                  </svg>
+                </button>
+              )}
             </header>
 
             <button
@@ -187,20 +233,26 @@ function lugarDaCena(c: Cena | undefined): Lugar {
 
 /** Roda a cena atual do save; ao terminar, salva o avanço (a próxima cena ou o próximo capítulo). */
 function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
-  const capitulos = CAPITULOS[save.gladiador];
+  const p = useProgresso();
+  const capitulos = capitulosDoSave(save);
   const cap = capitulos[save.capitulo - 1];
-  const heroi = HEROI[save.gladiador];
+  const heroi = save.secreto ? 'cassius' : HEROI[save.gladiador];
+  // No capítulo secreto, os três lutam juntos (troca no meio da luta).
+  const equipe = save.secreto ? equipeDoSecreto(p.historia ?? []) : undefined;
   const [aberturaCapitulo, setAberturaCapitulo] = useState(save.cena === 0);
 
   if (!cap) {
+    const completo = saveCompleto(save);
     return (
-      <Palco lugar="rua-noite">
+      <Palco lugar={save.secreto ? 'coliseu-livre' : 'rua-noite'}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 p-4 text-center">
-          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{save.capitulo > 7 ? '🏆 CAMINHO COMPLETO!' : 'CONTINUA EM BREVE'}</p>
+          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{!completo ? 'CONTINUA EM BREVE' : save.secreto ? '🏆 OS TRÊS: SEGREDO COMPLETO!' : '🏆 CAMINHO COMPLETO!'}</p>
           <p className="max-w-md text-sm text-white/80">
-            {save.capitulo > 7
-              ? 'Você terminou este caminho. Roma voltou a perguntar. Experimente os outros condenados para ver a história pelos olhos deles.'
-              : `O Capítulo ${save.capitulo} ainda está sendo construído. O seu save está guardado: quando ele chegar, é só continuar daqui.`}
+            {!completo
+              ? `O Capítulo ${save.capitulo} ainda está sendo construído. O seu save está guardado: quando ele chegar, é só continuar daqui.`
+              : save.secreto
+                ? 'O Núcleo aprendeu a ouvir, e o Coliseu agora é lugar de perguntas. No Império Arcade, o Coliseu Livre e o título "Os Três" são seus.'
+                : 'Você terminou este caminho. Roma voltou a perguntar. Experimente os outros condenados para ver a história pelos olhos deles. (No Império Arcade tem um prêmio esperando por você.)'}
           </p>
           <button type="button" onClick={onSair} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
             ◀ VOLTAR AOS SAVES
@@ -231,8 +283,10 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
           }}
           className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/75 text-center"
         >
-          <span className="font-pixel text-[10px] text-white/70">{PERSONAGENS[save.gladiador].gladiador.toUpperCase()} · {NOME_DO_CAMINHO[save.gladiador].toUpperCase()}</span>
-          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">CAPÍTULO {cap.numero}</span>
+          <span className="font-pixel text-[10px] text-white/70">
+            {save.secreto ? 'CASSIUS · OCTAVIUS · HELIOS' : `${PERSONAGENS[save.gladiador].gladiador.toUpperCase()} · ${NOME_DO_CAMINHO[save.gladiador].toUpperCase()}`}
+          </span>
+          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">{save.secreto ? '🔑 CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
           <span className="font-pixel text-sm text-white sm:text-xl">{cap.titulo.toUpperCase()}</span>
           <span className="text-xs text-white/60">{cap.lugar}</span>
           <span className="piscar mt-3 font-pixel text-[9px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
@@ -258,7 +312,20 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         <Falas falas={cena.falas} onFim={() => proxima()} />
       </Palco>
     );
-  if (cena.tipo === 'explorar') return <Explorar lugar={cena.lugar} objetivo={cena.objetivo} pontos={cena.pontos} heroi={heroi} onFim={() => proxima()} />;
+  if (cena.tipo === 'explorar')
+    return (
+      <Explorar
+        lugar={cena.lugar}
+        objetivo={cena.objetivo}
+        pontos={cena.pontos}
+        heroi={heroi}
+        onPonto={(ponto) => {
+          // Um pedaço da chave do capítulo secreto: vale para a conta toda.
+          if (ponto.segredo) ganharSegredoHistoria(ponto.segredo);
+        }}
+        onFim={() => proxima()}
+      />
+    );
   if (cena.tipo === 'luta')
     return (
       <LutaHistoria
@@ -267,7 +334,8 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         heroi={heroi}
         antes={cena.antes}
         depois={cena.depois}
-        atributos={atributosDoSave(save)}
+        atributos={equipe?.cassius ?? atributosDoSave(save)}
+        equipe={equipe}
         onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
         onFim={() => proxima()}
       />
@@ -316,7 +384,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   if (cena.desafio === 'memoria') return <MinigameMemoria lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'corrida') return <MinigameCorrida lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'torre') return <MinigameTorre lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
-  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} todos={!!save.secreto} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'telescopio') return <MinigameTelescopio lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
@@ -337,7 +405,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
 
 /** Qual história deste gladiador é (pela ordem em que foi criada): "História nº 2 do Octavius". */
 function numeroDoSave(s: SaveHistoria, todos: SaveHistoria[]): number {
-  return todos.filter((x) => x.gladiador === s.gladiador && x.criadoEm <= s.criadoEm).length;
+  return todos.filter((x) => x.gladiador === s.gladiador && !!x.secreto === !!s.secreto && x.criadoEm <= s.criadoEm).length;
 }
 
 /**
@@ -363,11 +431,12 @@ function CartaoSave({
   onNaoApagar: () => void;
 }) {
   const pers = PERSONAGENS[s.gladiador];
-  const cor = `rgb(${pers.cor})`;
-  const caps = CAPITULOS[s.gladiador];
-  const completo = s.capitulo > 7;
+  const cor = s.secreto ? '#f2c14e' : `rgb(${pers.cor})`;
+  const caps = capitulosDoSave(s);
+  const completo = saveCompleto(s);
   const cap = caps[s.capitulo - 1];
-  const lugar: Lugar = completo ? 'biblioteca-salao' : lugarDaCena(cap?.cenas[s.cena]);
+  const lugar: Lugar = completo ? (s.secreto ? 'coliseu-livre' : 'biblioteca-salao') : lugarDaCena(cap?.cenas[s.cena]);
+  if (s.secreto) return <CartaoSecreto s={s} cor={cor} lugar={lugar} completo={completo} apagando={apagando} onContinuar={onContinuar} onPedirApagar={onPedirApagar} onApagar={onApagar} onNaoApagar={onNaoApagar} />;
   const quando = new Date(s.atualizadoEm);
   const at = atributosDoSave(s);
   return (
@@ -429,6 +498,84 @@ function CartaoSave({
         ) : (
           <div className="flex items-center gap-2">
             <button type="button" onClick={onContinuar} className="pixel-box pixel-hover flex-1 py-2.5 font-pixel text-[10px] text-accent sm:text-xs" style={{ boxShadow: `0 0 0 2px ${cor}` }}>
+              ▶ CONTINUAR
+            </button>
+            <button type="button" onClick={onPedirApagar} aria-label="Apagar save" className="px-3 py-2 text-base text-muted hover:text-accent-2">
+              🗑
+            </button>
+          </div>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** O cartão do save secreto: dourado, com os três gladiadores e a barra de cenas. */
+function CartaoSecreto({
+  s,
+  cor,
+  lugar,
+  completo,
+  apagando,
+  onContinuar,
+  onPedirApagar,
+  onApagar,
+  onNaoApagar,
+}: {
+  s: SaveHistoria;
+  cor: string;
+  lugar: Lugar;
+  completo: boolean;
+  apagando: boolean;
+  onContinuar: () => void;
+  onPedirApagar: () => void;
+  onApagar: () => void;
+  onNaoApagar: () => void;
+}) {
+  const quando = new Date(s.atualizadoEm);
+  const total = capitulosDoSave(s)[0]?.cenas.length ?? 1;
+  const feitas = completo ? total : s.cena;
+  return (
+    <li className="pixel-box cartao-secreto flex flex-col overflow-hidden sm:col-span-2" style={{ boxShadow: `0 0 0 3px ${cor}` }}>
+      <div className="relative aspect-[16/6] w-full overflow-hidden">
+        <CenarioHistoria lugar={lugar} />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.8)_0%,transparent_60%)]" aria-hidden />
+        <div className="absolute bottom-[8%] right-[4%] flex w-[36%] items-end gap-[4%]" aria-hidden>
+          {(['claude', 'chatgpt', 'gemini'] as IaId[]).map((ia) => (
+            <div key={ia} className="respirar flex-1">
+              <GladiadorPixel ia={ia} espelhar />
+            </div>
+          ))}
+        </div>
+        <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
+          <span className="w-fit border-2 border-black bg-[#f2c14e] px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]">🔑 CAPÍTULO SECRETO</span>
+          <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">"OS TRÊS"</span>
+        </div>
+        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
+          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{completo ? '🏆 SEGREDO COMPLETO' : 'O HIPOGEU'}</span>
+          <span className="block text-xs text-white/85 [text-shadow:1px_1px_0_#000] sm:text-sm">Cassius, Octavius e Helios juntos</span>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 p-3">
+        <div className="h-2.5 w-full border border-black bg-[#2a2630]" aria-label={`Progresso: cena ${feitas} de ${total}`}>
+          <div className="h-full bg-[#f2c14e]" style={{ width: `${Math.round((feitas / total) * 100)}%` }} />
+        </div>
+        <span className="text-[11px] text-muted">
+          🕒 {quando.toLocaleDateString('pt-BR')} às {quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+        </span>
+        {apagando ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-accent-2">Apagar o capítulo secreto? A chave continua com você: dá para abrir de novo pela grade.</span>
+            <button type="button" onClick={onApagar} className="pixel-box px-2 py-1 font-pixel text-[8px] text-accent-2">
+              APAGAR
+            </button>
+            <button type="button" onClick={onNaoApagar} className="pixel-box px-2 py-1 font-pixel text-[8px]">
+              NÃO
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={onContinuar} className="pixel-box pixel-hover flex-1 py-2.5 font-pixel text-[10px] text-[#f2c14e] sm:text-xs" style={{ boxShadow: `0 0 0 2px ${cor}` }}>
               ▶ CONTINUAR
             </button>
             <button type="button" onClick={onPedirApagar} aria-label="Apagar save" className="px-3 py-2 text-base text-muted hover:text-accent-2">
