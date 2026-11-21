@@ -398,6 +398,7 @@ export function LutaHistoria({
     if (fase === 'luta' && e.fim === 'derrota') {
       // No treino não tem derrota: o Brutus te levanta e segue.
       if (treino) {
+        visto.current = 0;
         setE(novaLuta(def, atributos));
         return;
       }
@@ -690,6 +691,8 @@ export function LutaHistoria({
               onClick={() => {
                 tocar('start');
                 setTentativas((t) => t + 1);
+                // A luta nova conta os acontecimentos do zero: sem isto, os sons ficavam mudos depois de cair.
+                visto.current = 0;
                 setE(novaLuta(def, atributos));
                 setCombo(0);
                 setPlanosUsados([]);

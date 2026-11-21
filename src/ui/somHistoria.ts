@@ -163,6 +163,11 @@ function eco(a: Audio, tempo = 0.11, volta = 0.35): AudioNode {
   entrada.connect(atraso);
   atraso.connect(f).connect(fb).connect(atraso);
   f.connect(a.saida);
+  // Desliga o eco depois que o som acaba: senão cada eco fica girando para sempre e,
+  // numa sessão longa, o áudio vai ficando pesado e falhando.
+  window.setTimeout(() => {
+    for (const n of [entrada, atraso, fb, f]) n.disconnect();
+  }, 5000);
   return entrada;
 }
 

@@ -272,7 +272,7 @@ export function Explorar({
           >
             {p.personagem && (
               <span className="respirar block w-full" aria-hidden>
-                <Retrato quem={p.personagem} espelhar={p.x > x} />
+                <Retrato quem={p.personagem} espelhar={p.x > x} azul={p.personagem === "censor" && lugar === "coliseu-livre"} />
               </span>
             )}
             <span

@@ -120,7 +120,7 @@ export default function ColiseuHistoria() {
                   type="button"
                   onClick={tocarGrade}
                   aria-label="Uma grade no chão da arena"
-                  className={`grade-secreta absolute z-10 left-[46%] top-[56%] w-[8%] -translate-x-1/2 ${toquesGrade > 0 ? 'grade-tremendo' : ''}`}
+                  className={`grade-secreta absolute left-[4%] top-[8%] z-10 w-[9%] sm:w-[6%] ${toquesGrade > 0 ? 'grade-tremendo' : ''}`}
                   data-toques={toquesGrade}
                 >
                   <svg viewBox="0 0 16 8" className="block w-full" shapeRendering="crispEdges" aria-hidden>
@@ -552,7 +552,7 @@ function CartaoSecreto({
           <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">"OS TRÊS"</span>
         </div>
         <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
-          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{completo ? '🏆 SEGREDO COMPLETO' : 'O HIPOGEU'}</span>
+          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{completo ? '🏆 SEGREDO COMPLETO' : (LUGAR_SECRETO[lugar] ?? 'O HIPOGEU')}</span>
           <span className="block text-xs text-white/85 [text-shadow:1px_1px_0_#000] sm:text-sm">Cassius, Octavius e Helios juntos</span>
         </div>
       </div>
@@ -587,3 +587,13 @@ function CartaoSecreto({
     </li>
   );
 }
+
+/** O nome do lugar onde o capítulo secreto parou (no cartão do save). */
+const LUGAR_SECRETO: Partial<Record<Lugar, string>> = {
+  'coliseu-noite': 'O COLISEU À NOITE',
+  'ludus-patio-noite': 'O LUDUS DE MADRUGADA',
+  'coliseu-arena': 'A GRADE DA ARENA',
+  hipogeu: 'O HIPOGEU',
+  'nucleo-camara': 'A CÂMARA DO NÚCLEO',
+  'coliseu-livre': 'O COLISEU LIVRE',
+};

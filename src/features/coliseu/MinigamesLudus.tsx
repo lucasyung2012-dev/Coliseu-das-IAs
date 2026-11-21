@@ -586,7 +586,7 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🤝 OS TRÊS CONTRA A MURALHA: cuide da SUA faixa. {Math.min(derrubados, meta)}/{meta}
+          🤝 OS TRÊS CONTRA A MURALHA: {todos ? 'você controla os TRÊS' : 'cuide da SUA faixa'}. {Math.min(derrubados, meta)}/{meta}
         </p>
         <Vidas n={vidas} max={3} icone="🧱" />
       </div>
@@ -617,7 +617,7 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
             );
           })}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
-        {fase === 'perdeu' && <Perdeu titulo="A MURALHA PASSOU" dica="Aperte quando o boneco da SUA faixa entrar na zona branca, perto do seu gladiador." onDeNovo={comecar} />}
+        {fase === 'perdeu' && <Perdeu titulo="A MURALHA PASSOU" dica={todos ? "Cada botão é de uma faixa: aperte quando o boneco daquela faixa entrar na zona branca." : "Aperte quando o boneco da SUA faixa entrar na zona branca, perto do seu gladiador."} onDeNovo={comecar} />}
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
       {todos ? (

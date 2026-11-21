@@ -199,7 +199,7 @@ export default function PerfilCombatente() {
             </div>
             <div className="flex flex-col items-center justify-end">
               <p className="text-2xl">{premiosDe(id).find((pr) => pr.id === coliseu.comemoracao)?.icone ?? '🎉'}</p>
-              <p className="mt-1 text-center font-pixel text-[8px] text-muted">COMEMORAÇÃO · {nomeDoPremio(id, coliseu.comemoracao).toUpperCase()}</p>
+              <p className="mt-1 text-center font-pixel text-[8px] text-muted">COMEMORAÇÃO · {nomeDoPremio(id, coliseu.comemoracao).toUpperCase()}{hist.osTres ? " + OS TRÊS" : ""}</p>
             </div>
           </div>
           <Link
