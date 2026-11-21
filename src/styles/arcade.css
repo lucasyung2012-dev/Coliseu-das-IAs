@@ -1173,7 +1173,7 @@
 .palco-historia { aspect-ratio: 16 / 9; }
 /* Em pé no celular: a cena fica quadrada (maior, personagens maiores, sem espaço sobrando). */
 @media (orientation: portrait) and (max-width: 700px) {
-  .palco-historia { aspect-ratio: 1 / 1; }
+  .palco-historia { aspect-ratio: 5 / 6; }
   .botoes-luta button { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
 }
 /* Deitado no celular: tudo cabe na altura da tela; a cena encolhe para sobrar lugar para os botões. */

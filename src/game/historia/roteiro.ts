@@ -2,7 +2,7 @@ import type { IaId } from '../personagens';
 import type { SomHistoria } from '@/ui/somHistoria';
 import type { Tecnica } from './luta';
 import type { Equipamento } from './saves';
-import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
+import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
 
 /**
  * O roteiro do modo História em forma de dados (docs/HISTORIA.md): cada capítulo é
@@ -40,7 +40,8 @@ export type Falante =
   | 'gaivota'
   | 'pistao'
   | 'feitor'
-  | 'cozinheiro';
+  | 'cozinheiro'
+  | 'rufus';
 
 export interface Fala {
   quem: Falante;
@@ -200,6 +201,7 @@ export const NOMES: Record<Falante, string> = {
   pistao: 'Vovô Pistão',
   feitor: 'O Feitor do Tambor',
   cozinheiro: 'Cozinheiro de Bordo',
+  rufus: 'Rufus, o Dedo-Duro',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -957,6 +959,6 @@ const CAP2_CASSIUS: Capitulo = {
 
 export const CAPITULOS: Record<IaId, Capitulo[]> = {
   claude: [CAP1_CASSIUS, CAP2_CASSIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS],
-  chatgpt: [CAP1_OCTAVIUS, CAP2_OCTAVIUS],
+  chatgpt: [CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS],
   gemini: [],
 };

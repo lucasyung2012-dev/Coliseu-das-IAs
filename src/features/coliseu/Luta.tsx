@@ -47,7 +47,18 @@ import {
   RETIARIO_MECANICO,
 } from '@/ui/pixel/historia2';
 import { BRUTUS, PALETA_BRUTUS } from '@/ui/pixel/historia';
-import { CAPATAZ, COZINHEIRO_BORDO, FEITOR_TAMBOR, GUARDA_CHICOTE, PALETA_CAPATAZ, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GUARDA_CHICOTE } from '@/ui/pixel/historia3';
+import {
+  CAPATAZ,
+  COZINHEIRO_BORDO,
+  FEITOR_TAMBOR,
+  GUARDA_CHICOTE,
+  PALETA_CAPATAZ,
+  PALETA_COZINHEIRO,
+  PALETA_FEITOR,
+  PALETA_GUARDA_CHICOTE,
+  PALETA_TOURO,
+  TOURO_BRONZE,
+} from '@/ui/pixel/historia3';
 import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
@@ -88,6 +99,8 @@ const VISUAL: Record<string, { grade: string[]; paleta: Paleta; largura: number 
   'marujo-ferro': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO, E: '#ffd04a' }, largura: 16 },
   capataz: { grade: CAPATAZ, paleta: PALETA_CAPATAZ, largura: 18 },
   'feitor-tambor': { grade: FEITOR_TAMBOR, paleta: PALETA_FEITOR, largura: 24 },
+  'valentao-celas': { grade: GLADIADOR_SUCATA, paleta: { ...PALETA_SUCATA, G: '#6a4a3a', g: '#a8806a', E: '#ffd04a', A: '#5a3a2a' }, largura: 18 },
+  'touro-bronze': { grade: TOURO_BRONZE, paleta: { ...PALETA_TOURO, E: '#ffb02a' }, largura: 26 },
 };
 
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */

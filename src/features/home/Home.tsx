@@ -69,13 +69,13 @@ function PortalColiseu({ rota, frase }: { rota: string; frase: string }) {
         className="portal-coliseu group animate-fade-up relative block overflow-hidden border-4 border-[#c8962a] bg-black text-fg"
         style={{ animationDelay: '150ms' }}
       >
-        <div className="relative aspect-[16/10] w-full sm:aspect-[16/7]">
+        <div className="relative aspect-square w-full sm:aspect-[16/7]">
           <CenarioHistoria lugar="titulo" />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_40%,rgba(0,0,0,0.85)_100%)]" aria-hidden />
           {/* os três condenados, na frente do Coliseu */}
-          <div className="absolute bottom-[30%] left-1/2 flex -translate-x-1/2 items-end gap-3 sm:gap-8" aria-hidden>
+          <div className="absolute bottom-[44%] left-1/2 flex -translate-x-1/2 items-end gap-4 sm:bottom-[34%] sm:gap-8" aria-hidden>
             {IAS.map((id, i) => (
-              <div key={id} className="w-10 transition-transform duration-300 group-hover:-translate-y-2 sm:w-16" style={{ transitionDelay: `${i * 70}ms` }}>
+              <div key={id} className="w-14 transition-transform duration-300 group-hover:-translate-y-2 sm:w-16" style={{ transitionDelay: `${i * 70}ms` }}>
                 <div className="respirar" style={{ animationDelay: `${i * 250}ms` }}>
                   <GladiadorPixel ia={id} espelhar={i === 2} />
                 </div>

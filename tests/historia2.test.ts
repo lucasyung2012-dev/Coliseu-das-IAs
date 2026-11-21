@@ -136,6 +136,28 @@ describe('os capítulos', () => {
     expect(desafios).toEqual(expect.arrayContaining(['remar', 'tempestade']));
   });
 
+  it('o Ludus do Octavius tem os minigames dele (corrida e torre), o dos três, 2 lutas e a ESQUIVA DUPLA', () => {
+    const cap = CAPITULOS.chatgpt[2]!;
+    expect(cap.titulo).toBe('O Ludus');
+    const desafios = cap.cenas.flatMap((c) => (c.tipo === 'desafio' ? [c.desafio] : []));
+    expect(desafios).toEqual(expect.arrayContaining(['corrida', 'torre', 'trio']));
+    expect(cap.cenas.filter((c) => c.tipo === 'luta')).toHaveLength(2);
+    expect(cap.cenas.some((c) => c.tipo === 'ludus' && c.obrigatorio === 'esquiva-dupla')).toBe(true);
+  });
+
+  it('ESQUIVA DUPLA: esquiva recarrega na metade e o golpe depois de esquivar entra dobrado', () => {
+    const a = { ...ATRIBUTOS_INICIAIS, tecnicas: ['esquiva-dupla' as const] };
+    let s = novaLuta(INIMIGOS.incinerador!, a);
+    for (let i = 0; i < 200 && s.inimigo.estado !== 'sinal'; i++) s = passoLuta(s, a, () => 0);
+    for (let i = 0; i < 200 && s.tempo + 250 < s.inimigo.estadoAte; i++) s = passoLuta(s, a, () => 0);
+    s = agir(s, 'esquiva', a);
+    expect(s.jogador.esquivaPronta - s.tempo).toBe(425);
+    for (let i = 0; i < 200 && s.inimigo.estado === 'sinal'; i++) s = passoLuta(s, a, () => 0);
+    const antes = s.inimigo.vida;
+    s = agir({ ...s, jogador: { ...s.jogador, acaoAte: 0 } }, 'golpe', a);
+    expect(antes - s.inimigo.vida).toBeCloseTo(15.4);
+  });
+
   it('o Octavius já pode ser jogado: Capítulo 1 com o desafio dos planos e o Almirante Ferrugem', () => {
     expect(CAMINHOS_ABERTOS).toContain('chatgpt');
     const cap = CAPITULOS.chatgpt[0]!;

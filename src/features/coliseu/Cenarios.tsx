@@ -433,6 +433,8 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={ECO} paleta={PALETA_ECO} espelhar={espelhar} />;
     case 'crianca':
       return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
+    case 'rufus':
+      return <Sprite grade={GLADIADOR_SUCATA} paleta={{ ...PALETA_SUCATA, G: '#6a4a3a', g: '#a8806a', E: '#ffd04a', A: '#5a3a2a' }} espelhar={espelhar} />;
     case 'gaivota':
       return <Sprite grade={GAIVOTA} paleta={PALETA_GAIVOTA} espelhar={espelhar} />;
     case 'pistao':

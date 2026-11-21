@@ -427,4 +427,26 @@ export const INIMIGOS: Record<string, DefInimigo> = {
       { ataques: [fogo('Rufar de guerra', 700, 14, 1000, 3, 360), golpe('TUM! TUM! TUM! TUM!', 520, 8, 950, 4, 300), finta(450), investida('Baqueta dupla', 600, 24, 1100)], pausaMs: [550, 850] },
     ],
   },
+
+  // ---------- Caminho do Octavius: Capítulo 3, O Ludus ----------
+  // A briga nas celas: um valentão que dedura todo mundo para os guardas.
+  'valentao-celas': {
+    id: 'valentao-celas',
+    nome: 'Rufus, o Dedo-Duro',
+    vida: 95,
+    contra: 15,
+    fases: [{ ataques: [golpe('Soco de corrente', 650, 14, 850), investida('Cabeçada', 700, 18, 1000), finta(500), golpe('Dois socos', 600, 10, 850, 2, 330)], pausaMs: [700, 1050] }],
+  },
+  // O teste do Brutus para o Octavius: o Touro de Bronze, só investidas e chifradas.
+  'touro-bronze': {
+    id: 'touro-bronze',
+    nome: 'O Touro de Bronze',
+    vida: 140,
+    contra: 18,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [investida('Investida do touro', 800, 20, 1200), golpe('Chifrada', 650, 14, 900), finta(600), investida('Investida do touro', 700, 20, 1200)], pausaMs: [800, 1100] },
+      { ataques: [investida('Investida dupla', 650, 16, 1100), fogo('Bafo de vapor', 700, 18, 1000), golpe('Chifradas', 550, 10, 900, 3, 300), finta(450)], pausaMs: [600, 900] },
+    ],
+  },
 };

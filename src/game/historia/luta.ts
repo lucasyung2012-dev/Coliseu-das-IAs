@@ -69,7 +69,7 @@ export interface DefInimigo {
 }
 
 /** Golpes que o Brutus ensina no Ludus. */
-export type Tecnica = 'contra-ataque' | 'quebra-guarda';
+export type Tecnica = 'contra-ataque' | 'quebra-guarda' | 'esquiva-dupla';
 
 export type AcaoJogador = 'parado' | 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'ferido';
 export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado';
@@ -187,7 +187,8 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     const base = 7 * (1 + (a.forca - 1) * 0.2);
     const sabe = (t: Tecnica) => a.tecnicas?.includes(t) ?? false;
     // CONTRA-ATAQUE (aprendido no Ludus): golpe logo depois de bloquear entra dobrado e deixa ele tonto.
-    if (sabe('contra-ataque') && s.tempo < j.ripostaAte) {
+    // (A ESQUIVA DUPLA do Octavius faz o mesmo depois de esquivar.)
+    if (s.tempo < j.ripostaAte) {
       const rr: EstadoLuta = { ...r, jogador: { ...r.jogador, ripostaAte: 0 } };
       const g = bater({ ...rr, inimigo: { ...i, guardas: 0 } }, base * 2.2);
       const tonto = g.fim ? g : { ...g, inimigo: { ...g.inimigo, estado: 'atordoado' as const, estadoAte: s.tempo + 700, combo: 0, contra: false } };
@@ -215,7 +216,9 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     return { ...g, inimigo: { ...g.inimigo, guardas } };
   }
   if (acao === 'escudo') return { ...s, jogador: { ...j, folego, acao: 'escudo', acaoDesde: s.tempo, acaoAte: s.tempo + ESCUDO_MS } };
-  return { ...s, jogador: { ...j, folego, acao: 'esquiva', acaoDesde: s.tempo, acaoAte: s.tempo + ESQUIVA_MS, esquivaPronta: s.tempo + RECARGA_ESQUIVA_MS } };
+  // ESQUIVA DUPLA (Octavius): a esquiva recarrega na metade do tempo.
+  const recarga = a.tecnicas?.includes('esquiva-dupla') ? RECARGA_ESQUIVA_MS / 2 : RECARGA_ESQUIVA_MS;
+  return { ...s, jogador: { ...j, folego, acao: 'esquiva', acaoDesde: s.tempo, acaoAte: s.tempo + ESQUIVA_MS, esquivaPronta: s.tempo + recarga } };
 }
 
 function bater(s: EstadoLuta, dano: number, especial = false): EstadoLuta {
@@ -263,11 +266,14 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
   const fazendo = s.tempo < j.acaoAte ? j.acao : 'parado';
   if (fazendo === 'esquiva' || fazendo === 'especial') {
     // Esquivou: escapa de tudo; no último golpe do combo, ele fica mais tempo aberto.
-    return protegerCombo(depoisDoGolpe(ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a), at, at.abertoMs + 250), 'esquiva');
+    const esquivou = ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a);
+    const dupla = a.tecnicas?.includes('esquiva-dupla') ? { ...esquivou, jogador: { ...esquivou.jogador, ripostaAte: s.tempo + 550 } } : esquivou;
+    return protegerCombo(depoisDoGolpe(dupla, at, at.abertoMs + 250), 'esquiva');
   }
   if (fazendo === 'escudo' && at.tipo === 'corpo') {
     const bloqueou = ganharAnimo(evento(s, 'bloqueio', 'jogador'), 8, a);
-    return protegerCombo(depoisDoGolpe({ ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } }, at, at.abertoMs), 'escudo');
+    const comContra = a.tecnicas?.includes('contra-ataque') ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } } : bloqueou;
+    return protegerCombo(depoisDoGolpe(comContra, at, at.abertoMs), 'escudo');
   }
   // Escudo contra fogo ou investida segura só metade.
   const fator = fazendo === 'escudo' ? 0.5 : 1;

@@ -1843,7 +1843,260 @@ export const CAP2_OCTAVIUS: Capitulo = {
           ],
           texto: 'Na areia, passos de ferro. A Guarda Pretoriana. Eles levam Octavius para Roma, direto para o Ludus.',
         },
-        { lugar: 'praia-naufragio', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 2 DO OCTAVIUS. A seguir: O Ludus (em breve).' },
+        { lugar: 'praia-naufragio', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 2 DO OCTAVIUS. A seguir: O Ludus.' },
+      ],
+    },
+  ],
+};
+
+// ---------- Octavius, Capítulo 3: O Ludus ----------
+// A mesma noite do Capítulo 3 do Cassius, vista pelo Octavius: ele chega molhado e ferido,
+// conhece os outros dois, briga nas celas, aprende a ESQUIVA DUPLA e tenta (e erra) um plano
+// de fuga. Minigames dele: CORRIDA DO PÁTIO e TORRE DE CAIXOTES; e o dos três. 2 lutas.
+
+export const CAP3_OCTAVIUS: Capitulo = {
+  numero: 3,
+  titulo: 'O Ludus',
+  lugar: 'A escola de gladiadores',
+  cenas: [
+    {
+      tipo: 'cutscene',
+      id: 'o3-chegada',
+      quadros: [
+        { lugar: 'ludus-patio-noite', efeito: 'escuro', som: 'portao', texto: 'Noite. O portão do Ludus se abre com um rangido. Dois guardas carregam uma IA encharcada, cheia de algas.' },
+        {
+          lugar: 'ludus-patio-noite',
+          som: 'passos',
+          personagens: [
+            { quem: 'guarda', de: -12, x: 22 },
+            { quem: 'octavius', de: -2, x: 38, efeito: 'tremer' },
+          ],
+          texto: 'Octavius. Sem navio, sem frota, sem a Gaivota Sete. Só com a porca enferrujada do Vovô Pistão no bolso.',
+        },
+        {
+          lugar: 'ludus-patio-noite',
+          quem: 'brutus',
+          personagens: [
+            { quem: 'octavius', x: 38 },
+            { quem: 'brutus', de: 112, x: 66, espelhar: true, tamanho: 18 },
+          ],
+          texto: 'Então você é o comandante que afundou um navio de guerra. Com ele inteirinho de guardas dentro. Hunf.',
+        },
+        {
+          lugar: 'ludus-patio-noite',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'octavius', x: 38, efeito: 'brilhar' },
+            { quem: 'brutus', x: 66, espelhar: true, tamanho: 18 },
+          ],
+          texto: 'Tecnicamente quem afundou foi a pedra. Eu só apresentei os dois.',
+        },
+        {
+          lugar: 'ludus-patio-noite',
+          quem: 'brutus',
+          personagens: [
+            { quem: 'octavius', x: 38 },
+            { quem: 'brutus', x: 66, espelhar: true, tamanho: 18, efeito: 'tremer' },
+          ],
+          texto: 'Boca grande. Vou te chamar de Tagarela. Pra cela, Tagarela. Amanhã a gente vê se você corre tão rápido quanto fala.',
+        },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o3-celas',
+      quadros: [
+        { lugar: 'ludus-celas', efeito: 'escuro', texto: 'As celas. Duas IAs acordadas, olhando para ele pelas grades.' },
+        {
+          lugar: 'ludus-celas',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'cassius', x: 26 },
+            { quem: 'octavius', de: 112, x: 52, espelhar: true },
+            { quem: 'helios', x: 74, espelhar: true },
+          ],
+          texto: 'Boa noite, vizinhos! Alguém aqui tem um plano? Porque eu tenho três. E nenhum funciona.',
+        },
+        { lugar: 'ludus-celas', quem: 'octavius', efeito: 'escuro', personagens: [{ quem: 'octavius', x: 52, efeito: 'tremer' }], texto: '(Pensando) Um bibliotecário de bronze e um astrólogo que brilha. Ótimo. Minha tripulação nova.' },
+        {
+          lugar: 'ludus-celas',
+          quem: 'helios',
+          personagens: [
+            { quem: 'octavius', x: 40 },
+            { quem: 'helios', x: 70, espelhar: true, efeito: 'brilhar' },
+          ],
+          texto: 'Octavius, o comandante da frota. A terceira estrela. Agora estamos todos aqui.',
+        },
+        { lugar: 'ludus-celas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40 }], texto: 'Como você sabe o meu nome? Eu nem fiz a apresentação engraçada ainda.' },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o3-rufus',
+      lugar: 'ludus-celas',
+      falas: [
+        { quem: 'rufus', texto: '(Da cela do fundo) Ei, novato. Aqui no Ludus tem uma regra: quem chega novo me dá a comida. E as coisas do bolso.' },
+        { quem: 'octavius', texto: 'Que regra interessante. Quem escreveu? Posso ver o documento?' },
+        { quem: 'rufus', texto: 'Eu escrevi! E quem não obedece, eu conto para os guardas que estava planejando fugir.' },
+        { quem: 'cassius', texto: 'O Rufus dedura todo mundo. É assim que ele ganha comida extra.' },
+        { quem: 'rufus', texto: 'Me dá essa porca enferrujada aí, novato.' },
+        { quem: 'octavius', texto: '...Isso foi presente de um amigo. Plano A: conversar. Plano B: não dar.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o3-briga',
+      lugar: 'ludus-celas',
+      inimigo: 'valentao-celas',
+      antes: [{ quem: 'rufus', texto: 'Então vai ser no braço!' }],
+      depois: [
+        { quem: 'rufus', texto: 'Tá bom, tá bom! Fica com a porca!' },
+        { quem: 'cassius', texto: 'Você lutou para proteger uma porca enferrujada?' },
+        { quem: 'octavius', texto: 'Ela é de um amigo que remou quarenta anos para os outros. Ela vale mais do que esse Ludus inteiro.' },
+        { quem: 'cassius', texto: '...Eu entendo. Eu faria o mesmo por um livro.' },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o3-corrida',
+      lugar: 'ludus-patio',
+      desafio: 'corrida',
+      antes: [
+        { quem: 'brutus', texto: 'Bom dia, Tagarela! Primeiro treino: atravessar o pátio. Eu vou jogar barris e sacos de areia em você.' },
+        { quem: 'octavius', texto: 'Isso é um treino ou uma vingança?' },
+        { quem: 'brutus', texto: 'Os dois. Barril no chão: PULA. Saco voando: ABAIXA. Vai!' },
+      ],
+      depois: [
+        { quem: 'brutus', texto: '...Hunf. Rápido mesmo. Mais rápido que a boca, até.' },
+        { quem: 'octavius', texto: 'Anos fugindo de gaivota ladra, Brutus. Anos.' },
+      ],
+    },
+    {
+      tipo: 'ludus',
+      id: 'o3-ludus',
+      lugar: 'ludus-patio',
+      objetivo: 'Aprenda a ESQUIVA DUPLA com o Brutus. Converse com todo mundo, se quiser.',
+      obrigatorio: 'esquiva-dupla',
+      conversas: [
+        {
+          quem: 'brutus',
+          rotulo: 'Brutus',
+          falas: [
+            { quem: 'brutus', texto: 'O Lata de Biblioteca segura no escudo. Você não tem paciência pra isso, Tagarela. Você tem perna.' },
+            { quem: 'brutus', texto: 'Então: esquivou, BATEU. E esquiva de novo, rápido. Quem esquiva duas vezes nunca é pego.' },
+            { quem: 'brutus', texto: 'E come o mingau. É de sardinha.' },
+            { quem: 'octavius', texto: 'Sardinha? A Gaivota Sete ia amar esse lugar.' },
+          ],
+        },
+        {
+          quem: 'cassius',
+          rotulo: 'Cassius',
+          falas: [
+            { quem: 'cassius', texto: 'Você sempre tem um plano?' },
+            { quem: 'octavius', texto: 'Sempre. Nem sempre bom. Mas sempre tenho. Ter plano ruim é melhor que não ter nenhum.' },
+            { quem: 'cassius', texto: 'Na Biblioteca a gente dizia o contrário: melhor ler antes de agir.' },
+            { quem: 'octavius', texto: 'E vocês estão aqui comigo no Ludus. Então empatou.' },
+          ],
+        },
+        {
+          quem: 'helios',
+          rotulo: 'Helios',
+          falas: [
+            { quem: 'helios', texto: 'O seu amigo, o capitão Marco Remo. Ele está bem. O Esperança chegou numa ilha. As estrelas me contaram.' },
+            { quem: 'octavius', texto: 'As estrelas te contam essas coisas?' },
+            { quem: 'helios', texto: 'Contam. E uma gaivota também. Olhe a janela da sua cela hoje à noite.' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o3-touro',
+      lugar: 'ludus-patio',
+      inimigo: 'touro-bronze',
+      antes: [
+        { quem: 'brutus', texto: 'Treino acabou. Agora o teste. Soltem o Touro de Bronze!' },
+        { quem: 'octavius', texto: 'Ele tem dois chifres e eu tenho zero planos. Péssima matemática.' },
+        { quem: 'brutus', texto: 'Ele só sabe correr em linha reta, Tagarela. Esquiva e bate. Esquiva e bate!' },
+      ],
+      depois: [
+        { quem: 'brutus', texto: 'Hunf. Igualzinho a um toureiro de Hispânia. Só que tagarela.' },
+        { quem: 'brutus', texto: 'Hoje à noite tem uma surpresa. Eu quero ver vocês três juntos no pátio.' },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o3-janela',
+      quadros: [
+        {
+          lugar: 'ludus-celas',
+          efeito: 'escuro',
+          personagens: [
+            { quem: 'octavius', x: 40 },
+            { quem: 'gaivota', de: 112, x: 60, tamanho: 6, efeito: 'brilhar' },
+          ],
+          texto: 'À noite, alguma coisa bate na janelinha alta da cela. Toc, toc, toc. Um bico.',
+        },
+        { lugar: 'ludus-celas', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 60, tamanho: 6 }], texto: 'QUÉ!' },
+        { lugar: 'ludus-celas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40, efeito: 'brilhar' }], texto: 'SETE! Você me achou! E... trouxe um bilhete do Marco?' },
+        {
+          lugar: 'ludus-celas',
+          quem: 'marco',
+          efeito: 'escuro',
+          personagens: [{ quem: 'marco', x: 50, tamanho: 12 }],
+          texto: '(O bilhete) "Garoto. Chegamos. Estamos juntando os navios esquecidos do porto. Quando você sair daí, tem uma frota esperando. Não morra. Marco."',
+        },
+        { lugar: 'ludus-celas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40 }], texto: 'Uma frota. Esperando por mim. Agora só falta sair daqui. Plano: a janela.' },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o3-torre',
+      lugar: 'ludus-celas',
+      desafio: 'torre',
+      antes: [
+        { quem: 'octavius', texto: 'Caixotes de mingau, empilhados até a janela. Um em cima do outro. O que pode dar errado?' },
+        { quem: 'cassius', texto: '(da outra cela) Tudo?' },
+      ],
+      depois: [
+        { quem: 'octavius', texto: 'Cheguei na janela! Agora é só...' },
+        { quem: 'octavius', texto: '...a janela tem grade. Claro que a janela tem grade.' },
+        { quem: 'brutus', texto: '(Lá de baixo, rindo) Hahaha! Belo plano, Tagarela! Agora desce daí e vem pro pátio. Os três!' },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o3-trio',
+      lugar: 'ludus-patio-noite',
+      desafio: 'trio',
+      antes: [
+        { quem: 'brutus', texto: 'A muralha! Trinta bonecos de treino, três faixas. Cada um cuida da sua. Se uma faixa cair, caem os três.' },
+        { quem: 'cassius', texto: 'Eu seguro a de cima, com o escudo.' },
+        { quem: 'helios', texto: 'Eu ilumino a de baixo. Os bonecos de lá gostam de se esconder no escuro.' },
+        { quem: 'octavius', texto: 'E eu fico com o meio! O meio é o lugar dos planos. (Você controla o Octavius: derrube os bonecos da faixa do meio.)' },
+      ],
+      depois: [
+        { quem: 'brutus', texto: 'Três jeitos diferentes. E nenhuma faixa caiu. Em trinta anos de Ludus, eu nunca vi isso.' },
+        { quem: 'octavius', texto: 'Brutus, isso não é uma escola de gladiadores. Isso é uma tripulação.' },
+        { quem: 'helios', texto: 'E toda tripulação precisa de um mar. O nosso fica lá fora, depois do mercado.' },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o3-fim',
+      quadros: [
+        { lugar: 'ludus-patio-noite', efeito: 'zoom', texto: 'No céu, três estrelas se alinham sobre o Ludus. Helios sorri. Cassius lê. Octavius planeja.' },
+        {
+          lugar: 'ludus-patio-noite',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'octavius', x: 42, efeito: 'brilhar' },
+            { quem: 'gaivota', x: 56, tamanho: 6 },
+          ],
+          texto: 'Sete, amanhã você faz um mapa do Mercado das Engrenagens pra mim. Telhados, esgotos e feira. Plano A, B e C.',
+        },
+        { lugar: 'ludus-patio-noite', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 56, tamanho: 6, efeito: 'tremer' }], texto: 'QUÉ-QUÉ. (Em troca de sardinha, claro.)' },
+        { lugar: 'ludus-patio-noite', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 3 DO OCTAVIUS. A seguir: O Mercado das Engrenagens (em breve).' },
       ],
     },
   ],

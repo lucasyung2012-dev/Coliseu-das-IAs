@@ -57,12 +57,22 @@ const TREINOS_GOLPE: Record<Tecnica, DefTreino> = {
     rotulo: 'GUARDAS QUEBRADAS',
     explica: 'Enquanto eu estiver na guarda (sem sinal, sem ABERTO): ⚔️ ⚔️ ⚔️ rápido! Duas vezes.',
   },
+  'esquiva-dupla': {
+    id: 'esquiva-dupla',
+    nome: 'ESQUIVA DUPLA',
+    icone: '🌀',
+    efeito: 'A esquiva recarrega na metade do tempo; golpe logo depois de esquivar entra dobrado',
+    evento: 'riposta',
+    quantos: 3,
+    rotulo: 'ESQUIVA E GOLPE',
+    explica: 'Tagarela, você é rápido de boca. Agora seja rápido de perna: 💨 esquiva do meu golpe e, na hora, ⚔️! Três vezes.',
+  },
 };
 
 const TREINOS_ATRIBUTO: DefTreino[] = [
   { id: 'forca', nome: 'FORÇA', icone: '💪', efeito: '+1 Força (mais dano)', evento: 'acerto', quantos: 10, rotulo: 'GOLPES', explica: 'Acerta dez golpes em mim. Bate no ABERTO, que entra mais!' },
   { id: 'defesa', nome: 'DEFESA', icone: '🛡️', efeito: '+1 Defesa (apanha menos)', evento: 'bloqueio', quantos: 5, rotulo: 'BLOQUEIOS', explica: 'Bloqueia cinco golpes meus. Cuidado com as fintas!' },
-  { id: 'vida', nome: 'RESISTÊNCIA', icone: '❤️', efeito: '+10 Vida', evento: 'esquiva', quantos: 5, rotulo: 'ESQUIVAS', explica: 'Esquiva cinco golpes meus. Pernas leves, Lata!' },
+  { id: 'vida', nome: 'RESISTÊNCIA', icone: '❤️', efeito: '+10 Vida', evento: 'esquiva', quantos: 5, rotulo: 'ESQUIVAS', explica: 'Esquiva cinco golpes meus. Pernas leves!' },
   { id: 'carisma', nome: 'CARISMA', icone: '📣', efeito: '+1 Carisma (Ânimo e plateia enchem mais rápido)', evento: 'especial', quantos: 1, rotulo: 'ESPECIAIS', explica: 'Enche o Ânimo com boas jogadas e solta o ⭐ especial em mim.' },
 ];
 
