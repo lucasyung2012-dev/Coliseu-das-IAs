@@ -195,6 +195,7 @@ export const CAP_SECRETO: Capitulo = {
     {
       tipo: 'explorar',
       id: 's-hipogeu',
+      mapa: 'hipogeu',
       lugar: 'hipogeu',
       objetivo: 'Investigue o Hipogeu.',
       pontos: [
@@ -303,6 +304,7 @@ export const CAP_SECRETO: Capitulo = {
     {
       tipo: 'explorar',
       id: 's-galeria',
+      mapa: 'hipogeu-galeria',
       lugar: 'hipogeu',
       objetivo: 'Leia os murais da galeria.',
       pontos: [
@@ -535,6 +537,7 @@ export const CAP_SECRETO: Capitulo = {
     {
       tipo: 'explorar',
       id: 's-coliseu-livre',
+      mapa: 'coliseu-livre',
       lugar: 'coliseu-livre',
       objetivo: 'O Coliseu Livre. Fale com todo mundo.',
       pontos: [

@@ -33,7 +33,10 @@ export type Ladrilho =
   | 'D' // boneco de treino
   | 'F'; // a forja do ferreiro
 
-const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N', 'D', 'F']);
+// Novos (22/11/2026, mapas do Octavius e do Helios): água, barril, caixote, amarra, farol, casco de navio,
+// banco de remo, tambor, cartaz, telescópio, planetário, mapa do céu, janela acesa, chaminé, parapeito,
+// tripé do oráculo, espelho, arquibancada, camarote e mural.
+const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N', 'D', 'F', 'w', 'b', 'k', 'r', 'H', 'n', 'q', 'A', 'C', 'U', 'O', 'K', 'W', 'h', 'V', 'Q', 'Y', 'B', 'X', 'I']);
 
 export interface Coisa {
   id: string;
@@ -72,7 +75,7 @@ export interface Mundo {
 }
 
 /** As cores do mapa: biblioteca, catacumbas (escuro, com tochas), Fórum (claro, ao ar livre) e o túnel. */
-export type TemaMundo = 'biblioteca' | 'catacumbas' | 'forum' | 'tunel' | 'ludus';
+export type TemaMundo = 'biblioteca' | 'catacumbas' | 'forum' | 'tunel' | 'ludus' | 'porto' | 'navio' | 'mercado' | 'observatorio' | 'telhados' | 'aqueduto' | 'templo' | 'arena';
 
 export type Direcao = 'cima' | 'baixo' | 'esq' | 'dir';
 

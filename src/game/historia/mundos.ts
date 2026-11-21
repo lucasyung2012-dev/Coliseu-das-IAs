@@ -239,6 +239,327 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
       ],
     },
   },
+  // ---------- OCTAVIUS (22/11/2026) ----------
+  // Capítulo 1: o cais de Óstia de noite, com o farol, a amarra e o píer.
+  'porto-cais': {
+    tema: 'porto',
+    inicio: [2, 6],
+    mapa: [
+      'wwwwwwwwwwwwwwwwwwwwww',
+      'www..wwwwwwwwwwwHHwwww',
+      'www..wwwwwwwwwwwHHwwww',
+      'www..wwwwww..www..wwww',
+      'w.....r....k.........w',
+      'w..bb..............b.w',
+      'w....................w',
+      '#kk.......bb.......kk#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: { corrente: [6, 4], farol: [16, 2], gaivota: [3, 2], ordem: [12, 6] },
+    rotas: {
+      gaivota: [
+        [3, 2],
+        [4, 3],
+      ],
+      ordem: [
+        [12, 6],
+        [16, 6],
+      ],
+    },
+  },
+  // Capítulo 2: o porão da galera, com os bancos dos remadores e o tambor.
+  'galera-porao': {
+    tema: 'navio',
+    inicio: [2, 2],
+    mapa: [
+      '######################',
+      '#v........A.........v#',
+      '#....................#',
+      '#.qqq..qqq..qqq..qqq.#',
+      '#....................#',
+      '#.qqq..qqq..qqq..qqq.#',
+      '#....................#',
+      '#r..bb.........kk...P#',
+      '######################',
+    ],
+    pontos: { tambor: [10, 1], corrente: [1, 7], remadores: [8, 4], gaivota: [16, 6] },
+    rotas: {
+      remadores: [
+        [5, 4],
+        [12, 4],
+      ],
+      gaivota: [
+        [16, 6],
+        [18, 2],
+      ],
+    },
+  },
+  // Capítulo 4: a feira da Subura, barracas, a fonte e o cartaz do Censor.
+  'subura-feira': {
+    tema: 'mercado',
+    inicio: [2, 2],
+    mapa: [
+      '######################',
+      '#####C########C#######',
+      '#....................#',
+      '#.tt...tt...tt...tt..#',
+      '#....................#',
+      '#..bb.....ff.....kk..#',
+      '#.........ff.........#',
+      '#.tt...tt.......tt...#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: { cartaz: [5, 1], feirante: [8, 4], gaivota: [15, 6] },
+    rotas: {
+      gaivota: [
+        [15, 6],
+        [19, 4],
+      ],
+    },
+  },
+  // Capítulo 5: o cais da frota, de noite, com os navios encostados.
+  'frota-cais': {
+    tema: 'porto',
+    inicio: [2, 6],
+    mapa: [
+      'wwwwwwwwwwwwwwwwwwwwww',
+      'wnnnnnwwwwnnnnnwwwwwww',
+      'wnnnnnwwwwnnnnnwwwwwww',
+      'ww..wwwwwwww..wwwwwwww',
+      'w....................w',
+      'w..kk....bb....kk....w',
+      'w....................w',
+      '#v...kk.........v...P#',
+      '######################',
+    ],
+    pontos: { padeiro: [6, 4], refugiados: [3, 5], gaivota: [12, 3] },
+    rotas: {
+      gaivota: [
+        [12, 3],
+        [12, 6],
+      ],
+    },
+  },
+  // Capítulo 6: a jangada no meio do Coliseu inundado.
+  'coliseu-inundado': {
+    tema: 'arena',
+    inicio: [5, 2],
+    mapa: [
+      'BBBBBBBXXBBBBBB',
+      'Bwwdddddddddddg',
+      'Bwwdddddddddddg',
+      'BwwdddddddddPwB',
+      'BwwwwwwwwwwwwwB',
+      'BwwwwwwwwwwwwwB',
+      'BwwwwwwwwwwwwwB',
+      'BBBBBBBBBBBBBBB',
+    ],
+    pontos: { plateia: [4, 0], grade: [14, 1], camarote: [7, 0] },
+  },
+  // O final: o Porto de Óstia livre, de dia, com o Esperança no cais.
+  'porto-livre': {
+    tema: 'porto',
+    inicio: [2, 6],
+    mapa: [
+      'wwwwwwwwwwwwwwwwwwwwww',
+      'www..wwwwwwwnnnnnnwwww',
+      'www..wwwwwwwnnnnnnwwww',
+      'www..wwwwwwww..wwwwwww',
+      'w.....r..............w',
+      'w..bb..............b.w',
+      'w....................w',
+      '#kk.......bb.......kk#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: { marco: [8, 5], pistao: [13, 2], 'pistao-vivo': [16, 4], brutus: [5, 6], gaivota: [3, 2], 'chave-octavius': [20, 7] },
+    rotas: {
+      'pistao-vivo': [
+        [16, 4],
+        [16, 6],
+      ],
+    },
+  },
+  // ---------- HELIOS (22/11/2026) ----------
+  // O Observatório: telescópio, planetário, mapas do céu e as janelas.
+  observatorio: {
+    tema: 'observatorio',
+    inicio: [3, 8],
+    mapa: [
+      '######################',
+      '##KK######JJ######KK##',
+      '#....................#',
+      '#..TT.........UU.....#',
+      '#.............UU.....#',
+      '#......OO............#',
+      '#......OO.........E..#',
+      '#.cccccccccccccccccc.#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: {
+      orrery: [7, 5],
+      mapas: [2, 1],
+      lumen: [12, 4],
+      lente: [14, 3],
+      diario: [3, 3],
+      senhora: [15, 4],
+      brutus: [10, 2],
+      sibila: [5, 7],
+      'chave-helios': [18, 6],
+    },
+    rotas: {
+      lumen: [
+        [12, 4],
+        [17, 6],
+      ],
+      sibila: [
+        [5, 7],
+        [10, 7],
+      ],
+    },
+  },
+  // Capítulo 2: os telhados de Roma de noite, entre chaminés.
+  telhados: {
+    tema: 'telhados',
+    inicio: [2, 2],
+    mapa: [
+      '########W######W##VVV#',
+      '#....h...........h...#',
+      '#....................#',
+      '#..h........h........#',
+      '#....................#',
+      '#v.......h.........P.#',
+      '######################',
+    ],
+    pontos: { janela: [8, 0], chamine: [5, 1], coliseu: [19, 0] },
+  },
+  // Capítulo 4: em cima do aqueduto, o canal de água no meio e a ponte.
+  aqueduto: {
+    tema: 'aqueduto',
+    inicio: [2, 1],
+    mapa: [
+      'VVVVVVVVVVVVVVVVVVVVVV',
+      '#....................#',
+      '#...v.........v......#',
+      'wwwwwwwwwddwwwwwwwwgww',
+      '#....................#',
+      '#..................P.#',
+      'VVVVVVVVVVVVVVVVVVVVVV',
+    ],
+    pontos: { comporta: [19, 3], vista: [6, 0], lumen: [14, 4] },
+    rotas: {
+      lumen: [
+        [14, 4],
+        [17, 5],
+      ],
+    },
+  },
+  // Capítulo 5: a câmara do oráculo, colunas, mosaico e o tripé.
+  'templo-oraculo': {
+    tema: 'templo',
+    inicio: [2, 2],
+    mapa: [
+      '######################',
+      '#p..p..p..p..p..p..p.#',
+      '#....................#',
+      '#.....ZZZZZZZZZZ.....#',
+      '#.....ZZZZQZZZZZ.....#',
+      '#.....ZZZZZZZZZZ.....#',
+      '#p..p..p..p..p..p..p.#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: { mosaico: [7, 3], tripe: [10, 4], sibila: [14, 2] },
+    rotas: {
+      sibila: [
+        [14, 2],
+        [17, 4],
+      ],
+    },
+  },
+  // Capítulo 6: a arena antes do eclipse, com os espelhos.
+  'arena-eclipse': {
+    tema: 'arena',
+    inicio: [2, 1],
+    mapa: [
+      'BBBBBBBBBBXXBBBBBBBBBB',
+      'B....................B',
+      'B..Y..aaaaaaaaaa..Y..B',
+      'B.....aaaaaaaaaa.....B',
+      'B.....aaaaaaaaaa.....B',
+      'B..Y..aaaaaaaaaa..Y..B',
+      'B..................P.B',
+      'BBBBBBBBBBBBBBBBBBBBBB',
+    ],
+    pontos: { espelhos: [3, 2], sol: [11, 3], sibila: [16, 4] },
+    rotas: {
+      sibila: [
+        [16, 4],
+        [16, 1],
+      ],
+    },
+  },
+  // ---------- O CAPÍTULO SECRETO (22/11/2026) ----------
+  // O Hipogeu: o elevador, as jaulas, as marcas na parede e as engrenagens.
+  hipogeu: {
+    tema: 'tunel',
+    inicio: [2, 5],
+    mapa: [
+      '######################',
+      '##gg####NNN###########',
+      '#....................#',
+      '#.........v..........#',
+      '#.gg..............xx.#',
+      '#....................#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: { elevador: [2, 1], jaulas: [2, 4], marcas: [9, 1], engrenagem: [18, 4] },
+  },
+  // A galeria dos murais, debaixo da arena.
+  'hipogeu-galeria': {
+    tema: 'tunel',
+    inicio: [2, 3],
+    mapa: [
+      '######################',
+      '##II###II###II###II###',
+      '#....................#',
+      '#..v......v......v...#',
+      '#....................#',
+      '#..................P.#',
+      '######################',
+    ],
+    pontos: { 'mural-1': [2, 1], 'mural-2': [7, 1], 'mural-3': [12, 1], 'mural-4': [17, 1] },
+  },
+  // O Coliseu Livre: a arena de dia, com todo mundo.
+  'coliseu-livre': {
+    tema: 'arena',
+    inicio: [2, 1],
+    mapa: [
+      'BBBBBBBBBBXXBBBBBBBBBB',
+      'B....................B',
+      'B.....aaaaaaaaaa.....B',
+      'B.....aaaaaaaaaa.....B',
+      'B.....aaaaaaaaaa.....B',
+      'B.....aaaaaaaaaa.....B',
+      'B..................P.B',
+      'BBBBBBBBBBBBBBBBBBBBBB',
+    ],
+    pontos: { brutus: [6, 2], livia: [10, 4], gaivota: [14, 2], lumen: [17, 5], censor: [4, 5] },
+    rotas: {
+      brutus: [
+        [6, 2],
+        [9, 2],
+      ],
+      gaivota: [
+        [14, 2],
+        [17, 3],
+      ],
+    },
+  },
 };
 
 /** Monta o mapa de uma cena de explorar: os pontos dela, nos lugares que o mapa diz. */

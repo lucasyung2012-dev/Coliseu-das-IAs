@@ -1493,6 +1493,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'o1-cais',
+      mapa: 'porto-cais',
       lugar: 'porto-docas',
       objetivo: 'Faça a ronda no cais. Um mensageiro do Censor está procurando você.',
       pontos: [
@@ -1850,6 +1851,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'o2-planejar',
+      mapa: 'galera-porao',
       lugar: 'galera-porao',
       objetivo: 'Prepare o motim: veja o porão e combine o plano com a Gaivota Sete.',
       pontos: [
@@ -2403,6 +2405,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'o4-feira',
+      mapa: 'subura-feira',
       lugar: 'subura-mercado',
       objetivo: 'Descubra como chegar ao cofre do Cobrador.',
       pontos: [
@@ -2743,6 +2746,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'o5-tripulacao',
+      mapa: 'frota-cais',
       lugar: 'frota-noite',
       objetivo: 'Antes de zarpar, passe pelos navios e fale com a tripulação.',
       pontos: [
@@ -2990,6 +2994,7 @@ export const CAP6_OCTAVIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'o6-jangada',
+      mapa: 'coliseu-inundado',
       lugar: 'coliseu-inundado',
       objetivo: 'Em cima da jangada, olhe a arena inundada antes da primeira luta.',
       pontos: [
@@ -3256,6 +3261,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'fo-porto',
+      mapa: 'porto-livre',
       lugar: 'porto-docas',
       objetivo: 'O Porto de Óstia, livre. Passe pelo cais e fale com a tripulação.',
       pontos: [

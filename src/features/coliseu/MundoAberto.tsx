@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type Mundo, type TemaMundo } from '@/game/historia/mundo';
+import { livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type Mundo, type TemaMundo } from '@/game/historia/mundo';
 import type { Fala, Falante } from '@/game/historia/roteiro';
 import Emote from '@/ui/pixel/Emotes';
 import Icone from '@/ui/pixel/Icones';
@@ -255,6 +255,17 @@ export function MundoAberto({
               <Icone nome="dir" className="w-full" />
             </span>
           )}
+          {/* Coisa para examinar que fica no chão (não num móvel): um brilhinho, para dar para achar */}
+          {mundo.coisas
+            .filter((c) => !c.segredo && !s.vistos.includes(c.id) && livre(mundo, c.x + 0.5, c.y + 0.8))
+            .map((c) => (
+              <span
+                key={`br-${c.id}`}
+                className="brilho-coisa absolute block rotate-45 bg-[#fff4c0] shadow-[0_0_6px_#ffd04a]"
+                style={{ ...emMundo(c.x + 0.5, c.y + 0.5), width: `${(0.18 / W) * 100}%`, aspectRatio: '1', translate: '-50% -50%', zIndex: 240 }}
+                aria-hidden
+              />
+            ))}
           {/* Quem (ou o que) você PRECISA encontrar: uma estrelinha dourada até ver */}
           {obrigatorios.map((o) => (
             <span key={`ob-${o.id}`} className="estrela-objetivo absolute block" style={{ ...emMundo(o.x, o.y), width: `${(0.5 / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 260 }}>
@@ -278,7 +289,7 @@ export function MundoAberto({
         {/* A luz: escuro em volta, como uma noite de verdade */}
         <div
           className="pointer-events-none absolute inset-0 z-[400]"
-          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${Math.min(0.9, CORES[mundo.tema].escuro + (mundo.lugar.includes('noite') ? 0.35 : 0))}) 100%)` }}
+          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${Math.min(0.9, CORES[mundo.tema].escuro + (mundo.lugar.includes('noite') || mundo.lugar.includes('eclipse') || mundo.lugar.includes('ataque') ? 0.35 : 0))}) 100%)` }}
           aria-hidden
         />
 
@@ -341,6 +352,14 @@ const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; 
   forum: { chao1: '#a89a84', chao2: '#9e907a', parede1: '#8a7e6a', parede2: '#94887a', face: '#d8ccb4', faceTopo: '#f0e6d0', escuro: 0.18 },
   tunel: { chao1: '#6a5434', chao2: '#624e30', parede1: '#201810', parede2: '#2a2016', face: '#4a3a28', faceTopo: '#6a5438', escuro: 0.68 },
   ludus: { chao1: '#9a8460', chao2: '#927c58', parede1: '#3a2a1c', parede2: '#443222', face: '#6a5034', faceTopo: '#8a6a44', escuro: 0.25 },
+  porto: { chao1: '#7a5634', chao2: '#6e4c2c', parede1: '#2a2018', parede2: '#342a20', face: '#4a3a2a', faceTopo: '#6a5438', escuro: 0.5 },
+  navio: { chao1: '#6a4a2a', chao2: '#5e4224', parede1: '#2a1a0e', parede2: '#342214', face: '#4a301a', faceTopo: '#6a4a2a', escuro: 0.6 },
+  mercado: { chao1: '#7a6e5e', chao2: '#726656', parede1: '#3a2e24', parede2: '#44362a', face: '#5a4a3a', faceTopo: '#7a6650', escuro: 0.4 },
+  observatorio: { chao1: '#4a4a5e', chao2: '#444458', parede1: '#1a1a2e', parede2: '#22223a', face: '#3a3a52', faceTopo: '#5a5a78', escuro: 0.45 },
+  telhados: { chao1: '#9a4a32', chao2: '#8a422c', parede1: '#2a2030', parede2: '#342838', face: '#4a3a48', faceTopo: '#6a5868', escuro: 0.55 },
+  aqueduto: { chao1: '#a8a08c', chao2: '#9e9682', parede1: '#2a3a6a', parede2: '#34447a', face: '#8a826e', faceTopo: '#b8ae98', escuro: 0.3 },
+  templo: { chao1: '#d8ccb4', chao2: '#cec2aa', parede1: '#6a5e4c', parede2: '#746856', face: '#b8ac94', faceTopo: '#e0d4bc', escuro: 0.4 },
+  arena: { chao1: '#c8a870', chao2: '#c0a068', parede1: '#5a4a38', parede2: '#645240', face: '#8a7a64', faceTopo: '#a89880', escuro: 0.25 },
 };
 
 /**
@@ -362,14 +381,75 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
       const X = x * PX;
       const Y = y * PX;
       const k = `${x}-${y}`;
-      const chao = (cor1: string, cor2: string) => (
-        <g key={`c${k}`}>
+      const tabuas = (cor1: string, cor2: string, chave: string) => (
+        // Tábuas de madeira (cais, convés, jangada): quatro tábuas por ladrilho, emendas e pregos.
+        <g key={chave}>
           <rect x={X} y={Y} width={PX} height={PX} fill={cor1} />
-          <rect x={X + ((x + y) % 2) * 8} y={Y + (y % 2) * 8} width="8" height="8" fill={cor2} />
-          <rect x={X} y={Y + PX - 1} width={PX} height="1" fill="#3a2e26" opacity="0.5" />
+          {[0, 1, 2, 3].map((r) => (
+            <g key={r}>
+              <rect x={X} y={Y + r * 4 + 3} width={PX} height="1" fill={cor2} />
+              <rect x={X + ((x * 5 + r * 7) % 14)} y={Y + r * 4} width="1" height="3" fill={cor2} />
+              <rect x={X + ((x * 3 + r * 5) % 12) + 2} y={Y + r * 4 + 1} width="1" height="1" fill="#2a1a0e" opacity="0.6" />
+            </g>
+          ))}
         </g>
       );
-      if ('.PTSpvftgxMDF'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      const chao = (cor1: string, cor2: string) => {
+        if (mundo.tema === 'porto' || mundo.tema === 'navio') return tabuas(cor1, cor2, `c${k}`);
+        if (mundo.tema === 'telhados')
+          // Telhas de barro em fileiras, cada fileira deslocada.
+          return (
+            <g key={`c${k}`}>
+              <rect x={X} y={Y} width={PX} height={PX} fill={cor1} />
+              {[0, 1, 2, 3].map((r) => (
+                <g key={r}>
+                  <rect x={X} y={Y + r * 4 + 3} width={PX} height="1" fill="#5a2418" />
+                  {[0, 1].map((j) => (
+                    <rect key={j} x={X + j * 8 + (r % 2) * 4} y={Y + r * 4} width="1" height="4" fill="#6a2a1c" />
+                  ))}
+                  <rect x={X + 1 + (r % 2) * 4} y={Y + r * 4} width="3" height="1" fill="#c86a48" opacity="0.6" />
+                </g>
+              ))}
+            </g>
+          );
+        if (mundo.tema === 'arena')
+          return (
+            <g key={`c${k}`}>
+              <rect x={X} y={Y} width={PX} height={PX} fill={cor1} />
+              <rect x={X + ((x * 5 + y * 3) % 12)} y={Y + ((x * 7 + y) % 12)} width="2" height="1" fill={cor2} />
+              <rect x={X + ((x * 3 + y * 7) % 13)} y={Y + ((x + y * 5) % 13)} width="1" height="1" fill="#e8cc90" />
+            </g>
+          );
+        return (
+          <g key={`c${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill={cor1} />
+            <rect x={X + ((x + y) % 2) * 8} y={Y + (y % 2) * 8} width="8" height="8" fill={cor2} />
+            <rect x={X} y={Y + PX - 1} width={PX} height="1" fill="#3a2e26" opacity="0.5" />
+          </g>
+        );
+      };
+      if ('.PTSpvftgxMDFbkrqAUOhQYZ'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
+      if (c === 'w' || c === 'n' || c === 'H')
+        fundo.push(
+          <g key={`w${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#1a3a6a" />
+            <rect className="agua-onda" x={X + ((x * 5 + y * 3) % 10)} y={Y + 4} width="4" height="1" fill="#4a7ab8" />
+            <rect className="agua-onda" style={{ animationDelay: `${((x + y) % 4) * 300}ms` }} x={X + ((x * 3 + y * 7) % 9) + 3} y={Y + 10} width="5" height="1" fill="#3a6aa8" />
+            {!'wnH'.includes(t(x, y - 1)) && <rect x={X} y={Y} width={PX} height="2" fill="#a8d0f0" opacity="0.7" />}
+          </g>,
+        );
+      // A jangada: tábuas.
+      if (c === 'd') fundo.push(tabuas('#8a6438', '#6a4a28', `d${k}`));
+      // O mosaico do templo: pastilhas coloridas.
+      if (c === 'Z')
+        pecas.push(
+          <g key={`z${k}`}>
+            {[0, 1, 2, 3].map((q) => (
+              <rect key={q} x={X + (q % 2) * 8 + 1} y={Y + Math.floor(q / 2) * 8 + 1} width="6" height="6" fill={['#2a6aa0', '#c0583a', '#d8a83a', '#3a8a6a'][(x + y + q) % 4]} />
+            ))}
+          </g>,
+        );
       // Areia (o pátio do Ludus): grãos e marcas de pé.
       if (c === 'a')
         pecas.push(
@@ -490,8 +570,8 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
           </g>,
         );
       }
-      if (c === '#' || c === 'J' || c === 'N' || c === 'o') {
-        const frente = !'#JENo'.includes(t(x, y + 1));
+      if ('#JNoCKWI'.includes(c)) {
+        const frente = !'#JENoCKWIVBX'.includes(t(x, y + 1));
         pecas.push(
           <g key={`p${k}`}>
             <rect x={X} y={Y} width={PX} height={PX} fill={cor.parede1} />
@@ -675,6 +755,302 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
             )}
           </g>,
         );
+      }
+      // ---- Peças novas (22/11/2026): os mapas do Octavius e do Helios ----
+      // Cartaz do Censor na parede: o olho vermelho.
+      if (c === 'C')
+        pecas.push(
+          <g key={`cz${k}`}>
+            <rect x={X + 3} y={Y + 1} width="10" height="9" fill="#e8d8b0" />
+            <rect x={X + 3} y={Y + 1} width="10" height="1" fill="#b8a880" />
+            <rect x={X + 5} y={Y + 4} width="6" height="3" fill="#c0283c" />
+            <rect x={X + 7} y={Y + 5} width="2" height="1" fill="#1a0a0a" />
+            <rect x={X + 4} y={Y + 8} width="8" height="1" fill="#6a5a4a" />
+          </g>,
+        );
+      // Mapa do céu pendurado: constelações em azul-escuro.
+      if (c === 'K')
+        pecas.push(
+          <g key={`kc${k}`}>
+            <rect x={X + 1} y={Y} width="14" height="11" fill="#c8a050" />
+            <rect x={X + 2} y={Y + 1} width="12" height="9" fill="#14204a" />
+            {[
+              [4, 3],
+              [7, 5],
+              [11, 3],
+              [9, 8],
+              [4, 7],
+            ].map(([a, b], j) => (
+              <rect key={j} x={X + a!} y={Y + b!} width="1" height="1" fill="#fff4c0" />
+            ))}
+            <rect x={X + 4} y={Y + 4} width="4" height="0.5" fill="#8ab8ff" opacity="0.7" />
+            <rect x={X + 8} y={Y + 4} width="3" height="0.5" fill="#8ab8ff" opacity="0.7" />
+          </g>,
+        );
+      // Janela acesa de uma casa (os telhados de Roma).
+      if (c === 'W') {
+        pecas.push(
+          <g key={`wj${k}`}>
+            <rect x={X + 4} y={Y + 1} width="8" height="8" fill="#ffcc66" />
+            <rect x={X + 7.5} y={Y + 1} width="1" height="8" fill="#5a3a24" />
+            <rect x={X + 4} y={Y + 4.5} width="8" height="1" fill="#5a3a24" />
+            <rect x={X + 3} y={Y + 9} width="10" height="1" fill="#6a4a34" />
+          </g>,
+        );
+        luzes.push(<circle key={`wl${k}`} cx={X + 8} cy={Y + 8} r="18" fill="#ffb03a" opacity="0.18" className="luz-vela" />);
+      }
+      // Mural pintado na parede (o Hipogeu).
+      if (c === 'I')
+        pecas.push(
+          <g key={`mu${k}`}>
+            <rect x={X + 1} y={Y + 1} width="14" height="9" fill="#c8a878" />
+            <rect x={X + 1} y={Y + 1} width="14" height="1" fill="#8a6a3a" />
+            <rect x={X + 3} y={Y + 4} width="2" height="5" fill="#2a6aa0" />
+            <rect x={X + 3} y={Y + 3} width="2" height="1" fill="#e8c8a0" />
+            <rect x={X + 7} y={Y + 5} width="3" height="4" fill="#c0283c" />
+            <rect x={X + 7} y={Y + 4} width="3" height="1" fill="#e8c8a0" />
+            <rect x={X + 11} y={Y + 3} width="2" height="6" fill={['#d8a83a', '#8a3aa0', '#3a8a4a', '#e0782c'][x % 4]} />
+          </g>,
+        );
+      // Barril de madeira com cintas de ferro.
+      if (c === 'b')
+        pecas.push(
+          <g key={`ba${k}`}>
+            <ellipse cx={X + 8} cy={Y + 14} rx="6" ry="2" fill="#000" opacity="0.3" />
+            <rect x={X + 3} y={Y - 1} width="10" height="15" fill="#7a4a22" />
+            <rect x={X + 2} y={Y + 2} width="12" height="9" fill="#8a5a2a" />
+            <rect x={X + 2} y={Y + 2} width="12" height="1.5" fill="#4a4a54" />
+            <rect x={X + 2} y={Y + 9} width="12" height="1.5" fill="#4a4a54" />
+            <rect x={X + 3} y={Y - 2} width="10" height="2" fill="#a87a44" />
+            <rect x={X + 5} y={Y + 1} width="1" height="11" fill="#a87a44" opacity="0.6" />
+          </g>,
+        );
+      // Caixote de carga, com tábua cruzada.
+      if (c === 'k')
+        pecas.push(
+          <g key={`cx${k}`}>
+            <rect x={X + 1} y={Y - 3} width="14" height="17" fill="#a87a44" />
+            <rect x={X + 1} y={Y - 3} width="14" height="3" fill="#c89a5a" />
+            <rect x={X + 1} y={Y - 3} width="1.5" height="17" fill="#6a4a24" />
+            <rect x={X + 13.5} y={Y - 3} width="1.5" height="17" fill="#6a4a24" />
+            <rect x={X + 1} y={Y + 12.5} width="14" height="1.5" fill="#6a4a24" />
+            <rect x={X + 2} y={Y + 5} width="12" height="1.5" fill="#7a5a2a" transform={`rotate(-35 ${X + 8} ${Y + 6})`} />
+          </g>,
+        );
+      // A amarra do cais: poste de ferro com a corrente grossa.
+      if (c === 'r')
+        pecas.push(
+          <g key={`am${k}`}>
+            <rect x={X + 5} y={Y + 2} width="6" height="11" fill="#3a3a44" />
+            <rect x={X + 4} y={Y} width="8" height="3" fill="#5a5a66" />
+            <rect x={X + 6} y={Y + 3} width="1" height="9" fill="#6a6a78" />
+            {[0, 1, 2, 3].map((j) => (
+              <rect key={j} x={X + 10 + j * 2} y={Y + 6 + (j % 2)} width="2" height="1.5" fill="#8a8a98" />
+            ))}
+          </g>,
+        );
+      // O farol (2 × 2): torre listrada em cima da pedra, com a luz no alto.
+      if (c === 'H' && t(x - 1, y) !== 'H' && t(x, y - 1) !== 'H') {
+        pecas.push(
+          <g key={`fa${k}`}>
+            <rect x={X + 2} y={Y + 22} width="28" height="10" fill="#4a4a50" />
+            <rect x={X + 2} y={Y + 22} width="28" height="2" fill="#6a6a72" />
+            {[0, 1, 2, 3, 4].map((j) => (
+              <rect key={j} x={X + 9 + j * 0.5} y={Y - 18 + j * 8} width={14 - j} height="8" fill={j % 2 ? '#c0283c' : '#f0e6d0'} />
+            ))}
+            <rect x={X + 8} y={Y - 26} width="16" height="8" fill="#2a2a34" />
+            <rect x={X + 10} y={Y - 25} width="12" height="6" fill="#ffe08a" className="luz-vela" />
+            <rect x={X + 7} y={Y - 29} width="18" height="3" fill="#3a3a44" />
+            <rect x={X + 14} y={Y - 32} width="4" height="3" fill="#3a3a44" />
+          </g>,
+        );
+        luzes.push(<circle key={`fl${k}`} cx={X + 16} cy={Y - 22} r="44" fill="#ffe08a" opacity="0.2" className="luz-vela" />);
+      }
+      // Casco do navio: convés de tábuas, borda escura, e o mastro com a vela.
+      if (c === 'n') {
+        pecas.push(
+          <g key={`na${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#7a5430" />
+            {[3, 7, 11].map((r) => (
+              <rect key={r} x={X} y={Y + r} width={PX} height="1" fill="#5a3a1c" />
+            ))}
+            {t(x, y - 1) !== 'n' && <rect x={X} y={Y} width={PX} height="2" fill="#4a2a12" />}
+            {t(x, y + 1) !== 'n' && (
+              <>
+                <rect x={X} y={Y + 10} width={PX} height="6" fill="#4a2a12" />
+                <rect x={X} y={Y + 11} width={PX} height="1" fill="#c8962a" />
+              </>
+            )}
+            {t(x - 1, y) !== 'n' && <rect x={X} y={Y} width="2" height={PX} fill="#3a2010" />}
+            {t(x + 1, y) !== 'n' && <rect x={X + PX - 2} y={Y} width="2" height={PX} fill="#3a2010" />}
+          </g>,
+        );
+        if (t(x, y - 1) !== 'n' && t(x - 2, y) === 'n' && t(x - 3, y) !== 'n')
+          pecas.push(
+            <g key={`ms${k}`}>
+              <rect x={X + 7} y={Y - 30} width="2" height="36" fill="#5a3a1c" />
+              <rect x={X - 5} y={Y - 26} width="26" height="16" fill="#e8dcc0" />
+              <rect x={X - 5} y={Y - 20} width="26" height="3" fill="#c0283c" />
+              <rect x={X - 5} y={Y - 26} width="26" height="1" fill="#fff8e8" />
+              <rect x={X + 9} y={Y - 34} width="7" height="4" fill="#c0283c" />
+            </g>,
+          );
+      }
+      // Banco dos remadores, com o remo.
+      if (c === 'q')
+        pecas.push(
+          <g key={`re${k}`}>
+            <rect x={X} y={Y + 6} width={PX} height="5" fill="#7a5430" />
+            <rect x={X} y={Y + 6} width={PX} height="1" fill="#a87a44" />
+            <rect x={X + 2} y={Y + 11} width="2" height="4" fill="#4a2a12" />
+            <rect x={X + 12} y={Y + 11} width="2" height="4" fill="#4a2a12" />
+            <rect x={X + 7} y={Y - 6} width="2" height="13" fill="#a8844a" />
+            <rect x={X + 5} y={Y - 10} width="6" height="5" fill="#c89a5a" />
+          </g>,
+        );
+      // O tambor do mestre dos remos.
+      if (c === 'A')
+        pecas.push(
+          <g key={`ta${k}`}>
+            <ellipse cx={X + 8} cy={Y + 14} rx="7" ry="2" fill="#000" opacity="0.3" />
+            <rect x={X + 1} y={Y - 1} width="14" height="14" fill="#a83a2a" />
+            <rect x={X + 1} y={Y - 4} width="14" height="4" fill="#e8d8b0" />
+            {[2, 6, 10].map((j) => (
+              <rect key={j} x={X + 1 + j} y={Y + 1} width="1" height="10" fill="#e8d8b0" transform={`rotate(25 ${X + 1 + j} ${Y + 6})`} />
+            ))}
+            <rect x={X + 1} y={Y + 11} width="14" height="2" fill="#6a1a12" />
+            <rect x={X + 3} y={Y - 9} width="1.5" height="7" fill="#d8b860" transform={`rotate(-30 ${X + 3} ${Y - 3})`} />
+            <rect x={X + 11} y={Y - 9} width="1.5" height="7" fill="#d8b860" transform={`rotate(30 ${X + 12} ${Y - 3})`} />
+          </g>,
+        );
+      // O telescópio grande (2 × 2): tripé de madeira e o tubo de latão apontado para o céu.
+      if (c === 'U' && t(x - 1, y) !== 'U' && t(x, y - 1) !== 'U')
+        pecas.push(
+          <g key={`te${k}`}>
+            <ellipse cx={X + 16} cy={Y + 30} rx="12" ry="2.5" fill="#000" opacity="0.3" />
+            <rect x={X + 15} y={Y + 12} width="2" height="18" fill="#6a4220" />
+            <rect x={X + 8} y={Y + 14} width="2" height="17" fill="#6a4220" transform={`rotate(20 ${X + 9} ${Y + 14})`} />
+            <rect x={X + 22} y={Y + 14} width="2" height="17" fill="#6a4220" transform={`rotate(-20 ${X + 23} ${Y + 14})`} />
+            <g transform={`rotate(-38 ${X + 16} ${Y + 12})`}>
+              <rect x={X + 4} y={Y + 9} width="30" height="7" fill="#c8a050" />
+              <rect x={X + 4} y={Y + 9} width="30" height="2" fill="#f0d090" />
+              <rect x={X + 30} y={Y + 8} width="5" height="9" fill="#8a6a2a" />
+              <rect x={X + 12} y={Y + 8} width="2" height="9" fill="#8a6a2a" />
+              <rect x={X + 22} y={Y + 8} width="2" height="9" fill="#8a6a2a" />
+              <rect x={X + 34} y={Y + 10} width="1" height="5" fill="#a8d8ff" />
+            </g>
+          </g>,
+        );
+      // O planetário de latão (2 × 2): o sol no meio, os anéis e os planetas.
+      if (c === 'O' && t(x - 1, y) !== 'O' && t(x, y - 1) !== 'O') {
+        pecas.push(
+          <g key={`or${k}`}>
+            <ellipse cx={X + 16} cy={Y + 30} rx="10" ry="2" fill="#000" opacity="0.3" />
+            <rect x={X + 8} y={Y + 27} width="16" height="4" fill="#6a4220" />
+            <rect x={X + 15} y={Y + 10} width="2" height="18" fill="#c8a050" />
+            <ellipse cx={X + 16} cy={Y + 9} rx="14" ry="5" fill="none" stroke="#c8a050" strokeWidth="1" />
+            <ellipse cx={X + 16} cy={Y + 9} rx="9" ry="3" fill="none" stroke="#a8803a" strokeWidth="1" />
+            <circle cx={X + 16} cy={Y + 9} r="4" fill="#ffd04a" />
+            <circle cx={X + 16} cy={Y + 8} r="1.5" fill="#fff4c0" />
+            <circle cx={X + 3} cy={Y + 10} r="2" fill="#4a8ad8" />
+            <circle cx={X + 24} cy={Y + 7} r="1.6" fill="#c0583a" />
+            <circle cx={X + 28} cy={Y + 11} r="2.2" fill="#8ad04a" />
+          </g>,
+        );
+        luzes.push(<circle key={`ol${k}`} cx={X + 16} cy={Y + 9} r="16" fill="#ffd04a" opacity="0.15" />);
+      }
+      // Chaminé de tijolo soltando fumaça.
+      if (c === 'h')
+        pecas.push(
+          <g key={`ch${k}`}>
+            <rect x={X + 4} y={Y - 8} width="8" height="20" fill="#8a4a32" />
+            {[-6, -2, 2, 6].map((r) => (
+              <rect key={r} x={X + 4} y={Y + r} width="8" height="1" fill="#5a2a1c" />
+            ))}
+            <rect x={X + 3} y={Y - 10} width="10" height="3" fill="#4a3a32" />
+            <circle cx={X + 9} cy={Y - 14} r="3" fill="#8a8a94" opacity="0.5" className="fumaca-mapa" />
+            <circle cx={X + 12} cy={Y - 19} r="4" fill="#8a8a94" opacity="0.35" className="fumaca-mapa" style={{ animationDelay: '600ms' }} />
+          </g>,
+        );
+      // Parapeito: a mureta de pedra e a cidade lá embaixo (o Coliseu aparece de vez em quando).
+      if (c === 'V') {
+        const alto = 3 + ((x * 7) % 5);
+        pecas.push(
+          <g key={`pa${k}`}>
+            <rect x={X} y={Y} width={PX} height="11" fill={cor.parede1} />
+            <rect x={X + ((x * 5) % 13)} y={Y + 1} width="1" height="1" fill="#fff4c0" opacity="0.8" />
+            <rect x={X} y={Y + 10 - alto} width={PX} height={alto} fill="#140f22" />
+            <rect x={X + 3} y={Y + 9 - alto} width="2" height="2" fill="#ffb03a" opacity="0.8" />
+            {(x % 9 === 4 || (t(x - 1, y) === 'V' && t(x + 1, y) === 'V' && t(x - 2, y) !== 'V')) && (
+              <>
+                <rect x={X - 4} y={Y + 1} width="24" height="9" fill="#2a2238" />
+                {[0, 1, 2, 3, 4].map((j) => (
+                  <rect key={j} x={X - 2 + j * 4.5} y={Y + 3} width="2" height="3" fill="#ffcc66" opacity="0.7" />
+                ))}
+              </>
+            )}
+            <rect x={X} y={Y + 10} width={PX} height="6" fill="#a89a84" />
+            <rect x={X} y={Y + 10} width={PX} height="1" fill="#d8ccb4" />
+            <rect x={X + 1} y={Y + 8} width="5" height="2" fill="#a89a84" />
+            <rect x={X + 9} y={Y + 8} width="5" height="2" fill="#a89a84" />
+          </g>,
+        );
+      }
+      // O tripé do oráculo: bacia de bronze com a fumaça violeta.
+      if (c === 'Q') {
+        pecas.push(
+          <g key={`tr${k}`}>
+            <rect x={X + 3} y={Y + 2} width="1.5" height="12" fill="#8a5a22" transform={`rotate(15 ${X + 4} ${Y + 2})`} />
+            <rect x={X + 11} y={Y + 2} width="1.5" height="12" fill="#8a5a22" transform={`rotate(-15 ${X + 12} ${Y + 2})`} />
+            <rect x={X + 7.3} y={Y + 2} width="1.5" height="12" fill="#6a4218" />
+            <rect x={X + 2} y={Y - 1} width="12" height="4" fill="#a8742a" />
+            <rect x={X + 2} y={Y - 1} width="12" height="1" fill="#d8a85a" />
+            <circle cx={X + 8} cy={Y - 5} r="4" fill="#a88ad8" opacity="0.55" className="fumaca-mapa" />
+            <circle cx={X + 6} cy={Y - 11} r="5" fill="#a88ad8" opacity="0.35" className="fumaca-mapa" style={{ animationDelay: '500ms' }} />
+          </g>,
+        );
+        luzes.push(<circle key={`ql${k}`} cx={X + 8} cy={Y - 3} r="22" fill="#a8f0d8" opacity="0.16" className="luz-vela" />);
+      }
+      // O espelho grande num pé de bronze (a arena do eclipse).
+      if (c === 'Y') {
+        pecas.push(
+          <g key={`ey${k}`}>
+            <rect x={X + 7} y={Y + 3} width="2" height="11" fill="#8a6a2a" />
+            <rect x={X + 4} y={Y + 13} width="8" height="2" fill="#6a4a1a" />
+            <rect x={X + 2} y={Y - 11} width="12" height="15" fill="#c8a050" />
+            <rect x={X + 4} y={Y - 9} width="8" height="11" fill="#c8e8ff" />
+            <rect x={X + 5} y={Y - 8} width="2" height="6" fill="#ffffff" opacity="0.8" />
+          </g>,
+        );
+        luzes.push(<circle key={`yl${k}`} cx={X + 8} cy={Y - 4} r="14" fill="#fff4c0" opacity="0.15" />);
+      }
+      // A arquibancada: degraus de pedra e a plateia (cabecinhas coloridas).
+      if (c === 'B' || c === 'X') {
+        pecas.push(
+          <g key={`ab${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#8a7a64" />
+            {[3, 8, 13].map((r) => (
+              <rect key={r} x={X} y={Y + r} width={PX} height="1" fill="#5a4a38" />
+            ))}
+            {[0, 1, 2].map((j) => (
+              <rect key={j} x={X + 1 + j * 5 + ((x + y) % 2)} y={Y + 4 + (j % 2) * 5} width="3" height="3" fill={['#c0283c', '#2a6aa0', '#d8a83a', '#3a8a4a', '#e8c8a0'][(x * 3 + y * 5 + j) % 5]} />
+            ))}
+            {!'BX'.includes(t(x, y + 1)) && <rect x={X} y={Y + 12} width={PX} height="4" fill="#5a4a38" />}
+          </g>,
+        );
+        // O camarote do imperador: toldo listrado e moldura dourada.
+        if (c === 'X')
+          pecas.push(
+            <g key={`cm${k}`}>
+              <rect x={X} y={Y} width={PX} height={PX} fill="#6a1a2a" />
+              {[0, 1, 2, 3].map((j) => (
+                <rect key={j} x={X + j * 4} y={Y} width="2" height="6" fill="#f0d080" />
+              ))}
+              <rect x={X} y={Y + 6} width={PX} height="1" fill="#c8962a" />
+              <rect x={X + 5} y={Y + 9} width="6" height="5" fill="#c8962a" />
+              <rect x={X} y={Y + 14} width={PX} height="2" fill="#c8962a" />
+            </g>,
+          );
       }
       if (c === 'P') {
         pecas.push(

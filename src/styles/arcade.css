@@ -1654,10 +1654,10 @@
 /* Pela janela: some, estoura o vidro lá em cima, pula em arco e cai no chão. */
 .entrada-janela { animation: entrada-janela 1.9s both; }
 @keyframes entrada-janela {
-  0% { translate: 2% -62%; opacity: 0; scale: 0.7; }
-  17% { translate: 2% -62%; opacity: 0; scale: 0.7; }
-  20% { translate: 2% -62%; opacity: 1; scale: 0.75; }
-  45% { translate: -10% -70%; scale: 0.95; animation-timing-function: ease-in; }
+  0% { translate: -18% -50%; opacity: 0; scale: 0.6; }
+  17% { translate: -18% -50%; opacity: 0; scale: 0.6; }
+  20% { translate: -18% -50%; opacity: 1; scale: 0.65; }
+  45% { translate: -12% -62%; scale: 0.9; animation-timing-function: ease-in; }
   66% { translate: -2% 0; scale: 1; }
   72% { translate: -1% -5%; }
   78% { translate: 0 0; }
@@ -1680,3 +1680,13 @@
   .entrada-andando, .entrada-rapido, .entrada-voando, .entrada-pesado, .entrada-agua, .entrada-janela { animation-duration: 0.01s; }
   .caco-vidro, .poeira-entrada, .respingo-entrada, .clarao-entrada { display: none; }
 }
+
+/* Os mapas novos: a água mexendo e a fumaça das chaminés e do oráculo. */
+.agua-onda { animation: agua-onda 1.6s ease-in-out infinite alternate; }
+@keyframes agua-onda { from { opacity: 0.4; translate: 0 0; } to { opacity: 1; translate: 2px 0; } }
+.fumaca-mapa { animation: fumaca-mapa 2.4s ease-out infinite; }
+@keyframes fumaca-mapa { from { translate: 0 2px; opacity: 0.6; } to { translate: 3px -6px; opacity: 0; } }
+/* Coisa para examinar no chão: um brilhinho piscando. */
+.brilho-coisa { animation: brilho-coisa 1.2s ease-in-out infinite alternate; }
+@keyframes brilho-coisa { from { opacity: 0.25; scale: 0.7; } to { opacity: 1; scale: 1.1; } }
+@media (prefers-reduced-motion: reduce) { .agua-onda, .fumaca-mapa, .brilho-coisa { animation: none; } }

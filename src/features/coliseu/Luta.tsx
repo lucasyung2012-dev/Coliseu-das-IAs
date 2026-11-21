@@ -404,19 +404,17 @@ function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
       {entrada === 'janela' && (
         <>
           {/* a janela alta da biblioteca, de noite, que ele estoura para entrar */}
-          <div className="janela-entrada absolute z-[9] left-[60%] top-[4%] h-[42%] w-[22%] rounded-t-[45%] border-[5px] border-[#3a2414] bg-[#0c1030]">
-            <span className="vidro-entrada absolute inset-0 rounded-t-[45%] bg-[linear-gradient(135deg,#6a8ad8aa,#a8c8ff66_40%,#3a4a9a88)]" />
-            <span className="absolute inset-y-0 left-1/2 w-[6%] -translate-x-1/2 bg-[#3a2414]" />
-            <span className="absolute inset-x-0 top-[48%] h-[6%] bg-[#3a2414]" />
+          <div className="janela-entrada absolute z-[9] left-[33%] top-[9%] h-[50%] w-[38%] rounded-t-[50%]">
+            <span className="vidro-entrada absolute inset-0 rounded-t-[50%] bg-[linear-gradient(135deg,#6a8ad8aa,#a8c8ff66_40%,#3a4a9a88)]" />
           </div>
           {cacos.map(([dx, dy], k) => (
             <span
               key={k}
-              className="caco-vidro absolute z-[12] left-[71%] top-[24%] block h-[3%] w-[2%] bg-[#c8dcff]"
+              className="caco-vidro absolute z-[12] left-[52%] top-[32%] block h-[3%] w-[2%] bg-[#c8dcff]"
               style={{ '--dx': `${dx * 3}%`, '--dy': `${dy * 3}%`, animationDelay: `${330 + (k % 3) * 40}ms`, rotate: `${k * 37}deg` } as CSSProperties}
             />
           ))}
-          <span className="clarao-entrada absolute z-[12] left-[71%] top-[24%] block h-[30%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+          <span className="clarao-entrada absolute z-[12] left-[52%] top-[32%] block h-[30%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
         </>
       )}
       {entrada === 'agua' &&

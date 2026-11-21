@@ -43,6 +43,7 @@ export const CAP1_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'h1-observatorio',
+      mapa: 'observatorio',
       lugar: 'observatorio-dentro',
       objetivo: 'Prepare o Observatório para a noite das três estrelas.',
       pontos: [
@@ -161,6 +162,7 @@ export const CAP1_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'h1-lente',
+      mapa: 'observatorio',
       lugar: 'observatorio-ataque',
       objetivo: 'Salve o que der do Observatório.',
       pontos: [
@@ -331,6 +333,7 @@ export const CAP2_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'h2-janelas',
+      mapa: 'telhados',
       lugar: 'telhados-noite',
       objetivo: 'Recupere o fôlego entre as chaminés e olhe Roma de cima.',
       pontos: [
@@ -744,6 +747,7 @@ export const CAP4_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'h4-canal',
+      mapa: 'aqueduto',
       lugar: 'aqueduto',
       objetivo: 'Caminhe pelo alto do aqueduto e descubra o caminho até o Templo.',
       pontos: [
@@ -975,6 +979,7 @@ export const CAP5_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'h5-oraculo',
+      mapa: 'templo-oraculo',
       lugar: 'templo-oraculo',
       objetivo: 'Explore a câmara do oráculo e encontre a Sibila lá dentro.',
       pontos: [
@@ -1192,6 +1197,7 @@ export const CAP6_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'h6-arena-olhar',
+      mapa: 'arena-eclipse',
       lugar: 'coliseu-eclipse',
       objetivo: 'Antes do eclipse, olhe a arena e quem veio ver você.',
       pontos: [
@@ -1440,6 +1446,7 @@ export const FINAL_HELIOS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'fh-observatorio',
+      mapa: 'observatorio',
       lugar: 'observatorio-dentro',
       objetivo: 'O Observatório, de portas abertas. Fale com quem veio olhar o céu.',
       pontos: [

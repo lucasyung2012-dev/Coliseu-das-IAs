@@ -1,6 +1,7 @@
 import { ladrilhoEm, livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo } from '@/game/historia/mundo';
 import { MAPAS, MUNDOS, mundoDoExplorar, mundoDoLudus } from '@/game/historia/mundos';
 import { CAPITULOS } from '@/game/historia/roteiro';
+import { CAP_SECRETO } from '@/game/historia/roteiro4';
 
 /** O mundo visto de cima (22/11/2026): andar livre, paredes, interagir e a saída. */
 const nada: EntradaMundo = { cima: false, baixo: false, esq: false, dir: false };
@@ -63,14 +64,16 @@ describe('o mundo visto de cima', () => {
   });
 });
 
-describe('os mapas das cenas de explorar (caminho do Cassius)', () => {
-  const cenas = Object.values(CAPITULOS)
-    .flat()
+describe('os mapas das cenas de explorar (os três caminhos e o secreto)', () => {
+  const cenas = [...Object.values(CAPITULOS).flat(), CAP_SECRETO]
     .flatMap((cap) => cap.cenas)
     .flatMap((c) => (c.tipo === 'explorar' && c.mapa ? [c] : []));
 
-  it('as seis cenas do Cassius viraram mapa', () => {
-    expect(cenas.map((c) => c.id).sort()).toEqual(['c4-gavetas', 'c4-ossario', 'c4-tuneis', 'c5-povo', 'c6-nomes', 'f-biblioteca']);
+  it('toda cena de explorar virou mapa (menos a jaula, que é dentro da carroça)', () => {
+    const todas = [...Object.values(CAPITULOS).flat(), CAP_SECRETO].flatMap((cap) => cap.cenas);
+    const semMapa = todas.flatMap((c) => (c.tipo === 'explorar' && !c.mapa ? [c.id] : []));
+    expect(semMapa).toEqual(['c2-jaula']);
+    expect(cenas).toHaveLength(22);
   });
 
   it.each(cenas.map((c) => [c.id, c] as const))('%s: mapa certinho, todos os pontos no mapa e saída', (_, cena) => {
