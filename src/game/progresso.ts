@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { IAS, type IaId } from './personagens';
 import { variacaoTrofeus, type Modo } from './ligas';
 import { coliseuEmUso, premiosNovos, type EscolhaColiseu, type TipoPremio, type VisualColiseu } from './coliseu';
+import type { SaveHistoria } from './historia/saves';
 
 export interface Partida {
   id: string;
@@ -49,6 +50,8 @@ export interface Progresso {
   recorde?: Partial<Record<IaId, number>>;
   /** Prêmios do mapa escolhidos por IA (arena, estandarte, comemoração). */
   coliseu?: Partial<Record<IaId, EscolhaColiseu>>;
+  /** Saves do modo História (Coliseu). */
+  historia?: SaveHistoria[];
   /** Quando o progresso mudou pela última vez (ISO). Decide qual cópia vale ao sincronizar. */
   atualizadoEm?: string;
 }
@@ -167,6 +170,20 @@ export function useColiseu(ia: IaId): VisualColiseu {
 }
 
 /** Escolhe no mapa um prêmio já ganho para usar (vale só para esta IA). */
+/** Grava (cria ou atualiza) um save do modo História. */
+export function gravarSaveHistoria(s: SaveHistoria) {
+  const p = obterProgresso();
+  const lista = p.historia ?? [];
+  const existe = lista.some((x) => x.id === s.id);
+  salvar({ ...p, historia: existe ? lista.map((x) => (x.id === s.id ? s : x)) : [...lista, s] });
+}
+
+/** Apaga um save do modo História (a tela pede confirmação antes). */
+export function apagarSaveHistoria(id: string) {
+  const p = obterProgresso();
+  salvar({ ...p, historia: (p.historia ?? []).filter((x) => x.id !== id) });
+}
+
 export function escolherPremio(ia: IaId, tipo: TipoPremio, id: string) {
   const p = obterProgresso();
   salvar({ ...p, coliseu: { ...p.coliseu, [ia]: { ...p.coliseu?.[ia], [tipo]: id } } });
@@ -247,6 +264,14 @@ export function juntarProgresso(local: Progresso, nuvem: Progresso, primeiraVez:
     trofeus: maior(local.trofeus, nuvem.trofeus),
     xp: maior(local.xp, nuvem.xp),
     recorde: Object.fromEntries(IAS.map((ia) => [ia, Math.max(recordeDe(local, ia), recordeDe(nuvem, ia))])) as Record<IaId, number>,
+    // Saves da História: junta os dos dois aparelhos; o mesmo save fica com a versão mais nova.
+    historia: Object.values(
+      Object.fromEntries(
+        [...(nuvem.historia ?? []), ...(local.historia ?? [])]
+          .sort((a, b) => a.atualizadoEm.localeCompare(b.atualizadoEm))
+          .map((s) => [s.id, s]),
+      ),
+    ),
     // Estatísticas: fica a cópia com mais partidas jogadas de cada IA.
     estatisticas: Object.fromEntries(
       IAS.map((ia) => [ia, totalPartidas(nuvem.estatisticas[ia]) > totalPartidas(local.estatisticas[ia]) ? nuvem.estatisticas[ia] : local.estatisticas[ia]]),

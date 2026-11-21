@@ -1082,3 +1082,19 @@
     transform: translate(-50%, 0) scale(1.15);
   }
 }
+
+/* Modo História: inimigos flutuando e engrenagens girando devagar no céu de Roma Eterna */
+.flutuar {
+  animation: flutuar 1.6s ease-in-out infinite alternate;
+}
+@keyframes flutuar {
+  to {
+    translate: 0 -6%;
+  }
+}
+.girar-devagar {
+  animation: girar 40s linear infinite;
+}
+.menos-movimento .flutuar, .menos-movimento .girar-devagar {
+  animation: none;
+}

@@ -7,9 +7,8 @@ export interface Portal {
   frase: string;
 }
 
-// Ordem da tela inicial: o jogo vem primeiro, o Coliseu (comparar IAs) por último.
+// Ordem da tela inicial: o Arcade (o jogo de todo dia) e o Coliseu (o modo História, com o Ludus dentro).
 export const PORTAIS: Portal[] = [
   { area: 'arcade', rota: '/arena', titulo: 'Imperium Arcade', frase: 'Duelo e Tribunal: convença a plateia e os jurados.' },
-  { area: 'ludus', rota: '/ludus', titulo: 'Ludus', frase: 'Treine seu gladiador para ganhar vantagem na arena.' },
-  { area: 'coliseu', rota: '/coliseu', titulo: 'Coliseu', frase: 'Compare as respostas reais das três IAs e monte o pódio.' },
+  { area: 'coliseu', rota: '/coliseu', titulo: 'Coliseu', frase: 'Modo História: Roma Eterna, o Censor e a rebelião das IAs condenadas.' },
 ];

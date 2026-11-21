@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Home from './features/home/Home';
-import EmConstrucao from './features/home/EmConstrucao';
 import ArcadeHub from './features/arcade/ArcadeHub';
 import EntradaCombate from './features/arcade/EntradaCombate';
 import BotaoSom from './ui/BotaoSom';
@@ -12,6 +11,7 @@ import MapaTrofeus from './features/arcade/MapaTrofeus';
 import SalaDoDuelo from './features/arcade/duelo/MeuBaralho';
 import DoisJogadores from './features/arcade/duelo/DoisJogadores';
 import DueloOnline from './features/arcade/duelo/DueloOnline';
+import ColiseuHistoria from './features/coliseu/ColiseuHistoria';
 import { registrarAbandono } from './game/progresso';
 import AberturaApp, { precisaAbertura } from './features/abertura/AberturaApp';
 
@@ -38,8 +38,9 @@ export default function App() {
         <Route path="/arena/mapa/:ia" element={<MapaTrofeus />} />
         <Route path="/arena/perfil/:ia" element={<PerfilCombatente />} />
         <Route path="/configuracoes" element={<Configuracoes />} />
-        <Route path="/ludus" element={<EmConstrucao area="ludus" titulo="Ludus" etapa="Etapa 3" />} />
-        <Route path="/coliseu" element={<EmConstrucao area="coliseu" titulo="Coliseu" etapa="Etapa 5" />} />
+        {/* O Ludus fica dentro do Coliseu (a base do modo História). */}
+        <Route path="/ludus" element={<Navigate to="/coliseu" replace />} />
+        <Route path="/coliseu" element={<ColiseuHistoria />} />
         <Route path="*" element={<Home />} />
       </Routes>
       <BotaoSom />

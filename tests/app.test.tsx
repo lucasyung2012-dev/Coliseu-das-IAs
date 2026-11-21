@@ -36,12 +36,25 @@ describe('App', () => {
     expect(screen.getByRole('dialog', { name: /Como jogar: TRIBUNAL/ })).toBeInTheDocument();
   });
 
-  it('mostra os três portais na tela inicial', () => {
+  it('mostra os portais na tela inicial (o Ludus fica dentro do Coliseu)', () => {
     abrir('/');
     expect(screen.getByRole('heading', { level: 1, name: 'Coliseu das IAs' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Imperium Arcade/ })).toHaveAttribute('href', '/arena');
-    expect(screen.getByRole('link', { name: /Ludus/ })).toHaveAttribute('href', '/ludus');
     expect(screen.getByRole('link', { name: /Coliseu/ })).toHaveAttribute('href', '/coliseu');
+  });
+
+  it('Coliseu (modo História): prólogo, saves, escolher o Cassius e abrir o Capítulo 1', () => {
+    localStorage.removeItem('coliseu.historia.prologo');
+    abrir('/coliseu');
+    expect(screen.getByText(/Mil anos depois da fundação/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
+    fireEvent.click(screen.getByRole('button', { name: /NOVA HISTÓRIA/ }));
+    expect(screen.getByRole('button', { name: /OCTAVIUS/ })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /CASSIUS/ }));
+    expect(screen.getByText('A NOITE DAS CHAMAS')).toBeInTheDocument();
+    // O save foi criado e aparece na lista ao voltar.
+    fireEvent.click(screen.getByRole('button', { name: /SAVES/ }));
+    expect(screen.getByRole('button', { name: /CONTINUAR/ })).toBeInTheDocument();
   });
 
   it('mostra a sala de fliperama na primeira visita: a moeda entra e o crédito sobe', () => {
