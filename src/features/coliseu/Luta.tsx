@@ -396,7 +396,7 @@ const SONS_ENTRADA: Record<EntradaInimigo, [SomHistoria, number][]> = {
 
 /** O que acontece em volta da chegada: o vidro estourando, a poeira no chão, a água espirrando. */
 function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
-  const cacos = [
+  const cacos: [number, number][] = [
     [-60, -40], [-30, -70], [10, -80], [50, -50], [70, 10], [-70, 20], [30, 60], [-20, 70], [60, 70], [-50, -10],
   ];
   return (
