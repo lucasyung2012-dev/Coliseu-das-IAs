@@ -1,5 +1,8 @@
 import type { IaId } from '../personagens';
-import { ATRIBUTOS_INICIAIS, type AtributosLuta, type Tecnica } from './luta';
+import { ATRIBUTOS_INICIAIS, type AtributosLuta, type Estilo, type Tecnica } from './luta';
+
+/** O jeito de lutar de cada gladiador (Cassius guardião, Octavius estrategista, Helios vidente). */
+export const ESTILO_DA_IA: Record<IaId, Estilo> = { claude: 'guardiao', chatgpt: 'estrategista', gemini: 'vidente' };
 
 /**
  * Saves do modo História (docs/HISTORIA.md). Quantos o jogador quiser; cada save é
@@ -78,6 +81,7 @@ export function atributosDoSave(s: SaveHistoria): AtributosLuta {
     defesa: ATRIBUTOS_INICIAIS.defesa + (t.defesa ?? 0) + tem('escudo-reforcado') + tem('elmo-brutus'),
     carisma: ATRIBUTOS_INICIAIS.carisma + (t.carisma ?? 0) + tem('capa-vermelha'),
     tecnicas: s.tecnicas ?? [],
+    estilo: ESTILO_DA_IA[s.gladiador],
   };
 }
 

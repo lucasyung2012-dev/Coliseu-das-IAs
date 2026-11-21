@@ -297,3 +297,16 @@ O Arcade é "onde as lendas do Coliseu ganham vida" (o novo subtítulo). Quem te
 | Octavius | A Galé na Tempestade | Gaivota Sete no ombro | Capitão do Plano B |
 | Helios | O Coliseu do Eclipse | Lumen no ombro | Vidente das Três Estrelas |
 | Secreto (os três) | O Coliseu Livre | comemoração Os Três | Os Três (moldura de ouro) |
+
+## Jeitos de lutar (21/11/2026)
+
+Pedido do Lucas: cada gladiador com um estilo próprio, não só atacar, defender, esquivar e especial. Motor em `luta.ts` (`Estilo`, `RecursoEstilo`), tela em `Luta.tsx` (botões, barras e animações de cada um), testes em `tests/estilos.test.ts` e no balanço (o robô luta com o estilo do caminho).
+
+| | Cassius: GUARDIÃO | Octavius: ESTRATEGISTA | Helios: VIDENTE |
+|---|---|---|---|
+| Botões | Gládio, Escudo, Esquiva, Muralha | Tridente, Aparar, Rolar, Rede | Lança, Espelho, Lampejo, Eclipse |
+| Jeito próprio | Bloqueio na última hora guarda 📜 páginas (até 3); o golpe no aberto "cita" todas (+60% cada) | Rolar na última hora faz o inimigo TROPEÇAR (aberto +0,8 s); planos do cenário | Vê o PRÓXIMO golpe (até a finta); lampejo na última hora junta ☀️ luz (até 3) |
+| Ponto fraco | Esquiva pesada (mais fôlego, recarga 30% maior) | Aparar deixa passar 25% | 12% menos vida |
+| Especial | MURALHA DE LIVROS: 4,5 s em que tudo é bloqueado e metade volta | REDE E TRIDENTE: preso 2,6 s, estocadas +25% | ECLIPSE: os 3 próximos golpes erram; a luz vira raio (+9 por luz) |
+
+O especial abre com uma faixa na diagonal (o gladiador grande e o nome do golpe), como nos jogos de luta.

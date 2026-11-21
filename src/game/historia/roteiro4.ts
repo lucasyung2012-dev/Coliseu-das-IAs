@@ -1,7 +1,7 @@
 import type { IaId } from '../personagens';
 import { CAPITULOS, type Capitulo, type Falante } from './roteiro';
 import type { AtributosLuta, Tecnica } from './luta';
-import { atributosDoSave, type SaveHistoria } from './saves';
+import { atributosDoSave, ESTILO_DA_IA, type SaveHistoria } from './saves';
 
 /**
  * O capítulo secreto: OS TRÊS (docs/HISTORIA.md). Canônico, mas escondido: só abre
@@ -665,6 +665,7 @@ export function equipeDoSecreto(saves: SaveHistoria[]): Record<'cassius' | 'octa
       defesa: Math.max(VETERANO.defesa, melhor?.defesa ?? 0),
       carisma: Math.max(VETERANO.carisma, melhor?.carisma ?? 0),
       tecnicas: [...tecnicas],
+      estilo: ESTILO_DA_IA[ia],
     };
   }
   return equipe;

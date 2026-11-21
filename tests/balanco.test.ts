@@ -2,6 +2,7 @@ import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, novaLuta, passoLuta, type AtributosLuta, type DefInimigo, type EstadoLuta } from '@/game/historia/luta';
 import { CAPITULOS } from '@/game/historia/roteiro';
 import { CAP_SECRETO, equipeDoSecreto } from '@/game/historia/roteiro4';
+import { ESTILO_DA_IA } from '@/game/historia/saves';
 
 /**
  * Balanço das lutas da História (21/11/2026: o Lucas não conseguia vencer a Fornalha).
@@ -28,7 +29,11 @@ function bomJogador(def: DefInimigo, a: AtributosLuta, erraACada = 5): EstadoLut
         defesas++;
         if (defesas % erraACada === 0) continue;
         const at = ataqueAtual(s);
-        s = agir(s, at.tipo === 'corpo' || at.tipo === 'finta' ? 'escudo' : 'esquiva', a);
+        // Cada estilo defende do seu jeito: o Vidente vê a finta e não gasta fôlego com ela;
+        // o Estrategista prefere rolar (o escudo dele é fraco).
+        if (a.estilo === 'vidente' && at.tipo === 'finta') continue;
+        const rola = a.estilo === 'estrategista' && s.tempo >= s.jogador.esquivaPronta && s.jogador.folego >= 40;
+        s = agir(s, rola || !(at.tipo === 'corpo' || at.tipo === 'finta') ? 'esquiva' : 'escudo', a);
       }
       continue;
     }
@@ -63,14 +68,15 @@ const ATRIBUTOS: Record<number, AtributosLuta> = {
   7: { vida: 140, forca: 3, defesa: 3, carisma: 2, tecnicas: ['contra-ataque', 'quebra-guarda'] },
 };
 
-const lutas = [...CAPITULOS.claude, ...CAPITULOS.chatgpt, ...CAPITULOS.gemini].flatMap((cap) =>
-  cap.cenas.flatMap((c) => (c.tipo === 'luta' ? [{ cap: cap.numero, inimigo: c.inimigo }] : [])),
+// Cada caminho luta com o jeito do seu gladiador (Cassius guardião, Octavius estrategista, Helios vidente).
+const lutas = (['claude', 'chatgpt', 'gemini'] as const).flatMap((ia) =>
+  CAPITULOS[ia].flatMap((cap) => cap.cenas.flatMap((c) => (c.tipo === 'luta' ? [{ ia, estilo: ESTILO_DA_IA[ia], cap: cap.numero, inimigo: c.inimigo }] : []))),
 );
 
 describe('balanço das lutas da História', () => {
-  it.each(lutas)('um bom jogador vence: capítulo $cap, $inimigo', ({ cap, inimigo }) => {
+  it.each(lutas)('um bom jogador vence ($estilo): capítulo $cap, $inimigo', ({ estilo, cap, inimigo }) => {
     const def = INIMIGOS[inimigo]!;
-    const fim = bomJogador(def, ATRIBUTOS[cap] ?? ATRIBUTOS_INICIAIS);
+    const fim = bomJogador(def, { ...(ATRIBUTOS[cap] ?? ATRIBUTOS_INICIAIS), estilo });
     expect(fim.fim, `${inimigo}: terminou com ${Math.round(fim.jogador.vida)} de vida, inimigo com ${Math.round(fim.inimigo.vida)}/${def.vida}, ${Math.round(fim.tempo / 1000)} s`).toBe('vitoria');
   });
 

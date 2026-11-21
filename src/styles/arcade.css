@@ -1341,3 +1341,64 @@
 }
 .menos-movimento .portal-cena * { animation: none !important; }
 .menos-movimento .pc-grade { transform: translateY(-66px); }
+
+/* ---------- Os jeitos de lutar (Cassius, Octavius, Helios) ---------- */
+.recurso-cheio { animation: recurso-pulo 0.35s ease-out; filter: drop-shadow(0 0 3px #ffd04a); }
+@keyframes recurso-pulo { from { scale: 1.8; } to { scale: 1; } }
+/* páginas e luz girando em volta do gladiador */
+.orbita-recurso { animation: orbita-recurso 1.8s linear infinite; }
+@keyframes orbita-recurso {
+  0% { translate: -180% 0; scale: 1; z-index: 2; }
+  25% { translate: 0 -120%; scale: 0.8; }
+  50% { translate: 160% 0; scale: 0.65; z-index: 0; }
+  75% { translate: 0 90%; scale: 0.8; }
+  100% { translate: -180% 0; scale: 1; }
+}
+/* a Muralha de Livros sobe do chão */
+.muralha-livros { animation: muralha-sobe 0.35s ease-out both, muralha-brilha 1s ease-in-out 0.35s infinite alternate; transform-origin: 50% 100%; }
+@keyframes muralha-sobe { from { scale: 1 0; } to { scale: 1 1; } }
+@keyframes muralha-brilha { from { filter: drop-shadow(0 0 2px #e0782c); } to { filter: drop-shadow(0 0 10px #ffb04a); } }
+/* o Octavius rola no chão; o Helios some num lampejo */
+.esquiva-rolar { animation: esquiva-rolar 0.38s ease-out; transform-origin: 50% 70%; }
+@keyframes esquiva-rolar { from { rotate: 0deg; } to { rotate: -360deg; } }
+.esquiva-lampejo { animation: esquiva-lampejo 0.38s steps(4); }
+@keyframes esquiva-lampejo {
+  0% { opacity: 1; filter: brightness(3); }
+  25% { opacity: 0.1; }
+  50% { opacity: 0.8; filter: brightness(2) drop-shadow(0 0 8px #ffe08a); }
+  75% { opacity: 0.15; }
+  100% { opacity: 1; filter: none; }
+}
+.visao-proxima { animation: visao-proxima 0.9s ease-in-out infinite alternate; }
+@keyframes visao-proxima { from { opacity: 0.55; } to { opacity: 1; } }
+/* a rede cai por cima do inimigo */
+.rede-cai { animation: rede-cai 0.3s ease-in both; }
+@keyframes rede-cai { from { translate: 0 -60%; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+/* o eclipse: a tela fica roxa e escura, com um anel de luz no alto */
+.eclipse-tela {
+  background: radial-gradient(circle at 70% 18%, transparent 0 5%, rgba(255, 224, 138, 0.8) 5.5% 6.5%, rgba(255, 176, 74, 0.25) 7% 11%, transparent 13%), linear-gradient(180deg, rgba(20, 6, 40, 0.55), rgba(20, 6, 40, 0.25));
+  animation: eclipse-entra 0.5s ease-out both;
+}
+@keyframes eclipse-entra { from { opacity: 0; } to { opacity: 1; } }
+/* a faixa do especial, como nos jogos de luta */
+.corte-faixa { animation: corte-faixa 0.7s ease-out both; }
+@keyframes corte-faixa {
+  0% { translate: -100% 0; skew: -12deg 0; }
+  25%, 80% { translate: 0 0; skew: -12deg 0; }
+  100% { translate: 100% 0; skew: -12deg 0; opacity: 0; }
+}
+.corte-heroi { animation: corte-heroi 0.7s ease-out both; }
+@keyframes corte-heroi {
+  0% { translate: -200% 0; scale: 1.6; }
+  25%, 80% { translate: 0 0; scale: 1.6; }
+  100% { translate: 60% 0; scale: 1.6; opacity: 0; }
+}
+.corte-nome { animation: corte-nome 0.7s ease-out both; }
+@keyframes corte-nome {
+  0% { translate: 120% 0; opacity: 0; }
+  25%, 80% { translate: 0 0; opacity: 1; }
+  100% { translate: -40% 0; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbita-recurso, .muralha-livros, .esquiva-rolar, .esquiva-lampejo, .visao-proxima, .rede-cai, .eclipse-tela, .corte-faixa, .corte-heroi, .corte-nome, .recurso-cheio { animation: none; }
+}
