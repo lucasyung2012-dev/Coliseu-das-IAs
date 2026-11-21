@@ -15,34 +15,30 @@ import { tocar } from '@/ui/somHistoria';
  */
 const IAS: IaId[] = ['claude', 'chatgpt', 'gemini'];
 
-/** Onde fica cada capítulo (1 a 6) no mapa, por caminho. O 7 é o Coliseu. */
-const PONTOS: Record<IaId, [number, number][]> = {
-  claude: [
-    [52, 42], // 1 a Grande Biblioteca
-    [84, 76], // 2 as ruas de Roma
-    [120, 128], // 3 o Ludus
-    [146, 178], // 4 as Catacumbas
-    [168, 150], // 5 o Fórum
-    [188, 132], // 6 a Grande Arena
-  ],
-  chatgpt: [
-    [30, 176], // 1 o Porto de Óstia
-    [62, 196], // 2 as galés, no mar
-    [120, 128], // 3 o Ludus
-    [104, 92], // 4 a Subura
-    [258, 196], // 5 a frota, no mar
-    [222, 140], // 6 a Naumaquia
-  ],
-  gemini: [
-    [282, 36], // 1 o Observatório
-    [238, 52], // 2 os telhados
-    [120, 128], // 3 o Ludus
-    [164, 40], // 4 o Aqueduto
-    [252, 92], // 5 o Templo de Apolo
-    [214, 106], // 6 o Coliseu no eclipse
-  ],
+/**
+ * As estradas (refeitas em 22/11/2026, o Lucas achou o mapa bagunçado): cada uma vem reta
+ * do seu lado até o Coliseu, sem cruzar as outras. O capítulo 3 (o Ludus) fica num anel
+ * dourado em volta da arena, onde as três passam. O 7 é o próprio Coliseu.
+ */
+const COLISEU: [number, number] = [160, 116];
+const ORIGENS: Record<IaId, [number, number]> = {
+  claude: [42, 34], // a Grande Biblioteca, no noroeste
+  gemini: [278, 34], // o Observatório, no nordeste
+  chatgpt: [160, 204], // o Porto, no sul (no mar)
 };
-const COLISEU: [number, number] = [204, 122];
+/** O anel do Ludus: a mesma distância do Coliseu nas três estradas. */
+const RAIO_LUDUS = 62;
+const PONTOS: Record<IaId, [number, number][]> = Object.fromEntries(
+  (Object.keys(ORIGENS) as IaId[]).map((ia) => {
+    const [ox, oy] = ORIGENS[ia];
+    const dx = ox - COLISEU[0];
+    const dy = oy - COLISEU[1];
+    const tam = Math.hypot(dx, dy);
+    // Distância de cada capítulo até o Coliseu: a origem, o meio do caminho, o Ludus e três já perto da arena.
+    const dist = [tam, (tam + RAIO_LUDUS) / 2, RAIO_LUDUS, 49, 37, 25];
+    return [ia, dist.map((d) => [Math.round(COLISEU[0] + (dx / tam) * d), Math.round(COLISEU[1] + (dy / tam) * d)] as [number, number])];
+  }),
+) as Record<IaId, [number, number][]>;
 const ORIGEM: Record<IaId, { nome: string }> = {
   claude: { nome: 'BIBLIOTECA' },
   chatgpt: { nome: 'PORTO' },
@@ -119,35 +115,31 @@ export function LinhaDoTempo({ saves, segredos }: { saves: SaveHistoria[]; segre
               </defs>
               {/* o pergaminho do mapa */}
               <rect width="320" height="220" fill="url(#mr-papel)" />
-              {/* o mar (oeste e sul), com ondinhas */}
-              <path d="M0 0 H18 V150 Q30 170 48 205 H300 Q305 214 320 214 V220 H0 Z" fill="#7ab0c8" />
-              {[30, 70, 110, 150].map((y) => (
-                <rect key={y} x="5" y={y} width="6" height="1" fill="#d8eef6" />
+              {/* o mar, no sul (onde fica o Porto), com ondinhas */}
+              <path d="M0 196 Q80 188 160 196 Q240 204 320 194 V220 H0 Z" fill="#7ab0c8" shapeRendering="auto" />
+              {[30, 90, 230, 290].map((x) => (
+                <rect key={x} x={x} y="206" width="9" height="1" fill="#d8eef6" />
               ))}
-              {[70, 130, 190, 250, 290].map((x) => (
-                <rect key={x} x={x} y="212" width="7" height="1" fill="#d8eef6" />
-              ))}
-              {/* o rio Tibre, do norte até o mar */}
-              <path d="M150 0 Q130 40 140 70 Q150 100 110 110 Q70 120 70 160 Q72 190 60 210" fill="none" stroke="#7ab0c8" strokeWidth="6" shapeRendering="auto" />
-              {/* os morros e as casinhas da cidade */}
+              {/* morros e bosques, só nos cantos (longe das estradas) */}
+              <ellipse cx="160" cy="26" rx="34" ry="12" fill="#cfc492" shapeRendering="auto" />
+              <ellipse cx="28" cy="120" rx="20" ry="26" fill="#cfc492" shapeRendering="auto" />
+              <ellipse cx="292" cy="120" rx="20" ry="26" fill="#cfc492" shapeRendering="auto" />
               {[
-                [240, 20, 26, 12],
-                [180, 70, 22, 10],
-                [90, 150, 20, 10],
-                [290, 130, 20, 12],
-              ].map(([x, y, w, h], k) => (
-                <ellipse key={k} cx={x} cy={y} rx={w} ry={h} fill="#c8c08a" shapeRendering="auto" />
+                [150, 22],
+                [164, 20],
+                [24, 112],
+                [32, 126],
+                [288, 110],
+                [298, 128],
+              ].map(([x, y], k) => (
+                <rect key={k} x={x} y={y} width="5" height="5" fill="#8aa05a" />
               ))}
-              {Array.from({ length: 26 }, (_, k) => {
-                const x = 60 + ((k * 47) % 230);
-                const y = 20 + ((k * 31) % 170);
-                return <rect key={k} x={x} y={y} width="5" height="4" fill="#b88a5a" opacity="0.55" />;
-              })}
-              {/* o Aqueduto (arcos no norte) */}
-              {[0, 1, 2, 3, 4, 5].map((k) => (
-                <rect key={k} x={140 + k * 8} y="34" width="3" height="10" fill="#9a7a5a" />
-              ))}
-              <rect x="138" y="31" width="48" height="3" fill="#9a7a5a" />
+
+              {/* o anel do Ludus: no capítulo 3, as três estradas passam por ele */}
+              <ellipse cx={COLISEU[0]} cy={COLISEU[1]} rx={RAIO_LUDUS} ry={RAIO_LUDUS} fill="none" stroke="#c8962a" strokeWidth="2" strokeDasharray="3 3" shapeRendering="auto" />
+              <text x={COLISEU[0] + RAIO_LUDUS * 0.72} y={COLISEU[1] + RAIO_LUDUS * 0.72 + 8} textAnchor="middle" fontSize="6.5" className="font-pixel" fill="#8a5a1a">
+                LUDUS
+              </text>
 
               {/* as estradas (pontilhadas; pintadas até onde você chegou) */}
               {IAS.map((ia) => {
@@ -163,49 +155,57 @@ export function LinhaDoTempo({ saves, segredos }: { saves: SaveHistoria[]; segre
                       y1={y1}
                       x2={x2}
                       y2={y2}
-                      stroke={feito ? cor : '#8a6a4a'}
-                      strokeWidth={feito ? 3 : 2}
-                      strokeDasharray={feito ? undefined : '4 3'}
+                      stroke={feito ? cor : '#a08060'}
+                      strokeWidth={feito ? 3.5 : 2.5}
+                      strokeDasharray={feito ? undefined : '5 3'}
+                      strokeLinecap="round"
                       shapeRendering="auto"
-                      opacity={feito ? 1 : 0.8}
                     />
                   );
                 });
               })}
 
-              {/* os lugares de onde cada um sai */}
+              {/* o nome do lugar de onde cada um sai */}
               {IAS.map((ia) => {
                 const [x, y] = PONTOS[ia][0]!;
-                const o = ORIGEM[ia];
+                const sul = ia === 'chatgpt';
                 return (
-                  <text key={ia} x={x} y={y - 9} textAnchor="middle" fontSize="7" className="font-pixel" fill="#3a2410">
-                    {o.nome}
+                  <text
+                    key={ia}
+                    x={sul ? x + 10 : x}
+                    y={sul ? y + 3 : y - 10}
+                    textAnchor={sul ? 'start' : 'middle'}
+                    fontSize="7.5"
+                    className="font-pixel"
+                    fill="#3a2410"
+                  >
+                    {ORIGEM[ia].nome}
                   </text>
                 );
               })}
-              {/* o Ludus (onde os caminhos se cruzam) */}
-              <text x="120" y="146" textAnchor="middle" fontSize="6.5" className="font-pixel" fill="#3a2410">
-                LUDUS
-              </text>
 
-              {/* o Coliseu no centro */}
-              <ellipse cx={COLISEU[0]} cy={COLISEU[1]} rx="20" ry="12" fill="#c8a070" stroke="#5a3a1a" strokeWidth="2" shapeRendering="auto" />
-              <ellipse cx={COLISEU[0]} cy={COLISEU[1]} rx="11" ry="6" fill="#e6c890" shapeRendering="auto" />
-              {[-14, -7, 0, 7, 14].map((dx) => (
-                <rect key={dx} x={COLISEU[0] + dx - 1} y={COLISEU[1] - 11} width="2" height="3" fill="#5a3a1a" />
+              {/* o Coliseu no centro, com a grade do segredo no chão da arena */}
+              <ellipse cx={COLISEU[0]} cy={COLISEU[1]} rx="19" ry="13" fill="#c8a070" stroke="#5a3a1a" strokeWidth="2" shapeRendering="auto" />
+              {[-13, -6.5, 0, 6.5, 13].map((dx) => (
+                <rect key={dx} x={COLISEU[0] + dx - 1} y={COLISEU[1] - 12} width="2" height="3" fill="#5a3a1a" />
               ))}
-              <text x={COLISEU[0]} y={COLISEU[1] - 16} textAnchor="middle" fontSize="7" className="font-pixel" fill="#3a2410">
+              <ellipse cx={COLISEU[0]} cy={COLISEU[1] + 1} rx="10" ry="6" fill="#e6c890" shapeRendering="auto" />
+              <g role="button" tabIndex={0} aria-label="A grade debaixo da arena" onClick={() => escolher({ segredo: true })} className="cursor-pointer">
+                <rect x={COLISEU[0] - 4} y={COLISEU[1] - 2} width="8" height="6" fill={secretoFeito ? '#f2c14e' : temChave ? '#7ad0ff' : '#5a4a3a'} stroke="#1a0e06" />
+                {[0, 2, 4, 6].map((dx) => (
+                  <rect key={dx} x={COLISEU[0] - 3.5 + dx} y={COLISEU[1] - 1} width="0.8" height="4" fill="#1a0e06" />
+                ))}
+              </g>
+              <text x={COLISEU[0]} y={COLISEU[1] - 16} textAnchor="middle" fontSize="7.5" className="font-pixel" fill="#3a2410">
                 COLISEU
               </text>
 
-              {/* os pontos de cada capítulo */}
+              {/* os pontos de cada capítulo (o número; apagado se ainda não chegou) */}
               {IAS.map((ia) =>
                 PONTOS[ia].map(([x, y], k) => {
                   const n = k + 1;
-                  // O Ludus é um ponto só para os três: desenha um, mas cada um com o seu anel.
                   const st = estado(ia, n);
                   const cor = `rgb(${PERSONAGENS[ia].cor})`;
-                  const desloca = n === 3 ? (IAS.indexOf(ia) - 1) * 9 : 0;
                   return (
                     <g
                       key={`${ia}-${n}`}
@@ -215,25 +215,16 @@ export function LinhaDoTempo({ saves, segredos }: { saves: SaveHistoria[]; segre
                       onClick={() => escolher({ ia, n })}
                       onKeyDown={(ev) => (ev.key === 'Enter' || ev.key === ' ') && escolher({ ia, n })}
                       className={`cursor-pointer ${st === 'aqui' ? 'mapa-aqui' : ''}`}
-                      style={{ transformOrigin: `${x + desloca}px ${y}px` }}
+                      style={{ transformOrigin: `${x}px ${y}px` }}
                     >
-                      <circle cx={x + desloca} cy={y} r="6.5" fill={st === 'nao' ? '#d8c8a0' : cor} stroke={st === 'aqui' ? '#fff' : '#3a2410'} strokeWidth={st === 'aqui' ? 2 : 1.4} shapeRendering="auto" />
-                      <text x={x + desloca} y={y + 2.6} textAnchor="middle" fontSize="7" className="font-pixel" fill={st === 'nao' ? '#8a6a4a' : '#1a0e06'}>
-                        {st === 'nao' ? '?' : st === 'feito' ? '✓' : n}
+                      <circle cx={x} cy={y} r="5.6" fill={st === 'nao' ? '#e6d6ae' : cor} stroke={st === 'aqui' ? '#ffffff' : st === 'nao' ? '#a08060' : '#3a2410'} strokeWidth={st === 'aqui' ? 1.8 : 1.2} shapeRendering="auto" />
+                      <text x={x} y={y + 2.4} textAnchor="middle" fontSize="6.5" className="font-pixel" fill={st === 'nao' ? '#a08060' : '#1a0e06'}>
+                        {st === 'feito' ? '✓' : n}
                       </text>
                     </g>
                   );
                 }),
               )}
-
-              {/* a grade do segredo, debaixo da arena */}
-              <g role="button" tabIndex={0} aria-label="A grade debaixo da arena" onClick={() => escolher({ segredo: true })} className="cursor-pointer">
-                <rect x={COLISEU[0] - 6} y={COLISEU[1] + 14} width="12" height="7" fill={secretoFeito ? '#f2c14e' : temChave ? '#7ad0ff' : '#5a4a3a'} stroke="#1a0e06" />
-                {[0, 3, 6, 9].map((dx) => (
-                  <rect key={dx} x={COLISEU[0] - 5 + dx} y={COLISEU[1] + 15} width="1" height="5" fill="#1a0e06" />
-                ))}
-              </g>
-
               {/* a rosa dos ventos */}
               <g transform="translate(296 186)">
                 <rect x="-1" y="-9" width="2" height="18" fill="#5a3a1a" />
