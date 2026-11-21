@@ -1402,3 +1402,110 @@
 @media (prefers-reduced-motion: reduce) {
   .orbita-recurso, .muralha-livros, .esquiva-rolar, .esquiva-lampejo, .visao-proxima, .rede-cai, .eclipse-tela, .corte-faixa, .corte-heroi, .corte-nome, .recurso-cheio { animation: none; }
 }
+
+/* A linha do tempo da História: o capítulo onde você está pulsa. */
+.linha-aqui { animation: linha-aqui 1.4s ease-in-out infinite; }
+@keyframes linha-aqui {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242, 193, 78, 0); }
+  50% { box-shadow: 0 0 10px 1px rgba(242, 193, 78, 0.55); }
+}
+@media (prefers-reduced-motion: reduce) { .linha-aqui { animation: none; } }
+
+/* ---------- Botões do modo História (refeitos em 22/11/2026, o Lucas não gostou dos quadrados) ----------
+   Pedra escura com moldura de bronze em relevo; afundam quando você aperta. */
+[data-area='coliseu'] button.pixel-box,
+[data-area='coliseu'] a.pixel-box {
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 7px),
+    linear-gradient(180deg, #3a2a1e 0%, #241812 60%, #1a100a 100%);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 214, 140, 0.22),
+    inset -2px -3px 0 rgba(0, 0, 0, 0.55),
+    0 -3px 0 0 #8a6428,
+    0 3px 0 0 #5a3e16,
+    -3px 0 0 0 #8a6428,
+    3px 0 0 0 #6a4a1c,
+    0 6px 0 0 rgba(0, 0, 0, 0.45);
+  transition: translate 80ms, filter 120ms;
+}
+[data-area='coliseu'] button.pixel-box:hover:not(:disabled),
+[data-area='coliseu'] button.pixel-box:focus-visible {
+  filter: brightness(1.18) drop-shadow(0 0 6px rgba(242, 193, 78, 0.45));
+}
+[data-area='coliseu'] button.pixel-box:active:not(:disabled) {
+  translate: 0 3px;
+  box-shadow:
+    inset 2px 3px 0 rgba(0, 0, 0, 0.5),
+    0 -3px 0 0 #8a6428,
+    0 3px 0 0 #5a3e16,
+    -3px 0 0 0 #8a6428,
+    3px 0 0 0 #6a4a1c;
+}
+[data-area='coliseu'] button.pixel-box:disabled { filter: grayscale(0.7) brightness(0.7); }
+
+/* Os botões da luta: um medalhão de bronze com o ícone, na cor da ação (--cor). */
+.botao-luta {
+  position: relative;
+  overflow: hidden;
+}
+.botao-luta::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--cor, #f2c14e);
+  box-shadow: 0 0 8px var(--cor, #f2c14e);
+}
+.medalhao {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.35), transparent 45%), radial-gradient(circle, var(--cor, #f2c14e) 0%, color-mix(in srgb, var(--cor, #f2c14e) 45%, #1a100a) 75%);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 0 0 2px #c8962a, 0 2px 0 2px #5a3e16;
+}
+@media (min-width: 640px) {
+  .medalhao { width: 3.4rem; height: 3.4rem; }
+}
+.botao-luta:active:not(:disabled) .medalhao { scale: 0.9; }
+.botao-luta.pronto .medalhao { animation: medalhao-pronto 0.9s ease-in-out infinite; }
+@keyframes medalhao-pronto {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 0 0 2px #c8962a, 0 0 0 0 var(--cor); }
+  50% { box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45), 0 0 0 2px #ffe08a, 0 0 18px 4px var(--cor); }
+}
+@media (prefers-reduced-motion: reduce) { .botao-luta.pronto .medalhao { animation: none; } }
+
+/* As placas dos pontos para explorar: pergaminho com uma setinha. */
+.placa-ponto {
+  position: relative;
+  background: linear-gradient(180deg, #f4e2b4, #d8bc80);
+  color: #3a2410;
+  box-shadow: 0 0 0 2px #5a3414, 0 3px 0 2px rgba(0, 0, 0, 0.45);
+}
+.placa-ponto::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  translate: -50% 0;
+  border: 5px solid transparent;
+  border-top-color: #5a3414;
+}
+.placa-ponto.vista { filter: grayscale(0.8) brightness(0.75); }
+.placa-ponto.nova { animation: placa-chama 1.2s ease-in-out infinite; }
+@keyframes placa-chama {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -3px; }
+}
+@media (prefers-reduced-motion: reduce) { .placa-ponto.nova { animation: none; } }
+/* O gladiador que está lutando agora (troca do capítulo secreto): brilho dourado, sem parecer desligado. */
+[data-area='coliseu'] button.pixel-box.troca-ativa:disabled { filter: none; outline: 3px solid #f2c14e; outline-offset: 3px; }
+
+/* Cutscenes mais fluidas (22/11/2026): troca de lugar escurece e clareia; a caixa de texto desliza. */
+.troca-plano { animation: troca-plano 0.55s ease-out both; }
+@keyframes troca-plano { from { opacity: 1; } to { opacity: 0; } }
+.caixa-cutscene { animation: caixa-cutscene 0.25s ease-out; }
+@keyframes caixa-cutscene { from { translate: 0 6px; opacity: 0.6; } to { translate: 0 0; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .troca-plano, .caixa-cutscene { animation: none; opacity: 0; } .caixa-cutscene { opacity: 1; } }
+.menos-movimento .troca-plano { animation: none; opacity: 0; }

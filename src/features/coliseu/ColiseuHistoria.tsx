@@ -11,6 +11,7 @@ import { tocar } from '@/ui/somHistoria';
 import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { CenarioHistoria } from './Cenarios';
 import { Portoes } from './Portoes';
+import { LinhaDoTempo } from './LinhaDoTempo';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
@@ -144,7 +145,6 @@ export default function ColiseuHistoria() {
                 setTela({ tipo: 'prologo' });
               }}
               className="pixel-box pixel-hover flex items-center justify-center gap-3 py-4 font-pixel text-sm text-[#f2c14e] sm:text-base"
-              style={{ boxShadow: '0 0 0 3px #c8962a' }}
             >
               ➕ NOVA HISTÓRIA
             </button>
@@ -175,6 +175,9 @@ export default function ColiseuHistoria() {
                 </ul>
               </>
             )}
+
+            {/* A linha do tempo: os três caminhos lado a lado, onde se cruzam, e o final de verdade */}
+            <LinhaDoTempo saves={p.historia ?? []} segredos={p.historiaSegredos} />
           </section>
         )}
 

@@ -898,16 +898,14 @@ export function LutaHistoria({
               ev.preventDefault();
               apertar(acao);
             }}
-            className={`pixel-box flex select-none flex-col items-center gap-0.5 py-3 active:translate-y-0.5 disabled:opacity-35 sm:py-4 ${acao === 'especial' && cheio ? 'piscar' : ''}`}
-            style={{ boxShadow: `0 0 0 2px ${cor}` }}
+            className={`pixel-box botao-luta flex select-none flex-col items-center gap-1 pb-2 pt-3 disabled:opacity-40 sm:pb-3 sm:pt-4 ${acao === 'especial' && cheio ? 'pronto' : ''}`}
+            style={{ '--cor': cor } as CSSProperties}
             aria-label={nome}
           >
-            <span className="text-2xl sm:text-3xl" aria-hidden>
+            <span className="medalhao text-xl sm:text-3xl" aria-hidden>
               {icone}
             </span>
-            <span className="font-pixel text-[7px] sm:text-[9px]" style={{ color: cor }}>
-              {nome}
-            </span>
+            <span className="font-pixel text-[7px] text-[#f4e2b4] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{nome}</span>
           </button>
         ))}
       </div>
@@ -923,8 +921,8 @@ export function LutaHistoria({
                 ev.preventDefault();
                 trocarRef.current(q);
               }}
-              className="pixel-box flex select-none items-center justify-center gap-2 py-2 font-pixel text-[8px] disabled:opacity-100 sm:text-[10px]"
-              style={{ boxShadow: q === heroi ? '0 0 0 3px #f2c14e' : '0 0 0 1px #555', opacity: q === heroi ? 1 : 0.75 }}
+              className={`pixel-box flex select-none items-center justify-center gap-2 py-2 font-pixel text-[8px] sm:text-[10px] ${q === heroi ? 'troca-ativa text-[#f2c14e]' : 'text-[#f4e2b4]'}`}
+              style={{ opacity: q === heroi ? 1 : 0.85 }}
               aria-label={`Trocar para ${NOMES[q]}`}
             >
               <span className="w-6 sm:w-8" aria-hidden>

@@ -103,26 +103,47 @@ function Poeira() {
  * Um personagem na cutscene: entra, anda de `de` até `x` (marchando e virado
  * para onde vai, levantando poeira) e depois fica respirando ou com o efeito dele.
  */
-function Ator({ p }: { p: EmCena }) {
+function Ator({ p, falando, outrosFalam }: { p: EmCena; falando?: boolean; outrosFalam?: boolean }) {
   const anda = p.de !== undefined && p.de !== p.x && !prefereMenosMovimento();
-  const dur = anda ? Math.abs(p.x - (p.de ?? p.x)) * MS_POR_PASSO : 0;
   const [pos, setPos] = useState(anda ? (p.de ?? p.x) : p.x);
   const [andando, setAndando] = useState(anda);
+  const [dur, setDur] = useState(anda ? Math.abs(p.x - (p.de ?? p.x)) * MS_POR_PASSO : 0);
+  const [indo, setIndo] = useState<'esq' | 'dir'>(anda && (p.de ?? 0) > p.x ? 'esq' : 'dir');
+  const posRef = useRef(pos);
+  // Anda até `x` (no começo, vindo de `de`; e depois, sempre que o próximo quadro mudar a posição dele).
   useEffect(() => {
-    if (!anda) return;
-    const a = window.setTimeout(() => setPos(p.x), 40);
-    const b = window.setTimeout(() => setAndando(false), dur + 60);
+    const de = posRef.current;
+    if (de === p.x || prefereMenosMovimento()) {
+      setPos(p.x);
+      posRef.current = p.x;
+      return;
+    }
+    const d = Math.abs(p.x - de) * MS_POR_PASSO;
+    setDur(d);
+    setIndo(de > p.x ? 'esq' : 'dir');
+    setAndando(true);
+    const a = window.setTimeout(() => {
+      setPos(p.x);
+      posRef.current = p.x;
+    }, 40);
+    const b = window.setTimeout(() => setAndando(false), d + 60);
     return () => {
       window.clearTimeout(a);
       window.clearTimeout(b);
     };
-  }, []);
+  }, [p.x]);
   // Anda virado para onde vai; parado, fica como o roteiro pediu.
-  const espelhar = andando ? (p.de ?? 0) > p.x : p.espelhar;
+  const espelhar = andando ? indo === 'esq' : p.espelhar;
   return (
     <div
       className="absolute bottom-[12%] z-10 -translate-x-1/2"
-      style={{ left: `${pos}%`, width: `${p.tamanho ?? 14}%`, transition: anda ? `left ${dur}ms linear` : undefined }}
+      style={{
+        left: `${pos}%`,
+        width: `${p.tamanho ?? 14}%`,
+        transition: `left ${dur}ms linear, filter 300ms`,
+        // Quem fala fica em destaque; os outros, um pouco no escuro.
+        filter: outrosFalam ? 'brightness(0.62) saturate(0.8)' : falando ? 'drop-shadow(0 0 6px rgba(242,193,78,0.55))' : undefined,
+      }}
       aria-hidden
     >
       <div className={`relative ${p.entrada ? ENTRADA[p.entrada] : ''}`}>
@@ -146,10 +167,23 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
   const [i, setI] = useState(0);
   const q = quadros[i];
   const [mostrado, completo, completar] = useDigitando(q?.texto ?? '', i, q?.quem);
+  // AUTO: a cena segue sozinha depois de ler (fica lembrado neste aparelho).
+  const [auto, setAuto] = useState(() => {
+    try {
+      return localStorage.getItem('coliseu.cutscene.auto') === '1';
+    } catch {
+      return false;
+    }
+  });
   useEffect(() => {
     if (!q) onFim();
     else if (q.som) tocar(q.som);
   }, [q]);
+  useEffect(() => {
+    if (!auto || !completo || !q) return;
+    const id = window.setTimeout(() => setI((n) => n + 1), 1400 + q.texto.length * 22);
+    return () => window.clearTimeout(id);
+  }, [auto, completo, i]);
   if (!q) return null;
   const seguir = () => {
     desbloquear();
@@ -159,17 +193,25 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
   };
   const elenco: EmCena[] = q.personagens ?? (q.quem && q.quem !== 'narrador' && q.quem !== 'arauto' && q.quem !== 'povo' ? [{ quem: q.quem, x: 50, entrada: 'surgir' }] : []);
   const titulo = q.lugar === 'titulo';
+  // Quadros seguidos no mesmo lugar são um "plano" só: o cenário e a câmera continuam
+  // (antes, tudo recomeçava a cada fala). Trocou de lugar: a tela escurece e clareia.
+  let plano = i;
+  while (plano > 0 && quadros[plano - 1]!.lugar === q.lugar) plano--;
+  const efeitoPlano = quadros.slice(plano, i + 1).reduce<Quadro['efeito']>((ef, x) => (x.efeito === 'zoom' || x.efeito === 'panoramica' ? x.efeito : ef), undefined);
+  const variosEmCena = elenco.length > 1 && !!q.quem;
   return (
     <div className="flex flex-col gap-2">
     <div className={`pixel-box palco-historia relative w-full overflow-hidden ${q.efeito === 'tremor' ? 'tremer-forte' : ''}`}>
-      {/* o cenário, se aproximando devagar */}
-      <div key={`bg-${i}`} className={`absolute inset-0 ${q.efeito === 'zoom' ? 'cena-aproxima' : q.efeito === 'panoramica' ? 'cena-panorama' : 'cena-respira'}`}>
+      {/* o cenário, com a câmera se mexendo devagar durante o plano inteiro */}
+      <div key={`bg-${plano}`} className={`absolute inset-0 ${efeitoPlano === 'zoom' ? 'cena-aproxima' : efeitoPlano === 'panoramica' ? 'cena-panorama' : 'cena-respira'}`}>
         <CenarioHistoria lugar={q.lugar} />
       </div>
-      {/* os personagens em cena */}
+      {/* os personagens em cena (quem continua no quadro seguinte anda até o novo lugar) */}
       {elenco.map((p, k) => (
-        <Ator key={`${i}-${k}-${p.quem}`} p={p} />
+        <Ator key={`${plano}-${p.quem}-${elenco.slice(0, k).filter((x) => x.quem === p.quem).length}`} p={p} falando={p.quem === q.quem} outrosFalam={variosEmCena && p.quem !== q.quem} />
       ))}
+      {/* troca de lugar: escurece e clareia */}
+      <div key={`fade-${plano}`} className="troca-plano pointer-events-none absolute inset-0 z-[16] bg-black" aria-hidden />
       {/* efeitos */}
       {q.efeito === 'clarao' && <div key={`fx-${i}`} className="clarao pointer-events-none absolute inset-0 z-20 bg-white" />}
       {q.efeito === 'escuro' && <div className="pointer-events-none absolute inset-0 z-[5] bg-[radial-gradient(circle,transparent_30%,rgba(0,0,0,0.85))]" />}
@@ -196,16 +238,45 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
           <span className="piscar mt-4 font-pixel text-[8px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
         </button>
       )}
-      <button type="button" onClick={onFim} className="absolute right-2 top-[8%] z-30 bg-black/60 px-2 py-1 font-pixel text-[8px] text-white/70 hover:text-white">
-        PULAR ▶▶
-      </button>
+      <div className="absolute right-2 top-[8%] z-30 flex gap-1">
+        <button
+          type="button"
+          onClick={() => {
+            const novo = !auto;
+            setAuto(novo);
+            try {
+              localStorage.setItem('coliseu.cutscene.auto', novo ? '1' : '0');
+            } catch {
+              /* sem armazenamento: vale só agora */
+            }
+          }}
+          aria-pressed={auto}
+          className={`px-2 py-1 font-pixel text-[8px] ${auto ? 'bg-[#f2c14e] text-black' : 'bg-black/60 text-white/70 hover:text-white'}`}
+        >
+          AUTO {auto ? '●' : '○'}
+        </button>
+        <button type="button" onClick={onFim} className="bg-black/60 px-2 py-1 font-pixel text-[8px] text-white/70 hover:text-white">
+          PULAR ▶▶
+        </button>
+      </div>
+      {/* a barrinha do progresso da cena */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[17] h-[3px] bg-white/10" aria-hidden>
+        <div className="h-full bg-[#c8962a] transition-[width] duration-500" style={{ width: `${((i + 1) / quadros.length) * 100}%` }} />
+      </div>
     </div>
-    {/* O texto fica embaixo da cena, para não cobrir os personagens */}
+    {/* O texto fica embaixo da cena, para não cobrir os personagens; com o retrato de quem fala */}
     {!titulo && (
-      <button type="button" autoFocus onClick={seguir} className="w-full border-2 border-[#c8962a] bg-black/85 p-3 text-center">
-        {q.quem && NOMES[q.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[q.quem].toUpperCase()}</span>}
-        <span className="block min-h-[3.9em] text-sm leading-snug text-white sm:min-h-[2.6em] sm:text-lg">{mostrado}</span>
-        <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>TOQUE PARA SEGUIR ▶</span>
+      <button key={`caixa-${i}`} type="button" autoFocus onClick={seguir} className="caixa-cutscene flex w-full items-center gap-3 border-2 border-[#c8962a] bg-black/85 p-3 text-left">
+        {q.quem && q.quem !== 'narrador' && q.quem !== 'povo' && (
+          <span key={q.quem} className="surgir w-12 shrink-0 sm:w-16" aria-hidden>
+            <Retrato quem={q.quem} />
+          </span>
+        )}
+        <span className={`min-w-0 flex-1 ${q.quem && q.quem !== 'narrador' ? '' : 'text-center'}`}>
+          {q.quem && NOMES[q.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[q.quem].toUpperCase()}</span>}
+          <span className={`block min-h-[3.9em] text-sm leading-snug sm:min-h-[2.6em] sm:text-lg ${q.quem ? 'text-white' : 'italic text-white/90'}`}>{mostrado}</span>
+          <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>{auto ? 'AUTO ●' : 'TOQUE PARA SEGUIR ▶'}</span>
+        </span>
       </button>
     )}
     </div>
@@ -276,7 +347,7 @@ export function Explorar({
               </span>
             )}
             <span
-              className={`mt-1 block max-w-[30vw] border-2 bg-black/80 px-1.5 py-0.5 text-center font-pixel text-[7px] leading-tight sm:max-w-none sm:whitespace-nowrap sm:text-[9px] ${vistos.includes(p.id) ? 'border-white/30 text-white/60' : `border-[#f2c14e] text-white ${p.obrigatorio ? 'animate-pulse' : ''}`}`}
+              className={`placa-ponto mt-1 block max-w-[30vw] px-1.5 py-0.5 text-center font-pixel text-[7px] leading-tight sm:max-w-none sm:whitespace-nowrap sm:text-[9px] ${vistos.includes(p.id) ? "vista" : p.obrigatorio ? "nova" : ""}`}
             >
               {p.icone} {p.rotulo}
             </span>
