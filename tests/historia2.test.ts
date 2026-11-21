@@ -1,7 +1,14 @@
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, ATRIBUTOS_INICIAIS, novaLuta, passoLuta, type EstadoLuta } from '@/game/historia/luta';
 import { aprender, atributosDoSave, CAMINHOS_ABERTOS, criarSave, forjar, ganharEquipamento, ganharPecas, treinar, treinoFeito } from '@/game/historia/saves';
-import { CAPITULOS } from '@/game/historia/roteiro';
+import { CAPITULOS, cenaValida, proximaCena, type Capitulo } from '@/game/historia/roteiro';
+
+/** Todas as versões do capítulo (uma por opção da escolha, se ele tiver uma escolha). */
+function versoes(cap: Capitulo): Record<string, string>[] {
+  const escolha = cap.cenas.find((c) => c.tipo === 'escolha');
+  if (!escolha || escolha.tipo !== 'escolha') return [{}];
+  return escolha.opcoes.map((o) => ({ [escolha.id]: o.valor }));
+}
 
 const fixo = () => 0;
 function ateSinal(s: EstadoLuta, a = ATRIBUTOS_INICIAIS): EstadoLuta {
@@ -99,11 +106,41 @@ describe('os capítulos', () => {
   });
 
   it('nunca duas lutas seguidas sem nada no meio (pedido do Lucas)', () => {
+    // Em capítulos com ESCOLHA, cada rota é conferida separada (só as cenas daquela rota).
     for (const cap of [...CAPITULOS.claude, ...CAPITULOS.chatgpt]) {
-      cap.cenas.forEach((c, k) => {
-        if (k > 0 && c.tipo === 'luta') expect(cap.cenas[k - 1]!.tipo, `${cap.titulo}: ${c.id}`).not.toBe('luta');
-      });
+      for (const esc of versoes(cap)) {
+        const cenas = cap.cenas.filter((c) => cenaValida(c, esc));
+        cenas.forEach((c, k) => {
+          if (k > 0 && c.tipo === 'luta') expect(cenas[k - 1]!.tipo, `${cap.titulo}: ${c.id}`).not.toBe('luta');
+        });
+      }
     }
+  });
+
+  it('a escolha de rota do Octavius: cada rota tem 3 lutas próprias, depois o cofre e o Cobrador', () => {
+    const cap = CAPITULOS.chatgpt[3]!;
+    expect(cap.titulo).toBe('O Mercado das Engrenagens');
+    for (const esc of versoes(cap)) {
+      const lutas = cap.cenas.filter((c) => cenaValida(c, esc) && c.tipo === 'luta');
+      expect(lutas).toHaveLength(5);
+      expect(lutas[4]).toMatchObject({ inimigo: 'cobrador' });
+    }
+    // Andando de cena em cena pela rota do esgoto, nunca passa por uma luta dos telhados.
+    const esc = { 'o4-rota': 'esgoto' };
+    const vistas: string[] = [];
+    for (let i = proximaCena(cap, -1, esc); i < cap.cenas.length; i = proximaCena(cap, i, esc)) vistas.push(cap.cenas[i]!.id);
+    expect(vistas).toContain('o4-b2');
+    expect(vistas).not.toContain('o4-a1');
+    expect(vistas).not.toContain('o4-c1');
+  });
+
+  it('o caminho do Octavius está completo: 6 capítulos e o final, com o Caio e o titã', () => {
+    const caps = CAPITULOS.chatgpt;
+    expect(caps.map((c) => c.numero)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    const chefes = caps.flatMap((c) => c.cenas).flatMap((c) => (c.tipo === 'luta' && INIMIGOS[c.inimigo]!.chefao ? [c.inimigo] : []));
+    expect(chefes).toEqual(['almirante-ferrugem', 'feitor-tambor', 'cobrador', 'almirante-aco', 'leviata', 'censor-tita-octavius']);
+    const desafios = caps.flatMap((c) => c.cenas).flatMap((c) => (c.tipo === 'desafio' ? [c.desafio] : []));
+    expect(desafios).toEqual(expect.arrayContaining(['perseguicao', 'canhoes', 'estrelas', 'barcos']));
   });
 
   it('os desafios novos aparecem: furtivo, ritmo, proteger a Lívia e as armadilhas', () => {

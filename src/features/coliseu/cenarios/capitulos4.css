@@ -1,0 +1,613 @@
+/*
+ * Animações de ambiente dos cenários do quarto bloco de capítulos (320 × 180): o caminho do Octavius
+ * pela Subura, pelo mar e pelo Coliseu inundado.
+ * Toda classe e todo keyframe começam com "c4-" para não colidir com o resto do jogo.
+ * Atenção: animar opacity num elemento sobrescreve o atributo opacity dele;
+ * por isso as classes que mexem em opacity vão em grupos (<g>) ou em retângulos sem opacity própria.
+ * Nos elementos de SVG, px nas transformações vale como unidade do desenho.
+ */
+
+/* Halo de luz respirando devagar */
+.c4-pulsar {
+  animation: c4-pulsar 2.6s ease-in-out infinite alternate;
+}
+@keyframes c4-pulsar {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Olho do Censor brilhando */
+.c4-olho {
+  animation: c4-olho 2.4s steps(3) infinite alternate;
+}
+@keyframes c4-olho {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Estandarte ondulando */
+.c4-bandeira {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c4-bandeira 3.2s steps(4) infinite alternate;
+}
+@keyframes c4-bandeira {
+  from {
+    transform: skewX(-3deg);
+  }
+  to {
+    transform: skewX(3deg);
+  }
+}
+
+/* Engrenagens girando (a origem vem no estilo, em unidades do desenho) */
+.c4-gira {
+  animation: c4-gira 12s steps(48) infinite;
+}
+@keyframes c4-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Lanterna (ou rabo de gato) balançando pendurada pelo topo */
+.c4-balancar {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c4-balancar 3.2s ease-in-out infinite alternate;
+}
+@keyframes c4-balancar {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+/* Pássaros cruzando o céu, subindo e descendo */
+.c4-passaro {
+  animation: c4-passaro 20s linear infinite;
+}
+@keyframes c4-passaro {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(90px, -5px);
+  }
+  50% {
+    transform: translate(180px, 3px);
+  }
+  75% {
+    transform: translate(270px, -4px);
+  }
+  100% {
+    transform: translate(370px, 2px);
+  }
+}
+
+/* Asas batendo (vira de cabeça para baixo pela base) */
+.c4-asa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c4-asa 0.35s steps(1) infinite;
+}
+@keyframes c4-asa {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(-1);
+  }
+}
+
+/* Fumaça de chaminé (e de navio) subindo devagar e sumindo */
+.c4-fumaca {
+  opacity: 0;
+  animation: c4-fumaca 5s steps(20) infinite;
+}
+@keyframes c4-fumaca {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(7px, -30px);
+    opacity: 0;
+  }
+}
+
+/* Vapor de cano e de caldeirão: sobe rápido e some logo */
+.c4-vapor {
+  opacity: 0;
+  animation: c4-vapor 2.8s steps(14) infinite;
+}
+@keyframes c4-vapor {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(2px, -16px);
+    opacity: 0;
+  }
+}
+
+/* Gente da multidão mexendo a cabeça */
+.c4-multidao {
+  animation: c4-multidao 1.4s steps(1) infinite;
+}
+@keyframes c4-multidao {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Passante andando de um lado para o outro ao fundo */
+.c4-andar {
+  animation: c4-andar 14s steps(40) infinite alternate;
+}
+@keyframes c4-andar {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(40px);
+  }
+}
+
+/* Pombo bicando o chão de vez em quando */
+.c4-pombo {
+  animation: c4-pombo 4s steps(1) infinite;
+}
+@keyframes c4-pombo {
+  0%,
+  60% {
+    transform: translate(0, 0);
+  }
+  62% {
+    transform: translate(0, 1px);
+  }
+  70% {
+    transform: translate(0, 0);
+  }
+  74% {
+    transform: translate(0, 1px);
+  }
+  80% {
+    transform: translate(1px, 0);
+  }
+  100% {
+    transform: translate(1px, 0);
+  }
+}
+
+/* Roupa no varal e tecidos pendurados balançando no vento */
+.c4-roupa {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c4-roupa 2.4s steps(3) infinite alternate;
+}
+@keyframes c4-roupa {
+  from {
+    transform: skewX(-6deg);
+  }
+  to {
+    transform: skewX(6deg);
+  }
+}
+
+/* Chama: estica para cima a partir da base, em dois passos (retrô) */
+.c4-chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c4-chama 0.5s steps(2) infinite alternate;
+}
+@keyframes c4-chama {
+  from {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9, 1.25);
+    opacity: 0.85;
+  }
+}
+
+/* Nuvens (ou fumaça da batalha) andando devagar */
+.c4-nuvem {
+  animation: c4-nuvem 40s steps(30) infinite alternate;
+}
+@keyframes c4-nuvem {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-24px);
+  }
+}
+
+/* Gota caindo do cano até o canal do esgoto (30 px abaixo) */
+.c4-gota {
+  animation: c4-gota 2.2s steps(16) infinite;
+}
+@keyframes c4-gota {
+  0%,
+  35% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  88% {
+    transform: translate(0, 29px);
+    opacity: 1;
+  }
+  90%,
+  100% {
+    transform: translate(0, 30px);
+    opacity: 0;
+  }
+}
+
+/* Ondinha na água quando a gota cai (mesmo ritmo da gota) */
+.c4-ondinha {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: c4-ondinha 2.2s steps(6) infinite;
+}
+@keyframes c4-ondinha {
+  0%,
+  88% {
+    transform: scaleX(0.3);
+    opacity: 0;
+  }
+  90% {
+    transform: scaleX(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1.6);
+    opacity: 0;
+  }
+}
+
+/* Olhos no escuro que piscam de vez em quando */
+.c4-piscar {
+  animation: c4-piscar 5s steps(1) infinite;
+}
+@keyframes c4-piscar {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0;
+  }
+  97% {
+    opacity: 1;
+  }
+}
+
+/* Feixe de luz entrando pela grade (ou sol na arena) */
+.c4-feixe {
+  animation: c4-feixe 5s ease-in-out infinite alternate;
+}
+@keyframes c4-feixe {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Rato correndo pela passarela, com paradas */
+.c4-rato {
+  animation: c4-rato 12s steps(36) infinite;
+}
+@keyframes c4-rato {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  45%,
+  60% {
+    transform: translateX(48px);
+  }
+  100% {
+    transform: translateX(96px);
+  }
+}
+
+/* Correnteza do esgoto: as listras andam 12 px (o espaço entre elas) e recomeçam */
+.c4-correnteza {
+  animation: c4-correnteza 1.2s steps(6) infinite;
+}
+@keyframes c4-correnteza {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(12px);
+  }
+}
+
+/* Coisas boiando levadas pela correnteza */
+.c4-boiando {
+  animation: c4-boiando 10s steps(50) infinite;
+}
+@keyframes c4-boiando {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(30px, 1px);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(60px, 0);
+    opacity: 0;
+  }
+}
+
+/* Brilho na água (reflexo da lua, do fogo, da luz da grade) */
+.c4-agua {
+  animation: c4-agua 1.8s steps(3) infinite alternate;
+}
+@keyframes c4-agua {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Faísca de brilho (moedas, água ao sol) que acende de vez em quando */
+.c4-brilho {
+  opacity: 0;
+  animation: c4-brilho 3.2s steps(1) infinite;
+}
+@keyframes c4-brilho {
+  0%,
+  78% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  84% {
+    opacity: 1;
+  }
+  90%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Barcos boiando, subindo e descendo */
+.c4-boiar {
+  animation: c4-boiar 2.6s steps(2) infinite alternate;
+}
+@keyframes c4-boiar {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(2px);
+  }
+}
+
+/* Estrelas miúdas piscando */
+.c4-estrela {
+  animation: c4-estrela 3s steps(3) infinite alternate;
+}
+@keyframes c4-estrela {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* Ondas miúdas */
+.c4-onda {
+  animation: c4-onda 2.4s steps(6) infinite alternate;
+}
+@keyframes c4-onda {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-8px, 1px);
+  }
+}
+
+/* Neblina rolando devagar sobre a água (duas camadas em sentidos opostos) */
+.c4-neblina {
+  animation: c4-neblina 24s ease-in-out infinite alternate;
+}
+@keyframes c4-neblina {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-28px);
+  }
+}
+.c4-neblina-volta {
+  animation: c4-neblina-volta 30s ease-in-out infinite alternate;
+}
+@keyframes c4-neblina-volta {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(22px);
+  }
+}
+
+/* Clarão do tiro de canhão (cada portinhola com seu atraso) */
+.c4-clarao {
+  opacity: 0;
+  animation: c4-clarao 4.2s steps(1) infinite;
+}
+@keyframes c4-clarao {
+  0% {
+    opacity: 1;
+  }
+  4% {
+    opacity: 0.6;
+  }
+  8%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Fumaça do tiro: aparece logo depois do clarão e vai se desfazendo (mesmo ritmo) */
+.c4-fumaca-canhao {
+  opacity: 0;
+  animation: c4-fumaca-canhao 4.2s steps(16) infinite;
+}
+@keyframes c4-fumaca-canhao {
+  0%,
+  3% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  8% {
+    transform: translate(0, 0);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translate(-8px, -10px);
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate(-14px, -16px);
+    opacity: 0;
+  }
+}
+
+/* Coluna d'água subindo onde a bala cai */
+.c4-respingo {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: c4-respingo 6s steps(8) infinite;
+}
+@keyframes c4-respingo {
+  0%,
+  60% {
+    transform: scaleY(0.1);
+    opacity: 0;
+  }
+  66% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scaleY(0.8);
+    opacity: 0.7;
+  }
+  90%,
+  100% {
+    transform: scaleY(0.3);
+    opacity: 0;
+  }
+}
+
+/* Panos acenando na plateia */
+.c4-aceno {
+  animation: c4-aceno 0.8s steps(1) infinite;
+}
+@keyframes c4-aceno {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(1px, -2px);
+  }
+}
+
+/* Menos movimento: tudo parado (fumaça fica visível e parada; clarões, respingos, gotas e brilhos somem) */
+.menos-movimento .c4-pulsar,
+.menos-movimento .c4-olho,
+.menos-movimento .c4-bandeira,
+.menos-movimento .c4-gira,
+.menos-movimento .c4-balancar,
+.menos-movimento .c4-passaro,
+.menos-movimento .c4-asa,
+.menos-movimento .c4-fumaca,
+.menos-movimento .c4-vapor,
+.menos-movimento .c4-multidao,
+.menos-movimento .c4-andar,
+.menos-movimento .c4-pombo,
+.menos-movimento .c4-roupa,
+.menos-movimento .c4-chama,
+.menos-movimento .c4-nuvem,
+.menos-movimento .c4-gota,
+.menos-movimento .c4-ondinha,
+.menos-movimento .c4-piscar,
+.menos-movimento .c4-feixe,
+.menos-movimento .c4-rato,
+.menos-movimento .c4-correnteza,
+.menos-movimento .c4-boiando,
+.menos-movimento .c4-agua,
+.menos-movimento .c4-brilho,
+.menos-movimento .c4-boiar,
+.menos-movimento .c4-estrela,
+.menos-movimento .c4-onda,
+.menos-movimento .c4-neblina,
+.menos-movimento .c4-neblina-volta,
+.menos-movimento .c4-clarao,
+.menos-movimento .c4-fumaca-canhao,
+.menos-movimento .c4-respingo,
+.menos-movimento .c4-aceno {
+  animation: none;
+}
+.menos-movimento .c4-fumaca,
+.menos-movimento .c4-vapor {
+  opacity: 0.5;
+}
+.menos-movimento .c4-boiando {
+  opacity: 1;
+}
+.menos-movimento .c4-gota,
+.menos-movimento .c4-clarao,
+.menos-movimento .c4-fumaca-canhao,
+.menos-movimento .c4-respingo {
+  opacity: 0;
+}

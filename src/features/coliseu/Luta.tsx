@@ -56,9 +56,39 @@ import {
   PALETA_COZINHEIRO,
   PALETA_FEITOR,
   PALETA_GUARDA_CHICOTE,
+  COBRADOR,
+  LEVIATA,
+  paletaCobrador,
+  paletaLeviata,
   PALETA_TOURO,
   TOURO_BRONZE,
 } from '@/ui/pixel/historia3';
+import {
+  ALMIRANTE_ACO,
+  CAMPEAO_NAVAL,
+  FEIRANTE_AUTOMATO,
+  GATO_FERRO,
+  GUARDA_FEIRA,
+  IMEDIATO_FERRO,
+  JACARE_ESGOTO,
+  LIMPADOR_ESGOTO,
+  MERGULHADOR,
+  PALETA_CAMPEAO_NAVAL,
+  PALETA_FEIRANTE,
+  PALETA_GATO_FERRO,
+  PALETA_GUARDA_FEIRA,
+  PALETA_IMEDIATO,
+  PALETA_JACARE,
+  PALETA_LIMPADOR,
+  PALETA_MERGULHADOR,
+  PALETA_SENTINELA,
+  PALETA_TRITAO,
+  PALETA_VIGIA_TELHADO,
+  paletaAlmiranteAco,
+  SENTINELA_CAIS,
+  TRITAO_MECANICO,
+  VIGIA_TELHADO,
+} from '@/ui/pixel/historia4';
 import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
@@ -101,17 +131,36 @@ const VISUAL: Record<string, { grade: string[]; paleta: Paleta; largura: number 
   'feitor-tambor': { grade: FEITOR_TAMBOR, paleta: PALETA_FEITOR, largura: 24 },
   'valentao-celas': { grade: GLADIADOR_SUCATA, paleta: { ...PALETA_SUCATA, G: '#6a4a3a', g: '#a8806a', E: '#ffd04a', A: '#5a3a2a' }, largura: 18 },
   'touro-bronze': { grade: TOURO_BRONZE, paleta: { ...PALETA_TOURO, E: '#ffb02a' }, largura: 26 },
+  'vigia-telhado': { grade: VIGIA_TELHADO, paleta: PALETA_VIGIA_TELHADO, largura: 15 },
+  'gato-ferro': { grade: GATO_FERRO, paleta: PALETA_GATO_FERRO, largura: 20 },
+  'vigia-chefe': { grade: VIGIA_TELHADO, paleta: { ...PALETA_VIGIA_TELHADO, E: '#ffd04a' }, largura: 17 },
+  'jacare-esgoto': { grade: JACARE_ESGOTO, paleta: PALETA_JACARE, largura: 26 },
+  'limpador-esgoto': { grade: LIMPADOR_ESGOTO, paleta: PALETA_LIMPADOR, largura: 16 },
+  'jacare-rei': { grade: JACARE_ESGOTO, paleta: { ...PALETA_JACARE, E: '#ffd04a' }, largura: 32 },
+  'feirante-automato': { grade: FEIRANTE_AUTOMATO, paleta: PALETA_FEIRANTE, largura: 16 },
+  'guarda-feira': { grade: GUARDA_FEIRA, paleta: PALETA_GUARDA_FEIRA, largura: 16 },
+  'feirante-chefe': { grade: FEIRANTE_AUTOMATO, paleta: { ...PALETA_FEIRANTE, E: '#ffd04a' }, largura: 18 },
+  'guarda-cofre': { grade: GUARDA_FEIRA, paleta: { ...PALETA_GUARDA_FEIRA, E: '#ffd04a' }, largura: 17 },
+  'sentinela-cais': { grade: SENTINELA_CAIS, paleta: PALETA_SENTINELA, largura: 15 },
+  'imediato-ferro': { grade: IMEDIATO_FERRO, paleta: PALETA_IMEDIATO, largura: 18 },
+  'tritao-mecanico': { grade: TRITAO_MECANICO, paleta: PALETA_TRITAO, largura: 18 },
+  mergulhador: { grade: MERGULHADOR, paleta: PALETA_MERGULHADOR, largura: 17 },
+  'mergulhador-elite': { grade: MERGULHADOR, paleta: { ...PALETA_MERGULHADOR, E: '#ffd04a' }, largura: 18 },
+  'campeao-naval': { grade: CAMPEAO_NAVAL, paleta: PALETA_CAMPEAO_NAVAL, largura: 20 },
 };
 
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */
-const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38 };
+const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, cobrador: 22, leviata: 34, 'almirante-aco': 24 };
 
 function SpriteInimigo({ e }: { e: EstadoLuta }) {
   const sinalFogo = e.inimigo.estado === 'sinal' && ataqueAtual(e).tipo === 'fogo';
   if (e.def.id === 'fornalha') return <Sprite grade={FORNALHA} paleta={paletaFornalha(sinalFogo, e.inimigo.fase)} espelhar />;
   if (e.def.id === 'arquivista') return <Sprite grade={ARQUIVISTA} paleta={paletaArquivista(false)} espelhar />;
   if (e.def.id === 'leao-mecanico') return <Sprite grade={LEAO_MECANICO} paleta={paletaLeao(e.inimigo.fase > 0 || sinalFogo)} espelhar />;
-  if (e.def.id === 'censor-tita') return <Sprite grade={CENSOR_TITA} paleta={paletaTita(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'censor-tita' || e.def.id === 'censor-tita-octavius') return <Sprite grade={CENSOR_TITA} paleta={paletaTita(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'cobrador') return <Sprite grade={COBRADOR} paleta={paletaCobrador(e.inimigo.fase > 0 || sinalFogo)} espelhar />;
+  if (e.def.id === 'leviata') return <Sprite grade={LEVIATA} paleta={paletaLeviata(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'almirante-aco') return <Sprite grade={ALMIRANTE_ACO} paleta={paletaAlmiranteAco(e.inimigo.fase)} espelhar />;
   const v = VISUAL[e.def.id] ?? VISUAL.incinerador!;
   return <Sprite grade={v.grade} paleta={v.paleta} espelhar />;
 }

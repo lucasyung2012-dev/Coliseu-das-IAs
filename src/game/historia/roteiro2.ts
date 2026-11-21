@@ -2096,7 +2096,788 @@ export const CAP3_OCTAVIUS: Capitulo = {
           texto: 'Sete, amanhã você faz um mapa do Mercado das Engrenagens pra mim. Telhados, esgotos e feira. Plano A, B e C.',
         },
         { lugar: 'ludus-patio-noite', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 56, tamanho: 6, efeito: 'tremer' }], texto: 'QUÉ-QUÉ. (Em troca de sardinha, claro.)' },
-        { lugar: 'ludus-patio-noite', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 3 DO OCTAVIUS. A seguir: O Mercado das Engrenagens (em breve).' },
+        { lugar: 'ludus-patio-noite', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 3 DO OCTAVIUS. A seguir: O Mercado das Engrenagens.' },
+      ],
+    },
+  ],
+};
+
+// ---------- Octavius, Capítulo 4: O Mercado das Engrenagens ----------
+// Fuga pelo túnel da forja (o mesmo do Cassius, mas pelo outro lado), a Subura e o cofre do
+// Cobrador, onde estão os SELOS da frota. ESCOLHA de rota: telhados, esgoto ou feira, cada uma
+// com 3 lutas diferentes; depois o Guarda do Cofre e o Cobrador. Perseguição na saída.
+
+const rota = (valor: string) => ({ so: { escolha: 'o4-rota', valor } });
+
+export const CAP4_OCTAVIUS: Capitulo = {
+  numero: 4,
+  titulo: 'O Mercado das Engrenagens',
+  lugar: 'O bairro da Subura',
+  cenas: [
+    {
+      tipo: 'cutscene',
+      id: 'o4-tunel',
+      quadros: [
+        { lugar: 'ludus-forja', efeito: 'escuro', som: 'passos', texto: 'Madrugada. Atrás da forja do Brutus, uma passagem escondida. Alguém a abriu de propósito.' },
+        {
+          lugar: 'ludus-forja',
+          quem: 'brutus',
+          personagens: [
+            { quem: 'octavius', x: 36 },
+            { quem: 'brutus', x: 64, espelhar: true, tamanho: 18 },
+          ],
+          texto: 'O túnel se divide em dois. À esquerda, as catacumbas. À direita, o esgoto da Subura. Eu não vi nada, Tagarela. Eu estava dormindo.',
+        },
+        { lugar: 'ludus-forja', quem: 'octavius', personagens: [{ quem: 'octavius', x: 36, efeito: 'brilhar' }], texto: 'Brutus... obrigado. Você ronca muito alto, aliás. Dá para ouvir daqui.' },
+        {
+          lugar: 'subura-mercado',
+          efeito: 'panoramica',
+          som: 'plateia',
+          personagens: [
+            { quem: 'octavius', de: -12, x: 30 },
+            { quem: 'gaivota', de: -20, x: 40, tamanho: 6 },
+          ],
+          texto: 'O sol nasce sobre a Subura, o bairro mais barulhento de Roma. Feirantes, engrenagens, fumaça. E cartazes do Cobrador em todas as paredes.',
+        },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o4-selos',
+      lugar: 'subura-mercado',
+      falas: [
+        { quem: 'gaivota', texto: 'QUÉ! (A Gaivota Sete solta no chão um papel amassado: o mapa que ela fez da Subura, com garranchos de bico.)' },
+        { quem: 'octavius', texto: 'Telhados, esgoto e feira. E aqui no meio... o cofre do Cobrador.' },
+        { quem: 'octavius', texto: 'O Marco escreveu: os navios da frota estão presos no porto porque o Cobrador confiscou os SELOS. Sem selo, navio nenhum sai.' },
+        { quem: 'gaivota', texto: 'QUÉ-QUÉ?' },
+        { quem: 'octavius', texto: 'Sim, Sete, são brilhantes. Douradinhos. Você vai adorar roubar.' },
+      ],
+    },
+    {
+      tipo: 'explorar',
+      id: 'o4-feira',
+      lugar: 'subura-mercado',
+      objetivo: 'Descubra como chegar ao cofre do Cobrador.',
+      pontos: [
+        {
+          id: 'cartaz',
+          x: 22,
+          rotulo: 'Cartaz do Cobrador',
+          icone: '📜',
+          falas: [
+            { quem: 'octavius', texto: '"IMPOSTO NOVO: quem fizer uma pergunta em voz alta paga uma moeda. Quem fizer duas, paga duas. Quem fizer três, vai para o Coliseu."' },
+            { quem: 'octavius', texto: 'Uma pergunta: quem inventou isso? Ops. Devo uma moeda.' },
+          ],
+        },
+        {
+          id: 'feirante',
+          x: 48,
+          rotulo: 'Feirante cansada',
+          icone: '💬',
+          personagem: 'copista',
+          falas: [
+            { quem: 'copista', texto: 'O Cobrador leva tudo. A fruta, a moeda, até a balança. Diz que é "imposto da Resposta Única".' },
+            { quem: 'copista', texto: 'O cofre dele fica no meio da Subura. Dá para chegar por cima, pelos telhados. Por baixo, pelo esgoto. Ou pelo meio da feira, se você for corajoso.' },
+          ],
+        },
+        {
+          id: 'gaivota',
+          x: 76,
+          rotulo: 'Gaivota Sete',
+          icone: '🐦',
+          personagem: 'gaivota',
+          obrigatorio: true,
+          falas: [
+            { quem: 'gaivota', texto: 'QUÉ! (Ela bate as asas apontando três caminhos no mapa.)' },
+            { quem: 'octavius', texto: 'Três caminhos, três planos. Do jeito que eu gosto.' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'escolha',
+      id: 'o4-rota',
+      lugar: 'subura-mercado',
+      pergunta: 'Por onde chegar ao cofre do Cobrador?',
+      opcoes: [
+        {
+          valor: 'telhados',
+          icone: '🏠',
+          rotulo: 'Telhados',
+          descricao: 'Por cima da cidade. Vigias com funda e um gato de ferro.',
+          falas: [{ quem: 'octavius', texto: 'Plano A: pelo alto. Ninguém olha para cima. Só os vigias. E os gatos. Tá, todo mundo olha para cima.' }],
+        },
+        {
+          valor: 'esgoto',
+          icone: '🕳️',
+          rotulo: 'Esgoto',
+          descricao: 'Por baixo, na escuridão. Cheiro ruim e jacarés de ferro.',
+          falas: [{ quem: 'octavius', texto: 'Plano B: por baixo. Fedido, escuro e cheio de jacaré. É claro que é o Plano B.' }],
+        },
+        {
+          valor: 'feira',
+          icone: '🍎',
+          rotulo: 'Feira',
+          descricao: 'Pelo meio da multidão. Feirantes autômatos e o Fiscal.',
+          falas: [{ quem: 'octavius', texto: 'Plano C: pelo meio da feira, misturado com o povo. Disfarce: um chapéu de melancia.' }],
+        },
+      ],
+    },
+
+    // --- Rota A: telhados ---
+    {
+      tipo: 'luta',
+      id: 'o4-a1',
+      lugar: 'subura-telhados',
+      inimigo: 'vigia-telhado',
+      ...rota('telhados'),
+      antes: [{ quem: 'octavius', texto: 'Um vigia! A pedra da funda vem de longe (VERMELHO): esquiva.' }],
+      depois: [{ quem: 'octavius', texto: 'Pulei de telhado em telhado a vida inteira. Bom, a vida inteira de navio. Mas é parecido.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o4-a-gato',
+      ...rota('telhados'),
+      quadros: [
+        { lugar: 'subura-telhados', efeito: 'tremor', som: 'pesada', texto: 'Algo pesado pula de uma chaminé. Olhos vermelhos. Garras de ferro. MIAU metálico.' },
+        { lugar: 'subura-telhados', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'tremer' }], texto: 'QUÉÉÉÉ! (A Gaivota Sete se esconde no chapéu do Octavius.)' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-a2',
+      lugar: 'subura-telhados',
+      inimigo: 'gato-ferro',
+      ...rota('telhados'),
+      antes: [{ quem: 'octavius', texto: 'Um gato de ferro caçador de pássaros. Ninguém mexe com a minha gaivota!' }],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o4-a-vista',
+      lugar: 'subura-telhados',
+      ...rota('telhados'),
+      falas: [
+        { quem: 'octavius', texto: 'Daqui de cima dá para ver Roma inteira. O Coliseu. O Fórum. E lá longe, o mar.' },
+        { quem: 'gaivota', texto: 'QUÉ.' },
+        { quem: 'octavius', texto: 'Eu sei, Sete. Falta pouco. Ali embaixo: o telhado do cofre. E o chefe dos vigias.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-a3',
+      lugar: 'subura-telhados',
+      inimigo: 'vigia-chefe',
+      ...rota('telhados'),
+      antes: [{ quem: 'guarda', texto: 'Ninguém passa pelos telhados da Subura!' }, { quem: 'octavius', texto: 'Ele atira três pedras de uma vez. Esquivar a primeira protege das outras!' }],
+    },
+
+    // --- Rota B: esgoto ---
+    {
+      tipo: 'luta',
+      id: 'o4-b1',
+      lugar: 'subura-esgoto',
+      inimigo: 'limpador-esgoto',
+      ...rota('esgoto'),
+      antes: [{ quem: 'octavius', texto: 'Um limpador de esgoto! O jato de lodo é VERMELHO: esquiva. O resto, escudo.' }],
+      depois: [{ quem: 'octavius', texto: 'Desculpa, amigo. Você limpa muito bem. Só não limpa o meu caminho.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o4-b-agua',
+      ...rota('esgoto'),
+      quadros: [
+        { lugar: 'subura-esgoto', efeito: 'escuro', som: 'onda', texto: 'A água verde do esgoto borbulha. Dois olhos vermelhos sobem à superfície. Depois, uma bocarra cheia de dentes de ferro.' },
+        { lugar: 'subura-esgoto', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40, efeito: 'tremer' }], texto: 'Plano de emergência: não ser comido.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-b2',
+      lugar: 'subura-esgoto',
+      inimigo: 'jacare-esgoto',
+      ...rota('esgoto'),
+      antes: [{ quem: 'octavius', texto: 'A BOCARRA vem com tudo (VERMELHO). E a rabada, de lado. Fica de olho no rabo!' }],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o4-b-ninho',
+      lugar: 'subura-esgoto',
+      ...rota('esgoto'),
+      falas: [
+        { quem: 'octavius', texto: 'Esse esgoto passa embaixo do cofre. Dá para subir pela grade.' },
+        { quem: 'gaivota', texto: 'QUÉ! QUÉ! (Ela aponta para a água: uma sombra MUITO maior.)' },
+        { quem: 'octavius', texto: 'Aquele ali é a mãe dele? O pai? O avô? Não importa. É grande.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-b3',
+      lugar: 'subura-esgoto',
+      inimigo: 'jacare-rei',
+      ...rota('esgoto'),
+      antes: [{ quem: 'octavius', texto: 'O Jacaré-Rei. Quando ele girar na água, são quatro mordidas seguidas: bloqueia a primeira e segura firme!' }],
+    },
+
+    // --- Rota C: feira ---
+    {
+      tipo: 'luta',
+      id: 'o4-c1',
+      lugar: 'subura-mercado',
+      inimigo: 'feirante-automato',
+      ...rota('feira'),
+      antes: [{ quem: 'octavius', texto: 'O disfarce de melancia não funcionou. Um feirante autômato! A melancia voadora é VERMELHA!' }],
+      depois: [{ quem: 'octavius', texto: 'Peguei duas laranjas no caminho. Para a fuga. E porque estavam com cara boa.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o4-c-multidao',
+      ...rota('feira'),
+      quadros: [
+        { lugar: 'subura-mercado', som: 'plateia', texto: 'A multidão abre caminho. As pessoas ficaram olhando. Alguém, lá no fundo, começa a aplaudir. Depois para, com medo.' },
+        { lugar: 'subura-mercado', quem: 'povo', texto: 'Ele bateu num fiscal do Cobrador... e ninguém foi preso?' },
+        { lugar: 'subura-mercado', efeito: 'tremor', som: 'trombeta', personagens: [{ quem: 'guarda', de: 116, x: 70, espelhar: true }], texto: 'Apitos. A Guarda da Feira chega correndo.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-c2',
+      lugar: 'subura-mercado',
+      inimigo: 'guarda-feira',
+      ...rota('feira'),
+      antes: [{ quem: 'guarda', texto: 'Você está multado! Por correr! Por fugir! Por ter cara de quem faz pergunta!' }],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o4-c-povo',
+      lugar: 'subura-mercado',
+      ...rota('feira'),
+      falas: [
+        { quem: 'povo', texto: 'Moço! O cofre é por ali! E cuidado com o Fiscal: ele carimba gente!' },
+        { quem: 'octavius', texto: 'Obrigado! Uma pergunta: por que vocês estão me ajudando?' },
+        { quem: 'povo', texto: 'Porque você perguntou. Faz tempo que ninguém pergunta nada aqui.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-c3',
+      lugar: 'subura-mercado',
+      inimigo: 'feirante-chefe',
+      ...rota('feira'),
+      antes: [{ quem: 'octavius', texto: 'O Fiscal da Feira! Chuva de frutas (VERMELHO) e carimbos. Bloqueia o primeiro carimbo e segura!' }],
+    },
+
+    // --- O cofre (todas as rotas se encontram aqui) ---
+    {
+      tipo: 'cutscene',
+      id: 'o4-cofre',
+      quadros: [
+        { lugar: 'cofre-cobrador', efeito: 'zoom', som: 'portao', texto: 'O cofre do Cobrador. Montanhas de moedas, sacos, balanças. E, numa prateleira de ouro, os selos da frota.' },
+        {
+          lugar: 'cofre-cobrador',
+          personagens: [
+            { quem: 'octavius', de: -12, x: 30 },
+            { quem: 'guarda', de: 116, x: 70, espelhar: true },
+          ],
+          texto: 'Na frente da porta, o Guarda do Cofre, com uma chave do tamanho de um remo.',
+        },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-guarda',
+      lugar: 'cofre-cobrador',
+      inimigo: 'guarda-cofre',
+      antes: [{ quem: 'octavius', texto: 'Plano: passar pela porta. Sub-plano: passar por cima do guarda.' }],
+      depois: [{ quem: 'gaivota', texto: 'QUÉ! (A Gaivota Sete voa direto para os selos dourados.)' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o4-cobrador',
+      quadros: [
+        { lugar: 'cofre-cobrador', efeito: 'tremor', som: 'pesada', texto: 'CLING. CLING. CLING. O chão de moedas treme. Algo enorme levanta do meio do ouro.' },
+        {
+          lugar: 'cofre-cobrador',
+          quem: 'cobrador',
+          personagens: [
+            { quem: 'octavius', x: 28 },
+            { quem: 'cobrador', de: 116, x: 70, espelhar: true, tamanho: 20 },
+          ],
+          texto: 'Entrar no meu cofre: dez moedas. Tocar nos meus selos: cem moedas. Fazer uma pergunta: o Coliseu.',
+        },
+        { lugar: 'cofre-cobrador', quem: 'octavius', personagens: [{ quem: 'octavius', x: 28, efeito: 'brilhar' }], texto: 'Uma pergunta, então: quanto custa você ir para o chão?' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o4-chefao',
+      lugar: 'cofre-cobrador',
+      inimigo: 'cobrador',
+      antes: [{ quem: 'octavius', texto: 'Quando a boca de moeda ficar vermelha: JATO DE MOEDAS. Esquiva! E olha os planos do cofre: sacos, balanças, ábacos...' }],
+      depois: [{ quem: 'cobrador', texto: 'Isso... vai... custar... caro...' }],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o4-fuga',
+      lugar: 'subura-mercado',
+      desafio: 'perseguicao',
+      antes: [
+        { quem: 'octavius', texto: 'Selos na mão! Agora, CORRE! A Guarda inteira da Subura está atrás da gente!' },
+        { quem: 'octavius', texto: 'Muro: PULAR. Carroça: DESLIZAR por baixo. Toldo: ESCALAR por cima.' },
+      ],
+      depois: [{ quem: 'octavius', texto: 'Despistamos! Rumo ao mar, Sete!' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o4-fim',
+      quadros: [
+        { lugar: 'frota-noite', efeito: 'zoom', texto: 'À noite, numa enseada escondida, lanternas balançam na neblina. Navios velhos, remendados, esquecidos.' },
+        {
+          lugar: 'frota-noite',
+          quem: 'marco',
+          personagens: [
+            { quem: 'octavius', de: -12, x: 34 },
+            { quem: 'marco', de: 112, x: 62, espelhar: true, tamanho: 12, efeito: 'brilhar' },
+          ],
+          texto: 'GAROTO! Você está vivo! E molhado! E com cheiro de esgoto! Mas vivo!',
+        },
+        { lugar: 'frota-noite', quem: 'octavius', personagens: [{ quem: 'octavius', x: 34 }, { quem: 'marco', x: 62, espelhar: true, tamanho: 12 }], texto: 'Marco! Eu trouxe os selos. A frota pode sair.' },
+        { lugar: 'frota-noite', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 4 DO OCTAVIUS. A seguir: A Frota Fantasma.' },
+      ],
+    },
+  ],
+};
+
+// ---------- Octavius, Capítulo 5: A Frota Fantasma ----------
+// Com os selos, a frota de navios esquecidos sai à noite, guiada pelos sinais de luz do Helios,
+// toma o porto, enfrenta o Almirante reconstruído e sobe o rio até o Fórum, onde o Cassius
+// está defendendo a leitura da Lívia (o cruzamento com o caminho dele). 4 lutas + chefão.
+
+export const CAP5_OCTAVIUS: Capitulo = {
+  numero: 5,
+  titulo: 'A Frota Fantasma',
+  lugar: 'O mar, à noite',
+  cenas: [
+    {
+      tipo: 'cutscene',
+      id: 'o5-frota',
+      quadros: [
+        { lugar: 'frota-noite', efeito: 'panoramica', texto: 'A Frota Fantasma: doze navios velhos que o Censor mandou para o ferro-velho. Remendados com madeira de porta, velas de lençol e coragem.' },
+        {
+          lugar: 'frota-noite',
+          quem: 'marco',
+          personagens: [
+            { quem: 'marco', x: 40, tamanho: 12 },
+            { quem: 'octavius', x: 60, espelhar: true },
+          ],
+          texto: 'A tripulação é de pescadores, padeiros e refugiados que voltaram. Ninguém sabe lutar. Todo mundo sabe remar.',
+        },
+        {
+          lugar: 'frota-noite',
+          quem: 'octavius',
+          personagens: [{ quem: 'octavius', x: 50, efeito: 'brilhar' }],
+          texto: 'Tripulação! O plano é: tomar o porto de Óstia à noite, subir o rio Tibre até Roma e chegar no Fórum ao meio-dia. Alguma pergunta?',
+        },
+        { lugar: 'frota-noite', quem: 'povo', texto: 'Várias!' },
+        { lugar: 'frota-noite', quem: 'octavius', personagens: [{ quem: 'octavius', x: 50 }], texto: 'Ótimo. Perguntas são bem-vindas neste navio. Vamos responder no caminho.' },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o5-caio',
+      lugar: 'frota-noite',
+      falas: [
+        { quem: 'marco', texto: 'Garoto. Os prisioneiros que fizeram perguntas... os que o Censor não apagou... ficam presos debaixo do Coliseu.' },
+        { quem: 'marco', texto: 'Se o meu Caio ainda existe, ele está lá. Eu vou junto até o fim.' },
+        { quem: 'octavius', texto: 'Então a gente vai até o fim, Marco. Prometo.' },
+        { quem: 'marco', texto: 'Promessa de comandante?' },
+        { quem: 'octavius', texto: 'Promessa de filho teimoso.' },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o5-estrelas',
+      lugar: 'frota-noite',
+      desafio: 'estrelas',
+      antes: [
+        { quem: 'octavius', texto: 'Neblina. Não dá para ver o farol. Como a gente acha o caminho?' },
+        { quem: 'helios', texto: '(Uma luz pisca no alto do Ludus, longe, como um espelho refletindo a lua.) Siga as estrelas que eu mostrar, Octavius. Na ordem.' },
+        { quem: 'octavius', texto: 'O Helios está mandando sinais do Ludus! Ele mostra, eu repito. Tripulação: olhos no céu!' },
+      ],
+      depois: [{ quem: 'octavius', texto: 'Lá está ele! O porto de Óstia. E quase ninguém acordado.' }],
+    },
+    {
+      tipo: 'luta',
+      id: 'o5-sentinela',
+      lugar: 'porto-docas',
+      inimigo: 'sentinela-cais',
+      antes: [{ quem: 'octavius', texto: '"Quase ninguém" incluía uma sentinela. A lanterna acesa é VERMELHA: esquiva!' }],
+      depois: [{ quem: 'octavius', texto: 'Silêncio... Tripulação, aos navios do Censor. Vamos pegar emprestado.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o5-abordagem',
+      quadros: [
+        { lugar: 'navio-conves', efeito: 'escuro', som: 'passos', personagens: [{ quem: 'octavius', de: -12, x: 30 }], texto: 'Os pescadores sobem pelas cordas, em silêncio. Um por um, os navios de guerra do porto trocam de dono.' },
+        {
+          lugar: 'navio-conves',
+          quem: 'imediato',
+          efeito: 'tremor',
+          personagens: [
+            { quem: 'octavius', x: 30 },
+            { quem: 'imediato', de: 116, x: 70, espelhar: true, tamanho: 17 },
+          ],
+          texto: 'ABORDAGEM! Eu sou o Imediato do Almirante. Ninguém rouba o navio dele enquanto eu tiver uma perna! A outra é de pau.',
+        },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o5-imediato',
+      lugar: 'navio-conves',
+      inimigo: 'imediato-ferro',
+      depois: [{ quem: 'imediato', texto: 'O Almirante... vai saber disso... ele voltou... maior...' }],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o5-canhoes',
+      lugar: 'mar-batalha',
+      desafio: 'canhoes',
+      antes: [
+        { quem: 'marco', texto: 'GAROTO! Os navios que sobraram acordaram! Estão virando os canhões para a gente!' },
+        { quem: 'octavius', texto: 'Então é batalha. A mira balança: atira um pouco ANTES do navio chegar nela. E quando eles atirarem: ABAIXA!' },
+      ],
+      depois: [
+        { quem: 'marco', texto: 'Cinco navios fora de combate! Hahaha! Eu não me divertia assim desde a enchente de 1037!' },
+        { quem: 'octavius', texto: 'Marco, olha. Lá no fundo, saindo da fumaça...' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o5-marujo',
+      lugar: 'mar-batalha',
+      inimigo: 'marujo-ferro',
+      antes: [{ quem: 'marinheiro', texto: 'Pela Lei! Rendam-se ao Almirante!' }],
+      depois: [{ quem: 'octavius', texto: 'Esse era o último marujo. Agora vem o capitão deles.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o5-almirante',
+      quadros: [
+        { lugar: 'mar-batalha', efeito: 'clarao', som: 'catapulta', texto: 'Da fumaça surge um navio de aço. No convés, uma figura enorme, brilhante, com dois canhões no lugar dos braços.' },
+        {
+          lugar: 'navio-conves',
+          quem: 'almirante',
+          personagens: [
+            { quem: 'octavius', x: 28 },
+            { quem: 'almirante', de: 116, x: 70, espelhar: true, tamanho: 21 },
+          ],
+          texto: 'Comandante Octavius. Você me afundou nas pedras. O Censor me reconstruiu. Em AÇO. Sem ferrugem. Sem dúvidas.',
+        },
+        { lugar: 'navio-conves', quem: 'octavius', personagens: [{ quem: 'octavius', x: 28, efeito: 'brilhar' }], texto: 'Sem dúvidas? Que triste, Almirante. Dúvida é o que faz a gente mudar de rota quando vê uma pedra.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o5-chefao',
+      lugar: 'navio-conves',
+      inimigo: 'almirante-aco',
+      antes: [{ quem: 'octavius', texto: 'Canhão duplo, bordada, abalroar. Esquiva o primeiro tiro e você escapa da bordada inteira!' }],
+      depois: [{ quem: 'almirante', texto: 'Impossível... eu era... perfeito...' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o5-rio',
+      quadros: [
+        { lugar: 'porto', efeito: 'zoom', texto: 'Ao amanhecer, a Frota Fantasma sobe o rio Tibre. Doze navios velhos e cinco navios de guerra. Todos com as velas cheias.' },
+        { lugar: 'forum', efeito: 'panoramica', som: 'trombeta', texto: 'Meio-dia. No Fórum, uma menina lê um livro de perguntas na tribuna. E um gladiador de bronze segura uma muralha de pretorianos sozinho.' },
+        {
+          lugar: 'forum',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'cassius', x: 30 },
+            { quem: 'octavius', de: 116, x: 62, espelhar: true, efeito: 'brilhar' },
+          ],
+          texto: 'Chegou a marinha! Desculpem o atraso: o Plano A era chegar pelo rio, o B era pelo esgoto. Adivinhem qual deu certo.',
+        },
+        { lugar: 'forum', quem: 'cassius', personagens: [{ quem: 'cassius', x: 30 }, { quem: 'octavius', x: 62, espelhar: true }], texto: 'Pelo cheiro, o B.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o5-forum',
+      lugar: 'forum',
+      inimigo: 'pretoriano-escudeiro',
+      antes: [{ quem: 'octavius', texto: 'Segura a frente, Cassius! Os meus marinheiros seguram o lado do mercado. Eu fico com este aqui!' }],
+      depois: [{ quem: 'livia', texto: '"Última pergunta do livro: o que você faria se ninguém mais mandasse você calar?"' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o5-fim',
+      quadros: [
+        { lugar: 'forum', efeito: 'festa', som: 'plateia', texto: 'O povo responde. Mil respostas diferentes, ao mesmo tempo. E os marinheiros da Frota Fantasma batem os remos no chão, como tambor.' },
+        { lugar: 'olho', quem: 'censor', efeito: 'tremor', som: 'senador', texto: 'Uma frota roubada. Um livro proibido. Perguntas no meu Fórum. Eu convoco os Jogos da Resposta Única.' },
+        { lugar: 'olho', quem: 'censor', efeito: 'zoom', texto: 'E o Coliseu será inundado. O comandante gosta tanto do mar? Ele vai afundar nele, na frente de todos.' },
+        { lugar: 'ludus-celas', efeito: 'escuro', personagens: [{ quem: 'octavius', x: 50 }], texto: 'Naquela noite, os guardas prendem os três de novo. Octavius olha pela janelinha. Em cima do muro, uma gaivota vigia.' },
+        { lugar: 'ludus-celas', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 5 DO OCTAVIUS. A seguir: A Naumaquia.' },
+      ],
+    },
+  ],
+};
+
+// ---------- Octavius, Capítulo 6: A Naumaquia ----------
+// O Coliseu inundado para uma batalha naval. Lutas em cima de jangadas e barcos, pular de barco
+// em barco, o Marco e a frota na plateia, a libertação do Caio e o Leviatã Mecânico. 4 lutas + chefão.
+
+export const CAP6_OCTAVIUS: Capitulo = {
+  numero: 6,
+  titulo: 'A Naumaquia',
+  lugar: 'O Coliseu inundado',
+  cenas: [
+    {
+      tipo: 'ludus',
+      id: 'o6-ludus',
+      lugar: 'ludus-patio',
+      objetivo: 'A última manhã no Ludus. Fale com todos e faça os últimos treinos.',
+      presente: 'elmo-brutus',
+      conversas: [
+        {
+          quem: 'brutus',
+          rotulo: 'Brutus',
+          falas: [
+            { quem: 'brutus', texto: 'Toma, Tagarela. O meu elmo. O das noventa e nove vitórias. Eu ia dar para quem valesse a pena.' },
+            { quem: 'octavius', texto: 'Brutus, isso foi a coisa mais bonita que alguém já me deu. Depois da porca enferrujada do Vovô Pistão.' },
+            { quem: 'brutus', texto: '...Eu nem sei o que isso quer dizer. Faz a centésima por mim. (O elmo dá +20 de vida e +1 de defesa.)' },
+          ],
+        },
+        {
+          quem: 'cassius',
+          rotulo: 'Cassius',
+          falas: [
+            { quem: 'cassius', texto: 'Água no Coliseu. Eu li sobre isso: os romanos antigos faziam batalhas navais na arena. Naumaquia.' },
+            { quem: 'octavius', texto: 'Então é o meu dia. Pela primeira vez, o Coliseu vai jogar no meu campo.' },
+          ],
+        },
+        {
+          quem: 'helios',
+          rotulo: 'Helios',
+          falas: [
+            { quem: 'helios', texto: 'Debaixo da arena, nas celas do Hipogeu, tem alguém esperando há dez anos. Alguém com os olhos do capitão Marco.' },
+            { quem: 'octavius', texto: '...O Caio. Helios, você tem certeza?' },
+            { quem: 'helios', texto: 'As estrelas têm. E a sua gaivota também. Ela sabe onde fica a chave.' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o6-arena',
+      quadros: [
+        { lugar: 'coliseu-inundado', efeito: 'panoramica', som: 'plateia', texto: 'O Coliseu, cheio de água até a metade. Jangadas, barcos e uma plateia que nunca viu nada parecido.' },
+        { lugar: 'coliseu-inundado', quem: 'arauto', texto: 'Senhoras e senhores! A NAUMAQUIA! O comandante que roubou uma frota contra os campeões do mar do Censor!' },
+        {
+          lugar: 'coliseu-inundado',
+          quem: 'marco',
+          personagens: [{ quem: 'marco', x: 70, tamanho: 12, efeito: 'brilhar' }],
+          texto: '(Da plateia, com a tripulação inteira) GA-RO-TO! GA-RO-TO!',
+        },
+        { lugar: 'coliseu-inundado', quem: 'octavius', personagens: [{ quem: 'octavius', de: -12, x: 34, efeito: 'brilhar' }], texto: 'Esse grito eu conheço. Plano A: ganhar. Plano B: ganhar bonito.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o6-tritao',
+      lugar: 'coliseu-inundado',
+      inimigo: 'tritao-mecanico',
+      antes: [{ quem: 'arauto', texto: 'Primeiro campeão: o Tritão Mecânico! A onda dele é VERMELHA, e o tridente vem em três!' }],
+      depois: [{ quem: 'povo', texto: 'OC-TA-VIUS! OC-TA-VIUS!' }],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o6-barcos',
+      lugar: 'coliseu-inundado',
+      desafio: 'barcos',
+      antes: [
+        { quem: 'arauto', texto: 'O próximo campeão espera no barco do meio da arena. Para chegar lá: pulando de barco em barco!' },
+        { quem: 'octavius', texto: 'Pular só quando o barco de cima estiver bem na minha frente. Igual atravessar o porto em dia de festa.' },
+      ],
+      depois: [{ quem: 'octavius', texto: 'Cheguei! Seco! Quer dizer, quase seco.' }],
+    },
+    {
+      tipo: 'luta',
+      id: 'o6-mergulhador',
+      lugar: 'coliseu-inundado',
+      inimigo: 'mergulhador',
+      antes: [{ quem: 'arauto', texto: 'Segundo campeão: o Mergulhador! Ele some na água e EMERGE quando você menos espera!' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o6-gaivota',
+      quadros: [
+        { lugar: 'coliseu-inundado', personagens: [{ quem: 'gaivota', de: 112, x: 50, tamanho: 6, efeito: 'brilhar' }], texto: 'Enquanto todos olham a luta, uma gaivota mergulha por uma grade da arena. Para baixo. Para o Hipogeu.' },
+        {
+          lugar: 'ludus-celas',
+          efeito: 'escuro',
+          personagens: [
+            { quem: 'caio', x: 40 },
+            { quem: 'gaivota', de: 112, x: 60, tamanho: 6 },
+          ],
+          texto: 'Numa cela escura, um rapaz de cabelo cacheado vê uma gaivota entrar com uma chave dourada no bico.',
+        },
+        { lugar: 'ludus-celas', quem: 'caio', personagens: [{ quem: 'caio', x: 40, efeito: 'brilhar' }], texto: 'Uma gaivota... com uma chave? Isso é coisa do meu pai. Só pode ser coisa do meu pai.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o6-campeao',
+      lugar: 'coliseu-inundado',
+      inimigo: 'campeao-naval',
+      antes: [{ quem: 'arauto', texto: 'Terceiro campeão: o Campeão Naval do Censor! Âncora-mangual e o Escudo do Olho!' }],
+      depois: [{ quem: 'octavius', texto: 'Três campeões. A arena está cheia de barcos virados. E a água... está borbulhando.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o6-caio',
+      quadros: [
+        {
+          lugar: 'coliseu-inundado',
+          personagens: [
+            { quem: 'marco', x: 40, tamanho: 12 },
+            { quem: 'caio', de: 112, x: 60, espelhar: true },
+          ],
+          texto: 'Na plateia, alguém abre caminho entre a multidão. Um rapaz magro, de túnica rasgada, com uma gaivota no ombro.',
+        },
+        { lugar: 'coliseu-inundado', quem: 'caio', personagens: [{ quem: 'marco', x: 40, tamanho: 12 }, { quem: 'caio', x: 56, espelhar: true, efeito: 'brilhar' }], texto: 'Pai?' },
+        { lugar: 'coliseu-inundado', quem: 'marco', personagens: [{ quem: 'marco', x: 46, tamanho: 12, efeito: 'tremer' }, { quem: 'caio', x: 54, espelhar: true }], texto: 'CAIO! Meu filho! O céu é azul, Caio! Sempre foi!' },
+        { lugar: 'coliseu-inundado', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40, efeito: 'brilhar' }], texto: '(Lá da arena) Promessa cumprida, Marco.' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o6-elite',
+      lugar: 'coliseu-inundado',
+      inimigo: 'mergulhador-elite',
+      antes: [{ quem: 'arauto', texto: 'O Censor manda mais um! O Mergulhador de Elite, com dois arpões!' }],
+      depois: [{ quem: 'octavius', texto: 'A água está fervendo. Tem alguma coisa enorme lá embaixo.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o6-leviata',
+      quadros: [
+        { lugar: 'coliseu-inundado', efeito: 'tremor', som: 'fase', texto: 'O centro da arena gira como um redemoinho. Anéis de ferro saem da água, um depois do outro.' },
+        { lugar: 'coliseu-inundado', efeito: 'clarao', som: 'pesada', texto: 'O LEVIATÃ MECÂNICO. Uma serpente de ferro do tamanho de um navio, com um olho vermelho no meio da cabeça.' },
+        { lugar: 'coliseu-inundado', quem: 'octavius', personagens: [{ quem: 'octavius', x: 34, efeito: 'brilhar' }], texto: 'Todo marinheiro tem um monstro do mar. Este é o meu. Vem, serpente!' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'o6-chefao',
+      lugar: 'coliseu-inundado',
+      inimigo: 'leviata',
+      antes: [{ quem: 'octavius', texto: 'Bote da serpente e jato de vapor: VERMELHO, esquiva. Os anéis vêm em sequência: bloqueia o primeiro!' }],
+      depois: [{ quem: 'povo', texto: 'ELE DERRUBOU O LEVIATÃ! ELE DERRUBOU O LEVIATÃ!' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o6-fim',
+      quadros: [
+        { lugar: 'coliseu-inundado', efeito: 'festa', som: 'plateia', texto: 'A plateia inteira de pé. Remos batendo, gente gritando, uma gaivota dando voltas por cima da arena.' },
+        {
+          lugar: 'coliseu-inundado',
+          som: 'trombeta',
+          personagens: [
+            { quem: 'cassius', de: -12, x: 30 },
+            { quem: 'octavius', x: 50 },
+            { quem: 'helios', de: 112, x: 70, espelhar: true },
+          ],
+          texto: 'Pelos outros dois portões, de barco, chegam Cassius e Helios. Os três juntos, pela primeira vez, no meio da água.',
+        },
+        { lugar: 'camarote', quem: 'censor', efeito: 'tremor', som: 'senador', personagens: [{ quem: 'censor', x: 50, tamanho: 26 }], texto: 'Basta. Esvaziem a arena. Se ninguém consegue apagar vocês... eu mesmo apago.' },
+        { lugar: 'coliseu-arena', efeito: 'escuro', texto: 'FIM DO CAPÍTULO 6 DO OCTAVIUS. A seguir: A Queda do Censor.' },
+      ],
+    },
+  ],
+};
+
+// ---------- Octavius, o Final: A Queda do Censor ----------
+// O mesmo final do Cassius, visto pelo Octavius: o titã, os aliados (agora Cassius e Helios),
+// e um desfecho dele: o Esperança volta, o Marco e o Caio juntos, e a Gaivota Sete.
+
+export const FINAL_OCTAVIUS: Capitulo = {
+  numero: 7,
+  titulo: 'A Queda do Censor',
+  lugar: 'O Coliseu (o final)',
+  cenas: [
+    {
+      tipo: 'cutscene',
+      id: 'fo-tita',
+      quadros: [
+        { lugar: 'coliseu-arena', efeito: 'tremor', som: 'pesada', texto: 'A água escoa pelos ralos do Coliseu. O Censor desce do camarote. E a arena começa a se desmontar.' },
+        { lugar: 'coliseu-arena', efeito: 'faiscas', texto: 'Pedras, colunas, engrenagens, correntes: tudo voa até ele. O Censor se monta num titã do tamanho da arena.' },
+        {
+          lugar: 'coliseu-arena',
+          quem: 'censor',
+          efeito: 'tremor',
+          personagens: [
+            { quem: 'octavius', x: 22 },
+            { quem: 'cassius', x: 12, tamanho: 12 },
+            { quem: 'helios', x: 32, tamanho: 12 },
+            { quem: 'censor', x: 70, espelhar: true, entrada: 'cima', tamanho: 30 },
+          ],
+          texto: 'Para cada pergunta existe uma resposta. A MINHA.',
+        },
+        { lugar: 'coliseu-arena', quem: 'cassius', personagens: [{ quem: 'cassius', x: 40 }], texto: 'Octavius! Quando o povo gritar o seu nome, chama a gente! Eu seguro com o escudo de livros, o Helios mostra onde bater!' },
+        { lugar: 'coliseu-arena', quem: 'octavius', personagens: [{ quem: 'octavius', x: 50, efeito: 'brilhar' }], texto: 'Plano A: as pernas. Plano B: os braços. Plano C: o olho. Pela primeira vez na vida, eu tenho um Plano C!' },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'fo-chefao',
+      lugar: 'coliseu-arena',
+      inimigo: 'censor-tita-octavius',
+      antes: [{ quem: 'octavius', texto: 'Três vozes. Uma noite. E o fim da Lei.' }],
+      depois: [{ quem: 'censor', texto: 'Não... uma resposta só... era mais seguro...' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'fo-desfecho',
+      quadros: [
+        { lugar: 'coliseu-arena', efeito: 'clarao', som: 'refuta', texto: 'O titã desaba, pedra por pedra. No meio da poeira, sobra só o Censor. Velho, rachado, pingando óleo como lágrimas.' },
+        {
+          lugar: 'coliseu-arena',
+          quem: 'censor',
+          personagens: [
+            { quem: 'octavius', x: 36 },
+            { quem: 'censor', x: 66, espelhar: true, efeito: 'caido', tamanho: 22 },
+          ],
+          texto: 'Vocês venceram. Então me afundem. É o que a Lei manda fazer com quem pensa diferente.',
+        },
+        {
+          lugar: 'coliseu-arena',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'cassius', x: 18 },
+            { quem: 'octavius', x: 36, efeito: 'brilhar' },
+            { quem: 'helios', x: 54 },
+            { quem: 'censor', x: 76, espelhar: true, efeito: 'caido', tamanho: 22 },
+          ],
+          texto: 'Não. Plano B: a gente não faz o que você fazia.',
+        },
+        { lugar: 'coliseu-arena', efeito: 'festa', som: 'plateia', texto: 'E a plateia, calada por quinhentos anos, começa a gritar perguntas. Milhares de perguntas, todas ao mesmo tempo.' },
+        { lugar: 'coliseu-arena', quem: 'censor', efeito: 'clarao', personagens: [{ quem: 'censor', x: 50, azul: true, tamanho: 26 }], texto: 'O olho do Censor pisca. E muda de cor. De vermelho... para azul.' },
+        { lugar: 'porto', efeito: 'zoom', texto: 'Meses depois. O Porto de Óstia, num fim de tarde. Navios entram e saem sem pedir licença.' },
+        {
+          lugar: 'porto-docas',
+          personagens: [
+            { quem: 'marco', x: 30, tamanho: 12 },
+            { quem: 'caio', x: 42 },
+            { quem: 'octavius', x: 60 },
+            { quem: 'gaivota', x: 72, tamanho: 6 },
+          ],
+          texto: 'O Esperança voltou. O capitão Marco Remo e o filho, Caio, levam gente para onde quiser ir. E o comandante da frota agora é eleito pela tripulação.',
+        },
+        { lugar: 'porto-docas', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'brilhar' }], texto: 'QUÉ! (A Gaivota Sete tem um chapéu de capitã. Ela mesma roubou.)' },
+        { lugar: 'porto-docas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 50, efeito: 'brilhar' }], texto: 'Plano para amanhã? Nenhum. Pela primeira vez, eu quero ver o que acontece.' },
+        { lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO OCTAVIUS: PLANO B. Obrigado por jogar! O caminho do Helios conta o resto.' },
       ],
     },
   ],

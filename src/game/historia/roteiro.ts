@@ -2,7 +2,7 @@ import type { IaId } from '../personagens';
 import type { SomHistoria } from '@/ui/somHistoria';
 import type { Tecnica } from './luta';
 import type { Equipamento } from './saves';
-import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
+import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP4_OCTAVIUS, CAP5_OCTAVIUS, CAP6_OCTAVIUS, FINAL_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
 
 /**
  * O roteiro do modo História em forma de dados (docs/HISTORIA.md): cada capítulo é
@@ -41,7 +41,10 @@ export type Falante =
   | 'pistao'
   | 'feitor'
   | 'cozinheiro'
-  | 'rufus';
+  | 'rufus'
+  | 'caio'
+  | 'cobrador'
+  | 'imediato';
 
 export interface Fala {
   quem: Falante;
@@ -82,7 +85,14 @@ export type Lugar =
   | 'galera-porao'
   | 'galera-tempestade'
   | 'praia-naufragio'
-  | 'ludus-patio-noite';
+  | 'ludus-patio-noite'
+  | 'subura-mercado'
+  | 'subura-telhados'
+  | 'subura-esgoto'
+  | 'cofre-cobrador'
+  | 'frota-noite'
+  | 'mar-batalha'
+  | 'coliseu-inundado';
 
 /** Um personagem em cena numa cutscene. */
 export interface EmCena {
@@ -126,7 +136,21 @@ export interface PontoExplorar {
   personagem?: Falante;
 }
 
-export type Cena =
+/** Cena que só acontece se, numa ESCOLHA anterior do capítulo, o jogador escolheu `valor`. */
+export interface CondicaoEscolha {
+  escolha: string;
+  valor: string;
+}
+
+export interface OpcaoEscolha {
+  valor: string;
+  icone: string;
+  rotulo: string;
+  descricao: string;
+  falas?: Fala[];
+}
+
+export type Cena = (
   | { tipo: 'cutscene'; id: string; quadros: Quadro[] }
   | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[] }
   | { tipo: 'explorar'; id: string; lugar: Lugar; objetivo: string; pontos: PontoExplorar[] }
@@ -135,7 +159,7 @@ export type Cena =
       tipo: 'desafio';
       id: string;
       lugar: Lugar;
-      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas' | 'forja' | 'memoria' | 'corrida' | 'torre' | 'trio' | 'remar' | 'tempestade';
+      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas' | 'forja' | 'memoria' | 'corrida' | 'torre' | 'trio' | 'remar' | 'tempestade' | 'perseguicao' | 'canhoes' | 'estrelas' | 'barcos';
       antes?: Fala[];
       /** Falas ao vencer (furtivo, ritmo, proteger, armadilhas). */
       depois?: Fala[];
@@ -155,7 +179,9 @@ export type Cena =
       obrigatorio?: Tecnica;
       /** Presente que ganha ao entrar (o elmo do Brutus, no Capítulo 6). */
       presente?: Equipamento;
-    };
+    }
+  | { tipo: 'escolha'; id: string; lugar: Lugar; pergunta: string; opcoes: OpcaoEscolha[] }
+) & { so?: CondicaoEscolha };
 
 /** Uma conversa no Ludus: alguém de pé no pátio, com o que tem a dizer. */
 export interface ConversaLudus {
@@ -169,6 +195,18 @@ export interface Capitulo {
   titulo: string;
   lugar: string;
   cenas: Cena[];
+}
+
+/** A cena vale para este save? (Cenas com `so` só acontecem na rota escolhida.) */
+export function cenaValida(c: Cena, escolhas: Record<string, string> = {}): boolean {
+  return !c.so || escolhas[c.so.escolha] === c.so.valor;
+}
+
+/** O índice da próxima cena que vale, depois de `depoisDe` (ou o fim do capítulo). */
+export function proximaCena(cap: Capitulo, depoisDe: number, escolhas?: Record<string, string>): number {
+  let i = depoisDe + 1;
+  while (i < cap.cenas.length && !cenaValida(cap.cenas[i]!, escolhas)) i++;
+  return i;
 }
 
 export const NOMES: Record<Falante, string> = {
@@ -202,6 +240,9 @@ export const NOMES: Record<Falante, string> = {
   feitor: 'O Feitor do Tambor',
   cozinheiro: 'Cozinheiro de Bordo',
   rufus: 'Rufus, o Dedo-Duro',
+  caio: 'Caio',
+  cobrador: 'O Cobrador',
+  imediato: 'Imediato de Ferro',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -959,6 +1000,6 @@ const CAP2_CASSIUS: Capitulo = {
 
 export const CAPITULOS: Record<IaId, Capitulo[]> = {
   claude: [CAP1_CASSIUS, CAP2_CASSIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS],
-  chatgpt: [CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS],
+  chatgpt: [CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP4_OCTAVIUS, CAP5_OCTAVIUS, CAP6_OCTAVIUS, FINAL_OCTAVIUS],
   gemini: [],
 };

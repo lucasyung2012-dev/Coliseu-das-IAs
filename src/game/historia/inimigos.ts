@@ -449,4 +449,209 @@ export const INIMIGOS: Record<string, DefInimigo> = {
       { ataques: [investida('Investida dupla', 650, 16, 1100), fogo('Bafo de vapor', 700, 18, 1000), golpe('Chifradas', 550, 10, 900, 3, 300), finta(450)], pausaMs: [600, 900] },
     ],
   },
+
+  // ---------- Caminho do Octavius: Capítulo 4, O Mercado das Engrenagens ----------
+  // Rota A (telhados)
+  'vigia-telhado': {
+    id: 'vigia-telhado',
+    nome: 'Vigia dos Telhados',
+    vida: 105,
+    contra: 16,
+    fases: [{ ataques: [fogo('Pedra de funda', 650, 17, 900), golpe('Luneta na cabeça', 580, 13, 800), finta(480), fogo('Duas pedras', 600, 11, 900, 2, 330)], pausaMs: [600, 950] }],
+  },
+  'gato-ferro': {
+    id: 'gato-ferro',
+    nome: 'Gato de Ferro',
+    vida: 115,
+    contra: 17,
+    fases: [{ ataques: [golpe('Arranhão', 480, 8, 850, 4, 240), investida('Bote do gato', 600, 19, 1000), finta(420), golpe('Mordida', 520, 14, 750)], pausaMs: [500, 850] }],
+  },
+  'vigia-chefe': {
+    id: 'vigia-chefe',
+    nome: 'Chefe dos Vigias',
+    vida: 130,
+    contra: 19,
+    pecas: 3,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [fogo('Chuva de pedras', 650, 12, 950, 3, 330), golpe('Luneta', 560, 14, 800), finta(450)], pausaMs: [600, 900] },
+      { ataques: [investida('Salto de telhado', 600, 21, 1000), fogo('Chuva de pedras', 580, 12, 950, 3, 300), finta(400)], pausaMs: [500, 800] },
+    ],
+  },
+  // Rota B (esgoto)
+  'jacare-esgoto': {
+    id: 'jacare-esgoto',
+    nome: 'Jacaré de Esgoto',
+    vida: 120,
+    contra: 18,
+    fases: [{ ataques: [investida('Bocarra', 700, 22, 1100), golpe('Rabada', 600, 14, 850), finta(500), golpe('Mordida dupla', 600, 11, 900, 2, 360)], pausaMs: [650, 1000] }],
+  },
+  'limpador-esgoto': {
+    id: 'limpador-esgoto',
+    nome: 'Limpador de Esgoto',
+    vida: 105,
+    contra: 16,
+    fases: [{ ataques: [golpe('Escovão', 600, 13, 800), fogo('Jato de lodo', 650, 17, 950), finta(480), golpe('Desentupidor', 560, 10, 850, 2, 320)], pausaMs: [600, 950] }],
+  },
+  'jacare-rei': {
+    id: 'jacare-rei',
+    nome: 'O Jacaré-Rei',
+    vida: 135,
+    contra: 20,
+    pecas: 3,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [investida('Bocarra', 650, 22, 1100), finta(450), golpe('Rabada dupla', 560, 12, 900, 2, 330)], pausaMs: [600, 900] },
+      { ataques: [golpe('Rolar na água', 480, 8, 900, 4, 260), investida('Bocarra', 560, 24, 1100), finta(400)], pausaMs: [500, 800] },
+    ],
+  },
+  // Rota C (feira)
+  'feirante-automato': {
+    id: 'feirante-automato',
+    nome: 'Feirante Autômato',
+    vida: 100,
+    contra: 15,
+    fases: [{ ataques: [golpe('Prato da balança', 600, 13, 800), fogo('Melancia voadora', 650, 16, 950), finta(480), golpe('Peso de ferro', 580, 10, 850, 2, 330)], pausaMs: [600, 950] }],
+  },
+  'guarda-feira': {
+    id: 'guarda-feira',
+    nome: 'Guarda da Feira',
+    vida: 115,
+    contra: 17,
+    fases: [{ ataques: [golpe('Cassetete', 560, 14, 800), investida('Multa voadora', 620, 18, 950), finta(450), golpe('Cassetete duplo', 540, 10, 850, 2, 300)], pausaMs: [550, 900] }],
+  },
+  'feirante-chefe': {
+    id: 'feirante-chefe',
+    nome: 'O Fiscal da Feira',
+    vida: 130,
+    contra: 19,
+    pecas: 3,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [fogo('Chuva de frutas', 620, 11, 950, 3, 320), golpe('Carimbo', 560, 15, 800), finta(450)], pausaMs: [600, 900] },
+      { ataques: [investida('Carrinho de feira', 580, 22, 1000), golpe('Carimbo duplo', 500, 10, 850, 3, 280), finta(400)], pausaMs: [500, 800] },
+    ],
+  },
+  // Na porta do cofre (todas as rotas)
+  'guarda-cofre': {
+    id: 'guarda-cofre',
+    nome: 'Guarda do Cofre',
+    vida: 125,
+    contra: 18,
+    fases: [{ ataques: [golpe('Chave gigante', 580, 15, 850), finta(450), investida('Porta de cofre', 640, 20, 1000), golpe('Moedas na cara', 520, 8, 850, 3, 280)], pausaMs: [550, 900] }],
+  },
+  // Chefão: o Cobrador. A boca de moeda fica vermelha antes do JATO DE MOEDAS (esquiva).
+  cobrador: {
+    id: 'cobrador',
+    nome: 'O Cobrador',
+    vida: 230,
+    chefao: true,
+    contra: 20,
+    trocaDeFase: [0.66, 0.33],
+    fases: [
+      { ataques: [golpe('Saco de moedas', 700, 16, 950), fogo('Jato de moedas', 850, 20, 1100), finta(600), golpe('Ábaco', 620, 11, 900, 2, 360)], pausaMs: [750, 1100] },
+      { ataques: [fogo('Jato de moedas', 700, 14, 1000, 2, 400), investida('Multa em dobro', 650, 22, 1100), finta(500), golpe('Carimbo do imposto', 560, 16, 800)], pausaMs: [600, 950] },
+      { ataques: [fogo('Chuva de ouro', 620, 12, 1000, 3, 340), golpe('Cobrança final', 500, 9, 900, 4, 260), finta(420), investida('Multa em dobro', 560, 24, 1100)], pausaMs: [500, 800] },
+    ],
+  },
+
+  // ---------- Caminho do Octavius: Capítulo 5, A Frota Fantasma ----------
+  'sentinela-cais': {
+    id: 'sentinela-cais',
+    nome: 'Sentinela do Cais',
+    vida: 125,
+    contra: 19,
+    fases: [{ ataques: [investida('Lança-lanterna', 600, 20, 950), golpe('Cabo da lança', 540, 13, 780), finta(450), fogo('Lanterna acesa', 620, 18, 950)], pausaMs: [550, 900] }],
+  },
+  'imediato-ferro': {
+    id: 'imediato-ferro',
+    nome: 'O Imediato de Ferro',
+    vida: 140,
+    contra: 20,
+    pecas: 3,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [golpe('Machado de abordagem', 600, 16, 850), investida('Perna de pau', 650, 20, 1000), finta(450)], pausaMs: [550, 900] },
+      { ataques: [golpe('Machado em X', 500, 10, 900, 3, 280), investida('Abordagem!', 560, 22, 1000), finta(400)], pausaMs: [480, 780] },
+    ],
+  },
+  // Chefão: o Almirante Ferrugem reconstruído em aço, com dois canhões.
+  'almirante-aco': {
+    id: 'almirante-aco',
+    nome: 'Almirante de Aço',
+    vida: 260,
+    chefao: true,
+    contra: 22,
+    trocaDeFase: [0.66, 0.33],
+    fases: [
+      { ataques: [fogo('Canhão duplo', 800, 13, 1100, 2, 420), golpe('Sabre de aço', 620, 16, 900), finta(550), investida('Abalroar', 700, 22, 1100)], pausaMs: [650, 1000] },
+      { ataques: [fogo('Bordada de aço', 650, 11, 1000, 3, 360), golpe('Sabre duplo', 540, 11, 900, 2, 300), finta(450), investida('Abalroar', 600, 24, 1100)], pausaMs: [550, 850] },
+      { ataques: [fogo('Todos os canhões', 600, 10, 1000, 4, 300), golpe('Sabre furioso', 480, 9, 900, 4, 250), finta(400), investida('Afundar tudo', 540, 26, 1100)], pausaMs: [480, 760] },
+    ],
+  },
+
+  // ---------- Caminho do Octavius: Capítulo 6, A Naumaquia ----------
+  'tritao-mecanico': {
+    id: 'tritao-mecanico',
+    nome: 'Tritão Mecânico',
+    vida: 150,
+    contra: 21,
+    fases: [{ ataques: [investida('Tridente', 580, 20, 950), fogo('Onda', 650, 18, 1000), finta(420), golpe('Três pontas', 520, 9, 900, 3, 270)], pausaMs: [500, 850] }],
+  },
+  mergulhador: {
+    id: 'mergulhador',
+    nome: 'O Mergulhador',
+    vida: 155,
+    contra: 21,
+    fases: [{ ataques: [fogo('Arpão', 620, 20, 950), finta(420), golpe('Capacete', 560, 15, 800), investida('Emergir!', 600, 22, 1000)], pausaMs: [500, 850] }],
+  },
+  'campeao-naval': {
+    id: 'campeao-naval',
+    nome: 'O Campeão Naval',
+    vida: 175,
+    contra: 24,
+    pecas: 4,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [golpe('Âncora-mangual', 650, 18, 950), investida('Escudo do Olho', 620, 22, 1000), finta(480)], pausaMs: [550, 900] },
+      { ataques: [golpe('Mangual girando', 500, 9, 900, 4, 260), investida('Escudo do Olho', 560, 24, 1000), finta(420)], pausaMs: [480, 780] },
+    ],
+  },
+  'mergulhador-elite': {
+    id: 'mergulhador-elite',
+    nome: 'Mergulhador de Elite',
+    vida: 165,
+    contra: 22,
+    fases: [{ ataques: [fogo('Dois arpões', 580, 13, 950, 2, 330), finta(400), golpe('Capacete', 520, 16, 780), investida('Emergir!', 560, 23, 1000)], pausaMs: [480, 800] }],
+  },
+  // Chefão: o Leviatã Mecânico, a serpente de ferro que sobe da água da arena.
+  leviata: {
+    id: 'leviata',
+    nome: 'O Leviatã Mecânico',
+    vida: 300,
+    chefao: true,
+    contra: 24,
+    trocaDeFase: [0.66, 0.33],
+    fases: [
+      { ataques: [investida('Bote da serpente', 750, 24, 1150), fogo('Jato de vapor', 800, 22, 1100), finta(550), golpe('Cauda', 650, 13, 950, 2, 380)], pausaMs: [650, 1000] },
+      { ataques: [golpe('Anéis de ferro', 550, 10, 950, 3, 300), fogo('Jato de vapor', 680, 22, 1100), investida('Bote da serpente', 620, 25, 1150), finta(450)], pausaMs: [550, 880] },
+      { ataques: [fogo('Tempestade de vapor', 600, 13, 1000, 3, 340), golpe('Abraço da serpente', 480, 9, 950, 4, 250), finta(400), investida('Bote final', 540, 28, 1150)], pausaMs: [480, 760] },
+    ],
+  },
+  // O final do Octavius: o mesmo titã, mas quem ajuda são o Cassius e o Helios.
+  'censor-tita-octavius': {
+    id: 'censor-tita-octavius',
+    nome: 'O Censor, Titã do Coliseu',
+    vida: 380,
+    chefao: true,
+    contra: 26,
+    aliados: ['cassius', 'helios'],
+    pecas: 0,
+    trocaDeFase: [0.66, 0.33],
+    fases: [
+      { ataques: [investida('Pisão do titã', 900, 26, 1200), golpe('Pedras caindo', 700, 12, 1000, 3, 380), finta(650)], pausaMs: [800, 1200] },
+      { ataques: [golpe('Braço de engrenagem', 650, 16, 1000, 2, 400), fogo('Correntes da Lei', 750, 24, 1100), finta(550), investida('Varredura de braço', 650, 26, 1100)], pausaMs: [650, 1000] },
+      { ataques: [fogo('O OLHO: raio da Resposta Única', 800, 30, 1300), golpe('Desmoronar', 500, 10, 950, 4, 270), finta(450), fogo('Raio duplo', 650, 20, 1100, 2, 420)], pausaMs: [550, 850] },
+    ],
+  },
 };

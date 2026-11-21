@@ -3,6 +3,7 @@ import { CenaColiseu } from '../arcade/cenas/Cenarios';
 import { desenhoCapitulo } from './cenarios/capitulos';
 import { desenhoCapitulo2 } from './cenarios/capitulos2';
 import { desenhoCapitulo3 } from './cenarios/capitulos3';
+import { desenhoCapitulo4 } from './cenarios/capitulos4';
 import { desenhoPrologo } from './cenarios/prologo';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
@@ -43,7 +44,8 @@ import {
   paletaLeao,
   PRETOR_DE_ACO,
 } from '@/ui/pixel/historia2';
-import { COZINHEIRO_BORDO, FEITOR_TAMBOR, GAIVOTA, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GAIVOTA, PALETA_PISTAO, PISTAO } from '@/ui/pixel/historia3';
+import { COBRADOR, COZINHEIRO_BORDO, FEITOR_TAMBOR, GAIVOTA, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GAIVOTA, PALETA_PISTAO, paletaCobrador, PISTAO } from '@/ui/pixel/historia3';
+import { CAIO, IMEDIATO_FERRO, PALETA_CAIO, PALETA_IMEDIATO } from '@/ui/pixel/historia4';
 
 /**
  * Os cenários do modo História, em pixel (160 × 90, ampliados sem suavizar).
@@ -56,7 +58,7 @@ export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
   // A Grande Arena dos Jogos da Resposta Única: a arena imperial, lotada e em festa.
   if (lugar === 'coliseu-noite') return <CenaColiseu corA="#f08c50" corB="#c0283c" arena="imperial" viva festa />;
   // Os cenários novos, em 320 × 180 (o dobro de detalhe).
-  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar);
+  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar) ?? desenhoCapitulo4(lugar);
   if (hd)
     return (
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
@@ -433,6 +435,12 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={ECO} paleta={PALETA_ECO} espelhar={espelhar} />;
     case 'crianca':
       return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
+    case 'caio':
+      return <Sprite grade={CAIO} paleta={PALETA_CAIO} espelhar={espelhar} />;
+    case 'cobrador':
+      return <Sprite grade={COBRADOR} paleta={paletaCobrador(false)} espelhar={espelhar} />;
+    case 'imediato':
+      return <Sprite grade={IMEDIATO_FERRO} paleta={PALETA_IMEDIATO} espelhar={espelhar} />;
     case 'rufus':
       return <Sprite grade={GLADIADOR_SUCATA} paleta={{ ...PALETA_SUCATA, G: '#6a4a3a', g: '#a8806a', E: '#ffd04a', A: '#5a3a2a' }} espelhar={espelhar} />;
     case 'gaivota':

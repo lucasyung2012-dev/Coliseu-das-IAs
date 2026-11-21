@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
 import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
-import { CAPITULOS, PROLOGO, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
+import { CAPITULOS, PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -15,6 +15,8 @@ import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
 import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
 import { Ludus } from './Ludus';
+import { EscolhaRota } from './EscolhaRota';
+import { MinigameBarcos, MinigameCanhoes, MinigameEstrelas, MinigamePerseguicao } from './MinigamesOctavius';
 import { MinigameCorrida, MinigameForja, MinigameMemoria, MinigameTorre, MinigameTrio } from './MinigamesLudus';
 import { DesafioRemar, DesafioTempestade } from './MinigamesMar';
 
@@ -208,9 +210,11 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   }
 
   const cena: Cena | undefined = cap.cenas[save.cena];
-  const proxima = () => {
-    const fimDoCapitulo = save.cena + 1 >= cap.cenas.length;
-    gravarSaveHistoria(fimDoCapitulo ? avancarSave(save, save.capitulo + 1, 0) : avancarSave(save, save.capitulo, save.cena + 1));
+  // A próxima cena que vale (as cenas de uma rota que o jogador não escolheu são puladas).
+  const proxima = (s: SaveHistoria = save) => {
+    const i = proximaCena(cap, s.cena, s.escolhas);
+    const fimDoCapitulo = i >= cap.cenas.length;
+    gravarSaveHistoria(fimDoCapitulo ? avancarSave(s, s.capitulo + 1, 0) : avancarSave(s, s.capitulo, i));
   };
 
   if (aberturaCapitulo) {
@@ -237,14 +241,23 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   }
 
   if (!cena) return null;
-  if (cena.tipo === 'cutscene') return <Cutscene quadros={cena.quadros} onFim={proxima} />;
+  if (cena.tipo === 'escolha')
+    return (
+      <EscolhaRota
+        lugar={cena.lugar}
+        pergunta={cena.pergunta}
+        opcoes={cena.opcoes}
+        onEscolher={(valor) => proxima({ ...save, escolhas: { ...save.escolhas, [cena.id]: valor } })}
+      />
+    );
+  if (cena.tipo === 'cutscene') return <Cutscene quadros={cena.quadros} onFim={() => proxima()} />;
   if (cena.tipo === 'conversa')
     return (
       <Palco lugar={cena.lugar}>
-        <Falas falas={cena.falas} onFim={proxima} />
+        <Falas falas={cena.falas} onFim={() => proxima()} />
       </Palco>
     );
-  if (cena.tipo === 'explorar') return <Explorar lugar={cena.lugar} objetivo={cena.objetivo} pontos={cena.pontos} heroi={heroi} onFim={proxima} />;
+  if (cena.tipo === 'explorar') return <Explorar lugar={cena.lugar} objetivo={cena.objetivo} pontos={cena.pontos} heroi={heroi} onFim={() => proxima()} />;
   if (cena.tipo === 'luta')
     return (
       <LutaHistoria
@@ -255,7 +268,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         depois={cena.depois}
         atributos={atributosDoSave(save)}
         onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
-        onFim={proxima}
+        onFim={() => proxima()}
       />
     );
   if (cena.tipo === 'ludus')
@@ -269,7 +282,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         obrigatorio={cena.obrigatorio}
         presente={cena.presente}
         onGravar={(s) => gravarSaveHistoria({ ...s, atualizadoEm: new Date().toISOString() })}
-        onFim={proxima}
+        onFim={() => proxima()}
       />
     );
   if (cena.desafio === 'furtivo')
@@ -281,7 +294,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         depois={cena.depois ?? []}
         vigia={cena.vigia ?? 'a guarda'}
         objetivo={cena.objetivo ?? 'Atravesse sem ser visto.'}
-        onFim={proxima}
+        onFim={() => proxima()}
       />
     );
   if (cena.desafio === 'ritmo')
@@ -293,22 +306,26 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         objetivo={cena.objetivo ?? 'Toque no tempo certo.'}
         acao={cena.acao ?? 'GIRAR'}
         quantos={cena.quantos ?? 8}
-        onFim={proxima}
+        onFim={() => proxima()}
       />
     );
-  if (cena.desafio === 'proteger') return <DesafioProteger lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'armadilhas') return <DesafioArmadilhas lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'forja') return <MinigameForja lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'memoria') return <MinigameMemoria lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'corrida') return <MinigameCorrida lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'torre') return <MinigameTorre lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
-  if (cena.desafio === 'ler-marcas') return <DesafioMarcas lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
-  if (cena.desafio === 'escolher-plano') return <DesafioPlanos lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
-  if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
-  return <DesafioLivros lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
+  if (cena.desafio === 'proteger') return <DesafioProteger lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'armadilhas') return <DesafioArmadilhas lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'forja') return <MinigameForja lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'memoria') return <MinigameMemoria lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'corrida') return <MinigameCorrida lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'torre') return <MinigameTorre lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'perseguicao') return <MinigamePerseguicao lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'canhoes') return <MinigameCanhoes lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'estrelas') return <MinigameEstrelas lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'barcos') return <MinigameBarcos lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'ler-marcas') return <DesafioMarcas lugar={cena.lugar} antes={cena.antes} onFim={() => proxima()} />;
+  if (cena.desafio === 'escolher-plano') return <DesafioPlanos lugar={cena.lugar} antes={cena.antes} onFim={() => proxima()} />;
+  if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={() => proxima()} />;
+  return <DesafioLivros lugar={cena.lugar} antes={cena.antes} onFim={() => proxima()} />;
 }
 
 /** Qual história deste gladiador é (pela ordem em que foi criada): "História nº 2 do Octavius". */

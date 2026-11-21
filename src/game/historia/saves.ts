@@ -25,6 +25,8 @@ export interface SaveHistoria {
   tecnicas?: Tecnica[];
   pecas?: number;
   equipamento?: Equipamento[];
+  /** O que o jogador escolheu nas ESCOLHAS do capítulo (ex.: a rota no Mercado das Engrenagens). */
+  escolhas?: Record<string, string>;
 }
 
 export type Treino = 'forca' | 'defesa' | 'vida' | 'carisma';
