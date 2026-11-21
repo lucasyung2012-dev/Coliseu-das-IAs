@@ -18,7 +18,7 @@ import { MenuPausa, PausaContexto } from './Pausa';
 import { abafarMusica, temaDoLugar, useMusica, type TemaMusica } from '@/ui/musica';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { FASES } from '@/game/historia/fases';
-import { MUNDOS } from '@/game/historia/mundos';
+import { MAPAS, MUNDOS, mundoDoExplorar } from '@/game/historia/mundos';
 import { MundoAberto } from './MundoAberto';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
@@ -400,6 +400,8 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         <Falas falas={cena.falas} onFim={() => proxima()} />
       </Palco>
     );
+  if (cena.tipo === 'explorar' && cena.mapa && MAPAS[cena.mapa])
+    return <MundoAberto key={cena.id} mundo={mundoDoExplorar(cena, MAPAS[cena.mapa]!)} heroi={heroi} onSegredo={ganharSegredoHistoria} onFim={() => proxima()} />;
   if (cena.tipo === 'explorar')
     return (
       <Explorar

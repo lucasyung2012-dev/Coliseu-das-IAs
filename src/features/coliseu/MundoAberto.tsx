@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type Mundo } from '@/game/historia/mundo';
+import { marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type Mundo, type TemaMundo } from '@/game/historia/mundo';
 import type { Fala, Falante } from '@/game/historia/roteiro';
 import Emote from '@/ui/pixel/Emotes';
 import Icone from '@/ui/pixel/Icones';
@@ -196,7 +196,11 @@ export function MundoAberto({ mundo, heroi, onFim, onSegredo }: { mundo: Mundo; 
         </div>
 
         {/* A luz: escuro em volta, como uma noite de verdade */}
-        <div className="pointer-events-none absolute inset-0 z-[400] bg-[radial-gradient(ellipse_at_50%_55%,transparent_45%,rgba(4,2,12,0.55)_100%)]" aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-0 z-[400]"
+          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${CORES[mundo.tema].escuro}) 100%)` }}
+          aria-hidden
+        />
 
         {conversa && (
           <div className="absolute inset-0 z-[500]">
@@ -250,6 +254,14 @@ function BotaoSeta({ nome, props }: { nome: string; props: PropsSeta }) {
   );
 }
 
+/** As cores de cada tema: o chão, a parede (pedra e tijolo), a face da parede e quanto escurece em volta. */
+const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; parede2: string; face: string; faceTopo: string; escuro: number }> = {
+  biblioteca: { chao1: '#5a4a3e', chao2: '#53443a', parede1: '#24180f', parede2: '#2e2016', face: '#4a3424', faceTopo: '#6a4c34', escuro: 0.55 },
+  catacumbas: { chao1: '#3a3632', chao2: '#34302c', parede1: '#141210', parede2: '#1c1916', face: '#2e2a26', faceTopo: '#4a443c', escuro: 0.82 },
+  forum: { chao1: '#a89a84', chao2: '#9e907a', parede1: '#8a7e6a', parede2: '#94887a', face: '#d8ccb4', faceTopo: '#f0e6d0', escuro: 0.18 },
+  tunel: { chao1: '#6a5434', chao2: '#624e30', parede1: '#201810', parede2: '#2a2016', face: '#4a3a28', faceTopo: '#6a5438', escuro: 0.68 },
+};
+
 /**
  * O mapa desenhado em pixel, ladrilho por ladrilho (feito uma vez só: memo). Cada ladrilho
  * tem o seu desenho: pedra, tapete com borda dourada, parede com tijolos e a face de frente,
@@ -261,6 +273,7 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
   const t = (x: number, y: number) => mundo.mapa[y]?.[x] ?? '#';
   const pecas: ReactNode[] = [];
   const luzes: ReactNode[] = [];
+  const cor = CORES[mundo.tema];
   mundo.mapa.forEach((linha, y) =>
     linha.split('').forEach((c, x) => {
       const X = x * PX;
@@ -273,7 +286,76 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
           <rect x={X} y={Y + PX - 1} width={PX} height="1" fill="#3a2e26" opacity="0.5" />
         </g>
       );
-      if (c === '.' || c === 'P' || c === 'T' || c === 'S' || c === 'p' || c === 'v') pecas.push(chao('#5a4a3e', '#53443a'));
+      if ('.PTSpvftgxM'.includes(c)) pecas.push(chao(cor.chao1, cor.chao2));
+      // Mármore (o Fórum): placas claras com veios.
+      if (c === 'm')
+        pecas.push(
+          <g key={`mm${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#e4dccc" />
+            <rect x={X + ((x + y) % 2) * 8} y={Y} width="8" height={PX} fill="#d8cfbd" />
+            <rect x={X + 2} y={Y + 5} width="6" height="1" fill="#c8bca4" />
+            <rect x={X} y={Y + PX - 1} width={PX} height="1" fill="#b8ac94" />
+          </g>,
+        );
+      // A fonte do Fórum (2 × 2: desenha uma vez, no canto de cima à esquerda).
+      if (c === 'f' && t(x - 1, y) !== 'f' && t(x, y - 1) !== 'f')
+        pecas.push(
+          <g key={`fo${k}`}>
+            <rect x={X + 2} y={Y + 4} width="28" height="24" fill="#b8ac94" />
+            <rect x={X + 4} y={Y + 6} width="24" height="20" fill="#3a7aa0" />
+            <rect x={X + 6} y={Y + 9} width="6" height="1" fill="#a8d8f0" className="luz-lua" />
+            <rect x={X + 18} y={Y + 18} width="6" height="1" fill="#a8d8f0" className="luz-lua" />
+            <rect x={X + 14} y={Y + 10} width="4" height="10" fill="#d8ccb4" />
+            <rect x={X + 15} y={Y + 6} width="2" height="4" fill="#a8d8f0" />
+          </g>,
+        );
+      // A barraca de feira: balcão de madeira e o toldo listrado.
+      if (c === 't')
+        pecas.push(
+          <g key={`ba${k}`}>
+            <rect x={X} y={Y + 8} width={PX} height="7" fill="#8a5a2a" />
+            <rect x={X} y={Y + 8} width={PX} height="2" fill="#a8743a" />
+            <rect x={X} y={Y} width={PX} height="7" fill={x % 2 ? '#c0283c' : '#f0e6cc'} />
+            <rect x={X + 4} y={Y + 10} width="3" height="3" fill="#e0782c" />
+            <rect x={X + 9} y={Y + 10} width="3" height="3" fill="#4ad46a" />
+          </g>,
+        );
+      // A grade de ferro (o portão da arena): barras na frente do escuro.
+      if (c === 'g')
+        pecas.push(
+          <g key={`gr${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#120c08" />
+            {[1, 5, 9, 13].map((b) => (
+              <rect key={b} x={X + b} y={Y} width="2" height={PX} fill="#5a5a66" />
+            ))}
+            <rect x={X} y={Y + 6} width={PX} height="2" fill="#4a4a54" />
+          </g>,
+        );
+      // O monte de sucata (o ninho dos ratos de metal).
+      if (c === 'x')
+        pecas.push(
+          <g key={`su${k}`}>
+            <rect x={X + 1} y={Y + 5} width="14" height="10" fill="#4a4a54" />
+            <rect x={X + 3} y={Y + 2} width="8" height="6" fill="#6a6a74" />
+            <rect x={X + 5} y={Y + 7} width="4" height="4" fill="#8a7a4a" />
+            <rect x={X + 10} y={Y + 9} width="3" height="3" fill="#a8742a" />
+            <rect x={X + 2} y={Y + 12} width="5" height="1" fill="#e8dcc0" />
+          </g>,
+        );
+      // A máquina violeta do Arquivo (2 × 2): suga as letras dos rolos.
+      if (c === 'M' && t(x - 1, y) !== 'M' && t(x, y - 1) !== 'M') {
+        pecas.push(
+          <g key={`ma${k}`}>
+            <rect x={X + 2} y={Y} width="28" height="30" fill="#3a2a4a" />
+            <rect x={X + 4} y={Y + 2} width="24" height="10" fill="#6a3aa0" />
+            <rect x={X + 8} y={Y + 4} width="16" height="6" fill="#c08aff" className="luz-vela" />
+            {[0, 1, 2, 3].map((r) => (
+              <rect key={r} x={X + 6 + r * 6} y={Y + 16} width="3" height="10" fill="#8a5ac8" />
+            ))}
+          </g>,
+        );
+        luzes.push(<circle key={`ml${k}`} cx={X + 16} cy={Y + 8} r="30" fill="#a06aff" opacity="0.18" className="luz-vela" />);
+      }
       if (c === 'c') {
         pecas.push(
           <g key={`t${k}`}>
@@ -286,16 +368,29 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
           </g>,
         );
       }
-      if (c === '#' || c === 'J') {
-        const frente = t(x, y + 1) !== '#' && t(x, y + 1) !== 'J' && t(x, y + 1) !== 'E';
+      if (c === '#' || c === 'J' || c === 'N' || c === 'o') {
+        const frente = !'#JENo'.includes(t(x, y + 1));
         pecas.push(
           <g key={`p${k}`}>
-            <rect x={X} y={Y} width={PX} height={PX} fill="#24180f" />
+            <rect x={X} y={Y} width={PX} height={PX} fill={cor.parede1} />
             {[0, 1, 2, 3].map((r) => (
-              <rect key={r} x={X + (r % 2) * 6} y={Y + r * 4} width="9" height="3" fill="#2e2016" />
+              <rect key={r} x={X + (r % 2) * 6} y={Y + r * 4} width="9" height="3" fill={cor.parede2} />
             ))}
-            {frente && <rect x={X} y={Y + 10} width={PX} height="6" fill="#4a3424" />}
-            {frente && <rect x={X} y={Y + 10} width={PX} height="1" fill="#6a4c34" />}
+            {frente && <rect x={X} y={Y + 10} width={PX} height="6" fill={cor.face} />}
+            {frente && <rect x={X} y={Y + 10} width={PX} height="1" fill={cor.faceTopo} />}
+            {/* A parede dos nomes: riscos gravados na pedra */}
+            {c === 'N' &&
+              [2, 5, 8].map((r) => <rect key={`n${r}`} x={X + 2 + (r % 3)} y={Y + r} width={8 + ((x * r) % 4)} height="1" fill="#c8b890" opacity="0.7" />)}
+            {/* O nicho de ossos: caveiras enfileiradas */}
+            {c === 'o' &&
+              [3, 9].map((cx) => (
+                <g key={`o${cx}`}>
+                  <rect x={X + cx - 1} y={Y + 3} width="5" height="5" fill="#e8dcc0" />
+                  <rect x={X + cx} y={Y + 5} width="1" height="1" fill="#2a2018" />
+                  <rect x={X + cx + 2} y={Y + 5} width="1" height="1" fill="#2a2018" />
+                  <rect x={X + cx - 1} y={Y + 8} width="5" height="1" fill="#c8bca0" />
+                </g>
+              ))}
             {c === 'J' && (
               <>
                 <rect x={X + 3} y={Y + 2} width="10" height="11" fill="#6a4c34" />

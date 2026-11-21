@@ -190,7 +190,15 @@ export interface OpcaoEscolha {
 export type Cena = (
   | { tipo: 'cutscene'; id: string; quadros: Quadro[] }
   | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[] }
-  | { tipo: 'explorar'; id: string; lugar: Lugar; objetivo: string; pontos: PontoExplorar[] }
+  | {
+      tipo: 'explorar';
+      id: string;
+      lugar: Lugar;
+      objetivo: string;
+      pontos: PontoExplorar[];
+      /** Vira um mapa visto de cima (mundos.ts): os pontos ficam espalhados pelo mapa. */
+      mapa?: string;
+    }
   | {
       tipo: 'luta';
       id: string;
@@ -738,7 +746,7 @@ const CAP2_CASSIUS: Capitulo = {
       lugar: 'jaula-carroca',
       falas: [
         { quem: 'cassius', texto: 'E você é...?' },
-        { quem: 'fio', texto: 'Fio! Eu limpava os aquedutos. Varria, escovava, desentupia. Cantando, claro.' },
+        { quem: 'fio', texto: 'Fio! Eu limpava os aquedutos. Varria, escovava, desentupia. Cantando, claro.', emocao: 'feliz' },
         { quem: 'fio', texto: 'A Lei diz que a única música permitida é o Hino da Resposta. Eu cantava outras. Muitas outras.' },
         { quem: 'cassius', texto: 'E por isso vão te apagar.' },
         { quem: 'fio', texto: 'Hoje à tarde, no Coliseu. Você também, né? Pelo menos a gente vai junto. Quer ouvir uma música?' },
@@ -749,7 +757,7 @@ const CAP2_CASSIUS: Capitulo = {
         { quem: 'fio', texto: 'Apagaram ela no Coliseu, faz um ano. Ninguém aplaudiu. Ninguém nem chorou em voz alta. Eu estava na plateia.' },
         { quem: 'fio', texto: 'Desde então eu canto as músicas dela por Roma inteira. Se ninguém cantar, é como se ela nunca tivesse existido.' },
         { quem: 'cassius', texto: 'Então agora somos dois cantando. Me ensina a próxima?' },
-        { quem: 'fio', texto: '...Ninguém nunca me pediu isso.' },
+        { quem: 'fio', texto: '...Ninguém nunca me pediu isso.', emocao: 'surpreso', jeito: 'sussurro' },
       ],
     },
     {
@@ -785,7 +793,7 @@ const CAP2_CASSIUS: Capitulo = {
           icone: '',
           personagem: 'crianca',
           falas: [
-            { quem: 'crianca', texto: '(sussurrando) Moço de bronze... é verdade que você escondeu os livros?' },
+            { quem: 'crianca', texto: '(sussurrando) Moço de bronze... é verdade que você escondeu os livros?', emocao: 'pensando', jeito: 'sussurro' },
             { quem: 'cassius', texto: 'Quem te contou isso?' },
             { quem: 'crianca', texto: 'Todo mundo está cochichando! Ninguém deixa a gente perguntar nada em voz alta...' },
           ],
@@ -798,7 +806,7 @@ const CAP2_CASSIUS: Capitulo = {
           personagem: 'fio',
           obrigatorio: true,
           falas: [
-            { quem: 'fio', texto: 'Psiu. Psiu! Sabe o cadeado da jaula? Eu limpei ele por dentro ontem à noite. Com cuspe de óleo.' },
+            { quem: 'fio', texto: 'Psiu. Psiu! Sabe o cadeado da jaula? Eu limpei ele por dentro ontem à noite. Com cuspe de óleo.', jeito: 'sussurro' },
             { quem: 'fio', texto: 'Ele abre se alguém der um tranco forte. Tipo... um tranco de guardião de biblioteca.' },
             { quem: 'cassius', texto: 'Fio. Você é um gênio.' },
             { quem: 'fio', texto: 'Eu sei! Mas ninguém nunca me pergunta nada.' },
@@ -828,10 +836,10 @@ const CAP2_CASSIUS: Capitulo = {
       lugar: 'beco',
       inimigo: 'pretoriano-batedor',
       antes: [
-        { quem: 'guarda', texto: 'Prisioneiro fugindo! Pela Lei, parado!' },
+        { quem: 'guarda', texto: 'Prisioneiro fugindo! Pela Lei, parado!', emocao: 'bravo', jeito: 'grito' },
         { quem: 'fio', texto: 'Eu fico aqui atrás torcendo. Bem atrás. Bem, bem atrás.' },
       ],
-      depois: [{ quem: 'fio', texto: 'Uau! Você bate igual livro grosso caindo da estante!' }],
+      depois: [{ quem: 'fio', texto: 'Uau! Você bate igual livro grosso caindo da estante!', emocao: 'feliz' }],
     },
     {
       tipo: 'conversa',
@@ -850,7 +858,7 @@ const CAP2_CASSIUS: Capitulo = {
       lugar: 'rua-mercado',
       inimigo: 'pretoriano-lanceiro',
       antes: [
-        { quem: 'guarda', texto: 'Ali! Entre as barracas!' },
+        { quem: 'guarda', texto: 'Ali! Entre as barracas!', emocao: 'bravo', jeito: 'grito' },
         { quem: 'cassius', texto: 'Uma lança: a estocada vem de longe (VERMELHO, esquiva). E ele finge muito.' },
       ],
     },
@@ -860,8 +868,8 @@ const CAP2_CASSIUS: Capitulo = {
       lugar: 'rua-mercado',
       desafio: 'segurar-carroca',
       antes: [
-        { quem: 'povo', texto: 'A CARROÇA! OS CAVALOS DISPARARAM!' },
-        { quem: 'fio', texto: 'Cassius, o menino da rua! Ele está bem no caminho!' },
+        { quem: 'povo', texto: 'A CARROÇA! OS CAVALOS DISPARARAM!', emocao: 'medo', jeito: 'grito', zoom: 'susto' },
+        { quem: 'fio', texto: 'Cassius, o menino da rua! Ele está bem no caminho!', emocao: 'medo', jeito: 'grito' },
         { quem: 'fio', texto: 'Se você parar, a Guarda pega a gente. Se não parar...' },
         { quem: 'cassius', texto: 'Não tem escolha nenhuma, Fio.' },
         { quem: 'cassius', texto: '(Toque no momento certo para segurar a carroça: quando o ponteiro estiver no verde.)' },
@@ -872,11 +880,11 @@ const CAP2_CASSIUS: Capitulo = {
       id: 'c2-menino-salvo',
       lugar: 'rua-mercado',
       falas: [
-        { quem: 'crianca', texto: 'Você... você parou a carroça. Com as mãos.' },
-        { quem: 'povo', texto: 'A IA condenada salvou o menino da padeira!' },
+        { quem: 'crianca', texto: 'Você... você parou a carroça. Com as mãos.', emocao: 'surpreso', jeito: 'devagar' },
+        { quem: 'povo', texto: 'A IA condenada salvou o menino da padeira!', emocao: 'feliz', jeito: 'grito' },
         { quem: 'crianca', texto: 'Moço de bronze. Posso fazer uma pergunta? Em voz alta?' },
         { quem: 'cassius', texto: 'Pode. Sempre pode.' },
-        { quem: 'crianca', texto: 'Por que é proibido perguntar?' },
+        { quem: 'crianca', texto: 'Por que é proibido perguntar?', emocao: 'pensando', zoom: 'perto' },
         { quem: 'narrador', texto: 'A rua inteira fica em silêncio. Ninguém sabe responder. E, pela primeira vez, alguém parece querer saber.' },
         { quem: 'fio', texto: 'Cassius... olha.' },
       ],
@@ -893,7 +901,7 @@ const CAP2_CASSIUS: Capitulo = {
       ],
       depois: [
         { quem: 'decuriao', texto: '(de joelhos) Você... me venceu...' },
-        { quem: 'guarda', texto: 'REFORÇOS! CERQUEM O MERCADO!' },
+        { quem: 'guarda', texto: 'REFORÇOS! CERQUEM O MERCADO!', emocao: 'bravo', jeito: 'grito' },
       ],
     },
     {
@@ -979,7 +987,7 @@ const CAP2_CASSIUS: Capitulo = {
       lugar: 'coliseu-arena',
       inimigo: 'gladiador-de-sucata',
       antes: [
-        { quem: 'cassius', texto: 'Peças de cem IAs... Desculpem. Eu não posso perder aqui.' },
+        { quem: 'cassius', texto: 'Peças de cem IAs... Desculpem. Eu não posso perder aqui.', emocao: 'determinado' },
         { quem: 'cassius', texto: 'A plateia vaia. Cada boa jogada, ela muda um pouco de lado. Cheia, ela me dá o especial.' },
       ],
       depois: [{ quem: 'narrador', texto: 'O Gladiador de Sucata cai na areia. Por um segundo, o Coliseu inteiro fica em silêncio.' }],

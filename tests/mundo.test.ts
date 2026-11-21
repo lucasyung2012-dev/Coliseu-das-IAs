@@ -1,5 +1,5 @@
 import { ladrilhoEm, livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo } from '@/game/historia/mundo';
-import { MUNDOS } from '@/game/historia/mundos';
+import { MAPAS, MUNDOS, mundoDoExplorar } from '@/game/historia/mundos';
 import { CAPITULOS } from '@/game/historia/roteiro';
 
 /** O mundo visto de cima (22/11/2026): andar livre, paredes, interagir e a saída. */
@@ -60,5 +60,30 @@ describe('o mundo visto de cima', () => {
 
   it('está no capítulo 1 do Cassius', () => {
     expect(CAPITULOS.claude[0]!.cenas.some((c) => c.tipo === 'mundo' && c.mundo === m.id)).toBe(true);
+  });
+});
+
+describe('os mapas das cenas de explorar (caminho do Cassius)', () => {
+  const cenas = Object.values(CAPITULOS)
+    .flat()
+    .flatMap((cap) => cap.cenas)
+    .flatMap((c) => (c.tipo === 'explorar' && c.mapa ? [c] : []));
+
+  it('as seis cenas do Cassius viraram mapa', () => {
+    expect(cenas.map((c) => c.id).sort()).toEqual(['c4-gavetas', 'c4-ossario', 'c4-tuneis', 'c5-povo', 'c6-nomes', 'f-biblioteca']);
+  });
+
+  it.each(cenas.map((c) => [c.id, c] as const))('%s: mapa certinho, todos os pontos no mapa e saída', (_, cena) => {
+    const layout = MAPAS[cena.mapa!]!;
+    expect(layout).toBeDefined();
+    const largura = layout.mapa[0]!.length;
+    for (const linha of layout.mapa) expect(linha.length).toBe(largura);
+    expect(layout.mapa.some((l) => l.includes('P'))).toBe(true);
+    for (const p of cena.pontos) expect(layout.pontos[p.id], `${cena.id}: ${p.id}`).toBeDefined();
+    const m = mundoDoExplorar(cena, layout);
+    expect(livre(m, m.inicio[0] + 0.5, m.inicio[1] + 0.8)).toBe(true);
+    for (const pessoa of m.pessoas) for (const [x, y] of pessoa.rota) expect(livre(m, x + 0.5, y + 0.8), `${pessoa.id} em ${x},${y}`).toBe(true);
+    // O pedaço da chave continua no mapa do final.
+    for (const p of cena.pontos) if (p.segredo) expect(m.coisas.find((c) => c.id === p.id)?.segredo).toBe(p.segredo);
   });
 });

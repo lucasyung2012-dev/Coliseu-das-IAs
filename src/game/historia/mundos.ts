@@ -1,4 +1,5 @@
-import type { Mundo } from './mundo';
+import type { Coisa, Mundo, Pessoa, TemaMundo } from './mundo';
+import type { Cena, Lugar } from './roteiro';
 
 /**
  * Os mapas do mundo visto de cima. O primeiro (22/11/2026) é a Grande Biblioteca à
@@ -89,3 +90,177 @@ export const MUNDOS: Record<string, Mundo> = {
     ],
   },
 };
+
+/**
+ * OS MAPAS DOS PONTOS DE EXPLORAR (22/11/2026): a cena de explorar continua no roteiro
+ * (as mesmas falas, os mesmos pontos, o pedaço da chave), e o mapa só diz onde cada ponto
+ * fica. Ponto com personagem vira uma pessoa no mapa; os outros viram coisas para examinar.
+ *
+ * Ladrilhos novos: o nicho de ossos · m mármore · f fonte · t barraca · g grade de ferro ·
+ * x monte de sucata · M a máquina violeta · N parede com nomes gravados.
+ */
+export interface MapaDeExplorar {
+  tema: TemaMundo;
+  mapa: string[];
+  inicio: [number, number];
+  /** Onde fica cada ponto (pelo id do ponto) e, se for gente, por onde anda. */
+  pontos: Record<string, [number, number]>;
+  rotas?: Record<string, [number, number][]>;
+}
+
+export const MAPAS: Record<string, MapaDeExplorar> = {
+  // Capítulo 4: os túneis das catacumbas, com os sinais dos Copistas.
+  'catacumbas-tuneis': {
+    tema: 'catacumbas',
+    inicio: [2, 6],
+    mapa: [
+      '######################',
+      '#oooo#oooooo#ooooooo##',
+      '#....#......#.......v#',
+      '#....#..##..#........#',
+      '#.v..#..##..####..####',
+      '#.......##...........#',
+      '#....................#',
+      '####..#####..###.....#',
+      '#ooo..ooooo..ooo.....#',
+      '#v.................v.#',
+      '#...................P#',
+      '######################',
+    ],
+    pontos: { parede: [8, 7], ossos: [14, 8], copista: [17, 9] },
+  },
+  // Capítulo 4: o ossário, seguindo os rastros da Lívia.
+  'catacumbas-ossario': {
+    tema: 'catacumbas',
+    inicio: [2, 8],
+    mapa: [
+      '######################',
+      '#oooooooo####ooooooo##',
+      '#........#..#........#',
+      '#..v.....#..#.....v..#',
+      '#........#..#........#',
+      '#....................#',
+      '#..oo.........oo.....#',
+      '#..oo.........oo..xx.#',
+      '#.................xx.#',
+      '#...................P#',
+      '######################',
+    ],
+    pontos: { pegadas: [6, 5], bilhete: [10, 8], ninho: [18, 7] },
+  },
+  // Capítulo 4: o Arquivo Proibido, com as gavetas e a máquina violeta.
+  'catacumbas-arquivo': {
+    tema: 'catacumbas',
+    inicio: [3, 8],
+    mapa: [
+      '######################',
+      '#EEEEEE##EEEEEE##EEE##',
+      '#......##......##....#',
+      '#....................#',
+      '#.EE..EE..EE......MM.#',
+      '#.EE..EE..EE......MM.#',
+      '#....................#',
+      '#.EE..EE..EE.........#',
+      '#....................#',
+      '#v..................P#',
+      '######################',
+    ],
+    pontos: { 'gaveta-eco': [2, 4], 'gaveta-polux': [6, 7], maquina: [18, 4] },
+  },
+  // Capítulo 5: o Fórum, antes da leitura (mármore, colunas, fonte, barracas e a estátua do Censor).
+  forum: {
+    tema: 'forum',
+    inicio: [2, 10],
+    mapa: [
+      '########################',
+      '#p..p..p..p..p..p..p..p#',
+      '#......................#',
+      '#..tt......mmmm......tt#',
+      '#.........mmmmmm.......#',
+      '#........mmmSSmmm......#',
+      '#........mmmSSmmm......#',
+      '#.........mmmmmm.......#',
+      '#..ff......mmmm......tt#',
+      '#..ff..................#',
+      '#......................#',
+      '#p..p..p..p..p..p..p..p#',
+      '#.....................P#',
+      '########################',
+    ],
+    pontos: { vendedora: [3, 3], 'guarda-cansado': [20, 9], estatua: [12, 5] },
+    rotas: {
+      'guarda-cansado': [
+        [20, 9],
+        [20, 6],
+        [16, 9],
+      ],
+    },
+  },
+  // Capítulo 6: o túnel dos gladiadores, com a parede dos nomes e o portão da arena.
+  'coliseu-tunel': {
+    tema: 'tunel',
+    inicio: [2, 4],
+    mapa: [
+      '####################',
+      '####################',
+      '##NNNNNNNN###v###gg#',
+      '#................gg#',
+      '#..............P.gg#',
+      '#v.........S.......#',
+      '#..................#',
+      '####v######v########',
+      '####################',
+    ],
+    pontos: { parede: [5, 2], armadura: [11, 5], portao: [17, 3] },
+  },
+  // O final: a Grande Biblioteca reaberta, de dia, com todo mundo (e o pedaço da chave num canto).
+  'biblioteca-reaberta': {
+    tema: 'biblioteca',
+    inicio: [3, 12],
+    mapa: [
+      '########################',
+      '#EEEEE##JJJ##JJJ##EEEEE#',
+      '#......................#',
+      '#.p..cccccccccccccc..p.#',
+      '#....c..TT....TT..c....#',
+      '#EE..c............c..EE#',
+      '#EE..c.....SS.....c..EE#',
+      '#EE..c.....SS.....c..EE#',
+      '#....c..TT....TT..c....#',
+      '#.p..cccccccccccccc..p.#',
+      '#......................#',
+      '#EEEE.EEEE....EEEE.EEEE#',
+      '#......................#',
+      '#v....................P#',
+      '########################',
+    ],
+    pontos: { brutus: [6, 6], fio: [16, 6], censor: [14, 8], livia: [12, 10], 'chave-cassius': [21, 2] },
+    rotas: {
+      livia: [
+        [12, 10],
+        [18, 10],
+        [18, 12],
+        [12, 12],
+      ],
+      brutus: [
+        [6, 6],
+        [6, 9],
+      ],
+    },
+  },
+};
+
+/** Monta o mapa de uma cena de explorar: os pontos dela, nos lugares que o mapa diz. */
+export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: MapaDeExplorar): Mundo {
+  const coisas: Coisa[] = [];
+  const pessoas: Pessoa[] = [];
+  for (const p of cena.pontos) {
+    const [x, y] = m.pontos[p.id] ?? m.inicio;
+    if (p.personagem) {
+      pessoas.push({ id: p.id, quem: p.personagem, rota: m.rotas?.[p.id] ?? [[x, y]], falas: p.falas, obrigatorio: p.obrigatorio });
+    } else {
+      coisas.push({ id: p.id, x, y, falas: p.falas, obrigatorio: p.obrigatorio, segredo: p.segredo });
+    }
+  }
+  return { id: cena.id, tema: m.tema, lugar: cena.lugar as Lugar, mapa: m.mapa, objetivo: cena.objetivo, inicio: m.inicio, coisas, pessoas };
+}

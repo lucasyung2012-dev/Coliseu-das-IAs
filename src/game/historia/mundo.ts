@@ -19,10 +19,18 @@ export type Ladrilho =
   | 'T' // mesa
   | 'S' // estátua
   | 'p' // coluna
-  | 'v' // castiçal
-  | 'P'; // a saída (escada, porta)
+  | 'v' // castiçal (ou tocha)
+  | 'P' // a saída (escada, porta)
+  | 'o' // nicho de ossos (catacumbas)
+  | 'm' // chão de mármore
+  | 'f' // fonte
+  | 't' // barraca de feira
+  | 'g' // grade de ferro
+  | 'x' // monte de sucata (ou caixotes)
+  | 'M' // a máquina violeta do Arquivo
+  | 'N'; // parede com nomes gravados
 
-const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v']);
+const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N']);
 
 export interface Coisa {
   id: string;
@@ -55,10 +63,13 @@ export interface Mundo {
   coisas: Coisa[];
   pessoas: Pessoa[];
   /** O tema das cores (biblioteca, porto, observatório...). */
-  tema: 'biblioteca';
+  tema: TemaMundo;
   /** O lugar para a música e para o cartão do save. */
   lugar: Lugar;
 }
+
+/** As cores do mapa: biblioteca, catacumbas (escuro, com tochas), Fórum (claro, ao ar livre) e o túnel. */
+export type TemaMundo = 'biblioteca' | 'catacumbas' | 'forum' | 'tunel';
 
 export type Direcao = 'cima' | 'baixo' | 'esq' | 'dir';
 

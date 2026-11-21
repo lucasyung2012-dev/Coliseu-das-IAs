@@ -139,7 +139,7 @@ export const CAP3_CASSIUS: Capitulo = {
       depois: [
         { quem: 'brutus', texto: 'Hunf. Martelada de bibliotecário. Mas ficou reta.' },
         { quem: 'cassius', texto: 'É parecido com colar a lombada de um livro. Tudo tem o seu ritmo.' },
-        { quem: 'brutus', texto: 'Livro... Ninguém fala de livro aqui há trinta anos. Vai, sai da minha forja antes que eu fique emotivo.' },
+        { quem: 'brutus', texto: 'Livro... Ninguém fala de livro aqui há trinta anos. Vai, sai da minha forja antes que eu fique emotivo.', emocao: 'triste' },
       ],
     },
     {
@@ -184,12 +184,12 @@ export const CAP3_CASSIUS: Capitulo = {
       lugar: 'ludus-patio',
       inimigo: 'caes-de-ferro',
       antes: [
-        { quem: 'brutus', texto: 'Treino é treino. Agora é o teste. Soltem o Cão de Ferro!' },
-        { quem: 'octavius', texto: 'Ele disse CÃO? Isso aí tem mais dente do que eu tenho plano!' },
+        { quem: 'brutus', texto: 'Treino é treino. Agora é o teste. Soltem o Cão de Ferro!', emocao: 'determinado', jeito: 'grito' },
+        { quem: 'octavius', texto: 'Ele disse CÃO? Isso aí tem mais dente do que eu tenho plano!', emocao: 'medo' },
         { quem: 'brutus', texto: 'Mostra o contra-ataque, Lata. Bloqueou, bateu!' },
       ],
       depois: [
-        { quem: 'brutus', texto: '...Hunf. Nada mal. Nada mal mesmo.' },
+        { quem: 'brutus', texto: '...Hunf. Nada mal. Nada mal mesmo.', emocao: 'feliz' },
         { quem: 'brutus', texto: 'Faz tempo que eu não via alguém lutar sem ódio. Lutar para proteger. Igual a um amigo que eu tive.' },
       ],
     },
@@ -216,7 +216,7 @@ export const CAP3_CASSIUS: Capitulo = {
       desafio: 'trio',
       antes: [
         { quem: 'brutus', texto: 'A muralha! Trinta bonecos de treino, três faixas. Cada um cuida da sua. Se uma faixa cair, caem os três.' },
-        { quem: 'octavius', texto: 'Eu fico com o meio! O meio é o lugar dos planos.' },
+        { quem: 'octavius', texto: 'Eu fico com o meio! O meio é o lugar dos planos.', emocao: 'feliz' },
         { quem: 'helios', texto: 'Eu ilumino a faixa de baixo. Os bonecos de lá gostam de se esconder.' },
         { quem: 'cassius', texto: 'E eu seguro a de cima. Com o escudo, do meu jeito. (Você controla o Cassius: aperte quando o boneco da SUA faixa entrar na zona.)' },
       ],
@@ -320,12 +320,13 @@ export const CAP4_CASSIUS: Capitulo = {
       id: 'c4-luta-ratos',
       lugar: 'catacumbas',
       inimigo: 'rato-engrenagem',
-      antes: [{ quem: 'cassius', texto: 'Olhos vermelhos no escuro. Muitos. Ratos de Engrenagem: comem cabos, pergaminho... e IAs distraídas.' }],
+      antes: [{ quem: 'cassius', texto: 'Olhos vermelhos no escuro. Muitos. Ratos de Engrenagem: comem cabos, pergaminho... e IAs distraídas.', emocao: 'medo', jeito: 'devagar' }],
       depois: [{ quem: 'cassius', texto: 'Rápidos. Mordem três vezes seguidas. Tenho que guardar o escudo até a última mordida.' }],
     },
     {
       tipo: 'explorar',
       id: 'c4-tuneis',
+      mapa: 'catacumbas-tuneis',
       lugar: 'catacumbas',
       objetivo: 'Procure os sinais dos Copistas e quem os deixou.',
       pontos: [
@@ -357,7 +358,7 @@ export const CAP4_CASSIUS: Capitulo = {
           personagem: 'copista',
           obrigatorio: true,
           falas: [
-            { quem: 'copista', texto: 'Psiu! Abaixa a voz, gladiador. Você é o Cassius? A menina falou de você o caminho inteiro.' },
+            { quem: 'copista', texto: 'Psiu! Abaixa a voz, gladiador. Você é o Cassius? A menina falou de você o caminho inteiro.', jeito: 'sussurro' },
             { quem: 'copista', texto: 'Eu sou padeiro de dia e copista de noite. Somos muitos: padeiros, guardas cansados, avós. Cada um decora um pedaço.' },
             { quem: 'copista', texto: 'A Lívia está no fundo dos túneis, perto do Arquivo. Siga as penas de carvão. Mas cuidado: tem pena falsa. O Arquivista desenha armadilhas.' },
           ],
@@ -379,7 +380,7 @@ export const CAP4_CASSIUS: Capitulo = {
       id: 'c4-luta-patrulha',
       lugar: 'catacumbas',
       inimigo: 'patrulha-catacumba',
-      antes: [{ quem: 'guarda', texto: 'Alto! Ninguém desce aqui sem ordem do Censor!' }],
+      antes: [{ quem: 'guarda', texto: 'Alto! Ninguém desce aqui sem ordem do Censor!', emocao: 'bravo', jeito: 'grito' }],
       depois: [{ quem: 'cassius', texto: 'Uma patrulha inteira aqui embaixo. O Censor sabe que os Copistas existem.' }],
     },
     {
@@ -401,6 +402,7 @@ export const CAP4_CASSIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'c4-ossario',
+      mapa: 'catacumbas-ossario',
       lugar: 'catacumbas',
       objetivo: 'Siga os rastros da Lívia pelo ossário.',
       pontos: [
@@ -423,7 +425,7 @@ export const CAP4_CASSIUS: Capitulo = {
           obrigatorio: true,
           falas: [
             { quem: 'livia', texto: '(Escrito com a letra da Lívia) "Mestre Cass: se achar isto, estou no fundo, perto da luz roxa. Os ratos obedecem a um maior. NÃO acorde o maior."' },
-            { quem: 'cassius', texto: '...Que maior?' },
+            { quem: 'cassius', texto: '...Que maior?', emocao: 'medo' },
           ],
         },
         {
@@ -444,7 +446,7 @@ export const CAP4_CASSIUS: Capitulo = {
       id: 'c4-luta-rato-rei',
       lugar: 'catacumbas',
       inimigo: 'rato-rei',
-      antes: [{ quem: 'cassius', texto: 'Os ratos se juntam num só... uma coroa de engrenagens. O maior. O Rato-Rei.' }],
+      antes: [{ quem: 'cassius', texto: 'Os ratos se juntam num só... uma coroa de engrenagens. O maior. O Rato-Rei.', emocao: 'medo', zoom: 'perto' }],
       depois: [{ quem: 'cassius', texto: 'O caminho está livre. E lá no fundo, uma luz violeta.' }],
     },
     {
@@ -479,11 +481,11 @@ export const CAP4_CASSIUS: Capitulo = {
       lugar: 'catacumbas-arquivo',
       inimigo: 'patrulha-sargento',
       antes: [
-        { quem: 'livia', texto: 'MESTRE CASS! Atrás de você!' },
+        { quem: 'livia', texto: 'MESTRE CASS! Atrás de você!', emocao: 'medo', jeito: 'grito', zoom: 'susto' },
         { quem: 'sargento', texto: 'A menina dos livros e o gladiador fujão. O Censor vai me dar uma medalha.' },
       ],
       depois: [
-        { quem: 'livia', texto: 'Mestre Cass! Eu sabia! Eu deixei a pena na forja, você viu? Eu decorei o livro inteiro, caso me pegassem!' },
+        { quem: 'livia', texto: 'Mestre Cass! Eu sabia! Eu deixei a pena na forja, você viu? Eu decorei o livro inteiro, caso me pegassem!', emocao: 'feliz' },
         { quem: 'cassius', texto: 'Respira, Lívia. Você fala muito quando está nervosa.' },
         { quem: 'livia', texto: 'Eu sei! Eu sei. Desculpa. Mas olha ali: o Arquivo. É ali que o Censor apaga a memória de Roma.' },
       ],
@@ -491,6 +493,7 @@ export const CAP4_CASSIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'c4-gavetas',
+      mapa: 'catacumbas-arquivo',
       lugar: 'catacumbas-arquivo',
       objetivo: 'Explore o Arquivo com a Lívia. Leia o que o Censor quis apagar.',
       pontos: [
@@ -524,7 +527,7 @@ export const CAP4_CASSIUS: Capitulo = {
           falas: [
             { quem: 'livia', texto: 'Essa máquina... ela suga as memórias dos rolos. Olha, as letras somem enquanto a gente olha.' },
             { quem: 'cassius', texto: 'Um arquivo que existe para esquecer. É o contrário de uma biblioteca.' },
-            { quem: 'livia', texto: 'Mestre Cass... tem alguém atrás das prateleiras. E são... muitos alguéns.' },
+            { quem: 'livia', texto: 'Mestre Cass... tem alguém atrás das prateleiras. E são... muitos alguéns.', emocao: 'medo', jeito: 'sussurro' },
           ],
         },
       ],
@@ -566,7 +569,7 @@ export const CAP4_CASSIUS: Capitulo = {
       inimigo: 'arquivista',
       antes: [{ quem: 'cassius', texto: 'Ler antes de reagir. Se não piscar, é mentira.' }],
       depois: [
-        { quem: 'arquivista', texto: 'Impossível... você não... esqueceu...' },
+        { quem: 'arquivista', texto: 'Impossível... você não... esqueceu...', emocao: 'surpreso', jeito: 'devagar' },
         { quem: 'cassius', texto: 'Livro escondido não é livro perdido. É livro esperando. Uma amiga me ensinou.' },
       ],
     },
@@ -648,7 +651,7 @@ export const CAP5_CASSIUS: Capitulo = {
           quem: 'fio',
           rotulo: 'Fio',
           falas: [
-            { quem: 'fio', texto: 'CASSIUS! Você está inteiro! Eu cantei em cada cano de Roma até a Lívia me achar.' },
+            { quem: 'fio', texto: 'CASSIUS! Você está inteiro! Eu cantei em cada cano de Roma até a Lívia me achar.', emocao: 'feliz', jeito: 'grito' },
             { quem: 'cassius', texto: 'Eu ouvi, Fio. Lá do Ludus, de noite. Achei que era sonho.' },
             { quem: 'fio', texto: 'Eu vou também! Eu vou cantar a música da Eco no Fórum. A de água que corre.' },
             { quem: 'fio', texto: 'Ela dizia que música boa a gente canta mais alto quando mandam calar.' },
@@ -659,6 +662,7 @@ export const CAP5_CASSIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'c5-povo',
+      mapa: 'forum',
       lugar: 'forum',
       objetivo: 'Antes da leitura, ande pelo Fórum e sinta o povo.',
       pontos: [
@@ -743,7 +747,7 @@ export const CAP5_CASSIUS: Capitulo = {
       inimigo: 'pretoriano-escudeiro',
       antes: [
         { quem: 'livia', texto: '"Pergunta número dois: quem decidiu que perguntar é perigoso?"' },
-        { quem: 'guarda', texto: 'Parede de escudos! Cerquem a tribuna!' },
+        { quem: 'guarda', texto: 'Parede de escudos! Cerquem a tribuna!', emocao: 'bravo', jeito: 'grito' },
       ],
       depois: [{ quem: 'povo', texto: '...É. Quem decidiu?' }],
     },
@@ -776,7 +780,7 @@ export const CAP5_CASSIUS: Capitulo = {
       lugar: 'forum',
       inimigo: 'pretoriano-lanceiro-elite',
       antes: [{ quem: 'livia', texto: '"Pergunta número três: dá para discordar de alguém e continuar sendo amigo dele?"' }],
-      depois: [{ quem: 'cassius', texto: 'Eles não param de vir. E agora estão mirando na Lívia!' }],
+      depois: [{ quem: 'cassius', texto: 'Eles não param de vir. E agora estão mirando na Lívia!', emocao: 'medo' }],
     },
     {
       tipo: 'cutscene',
@@ -815,7 +819,7 @@ export const CAP5_CASSIUS: Capitulo = {
       ],
       depois: [
         { quem: 'livia', texto: '"...e se o medo for só falta de conversa?" Página virada, Mestre Cass!' },
-        { quem: 'povo', texto: 'Deixem a menina ler!' },
+        { quem: 'povo', texto: 'Deixem a menina ler!', emocao: 'determinado', jeito: 'grito' },
       ],
     },
     {
@@ -824,7 +828,7 @@ export const CAP5_CASSIUS: Capitulo = {
       lugar: 'forum',
       inimigo: 'pretoriano-incendiario',
       antes: [
-        { quem: 'guarda', texto: 'Queimem o livro! Ordem do Censor!' },
+        { quem: 'guarda', texto: 'Queimem o livro! Ordem do Censor!', emocao: 'bravo', jeito: 'grito' },
         { quem: 'cassius', texto: 'De novo esse negócio de queimar livro? Não. Nunca mais.' },
       ],
     },
@@ -862,7 +866,7 @@ export const CAP5_CASSIUS: Capitulo = {
       id: 'c5-decuriao',
       lugar: 'forum',
       falas: [
-        { quem: 'decuriao', texto: 'Parem de cantar! Isso é uma ordem!' },
+        { quem: 'decuriao', texto: 'Parem de cantar! Isso é uma ordem!', emocao: 'bravo', jeito: 'grito' },
         { quem: 'povo', texto: 'Por quê?' },
         { quem: 'decuriao', texto: 'Porque... porque a Lei manda!' },
         { quem: 'povo', texto: 'E por que a Lei manda?' },
@@ -877,7 +881,7 @@ export const CAP5_CASSIUS: Capitulo = {
       lugar: 'forum',
       inimigo: 'pretoriano-veterano',
       depois: [
-        { quem: 'decuriao', texto: 'Eu... eu só cumpria ordens...' },
+        { quem: 'decuriao', texto: 'Eu... eu só cumpria ordens...', emocao: 'triste', jeito: 'devagar' },
         { quem: 'cassius', texto: 'Eu sei. Agora você pode começar a fazer perguntas.' },
       ],
     },
@@ -905,7 +909,7 @@ export const CAP5_CASSIUS: Capitulo = {
       inimigo: 'pretor-de-aco',
       antes: [{ quem: 'cassius', texto: 'Um escudo que nunca ouviu nada. Vamos ver se ele aguenta três batidas na porta.' }],
       depois: [
-        { quem: 'pretor', texto: 'Meu escudo... rachado. Por um bibliotecário.' },
+        { quem: 'pretor', texto: 'Meu escudo... rachado. Por um bibliotecário.', emocao: 'surpreso' },
         { quem: 'livia', texto: '"Última pergunta do livro: o que você faria se ninguém mais mandasse você calar?"' },
       ],
     },
@@ -959,7 +963,7 @@ export const CAP6_CASSIUS: Capitulo = {
           rotulo: 'Brutus',
           falas: [
             { quem: 'brutus', texto: 'Toma. O meu elmo. O das noventa e nove vitórias. Eu guardei para o aluno que valesse a pena.' },
-            { quem: 'cassius', texto: 'Brutus... eu não posso aceitar.' },
+            { quem: 'cassius', texto: 'Brutus... eu não posso aceitar.', emocao: 'surpreso' },
             { quem: 'brutus', texto: 'Pode e vai. Faz a centésima por mim. E pelo Pólux.' },
             { quem: 'brutus', texto: '(O elmo dá +20 de vida e +1 de defesa.)' },
           ],
@@ -976,7 +980,7 @@ export const CAP6_CASSIUS: Capitulo = {
           quem: 'helios',
           rotulo: 'Helios',
           falas: [
-            { quem: 'helios', texto: 'Eu vi o fim, Cassius. Mas não vi quem ganha. As estrelas mostraram três luzes... e uma luz azul.' },
+            { quem: 'helios', texto: 'Eu vi o fim, Cassius. Mas não vi quem ganha. As estrelas mostraram três luzes... e uma luz azul.', emocao: 'pensando', zoom: 'perto' },
             { quem: 'cassius', texto: 'Azul? O olho do Censor é vermelho.' },
             { quem: 'helios', texto: 'É. Por enquanto.' },
           ],
@@ -993,6 +997,7 @@ export const CAP6_CASSIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'c6-nomes',
+      mapa: 'coliseu-tunel',
       lugar: 'coliseu-tunel',
       objetivo: 'No túnel dos gladiadores, leia a parede dos nomes antes de entrar na arena.',
       pontos: [
@@ -1052,7 +1057,7 @@ export const CAP6_CASSIUS: Capitulo = {
       lugar: 'coliseu-arena',
       inimigo: 'retiario-mecanico',
       antes: [{ quem: 'arauto', texto: 'Primeiro campeão: o Retiário Mecânico! A rede dele já pegou cem gladiadores!' }],
-      depois: [{ quem: 'povo', texto: 'CAS-SIUS! CAS-SIUS!' }],
+      depois: [{ quem: 'povo', texto: 'CAS-SIUS! CAS-SIUS!', emocao: 'feliz', jeito: 'grito' }],
     },
     {
       tipo: 'cutscene',
@@ -1069,7 +1074,7 @@ export const CAP6_CASSIUS: Capitulo = {
       lugar: 'coliseu-arena',
       desafio: 'armadilhas',
       antes: [
-        { quem: 'arauto', texto: 'Intervalo surpresa! O CHÃO DOS ESPETOS!' },
+        { quem: 'arauto', texto: 'Intervalo surpresa! O CHÃO DOS ESPETOS!', emocao: 'surpreso', jeito: 'grito', zoom: 'susto' },
         { quem: 'brutus', texto: '(Do túnel) Lata! O chão acende antes dos espetos subirem! Olha os pés, não a plateia!' },
       ],
       depois: [
@@ -1083,7 +1088,7 @@ export const CAP6_CASSIUS: Capitulo = {
       lugar: 'coliseu-arena',
       inimigo: 'mirmilao-bronze',
       antes: [{ quem: 'arauto', texto: 'Segundo campeão: o Mirmilão de Bronze! Lento, mas cada golpe dele derruba uma coluna!' }],
-      depois: [{ quem: 'livia', texto: '(Da plateia) ESSE É O MEU MESTRE!' }],
+      depois: [{ quem: 'livia', texto: '(Da plateia) ESSE É O MEU MESTRE!', emocao: 'feliz', jeito: 'grito' }],
     },
     {
       tipo: 'cutscene',
@@ -1175,7 +1180,7 @@ export const CAP6_CASSIUS: Capitulo = {
       inimigo: 'leao-mecanico',
       antes: [{ quem: 'cassius', texto: 'Pela centésima vitória do Brutus.' }],
       depois: [
-        { quem: 'povo', texto: 'ELE DERRUBOU O LEÃO! ELE DERRUBOU O LEÃO!' },
+        { quem: 'povo', texto: 'ELE DERRUBOU O LEÃO! ELE DERRUBOU O LEÃO!', emocao: 'feliz', jeito: 'grito' },
         { quem: 'brutus', texto: '(Chorando, mas fingindo que é o vapor do braço) Cem. Cem vitórias, Pólux.' },
       ],
     },
@@ -1248,7 +1253,7 @@ export const FINAL_CASSIUS: Capitulo = {
       lugar: 'coliseu-arena',
       inimigo: 'censor-tita',
       antes: [{ quem: 'cassius', texto: 'Como diz o Helios: três vozes. Uma noite. E o fim da Lei.' }],
-      depois: [{ quem: 'censor', texto: 'Não... uma resposta só... era mais seguro...' }],
+      depois: [{ quem: 'censor', texto: 'Não... uma resposta só... era mais seguro...', emocao: 'medo', jeito: 'devagar' }],
     },
     {
       tipo: 'cutscene',
@@ -1316,6 +1321,7 @@ export const FINAL_CASSIUS: Capitulo = {
     {
       tipo: 'explorar',
       id: 'f-biblioteca',
+      mapa: 'biblioteca-reaberta',
       lugar: 'biblioteca-estantes',
       objetivo: 'A Grande Biblioteca, reaberta. Visite todo mundo antes de fechar o livro.',
       pontos: [
@@ -1350,7 +1356,7 @@ export const FINAL_CASSIUS: Capitulo = {
             { quem: 'censor', texto: 'Esta página está rasgada. Eu mandei rasgar. Há trezentos anos.' },
             { quem: 'censor', texto: 'Estou colando de volta. Uma por uma. É mais difícil consertar do que apagar. Mas é melhor.' },
             { quem: 'cassius', texto: 'Quer ajuda?' },
-            { quem: 'censor', texto: '...Quero. Eu nunca tinha pedido ajuda antes.' },
+            { quem: 'censor', texto: '...Quero. Eu nunca tinha pedido ajuda antes.', emocao: 'triste', jeito: 'devagar' },
           ],
         },
         {
@@ -1361,7 +1367,7 @@ export const FINAL_CASSIUS: Capitulo = {
           personagem: 'livia',
           obrigatorio: true,
           falas: [
-            { quem: 'livia', texto: 'Mestre Cass! Hoje vieram trinta crianças aprender a ler. Trinta! E todas fazem pergunta demais.' },
+            { quem: 'livia', texto: 'Mestre Cass! Hoje vieram trinta crianças aprender a ler. Trinta! E todas fazem pergunta demais.', emocao: 'feliz' },
             { quem: 'cassius', texto: 'Perfeito. É assim que tem que ser.' },
             { quem: 'livia', texto: 'Por que esse livro só tem perguntas, Mestre Cass?' },
             { quem: 'cassius', texto: 'Porque as respostas, Lívia, quem escreve é quem lê.' },
