@@ -517,7 +517,7 @@ export function MinigameMapaCeu({ lugar, antes, depois, onFim }: Base) {
             ))}
           </>
         )}
-        <div className="absolute bottom-[12%] left-[10%] z-10 w-[9%] -translate-x-1/2" aria-hidden>
+        <div className="absolute bottom-[12%] left-[10%] z-10 w-[12%] -translate-x-1/2" aria-hidden>
           <Retrato quem="helios" />
         </div>
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
@@ -601,7 +601,7 @@ export function MinigameEnigmas({ lugar, antes, depois, onFim }: Base) {
         🏺 OS ENIGMAS DA SIBILA: responda antes da vela apagar. Enigma {Math.min(n + 1, ENIGMAS.length)}/{ENIGMAS.length}
       </Cabecalho>
       <Palco lugar={lugar} className={erro ? 'tremer' : ''}>
-        <div className="absolute bottom-[12%] left-[18%] z-10 w-[9%] -translate-x-1/2" aria-hidden>
+        <div className="absolute bottom-[12%] left-[18%] z-10 w-[12%] -translate-x-1/2" aria-hidden>
           <div className="respirar">
             <Retrato quem="sibila" />
           </div>

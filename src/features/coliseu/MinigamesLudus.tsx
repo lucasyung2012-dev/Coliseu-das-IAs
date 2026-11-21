@@ -366,7 +366,7 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
       </div>
       <Palco lugar={lugar}>
         <div
-          className="absolute left-[20%] z-10 w-[11%] -translate-x-1/2 transition-[bottom] duration-100"
+          className="absolute left-[20%] z-10 w-[14%] -translate-x-1/2 transition-[bottom] duration-100"
           style={{ bottom: pose === 'pulo' ? '34%' : '12%', scale: pose === 'abaixa' ? '1 0.6' : undefined, transformOrigin: 'bottom' }}
           aria-hidden
         >
@@ -374,7 +374,7 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
             <Retrato quem="octavius" />
           </div>
         </div>
-        <div className="absolute bottom-[12%] right-[4%] z-10 w-[13%]" aria-hidden>
+        <div className="absolute bottom-[12%] right-[4%] z-10 w-[16%]" aria-hidden>
           <Retrato quem="brutus" espelhar />
         </div>
         {fase === 'jogo' &&

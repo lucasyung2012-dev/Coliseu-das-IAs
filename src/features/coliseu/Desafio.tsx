@@ -271,7 +271,7 @@ export function DesafioCarroca({ lugar, antes, onFim }: { lugar: Lugar; antes?: 
           <Retrato quem="crianca" />
         </div>
         {/* Cassius segurando */}
-        <div className="absolute bottom-[14%] z-10 w-[13%] -translate-x-1/2 transition-[left] duration-300" style={{ left: `${distancia - 12}%` }} aria-hidden>
+        <div className="absolute bottom-[14%] z-10 w-[16%] -translate-x-1/2 transition-[left] duration-300" style={{ left: `${distancia - 12}%` }} aria-hidden>
           <Retrato quem="cassius" />
         </div>
         {/* a carroça com o cavalo mecânico */}

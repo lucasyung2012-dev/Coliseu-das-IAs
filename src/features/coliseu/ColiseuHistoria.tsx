@@ -12,6 +12,9 @@ import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { CenarioHistoria } from './Cenarios';
 import { Portoes } from './Portoes';
 import { LinhaDoTempo } from './LinhaDoTempo';
+import { FaseAberta } from './FaseAberta';
+import { MenuPausa, PausaContexto } from './Pausa';
+import { FASES } from '@/game/historia/fases';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
@@ -69,6 +72,17 @@ export default function ColiseuHistoria() {
     setTela({ tipo: 'jogo', id: novo.id });
   };
 
+  // O menu de pausa (☰ MENU ou Esc): pausa a luta e a fase.
+  const [pausado, setPausado] = useState(false);
+  useEffect(() => {
+    if (tela.tipo !== 'jogo') return;
+    const tecla = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') setPausado((x) => !x);
+    };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, [tela.tipo]);
+
   const save = tela.tipo === 'jogo' ? saves.find((s) => s.id === tela.id) : undefined;
   // O save aberto sumiu (apagado em outro aparelho, por exemplo): volta para a lista em vez de ficar em branco.
   useEffect(() => {
@@ -81,8 +95,17 @@ export default function ColiseuHistoria() {
       <div className="coliseu-conteudo relative mx-auto flex max-w-4xl flex-col gap-4 px-3 pb-16 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           {tela.tipo === 'jogo' ? (
-            <button type="button" onClick={() => setTela({ tipo: 'saves' })} className="font-pixel text-[10px] text-muted hover:text-accent">
-              ◀ SAVES (o jogo já salvou)
+            <button
+              type="button"
+              onClick={() => {
+                desbloquear();
+                tocar('clique');
+                setPausado(true);
+              }}
+              className="pixel-box px-3 py-1.5 font-pixel text-[10px] text-[#f2c14e]"
+              aria-label="Abrir o menu (pausa)"
+            >
+              ☰ MENU
             </button>
           ) : (
             <Link to="/" className="font-pixel text-[10px] text-muted hover:text-accent">
@@ -222,7 +245,20 @@ export default function ColiseuHistoria() {
           </section>
         )}
 
-        {tela.tipo === 'jogo' && save && <Jogo key={`${save.id}-${save.capitulo}-${save.cena}`} save={save} onSair={() => setTela({ tipo: 'saves' })} />}
+        {tela.tipo === 'jogo' && save && (
+          <PausaContexto.Provider value={pausado}>
+            <Jogo key={`${save.id}-${save.capitulo}-${save.cena}`} save={save} onSair={() => setTela({ tipo: 'saves' })} />
+          </PausaContexto.Provider>
+        )}
+        {tela.tipo === 'jogo' && pausado && (
+          <MenuPausa
+            onContinuar={() => setPausado(false)}
+            onSaves={() => {
+              setPausado(false);
+              setTela({ tipo: 'saves' });
+            }}
+          />
+        )}
       </div>
     </main>
   );
@@ -344,6 +380,10 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         onFim={() => proxima()}
       />
     );
+  if (cena.tipo === 'fase') {
+    const fase = FASES[cena.fase];
+    return fase ? <FaseAberta key={cena.id} fase={fase} heroi={heroi} onFim={() => proxima()} /> : null;
+  }
   if (cena.tipo === 'ludus')
     return (
       <Ludus

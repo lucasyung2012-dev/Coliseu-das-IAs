@@ -151,7 +151,7 @@ export function MinigamePerseguicao({ lugar, antes, depois, onFim }: Base) {
         <Vidas n={distancia} max={3} icone="💨" />
       </div>
       <Palco lugar={lugar}>
-        <div className="absolute bottom-[12%] left-[30%] z-10 w-[11%] -translate-x-1/2 transition-[bottom] duration-100" style={{ bottom: pose === 'PULAR' || pose === 'ESCALAR' ? '30%' : '12%' }} aria-hidden>
+        <div className="absolute bottom-[12%] left-[30%] z-10 w-[14%] -translate-x-1/2 transition-[bottom] duration-100" style={{ bottom: pose === 'PULAR' || pose === 'ESCALAR' ? '30%' : '12%' }} aria-hidden>
           <div className={pose ? '' : 'andar'} style={{ scale: pose === 'DESLIZAR' ? '1.2 0.55' : undefined, transformOrigin: 'bottom' }}>
             <Retrato quem="octavius" />
           </div>
@@ -301,7 +301,7 @@ export function MinigameCanhoes({ lugar, antes, depois, onFim }: Base) {
             )}
           </>
         )}
-        <div className="absolute bottom-[12%] left-[20%] z-10 w-[11%] -translate-x-1/2" aria-hidden style={{ scale: Date.now() < abaixado ? '1 0.6' : undefined, transformOrigin: 'bottom' }}>
+        <div className="absolute bottom-[12%] left-[20%] z-10 w-[14%] -translate-x-1/2" aria-hidden style={{ scale: Date.now() < abaixado ? '1 0.6' : undefined, transformOrigin: 'bottom' }}>
           <Retrato quem="octavius" />
         </div>
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}

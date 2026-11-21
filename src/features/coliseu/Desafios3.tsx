@@ -158,7 +158,7 @@ export function DesafioFurtivo({
         ))}
         <span className="absolute bottom-[14%] right-[3%] z-[6] font-pixel text-[8px] text-[#4ad46a] sm:text-[10px]">CHEGADA ▶</span>
         {/* o herói */}
-        <div className="absolute bottom-[14%] z-10 w-[9%] -translate-x-1/2" style={{ left: `${6 + pos * 0.86}%` }} aria-hidden>
+        <div className="absolute bottom-[14%] z-10 w-[12%] -translate-x-1/2" style={{ left: `${6 + pos * 0.86}%` }} aria-hidden>
           <div className={andando ? 'andar' : 'respirar'}>
             <Retrato quem={heroi} />
           </div>

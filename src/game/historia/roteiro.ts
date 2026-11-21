@@ -215,6 +215,7 @@ export type Cena = (
       /** Presente que ganha ao entrar (o elmo do Brutus, no Capítulo 6). */
       presente?: Equipamento;
     }
+  | { tipo: 'fase'; id: string; lugar: Lugar; /** A fase aberta (fases.ts). */ fase: string }
   | { tipo: 'escolha'; id: string; lugar: Lugar; pergunta: string; opcoes: OpcaoEscolha[] }
 ) & { so?: CondicaoEscolha };
 
@@ -545,41 +546,11 @@ const CAP1_CASSIUS: Capitulo = {
       ],
     },
     {
-      tipo: 'explorar',
+      // A FASE ABERTA (teste, 22/11/2026): no lugar do antigo "explorar o salão".
+      tipo: 'fase',
       id: 'c1-salao',
       lugar: 'biblioteca-salao',
-      objetivo: 'Encontre a porta da escada para as catacumbas.',
-      pontos: [
-        {
-          id: 'janela',
-          x: 18,
-          rotulo: 'Janela',
-          icone: '🔥',
-          falas: [
-            { quem: 'cassius', texto: 'Roma lá fora está escura. Só a Biblioteca brilha... de fogo.' },
-            { quem: 'cassius', texto: 'E ninguém nas janelas das casas. Todo mundo de luz apagada, fingindo que não está vendo.' },
-          ],
-        },
-        {
-          id: 'estatua',
-          x: 45,
-          rotulo: 'Estátua antiga',
-          icone: '🗿',
-          falas: [
-            { quem: 'narrador', texto: 'Uma estátua de bronze, coberta de poeira. Na base: "GUARDIÃO ZERO, o primeiro protetor desta Biblioteca".' },
-            { quem: 'cassius', texto: 'O primeiro guardião. Ninguém sabe o que aconteceu com ele.' },
-            { quem: 'cassius', texto: 'Às vezes, tenho a sensação de que ele está me olhando.' },
-          ],
-        },
-        {
-          id: 'porta',
-          x: 84,
-          rotulo: 'Porta da escada',
-          icone: '🚪',
-          obrigatorio: true,
-          falas: [{ quem: 'cassius', texto: 'A escada para as catacumbas. A Lívia já deve estar lá embaixo.' }],
-        },
-      ],
+      fase: 'biblioteca-em-chamas',
     },
     {
       tipo: 'luta',

@@ -159,7 +159,7 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
             🥁 {lado === 0 ? 'TUM!' : 'TÁ!'}
           </span>
         )}
-        <div className="absolute bottom-[12%] left-[45%] z-10 w-[11%] -translate-x-1/2" aria-hidden>
+        <div className="absolute bottom-[12%] left-[45%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
           <div className={brilho === 'ok' ? 'investida-dir' : 'respirar'} key={acertos}>
             <Retrato quem="octavius" />
           </div>
@@ -268,7 +268,7 @@ export function DesafioTempestade({ lugar, antes, depois, onFim }: Base) {
             </span>
           </>
         )}
-        <div className="absolute bottom-[12%] left-[50%] z-10 w-[11%] -translate-x-1/2" aria-hidden>
+        <div className="absolute bottom-[12%] left-[50%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
           <div className={batendo ? 'tremer' : 'respirar'}>
             <Retrato quem="octavius" />
           </div>

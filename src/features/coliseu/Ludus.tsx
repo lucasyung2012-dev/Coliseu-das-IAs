@@ -157,7 +157,7 @@ export function Ludus({
     <div className="flex flex-col gap-2">
       <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🏛️ LUDUS · {objetivo}</p>
       <Palco lugar={lugar}>
-        <div className="absolute bottom-[12%] left-[12%] z-10 w-[11%] -translate-x-1/2" aria-hidden>
+        <div className="absolute bottom-[12%] left-[12%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
           <div className="respirar">
             <Retrato quem={heroi} />
           </div>

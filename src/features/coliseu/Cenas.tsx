@@ -139,7 +139,7 @@ function Ator({ p, falando, outrosFalam }: { p: EmCena; falando?: boolean; outro
       className="absolute bottom-[12%] z-10 -translate-x-1/2"
       style={{
         left: `${pos}%`,
-        width: `${p.tamanho ?? 14}%`,
+        width: `${(p.tamanho ?? 14) * 1.25}%`,
         transition: `left ${dur}ms linear, filter 300ms`,
         // Quem fala fica em destaque; os outros, um pouco no escuro.
         filter: outrosFalam ? 'brightness(0.62) saturate(0.8)' : falando ? 'drop-shadow(0 0 6px rgba(242,193,78,0.55))' : undefined,
@@ -339,7 +339,7 @@ export function Explorar({
             onClick={() => ir(p)}
             aria-label={p.rotulo}
             className="absolute z-10 flex -translate-x-1/2 flex-col items-center"
-            style={{ left: `${p.x}%`, bottom: p.personagem ? "22%" : k % 2 ? "40%" : "24%", width: p.personagem ? "9%" : "auto" }}
+            style={{ left: `${p.x}%`, bottom: p.personagem ? "22%" : k % 2 ? "40%" : "24%", width: p.personagem ? "12%" : "auto" }}
           >
             {p.personagem && (
               <span className="respirar block w-full" aria-hidden>
@@ -355,7 +355,7 @@ export function Explorar({
         ))}
         {/* o gladiador */}
         <div
-          className="absolute bottom-[14%] z-10 w-[9%] -translate-x-1/2 ease-linear"
+          className="absolute bottom-[14%] z-10 w-[12%] -translate-x-1/2 ease-linear"
           style={{ left: `${x}%`, transition: `left ${duracao}ms linear` }}
           aria-hidden
         >

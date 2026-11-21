@@ -1,0 +1,266 @@
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
+import { NOMES, type Falante } from '@/game/historia/roteiro';
+import { fogoAceso, larguraDa, novaFase, passoFase, saidaAberta, type Entrada, type Fase } from '@/game/historia/fase';
+import { desbloquear } from '@/ui/som';
+import { tocar, voz } from '@/ui/somHistoria';
+import { CenarioHistoria, Retrato } from './Cenarios';
+import { usePausado } from './Pausa';
+
+/**
+ * A FASE ABERTA (teste, 22/11/2026): o lugar é maior que a tela e a câmera segue o
+ * gladiador. Anda (◀ ▶ ou A/D), pula (⤒, W ou espaço), sobe em mesas e estantes,
+ * desvia do fogo, pega os livros e chega na saída. Quem está perto fala sozinho.
+ */
+const ALTURA_TELA = 56.25;
+const CHAO = 13; // % da altura da tela onde fica o chão
+const LARGURA_HEROI = 10; // o gladiador maior (pedido do Lucas: "os bonecos estão muito pequenininhos")
+
+export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante; onFim: () => void }) {
+  const [s, setS] = useState(novaFase);
+  const entrada = useRef<Entrada>({ esq: false, dir: false, pular: false });
+  const [acabou, setAcabou] = useState(false);
+  const largura = larguraDa(fase);
+  // O menu de pausa para a fase (o relógio não anda).
+  const pausado = usePausado();
+  const pausadoRef = useRef(pausado);
+  pausadoRef.current = pausado;
+
+  // O relógio da fase (um passo por quadro, no máximo 50 ms de uma vez).
+  useEffect(() => {
+    let ultimo = performance.now();
+    let id = 0;
+    const quadro = (agora: number) => {
+      const dt = Math.min(50, agora - ultimo);
+      ultimo = agora;
+      if (!pausadoRef.current) setS((x) => passoFase(fase, x, entrada.current, dt));
+      entrada.current = { ...entrada.current, pular: false };
+      id = requestAnimationFrame(quadro);
+    };
+    id = requestAnimationFrame(quadro);
+    return () => cancelAnimationFrame(id);
+  }, [fase]);
+
+  // Teclado: A/D ou setas para andar; W, seta para cima ou espaço para pular.
+  useEffect(() => {
+    const muda = (ev: KeyboardEvent, valor: boolean) => {
+      const k = ev.key.toLowerCase();
+      if (k === 'a' || k === 'arrowleft') entrada.current.esq = valor;
+      else if (k === 'd' || k === 'arrowright') entrada.current.dir = valor;
+      else if (valor && (k === 'w' || k === 'arrowup' || k === ' ')) {
+        ev.preventDefault();
+        entrada.current.pular = true;
+      } else return;
+      desbloquear();
+    };
+    const desce = (ev: KeyboardEvent) => muda(ev, true);
+    const sobe = (ev: KeyboardEvent) => muda(ev, false);
+    window.addEventListener('keydown', desce);
+    window.addEventListener('keyup', sobe);
+    return () => {
+      window.removeEventListener('keydown', desce);
+      window.removeEventListener('keyup', sobe);
+    };
+  }, []);
+
+  // Sons: pegar um livro, queimar, a voz de quem comenta, chegar na saída.
+  const antes = useRef(s);
+  useEffect(() => {
+    const a = antes.current;
+    if (s.coletados.length > a.coletados.length) tocar('selecionar');
+    if (s.queimadas > a.queimadas) tocar('dano');
+    if (s.vy > 0 && a.vy <= 0 && a.noChao) tocar('esquiva');
+    if (s.falando && s.falando.id !== a.falando?.id) {
+      const c = fase.comentarios.find((x) => x.id === s.falando!.id);
+      if (c) [0, 140, 280].forEach((ms, k) => window.setTimeout(() => voz(c.quem, 'a', k * 2), ms));
+    }
+    if (s.fim && !a.fim) {
+      tocar('vitoria');
+      setAcabou(true);
+    }
+    antes.current = s;
+  }, [s]);
+
+  // A câmera segue o gladiador (sem sair do cenário).
+  const camera = Math.max(0, Math.min(largura - 100, s.x - 45));
+  const emX = (x: number) => `${(x / largura) * 100}%`;
+  const emY = (y: number) => `${CHAO + (y / ALTURA_TELA) * 100}%`;
+  const falando = s.falando ? fase.comentarios.find((c) => c.id === s.falando!.id) : undefined;
+  const aberta = saidaAberta(fase, s);
+
+  const botao = (tecla: 'esq' | 'dir' | 'pular') => ({
+    onPointerDown: (ev: PointerEvent) => {
+      ev.preventDefault();
+      desbloquear();
+      if (tecla === 'pular') entrada.current.pular = true;
+      else entrada.current[tecla] = true;
+    },
+    onPointerUp: () => {
+      if (tecla !== 'pular') entrada.current[tecla] = false;
+    },
+    onPointerLeave: () => {
+      if (tecla !== 'pular') entrada.current[tecla] = false;
+    },
+    onContextMenu: (ev: MouseEvent) => ev.preventDefault(),
+  });
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🎯 {fase.objetivo}</p>
+        <p className="font-pixel text-[9px] text-white sm:text-[10px]" aria-label={`Coletados: ${s.coletados.length} de ${fase.coletaveis.length}`}>
+          {fase.coletaveis.map((c) => (
+            <span key={c.id} className={s.coletados.includes(c.id) ? 'recurso-cheio' : 'opacity-25 grayscale'}>
+              {c.icone}
+            </span>
+          ))}
+        </p>
+      </div>
+      <div className="pixel-box palco-historia fase-aberta relative w-full select-none overflow-hidden" style={{ touchAction: 'none' }}>
+        {/* O mundo inteiro, que anda com a câmera */}
+        <div
+          className="absolute inset-y-0 left-0"
+          style={{ width: `${fase.telas.length * 100}%`, transform: `translateX(${(-camera / largura) * 100}%)` }}
+        >
+          {fase.telas.map((t, k) => (
+            <div key={k} className="absolute inset-y-0" style={{ left: `${(k / fase.telas.length) * 100}%`, width: `${100 / fase.telas.length}%` }}>
+              <CenarioHistoria lugar={t} />
+            </div>
+          ))}
+
+          {/* Mesas, estantes, sacadas e vigas */}
+          {fase.plataformas.map((p, k) => (
+            <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO}%`, height: `${(p.y / ALTURA_TELA) * 100}%` }} aria-hidden>
+              <div className={`plataforma plataforma-${p.tipo} absolute inset-x-0 top-0`} />
+              {(p.tipo === 'mesa' || p.tipo === 'estante') && (
+                <>
+                  <div className="absolute bottom-0 left-[8%] top-0 w-[8%] bg-[#4a2a14]" />
+                  <div className="absolute bottom-0 right-[8%] top-0 w-[8%] bg-[#4a2a14]" />
+                </>
+              )}
+              {p.tipo === 'estante' && (
+                <div className="absolute inset-x-[16%] bottom-0 top-[12%] flex flex-col justify-around">
+                  {[0, 1, 2].map((r) => (
+                    <div key={r} className="flex h-[18%] gap-[3%]">
+                      {['#c0283c', '#2a6aa0', '#e0782c', '#3a8a4a', '#8a3aa0'].map((c, j) => (
+                        <span key={j} className="h-full flex-1" style={{ background: c }} />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* O fogo (o que pisca mostra a fumaça antes de acender) */}
+          {fase.perigos.map((p, k) => {
+            const aceso = fogoAceso(p, s.tempo);
+            return (
+              <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO - 1}%`, height: '12%' }} aria-hidden>
+                <div className="absolute inset-x-0 bottom-0 h-[18%] rounded-[50%] bg-[#2a0a04]/80" />
+                {aceso ? (
+                  Array.from({ length: Math.max(2, Math.round(p.w / 3)) }, (_, j) => (
+                    <span
+                      key={j}
+                      className="chama-fase absolute bottom-0"
+                      style={{ left: `${(j / Math.max(2, Math.round(p.w / 3))) * 100}%`, animationDelay: `${(j * 137) % 500}ms` } as CSSProperties}
+                    />
+                  ))
+                ) : (
+                  <span className="fumaca-fase absolute bottom-0 left-1/4 h-1/2 w-1/2" />
+                )}
+              </div>
+            );
+          })}
+
+          {/* Os livros para salvar */}
+          {fase.coletaveis.map((c) =>
+            s.coletados.includes(c.id) ? null : (
+              <span key={c.id} className="coletavel-fase absolute text-lg sm:text-3xl" style={{ left: emX(c.x), bottom: emY(c.y) }} title={c.nome} aria-label={c.nome}>
+                {c.icone}
+              </span>
+            ),
+          )}
+
+          {/* Coisas e pessoas que comentam */}
+          {fase.comentarios.map((c) =>
+            c.personagem ? (
+              <div key={c.id} className="absolute -translate-x-1/2" style={{ left: emX(c.x), bottom: `${CHAO}%`, width: emX(LARGURA_HEROI) }} aria-hidden>
+                <div className="respirar">
+                  <Retrato quem={c.personagem} espelhar={s.x < c.x} />
+                </div>
+              </div>
+            ) : c.icone ? (
+              <span key={c.id} className="absolute -translate-x-1/2 text-xl opacity-80 sm:text-3xl" style={{ left: emX(c.x), bottom: emY(20) }} aria-hidden>
+                {c.icone}
+              </span>
+            ) : null,
+          )}
+
+          {/* A saída */}
+          <div className="absolute -translate-x-1/2 text-center" style={{ left: emX(fase.saida.x), bottom: `${CHAO}%` }}>
+            <span className={`block text-2xl sm:text-4xl ${aberta ? 'piscar' : ''}`} aria-hidden>
+              {aberta ? '🚪' : '🔒'}
+            </span>
+            <span className="placa-ponto block whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px]">
+              {aberta ? fase.saida.rotulo : `SALVE ${fase.precisa} LIVROS`}
+            </span>
+          </div>
+
+          {/* O gladiador */}
+          <div
+            className={`absolute -translate-x-1/2 ${s.tempo < s.feridoAte ? 'piscar' : ''}`}
+            style={{ left: emX(s.x), bottom: emY(s.y), width: emX(LARGURA_HEROI) }}
+            aria-label={NOMES[heroi]}
+          >
+            <span className="absolute -bottom-[3%] left-1/2 h-[6%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" style={{ opacity: s.y > 0.5 ? 0.3 : 1 }} />
+            <div className={s.andando ? 'andar' : s.noChao ? 'respirar' : ''}>
+              <Retrato quem={heroi} espelhar={s.dir < 0} />
+            </div>
+          </div>
+        </div>
+
+        {/* O balão de quem está falando (fica na tela, não no mundo) */}
+        {falando && (
+          <div key={falando.id} className="balao-fase absolute inset-x-[4%] top-[6%] z-20 flex items-center gap-2 border-2 border-[#c8962a] bg-black/85 p-2">
+            {falando.quem !== 'narrador' && (
+              <span className="w-8 shrink-0 sm:w-12" aria-hidden>
+                <Retrato quem={falando.quem} />
+              </span>
+            )}
+            <span className="text-xs leading-snug text-white sm:text-sm">
+              {NOMES[falando.quem] && <b className="mr-1 font-pixel text-[8px] text-[#f2c14e]">{NOMES[falando.quem].toUpperCase()}:</b>}
+              {falando.texto}
+            </span>
+          </div>
+        )}
+
+        {s.tempo < s.feridoAte && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
+
+        {acabou && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/75 p-3 text-center">
+            <p className="font-pixel text-sm text-[#f2c14e] sm:text-xl">📚 {s.coletados.length} DE {fase.coletaveis.length} LIVROS SALVOS!</p>
+            <p className="text-sm text-white/80">{s.coletados.length === fase.coletaveis.length ? 'Todos! O Guardião Zero ficaria orgulhoso.' : 'Os que ficaram para trás viraram cinza... mas esses, ninguém apaga.'}</p>
+            <button type="button" autoFocus onClick={onFim} className="pixel-box px-4 py-2 font-pixel text-[10px] text-[#f2c14e]">
+              SEGUIR ▶
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Os controles na tela (bons para o celular): segure ◀ ▶ e toque ⤒ para pular */}
+      <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2">
+        <button type="button" {...botao('esq')} className="pixel-box botao-luta flex items-center justify-center py-3" style={{ '--cor': '#c8962a' } as CSSProperties} aria-label="Andar para a esquerda">
+          <span className="medalhao text-xl sm:text-2xl">◀</span>
+        </button>
+        <button type="button" {...botao('dir')} className="pixel-box botao-luta flex items-center justify-center py-3" style={{ '--cor': '#c8962a' } as CSSProperties} aria-label="Andar para a direita">
+          <span className="medalhao text-xl sm:text-2xl">▶</span>
+        </button>
+        <button type="button" {...botao('pular')} className="pixel-box botao-luta flex items-center justify-center gap-2 py-3" style={{ '--cor': '#4ad46a' } as CSSProperties} aria-label="Pular">
+          <span className="medalhao text-xl sm:text-2xl">⤒</span>
+          <span className="font-pixel text-[8px] text-[#f4e2b4] sm:text-[10px]">PULAR</span>
+        </button>
+      </div>
+      <p className="text-center text-[10px] text-muted">Teclado: A e D (ou as setas) para andar · W ou espaço para pular · suba nas mesas e passe por cima do fogo</p>
+    </div>
+  );
+}

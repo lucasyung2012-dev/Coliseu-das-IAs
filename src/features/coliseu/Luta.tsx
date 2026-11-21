@@ -121,6 +121,7 @@ import type { IaId } from '@/game/personagens';
 import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
+import { usePausado } from './Pausa';
 import { Retrato } from './Cenarios';
 
 /** O desenho e o tamanho de cada inimigo (em % da largura da cena). */
@@ -436,11 +437,13 @@ export function LutaHistoria({
   // Golpes seguidos sem apanhar (o COMBO na tela).
   const [combo, setCombo] = useState(0);
 
+  // O menu de pausa (☰ MENU ou Esc) para o relógio da luta.
+  const pausado = usePausado();
   useEffect(() => {
-    if (fase !== 'luta') return;
+    if (fase !== 'luta' || pausado) return;
     const id = window.setInterval(() => setE((s) => passoLuta(s, atributosRef.current)), TICK_LUTA);
     return () => window.clearInterval(id);
-  }, [fase]);
+  }, [fase, pausado]);
 
   // Fim da luta e os sons de cada acontecimento.
   useEffect(() => {
@@ -473,7 +476,7 @@ export function LutaHistoria({
   }, [e]);
 
   const apertar = (acao: 'golpe' | 'escudo' | 'esquiva' | 'especial') => {
-    if (fase !== 'luta') return;
+    if (fase !== 'luta' || pausado) return;
     desbloquear();
     setE((s) => agir(s, acao, atributosRef.current));
   };
@@ -498,7 +501,7 @@ export function LutaHistoria({
     };
     window.addEventListener('keydown', tecla);
     return () => window.removeEventListener('keydown', tecla);
-  }, [fase]);
+  }, [fase, pausado]);
 
   const j = e.jogador;
   const i = e.inimigo;
@@ -507,7 +510,8 @@ export function LutaHistoria({
   const corSinal = at.tipo === 'corpo' ? '#ffd04a' : at.tipo === 'finta' ? '#ffd04a' : '#ff3a3a';
   const cheio = e.animo >= ANIMO_MAX;
   const acaoJ = e.tempo < j.acaoAte ? j.acao : 'parado';
-  const largura = LARGURA_ESPECIAL[def.id] ?? VISUAL[def.id]?.largura ?? 13;
+  // Os inimigos também ficaram maiores (pedido do Lucas: "os bonecos estão muito pequenininhos").
+  const largura = Math.min(48, (LARGURA_ESPECIAL[def.id] ?? VISUAL[def.id]?.largura ?? 13) * 1.15);
   const apanhou = e.eventos.some((ev) => ev.tipo === 'acerto' && ev.ate - e.tempo > 550);
   const plateiaLado = e.animo >= 50;
   // O inimigo avança quando o golpe dele chega; cai quando perde.
@@ -593,19 +597,19 @@ export function LutaHistoria({
         </div>
 
         {/* Sombras no chão */}
-        <span className="pointer-events-none absolute bottom-[12%] left-[22%] z-[9] h-[4%] w-[11%] -translate-x-1/2 rounded-[50%] bg-black/50" aria-hidden style={{ scale: acaoJ === 'esquiva' ? '0.6' : '1', transition: 'scale 120ms' }} />
+        <span className="pointer-events-none absolute bottom-[12%] left-[22%] z-[9] h-[4%] w-[14%] -translate-x-1/2 rounded-[50%] bg-black/50" aria-hidden style={{ scale: acaoJ === 'esquiva' ? '0.6' : '1', transition: 'scale 120ms' }} />
         {!vencido && <span className="pointer-events-none absolute bottom-[10%] left-[70%] z-[9] h-[4%] -translate-x-1/2 rounded-[50%] bg-black/50" style={{ width: `${largura * 0.85}%` }} aria-hidden />}
 
         {/* A sombra que fica para trás na esquiva */}
         {acaoJ === 'esquiva' && (
-          <div className="rastro-esquiva pointer-events-none absolute bottom-[14%] left-[22%] z-[9] w-[13%] -translate-x-1/2 opacity-40" aria-hidden>
+          <div className="rastro-esquiva pointer-events-none absolute bottom-[14%] left-[22%] z-[9] w-[16%] -translate-x-1/2 opacity-40" aria-hidden>
             <Retrato quem={heroi} />
           </div>
         )}
 
         {/* O herói */}
         <div
-          className={`absolute bottom-[14%] left-[22%] z-10 w-[13%] -translate-x-1/2 ${acaoJ === 'golpe' || acaoJ === 'especial' ? 'investida-dir' : acaoJ === 'parado' ? 'respirar-t' : ''}`}
+          className={`absolute bottom-[14%] left-[22%] z-10 w-[16%] -translate-x-1/2 ${acaoJ === 'golpe' || acaoJ === 'especial' ? 'investida-dir' : acaoJ === 'parado' ? 'respirar-t' : ''}`}
           style={{
             // Cada um esquiva do seu jeito: o Cassius pula pesado, o Octavius rola no chão, o Helios some num lampejo.
             translate:
@@ -733,7 +737,7 @@ export function LutaHistoria({
         {/* Na luta final, o especial chama um aliado que entra correndo */}
         {quemAjuda && aliado && (
           <div key={aliado.id} className="pointer-events-none absolute inset-0 z-20" aria-hidden>
-            <div className="entra-esq absolute bottom-[14%] left-[44%] w-[13%] -translate-x-1/2">
+            <div className="entra-esq absolute bottom-[14%] left-[44%] w-[16%] -translate-x-1/2">
               <Retrato quem={quemAjuda} azul={quemAjuda === 'censor'} />
             </div>
             <span className="lute-entra absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap font-pixel text-xs text-[#f2c14e] [text-shadow:2px_2px_0_#000] sm:text-xl">
