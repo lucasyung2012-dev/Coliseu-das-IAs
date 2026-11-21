@@ -1,5 +1,5 @@
 import { ladrilhoEm, livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo } from '@/game/historia/mundo';
-import { MAPAS, MUNDOS, mundoDoExplorar } from '@/game/historia/mundos';
+import { MAPAS, MUNDOS, mundoDoExplorar, mundoDoLudus } from '@/game/historia/mundos';
 import { CAPITULOS } from '@/game/historia/roteiro';
 
 /** O mundo visto de cima (22/11/2026): andar livre, paredes, interagir e a saída. */
@@ -85,5 +85,19 @@ describe('os mapas das cenas de explorar (caminho do Cassius)', () => {
     for (const pessoa of m.pessoas) for (const [x, y] of pessoa.rota) expect(livre(m, x + 0.5, y + 0.8), `${pessoa.id} em ${x},${y}`).toBe(true);
     // O pedaço da chave continua no mapa do final.
     for (const p of cena.pontos) if (p.segredo) expect(m.coisas.find((c) => c.id === p.id)?.segredo).toBe(p.segredo);
+  });
+});
+
+describe('o pátio do Ludus visto de cima', () => {
+  const ludus = CAPITULOS.claude.flatMap((c) => c.cenas).find((c) => c.tipo === 'ludus');
+  it('todo mundo da cena está no pátio, em chão livre, e o boneco e a forja existem', () => {
+    if (!ludus || ludus.tipo !== 'ludus') throw new Error('sem Ludus');
+    const m = mundoDoLudus(ludus.conversas, ludus.lugar, ludus.objetivo);
+    expect(m.pessoas).toHaveLength(ludus.conversas.length);
+    for (const p of m.pessoas) for (const [x, y] of p.rota) expect(livre(m, x + 0.5, y + 0.8), `${p.id} em ${x},${y}`).toBe(true);
+    expect(m.coisas.map((c) => c.id).sort()).toEqual(['boneco', 'forja']);
+    expect(livre(m, m.inicio[0] + 0.5, m.inicio[1] + 0.8)).toBe(true);
+    const largura = m.mapa[0]!.length;
+    for (const linha of m.mapa) expect(linha.length).toBe(largura);
   });
 });

@@ -1,5 +1,5 @@
 import type { Coisa, Mundo, Pessoa, TemaMundo } from './mundo';
-import type { Cena, Lugar } from './roteiro';
+import type { Cena, ConversaLudus, Lugar } from './roteiro';
 
 /**
  * Os mapas do mundo visto de cima. O primeiro (22/11/2026) é a Grande Biblioteca à
@@ -263,4 +263,53 @@ export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: Ma
     }
   }
   return { id: cena.id, tema: m.tema, lugar: cena.lugar as Lugar, mapa: m.mapa, objetivo: cena.objetivo, inicio: m.inicio, coisas, pessoas };
+}
+
+/**
+ * O PÁTIO DO LUDUS visto de cima (22/11/2026): a arena de areia no meio, a forja do
+ * ferreiro no canto, os bonecos de treino e as pessoas da cena andando. Examinar o
+ * boneco abre os treinos do Brutus; examinar a forja abre o ferreiro.
+ */
+export const MAPA_LUDUS = [
+  '########################',
+  '#FF..xx........xx..vv..#',
+  '#FF....................#',
+  '#......aaaaaaaaaa......#',
+  '#.p...aaaaaaaaaaaa...p.#',
+  '#.....aaaaaaaaaaaa.....#',
+  '#.....aaaaaaaaaaaa..D..#',
+  '#.....aaaaaaaaaaaa.....#',
+  '#.p...aaaaaaaaaaaa..D.p#',
+  '#......aaaaaaaaaa......#',
+  '#..............D.......#',
+  '#xx..................xx#',
+  '########################',
+];
+const LUGARES_LUDUS: [number, number][] = [
+  [10, 5],
+  [15, 4],
+  [17, 9],
+  [7, 8],
+  [12, 10],
+];
+
+export function mundoDoLudus(conversas: ConversaLudus[], lugar: Lugar, objetivo: string): Mundo {
+  // O Brutus anda em volta da arena, de olho em todo mundo; os outros ficam cada um no seu canto.
+  let vaga = 1;
+  const pessoas: Pessoa[] = conversas.map((c, k) => {
+    const rota: [number, number][] =
+      c.quem === 'brutus'
+        ? [
+            [10, 5],
+            [14, 8],
+            [8, 8],
+          ]
+        : [LUGARES_LUDUS[vaga++ % LUGARES_LUDUS.length]!];
+    return { id: `${c.quem}-${k}`, quem: c.quem, rota, falas: c.falas };
+  });
+  const coisas: Coisa[] = [
+    { id: 'boneco', x: 20, y: 6, falas: [] },
+    { id: 'forja', x: 1, y: 1, falas: [] },
+  ];
+  return { id: 'ludus', tema: 'ludus', lugar, mapa: MAPA_LUDUS, objetivo, inicio: [3, 9], coisas, pessoas };
 }

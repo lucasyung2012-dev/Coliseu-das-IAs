@@ -17,7 +17,19 @@ import { usePausado } from './Pausa';
 const VISIVEL = 11; // quantos ladrilhos de largura cabem na tela
 const PX = 16; // pixels de um ladrilho no desenho
 
-export function MundoAberto({ mundo, heroi, onFim, onSegredo }: { mundo: Mundo; heroi: Falante; onFim: () => void; onSegredo?: (id: string) => void }) {
+export function MundoAberto({
+  mundo,
+  heroi,
+  onFim,
+  onSegredo,
+  onCoisa,
+}: {
+  mundo: Mundo;
+  heroi: Falante;
+  onFim: () => void;
+  onSegredo?: (id: string) => void;
+  /** Coisa especial (o boneco de treino, a forja): se devolver true, não abre conversa. */
+  onCoisa?: (id: string) => boolean }) {
   const W = mundo.mapa[0]!.length;
   const H = mundo.mapa.length;
   const [s, setS] = useState<EstadoMundo>(() => novoMundo(mundo));
@@ -81,7 +93,10 @@ export function MundoAberto({ mundo, heroi, onFim, onSegredo }: { mundo: Mundo; 
     desbloquear();
     tocar('pagina');
     if (alvo.tipo === 'pessoa') setConversa({ id: alvo.p.id, falas: alvo.p.falas });
-    else setConversa({ id: alvo.c.id, falas: alvo.c.falas, segredo: alvo.c.segredo });
+    else if (onCoisa?.(alvo.c.id)) {
+      estado.current = marcarVisto(estado.current, alvo.c.id);
+      setS(estado.current);
+    } else setConversa({ id: alvo.c.id, falas: alvo.c.falas, segredo: alvo.c.segredo });
   };
   const fimDaConversa = () => {
     const c = conversaRef.current;
@@ -146,7 +161,7 @@ export function MundoAberto({ mundo, heroi, onFim, onSegredo }: { mundo: Mundo; 
   return (
     <div className="flex flex-col gap-2">
       <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-        {mundo.objetivo}{aberta ? ' · a saída está aberta' : ''}
+        {mundo.objetivo}{aberta && mundo.mapa.some((l) => l.includes('P')) ? ' · a saída está aberta' : ''}
       </p>
       <div ref={palcoRef} className="pixel-box mundo-aberto relative w-full select-none overflow-hidden bg-black" style={{ touchAction: 'none' }}>
         {/* O mundo inteiro, que anda com a câmera */}
@@ -198,7 +213,7 @@ export function MundoAberto({ mundo, heroi, onFim, onSegredo }: { mundo: Mundo; 
         {/* A luz: escuro em volta, como uma noite de verdade */}
         <div
           className="pointer-events-none absolute inset-0 z-[400]"
-          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${CORES[mundo.tema].escuro}) 100%)` }}
+          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${Math.min(0.9, CORES[mundo.tema].escuro + (mundo.lugar.includes('noite') ? 0.35 : 0))}) 100%)` }}
           aria-hidden
         />
 
@@ -260,6 +275,7 @@ const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; 
   catacumbas: { chao1: '#3a3632', chao2: '#34302c', parede1: '#141210', parede2: '#1c1916', face: '#2e2a26', faceTopo: '#4a443c', escuro: 0.82 },
   forum: { chao1: '#a89a84', chao2: '#9e907a', parede1: '#8a7e6a', parede2: '#94887a', face: '#d8ccb4', faceTopo: '#f0e6d0', escuro: 0.18 },
   tunel: { chao1: '#6a5434', chao2: '#624e30', parede1: '#201810', parede2: '#2a2016', face: '#4a3a28', faceTopo: '#6a5438', escuro: 0.68 },
+  ludus: { chao1: '#9a8460', chao2: '#927c58', parede1: '#3a2a1c', parede2: '#443222', face: '#6a5034', faceTopo: '#8a6a44', escuro: 0.25 },
 };
 
 /**
@@ -286,7 +302,16 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
           <rect x={X} y={Y + PX - 1} width={PX} height="1" fill="#3a2e26" opacity="0.5" />
         </g>
       );
-      if ('.PTSpvftgxM'.includes(c)) pecas.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDF'.includes(c)) pecas.push(chao(cor.chao1, cor.chao2));
+      // Areia (o pátio do Ludus): grãos e marcas de pé.
+      if (c === 'a')
+        pecas.push(
+          <g key={`ar${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#d8b878" />
+            <rect x={X + ((x * 5 + y * 3) % 12)} y={Y + ((x * 7 + y) % 12)} width="2" height="1" fill="#c0a060" />
+            <rect x={X + ((x * 3 + y * 7) % 13)} y={Y + ((x + y * 5) % 13)} width="1" height="1" fill="#e8cc90" />
+          </g>,
+        );
       // Mármore (o Fórum): placas claras com veios.
       if (c === 'm')
         pecas.push(
@@ -331,6 +356,36 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
             <rect x={X} y={Y + 6} width={PX} height="2" fill="#4a4a54" />
           </g>,
         );
+      // O boneco de treino: poste de madeira, corpo de palha e o alvo no peito.
+      if (c === 'D')
+        pecas.push(
+          <g key={`bo${k}`}>
+            <rect x={X + 7} y={Y + 2} width="2" height="14" fill="#6a4220" />
+            <rect x={X + 4} y={Y - 6} width="8" height="12" fill="#d8b860" />
+            <rect x={X + 4} y={Y - 6} width="8" height="2" fill="#b89840" />
+            <rect x={X + 1} y={Y - 3} width="14" height="3" fill="#c8a850" />
+            <rect x={X + 6} y={Y - 2} width="4" height="4" fill="#c0283c" />
+            <rect x={X + 7} y={Y - 1} width="2" height="2" fill="#f0e6cc" />
+            <rect x={X + 5} y={Y - 11} width="6" height="5" fill="#d8b860" />
+          </g>,
+        );
+      // A forja do ferreiro (2 × 2): fornalha de pedra com fogo, bigorna e martelo.
+      if (c === 'F' && t(x - 1, y) !== 'F' && t(x, y - 1) !== 'F') {
+        pecas.push(
+          <g key={`fj${k}`}>
+            <rect x={X + 1} y={Y} width="20" height="22" fill="#5a4a40" />
+            <rect x={X + 1} y={Y} width="20" height="2" fill="#7a6a5a" />
+            <rect x={X + 5} y={Y + 8} width="12" height="10" fill="#1a0e08" />
+            <rect x={X + 6} y={Y + 11} width="10" height="7" fill="#ff6a1a" className="luz-vela" />
+            <rect x={X + 8} y={Y + 13} width="6" height="4" fill="#ffd04a" />
+            <rect x={X + 22} y={Y + 18} width="9" height="4" fill="#4a4a54" />
+            <rect x={X + 24} y={Y + 22} width="5" height="6" fill="#3a3a44" />
+            <rect x={X + 25} y={Y + 12} width="2" height="6" fill="#6a4220" />
+            <rect x={X + 23} y={Y + 10} width="6" height="3" fill="#8a8a98" />
+          </g>,
+        );
+        luzes.push(<circle key={`fl${k}`} cx={X + 11} cy={Y + 14} r="26" fill="#ff8a2a" opacity="0.2" className="luz-vela" />);
+      }
       // O monte de sucata (o ninho dos ratos de metal).
       if (c === 'x')
         pecas.push(

@@ -28,9 +28,12 @@ export type Ladrilho =
   | 'g' // grade de ferro
   | 'x' // monte de sucata (ou caixotes)
   | 'M' // a máquina violeta do Arquivo
-  | 'N'; // parede com nomes gravados
+  | 'N' // parede com nomes gravados
+  | 'a' // areia (o pátio do Ludus)
+  | 'D' // boneco de treino
+  | 'F'; // a forja do ferreiro
 
-const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N']);
+const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N', 'D', 'F']);
 
 export interface Coisa {
   id: string;
@@ -69,7 +72,7 @@ export interface Mundo {
 }
 
 /** As cores do mapa: biblioteca, catacumbas (escuro, com tochas), Fórum (claro, ao ar livre) e o túnel. */
-export type TemaMundo = 'biblioteca' | 'catacumbas' | 'forum' | 'tunel';
+export type TemaMundo = 'biblioteca' | 'catacumbas' | 'forum' | 'tunel' | 'ludus';
 
 export type Direcao = 'cima' | 'baixo' | 'esq' | 'dir';
 

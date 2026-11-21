@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Icone from '@/ui/pixel/Icones';
 import type { EventoLuta, Tecnica } from '@/game/historia/luta';
 import type { ConversaLudus, Falante, Lugar } from '@/game/historia/roteiro';
@@ -16,8 +16,8 @@ import {
 } from '@/game/historia/saves';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
-import { Falas, Palco } from './Cenas';
-import { Retrato } from './Cenarios';
+import { MundoAberto } from './MundoAberto';
+import { mundoDoLudus } from '@/game/historia/mundos';
 import { LutaHistoria } from './Luta';
 
 /**
@@ -110,11 +110,18 @@ export function Ludus({
   onGravar: (s: SaveHistoria) => void;
   onFim: () => void;
 }) {
-  const [falando, setFalando] = useState<ConversaLudus | null>(null);
   const [treinando, setTreinando] = useState<DefTreino | null>(null);
   const [painel, setPainel] = useState<'treinos' | 'ferreiro'>('treinos');
-  const [vistos, setVistos] = useState<string[]>([]);
   const [ganhou, setGanhou] = useState<Equipamento | null>(null);
+  // O pátio visto de cima (22/11/2026): anda livre, fala com quem está lá, examina o boneco
+  // (abre os treinos) e a forja (abre o ferreiro).
+  const patio = useMemo(() => mundoDoLudus(conversas, lugar, objetivo), [conversas, lugar, objetivo]);
+  const abrirPainel = (p: 'treinos' | 'ferreiro') => {
+    desbloquear();
+    tocar('selecionar');
+    setPainel(p);
+    window.setTimeout(() => document.getElementById('paineis-ludus')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  };
 
   // O presente (o elmo do Brutus): entra no save assim que chega no Ludus.
   useEffect(() => {
@@ -152,64 +159,30 @@ export function Ludus({
     );
   }
 
-  const posicoes = conversas.map((_, k) => 28 + (k * 60) / Math.max(1, conversas.length - 1 || 1));
-
   return (
     <div className="flex flex-col gap-2">
-      <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">LUDUS · {objetivo}</p>
-      <Palco lugar={lugar}>
-        <div className="absolute bottom-[12%] left-[12%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
-          <div className="respirar">
-            <Retrato quem={heroi} />
-          </div>
-        </div>
-        {conversas.map((c, k) => (
-          <button
-            key={c.quem + k}
-            type="button"
-            onClick={() => {
-              desbloquear();
-              tocar('clique');
-              setFalando(c);
-            }}
-            className="absolute bottom-[12%] z-10 flex -translate-x-1/2 flex-col items-center"
-            style={{ left: `${posicoes[k]}%`, width: c.quem === 'brutus' ? '13%' : '10%' }}
-            aria-label={`Falar com ${c.rotulo}`}
-          >
-            <span className="respirar block w-full" aria-hidden>
-              <Retrato quem={c.quem} espelhar />
-            </span>
-            <span
-              className={`mt-1 whitespace-nowrap border-2 bg-black/80 px-1.5 py-0.5 font-pixel text-[7px] sm:text-[9px] ${vistos.includes(c.quem + k) ? 'border-white/30 text-white/60' : 'piscar border-[#f2c14e] text-white'}`}
-            >
-              {c.rotulo}
-            </span>
-          </button>
-        ))}
-        {falando && (
-          <Falas
-            falas={falando.falas}
-            onFim={() => {
-              const id = falando.quem + conversas.indexOf(falando);
-              setVistos((v) => (v.includes(id) ? v : [...v, id]));
-              setFalando(null);
-            }}
-          />
-        )}
-        {ganhou && !falando && (
-          <button
-            type="button"
-            onClick={() => setGanhou(null)}
-            className="absolute inset-x-6 top-[30%] z-20 border-2 border-[#f2c14e] bg-black/90 p-3 text-center"
-          >
-            <span className="block font-pixel text-[10px] text-[#f2c14e] sm:text-sm">VOCÊ GANHOU: {ganhou === 'elmo-brutus' ? 'O ELMO DAS 99 VITÓRIAS' : ganhou.toUpperCase()}</span>
-            <span className="mt-1 block text-xs text-white/80">+20 Vida · +1 Defesa · toque para fechar</span>
-          </button>
-        )}
-      </Palco>
+      {/* O presente (o elmo do Brutus) aparece por cima de tudo até tocar */}
+      {ganhou && (
+        <button type="button" onClick={() => setGanhou(null)} className="border-2 border-[#f2c14e] bg-black/90 p-3 text-center">
+          <span className="block font-pixel text-[10px] text-[#f2c14e] sm:text-sm">VOCÊ GANHOU: {ganhou === 'elmo-brutus' ? 'O ELMO DAS 99 VITÓRIAS' : ganhou.toUpperCase()}</span>
+          <span className="mt-1 block text-xs text-white/80">+20 Vida · +1 Defesa · toque para fechar</span>
+        </button>
+      )}
+      <MundoAberto
+        mundo={patio}
+        heroi={heroi}
+        onFim={() => undefined}
+        onCoisa={(id) => {
+          if (id === 'boneco') abrirPainel('treinos');
+          else if (id === 'forja') abrirPainel('ferreiro');
+          else return false;
+          return true;
+        }}
+      />
+      <p className="text-center text-xs text-muted">Examine o BONECO para treinar com o Brutus e a FORJA para falar com o ferreiro. Quando estiver pronto, siga lá embaixo.</p>
 
       {/* Os atributos do gladiador */}
-      <div className="pixel-box flex flex-wrap items-center justify-center gap-x-4 gap-y-1 p-2 font-pixel text-[8px] sm:text-[10px]">
+      <div id="paineis-ludus" className="pixel-box flex flex-wrap items-center justify-center gap-x-4 gap-y-1 p-2 font-pixel text-[8px] sm:text-[10px]">
         <span>VIDA {at.vida}</span>
         <span>FORÇA {at.forca}</span>
         <span>DEFESA {at.defesa}</span>
@@ -305,7 +278,7 @@ export function Ludus({
         <p className="text-xs text-muted">{falta ? `Antes de seguir, aprenda o ${TREINOS_GOLPE[obrigatorio!].nome} com o Brutus.` : 'Quando estiver pronto, siga em frente.'}</p>
         <button
           type="button"
-          disabled={!!falta || !!falando}
+          disabled={!!falta}
           onClick={() => {
             tocar('selecionar');
             onFim();

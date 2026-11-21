@@ -310,3 +310,14 @@ Pedido do Lucas: cada gladiador com um estilo próprio, não só atacar, defende
 | Especial | MURALHA DE LIVROS: 4,5 s em que tudo é bloqueado e metade volta | REDE E TRIDENTE: preso 2,6 s, estocadas +25% | ECLIPSE: os 3 próximos golpes erram; a luz vira raio (+9 por luz) |
 
 O especial abre com uma faixa na diagonal (o gladiador grande e o nome do golpe), como nos jogos de luta.
+
+## O estilo novo (22/11/2026): mundo visto de cima e diálogo com emoção
+
+Pedido do Lucas: "uma mistura de Undertale, Stardew Valley e Hollow Knight". Regras dele: **nunca emoji no jogo** (tudo em pixel) e **o humor a gente escreve junto**.
+
+- **Mundo visto de cima** (`mundo.ts`, `mundos.ts`, `MundoAberto.tsx`): mapa de ladrilhos desenhado em pixel, anda para todos os lados (setas/WASD ou o controle na tela), um botão para interagir (E/Z/espaço ou a mão), pessoas andando sozinhas, câmera suave, luz de vela e de janela, temas (biblioteca, catacumbas, Fórum, túnel, Ludus).
+  - A cena `mundo` usa um mapa pronto (a Biblioteca à noite, capítulo 1 do Cassius).
+  - A cena `explorar` com `mapa` vira mapa usando os próprios pontos do roteiro (mesmas falas, pedaço da chave): túneis, ossário e Arquivo (cap. 4), Fórum (cap. 5), túnel dos gladiadores (cap. 6) e a Biblioteca reaberta (final).
+  - O **Ludus** virou o pátio visto de cima (vale para os três caminhos): examinar o boneco abre os treinos; a forja, o ferreiro.
+- **Fase de lado** (`fase.ts`, `FaseAberta.tsx`): a Biblioteca em chamas (capítulo 1), para as partes de ação.
+- **Diálogo com emoção** (`Cenas.tsx`): o personagem grande do lado da caixa, que muda com a `emocao` (feliz, bravo, medo, triste, surpreso, pensando, determinado), com um balãozinho em pixel (`Emotes.tsx`); `jeito` grito (letras tremem), sussurro, devagar; `zoom` perto ou susto. Falas fortes do caminho do Cassius já marcadas.
