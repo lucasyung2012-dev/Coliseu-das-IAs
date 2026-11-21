@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
 
@@ -105,7 +106,7 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
     if (fase !== 'jogo') return;
     const k = chegadas.current.findIndex((c, i) => !resolvidas.includes(i) && Math.abs(c - t) <= 2);
     if (k >= 0) {
-      tocar('escudoMetal');
+      tocar('martelo');
       setAcertos((a) => a + 1);
       setResolvidas((r) => [...r, k]);
       setBrilho('ok');

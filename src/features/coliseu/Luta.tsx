@@ -48,7 +48,8 @@ import {
 } from '@/ui/pixel/historia2';
 import { BRUTUS, PALETA_BRUTUS } from '@/ui/pixel/historia';
 import { CAPATAZ, COZINHEIRO_BORDO, FEITOR_TAMBOR, GUARDA_CHICOTE, PALETA_CAPATAZ, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GUARDA_CHICOTE } from '@/ui/pixel/historia3';
-import { desbloquear, tocar, type NomeSom } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
 
@@ -110,21 +111,21 @@ function Barra({ valor, max, cor, rotulo, fina = false }: { valor: number; max: 
   );
 }
 
-const SOM: Partial<Record<string, NomeSom>> = {
+const SOM: Partial<Record<string, SomHistoria>> = {
   acerto: 'espadas',
   bloqueio: 'escudoMetal',
-  esquiva: 'selecionar',
-  dano: 'falha',
-  especial: 'fanfarra',
-  fase: 'trombeta',
-  guarda: 'clique',
-  finta: 'pergunta',
-  contra: 'pesada',
-  cansado: 'falha',
-  riposta: 'pesada',
-  quebra: 'refuta',
-  plano: 'catapulta',
-  aliado: 'fanfarra',
+  esquiva: 'esquiva',
+  dano: 'dano',
+  especial: 'especial',
+  fase: 'fase',
+  guarda: 'guarda',
+  finta: 'finta',
+  contra: 'contra',
+  cansado: 'cansado',
+  riposta: 'riposta',
+  quebra: 'quebra',
+  plano: 'plano',
+  aliado: 'aliado',
 };
 const TEXTO: Record<string, string> = {
   bloqueio: 'BLOQUEOU!',
@@ -519,7 +520,7 @@ export function LutaHistoria({
       </Palco>
 
       {/* Os botões grandes (bons para o iPad) */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="botoes-luta grid grid-cols-4 gap-2">
         {(
           [
             ['golpe', '⚔️', 'GOLPE', '#e04a3a'],
@@ -549,7 +550,7 @@ export function LutaHistoria({
           </button>
         ))}
       </div>
-      <p className="text-center text-[10px] text-muted">
+      <p className="dica-luta text-center text-[10px] text-muted">
         Amarelo: 🛡️ · Vermelho: 💨 · ⚔️ no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas · teclado: J, K, L e espaço
       </p>
     </div>

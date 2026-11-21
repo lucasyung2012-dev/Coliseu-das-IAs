@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import { prefereMenosMovimento } from '@/ui/movimento';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
 

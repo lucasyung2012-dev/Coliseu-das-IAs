@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Fala, Lugar } from '@/game/historia/roteiro';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
 
@@ -111,7 +112,7 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
         } else setFase('perdeu');
         return;
       }
-      tocar('pesada');
+      tocar('tambor');
       setLado(Math.random() < 0.5 ? 0 : 1);
       setRespondeu(false);
       setBatida((b) => b + 1);
@@ -133,7 +134,7 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
     if (fase !== 'jogo' || batida < 0 || respondeu) return;
     setRespondeu(true);
     if (l === lado) {
-      tocar('clique');
+      tocar('remo');
       setAcertos((a) => a + 1);
       setBrilho('ok');
       window.setTimeout(() => setBrilho(null), 150);
@@ -218,7 +219,7 @@ export function DesafioTempestade({ lugar, antes, depois, onFim }: Base) {
     if (t < bateEm || batendo) return;
     // A onda bate: corda certa que não foi amarrada arrebenta.
     setBatendo(true);
-    tocar('pesada');
+    tocar('onda');
     const soltas = alvo.filter((a) => !amarradas.includes(a)).length;
     window.setTimeout(() => setBatendo(false), 500);
     if (soltas > 0) {

@@ -376,3 +376,15 @@ export function useVolume(): number {
     () => volume,
   );
 }
+
+/**
+ * Para outros bancos de som (os sons próprios do modo História, em somHistoria.ts):
+ * devolve o áudio e a saída só se puder tocar agora (som ligado e áudio liberado),
+ * para o botão de som e o volume valerem para tudo.
+ */
+export function saidaDeAudio(): { c: AudioContext; saida: GainNode } | null {
+  if (desligado) return null;
+  const c = contexto();
+  if (!c || !saida || (!desbloqueado && c.state !== 'running')) return null;
+  return { c, saida };
+}

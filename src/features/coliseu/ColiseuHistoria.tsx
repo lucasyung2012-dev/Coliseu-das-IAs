@@ -5,7 +5,8 @@ import { apagarSaveHistoria, gravarSaveHistoria, useProgresso } from '@/game/pro
 import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { CAPITULOS, PROLOGO, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar } from '@/ui/somHistoria';
 import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
@@ -46,7 +47,7 @@ export default function ColiseuHistoria() {
 
   return (
     <main data-area="coliseu" className="relative min-h-screen bg-[#0c0a10] text-fg">
-      <div className="relative mx-auto flex max-w-4xl flex-col gap-4 px-3 pb-16 pt-5 sm:px-6">
+      <div className="coliseu-conteudo relative mx-auto flex max-w-4xl flex-col gap-4 px-3 pb-16 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           {tela.tipo === 'jogo' ? (
             <button type="button" onClick={() => setTela({ tipo: 'saves' })} className="font-pixel text-[10px] text-muted hover:text-accent">

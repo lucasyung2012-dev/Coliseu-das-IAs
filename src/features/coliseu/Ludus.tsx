@@ -13,7 +13,8 @@ import {
   type SaveHistoria,
   type Treino,
 } from '@/game/historia/saves';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
 import { LutaHistoria } from './Luta';

@@ -1168,3 +1168,18 @@
 .tremer-t { animation: tremer-t 380ms steps(6) infinite; }
 @keyframes tremer-t { 0%, 100% { translate: 0 0; } 25% { translate: -3% 0; } 50% { translate: 3% 0; } 75% { translate: -2% 0; } }
 .menos-movimento .respirar-t, .menos-movimento .tremer-t { animation: none; }
+
+/* ===== Modo História no celular (21/11/2026: o Lucas achou grande demais deitado e vazio em pé) ===== */
+.palco-historia { aspect-ratio: 16 / 9; }
+/* Em pé no celular: a cena fica quadrada (maior, personagens maiores, sem espaço sobrando). */
+@media (orientation: portrait) and (max-width: 700px) {
+  .palco-historia { aspect-ratio: 1 / 1; }
+  .botoes-luta button { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+}
+/* Deitado no celular: tudo cabe na altura da tela; a cena encolhe para sobrar lugar para os botões. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .coliseu-conteudo { max-width: calc((100dvh - 7.5rem) * 16 / 9) !important; padding-top: 0.25rem !important; padding-bottom: 0.5rem !important; gap: 0.35rem !important; }
+  .coliseu-conteudo > div:first-child { font-size: 0.8em; }
+  .dica-luta { display: none; }
+  .botoes-luta button { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+}

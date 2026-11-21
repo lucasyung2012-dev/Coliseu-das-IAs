@@ -1,18 +1,24 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NOMES, type EmCena, type Fala, type Falante, type Lugar, type PontoExplorar, type Quadro } from '@/game/historia/roteiro';
 import { prefereMenosMovimento } from '@/ui/movimento';
-import { desbloquear, tocar } from '@/ui/som';
+import { desbloquear } from '@/ui/som';
+import { tocar, voz } from '@/ui/somHistoria';
 import { CenarioHistoria, Retrato } from './Cenarios';
 
-/** A caixa de fala: retrato, nome e texto. Toque para seguir. */
+/**
+ * A caixa de fala: retrato, nome e o texto aparecendo letra por letra, com a "voz"
+ * do personagem (um barulhinho próprio). Toque para completar; toque de novo para seguir.
+ */
 export function CaixaFala({ fala, onSeguir }: { fala: Fala; onSeguir: () => void }) {
+  const [mostrado, completo, completar] = useDigitando(fala.texto, 0, fala.quem);
   return (
     <button
       type="button"
       autoFocus
       onClick={() => {
         desbloquear();
-        tocar('clique');
+        if (!completo) return completar();
+        tocar('pagina');
         onSeguir();
       }}
       className="absolute inset-x-2 bottom-2 z-20 flex items-end gap-3 border-2 border-[#c8962a] bg-black/85 p-2 text-left sm:inset-x-4 sm:bottom-4 sm:p-3"
@@ -24,9 +30,13 @@ export function CaixaFala({ fala, onSeguir }: { fala: Fala; onSeguir: () => void
       )}
       <span className="min-w-0 flex-1">
         {NOMES[fala.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[fala.quem].toUpperCase()}</span>}
-        <span className={`mt-1 block text-sm leading-snug sm:text-base ${fala.quem === 'narrador' ? 'italic text-muted' : 'text-white'}`}>{fala.texto}</span>
+        <span className={`mt-1 block text-sm leading-snug sm:text-base ${fala.quem === 'narrador' ? 'italic text-muted' : 'text-white'}`}>
+          {mostrado}
+          {/* o resto do texto, invisível, para a caixa não mudar de tamanho enquanto digita */}
+          <span className="invisible">{fala.texto.slice(mostrado.length)}</span>
+        </span>
       </span>
-      <span className="piscar shrink-0 font-pixel text-[9px] text-[#f2c14e]">▶</span>
+      <span className={`shrink-0 font-pixel text-[9px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>▶</span>
     </button>
   );
 }
@@ -45,15 +55,15 @@ export function Falas({ falas, onFim }: { falas: Fala[]; onFim: () => void }) {
 /** O palco das cenas: o cenário em pixel, sempre no mesmo formato. */
 export function Palco({ lugar, children, className = '' }: { lugar: Lugar; children?: ReactNode; className?: string }) {
   return (
-    <div className={`pixel-box relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9] ${className}`}>
+    <div className={`pixel-box palco-historia relative w-full overflow-hidden ${className}`}>
       <CenarioHistoria lugar={lugar} />
       {children}
     </div>
   );
 }
 
-/** Texto aparecendo letra por letra (o toque completa na hora). */
-function useDigitando(texto: string, chave: number): [string, boolean, () => void] {
+/** Texto aparecendo letra por letra (o toque completa na hora), com a voz de quem fala. */
+function useDigitando(texto: string, chave: number, quem?: Falante): [string, boolean, () => void] {
   const [n, setN] = useState(0);
   useEffect(() => {
     setN(0);
@@ -63,7 +73,13 @@ function useDigitando(texto: string, chave: number): [string, boolean, () => voi
     }
     const id = window.setInterval(() => setN((x) => (x >= texto.length ? x : x + 1)), 28);
     return () => window.clearInterval(id);
-  }, [chave]);
+  }, [chave, texto]);
+  // Cada letra nova faz a "voz" (só enquanto está digitando, não quando o toque completa).
+  const anterior = useRef(0);
+  useEffect(() => {
+    if (n === anterior.current + 1) voz(quem, texto.charAt(n - 1), n);
+    anterior.current = n;
+  }, [n]);
   return [texto.slice(0, n), n >= texto.length, () => setN(texto.length)];
 }
 
@@ -129,7 +145,7 @@ function Ator({ p }: { p: EmCena }) {
 export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => void }) {
   const [i, setI] = useState(0);
   const q = quadros[i];
-  const [mostrado, completo, completar] = useDigitando(q?.texto ?? '', i);
+  const [mostrado, completo, completar] = useDigitando(q?.texto ?? '', i, q?.quem);
   useEffect(() => {
     if (!q) onFim();
     else if (q.som) tocar(q.som);
@@ -138,14 +154,14 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
   const seguir = () => {
     desbloquear();
     if (!completo) return completar();
-    tocar('clique');
+    tocar('pagina');
     setI((n) => n + 1);
   };
   const elenco: EmCena[] = q.personagens ?? (q.quem && q.quem !== 'narrador' && q.quem !== 'arauto' && q.quem !== 'povo' ? [{ quem: q.quem, x: 50, entrada: 'surgir' }] : []);
   const titulo = q.lugar === 'titulo';
   return (
     <div className="flex flex-col gap-2">
-    <div className={`pixel-box relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9] ${q.efeito === 'tremor' ? 'tremer-forte' : ''}`}>
+    <div className={`pixel-box palco-historia relative w-full overflow-hidden ${q.efeito === 'tremor' ? 'tremer-forte' : ''}`}>
       {/* o cenário, se aproximando devagar */}
       <div key={`bg-${i}`} className={`absolute inset-0 ${q.efeito === 'zoom' ? 'cena-aproxima' : q.efeito === 'panoramica' ? 'cena-panorama' : 'cena-respira'}`}>
         <CenarioHistoria lugar={q.lugar} />
