@@ -10,6 +10,7 @@ import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
+import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
 import { Ludus } from './Ludus';
 
 /**
@@ -279,6 +280,32 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         onFim={proxima}
       />
     );
+  if (cena.desafio === 'furtivo')
+    return (
+      <DesafioFurtivo
+        lugar={cena.lugar}
+        heroi={heroi}
+        antes={cena.antes}
+        depois={cena.depois ?? []}
+        vigia={cena.vigia ?? 'a guarda'}
+        objetivo={cena.objetivo ?? 'Atravesse sem ser visto.'}
+        onFim={proxima}
+      />
+    );
+  if (cena.desafio === 'ritmo')
+    return (
+      <DesafioRitmo
+        lugar={cena.lugar}
+        antes={cena.antes}
+        depois={cena.depois ?? []}
+        objetivo={cena.objetivo ?? 'Toque no tempo certo.'}
+        acao={cena.acao ?? 'GIRAR'}
+        quantos={cena.quantos ?? 8}
+        onFim={proxima}
+      />
+    );
+  if (cena.desafio === 'proteger') return <DesafioProteger lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'armadilhas') return <DesafioArmadilhas lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
   if (cena.desafio === 'ler-marcas') return <DesafioMarcas lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   if (cena.desafio === 'escolher-plano') return <DesafioPlanos lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;

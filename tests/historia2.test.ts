@@ -98,6 +98,19 @@ describe('os capítulos', () => {
     expect(ludus.find((l) => l.x.tipo === 'ludus' && l.x.obrigatorio === 'quebra-guarda')?.cap).toBe(5);
   });
 
+  it('nunca duas lutas seguidas sem nada no meio (pedido do Lucas)', () => {
+    for (const cap of [...CAPITULOS.claude, ...CAPITULOS.chatgpt]) {
+      cap.cenas.forEach((c, k) => {
+        if (k > 0 && c.tipo === 'luta') expect(cap.cenas[k - 1]!.tipo, `${cap.titulo}: ${c.id}`).not.toBe('luta');
+      });
+    }
+  });
+
+  it('os desafios novos aparecem: furtivo, ritmo, proteger a Lívia e as armadilhas', () => {
+    const desafios = [...CAPITULOS.claude, ...CAPITULOS.chatgpt].flatMap((c) => c.cenas).flatMap((c) => (c.tipo === 'desafio' ? [c.desafio] : []));
+    for (const d of ['furtivo', 'ritmo', 'proteger', 'armadilhas'] as const) expect(desafios).toContain(d);
+  });
+
   it('o Octavius já pode ser jogado: Capítulo 1 com o desafio dos planos e o Almirante Ferrugem', () => {
     expect(CAMINHOS_ABERTOS).toContain('chatgpt');
     const cap = CAPITULOS.chatgpt[0]!;

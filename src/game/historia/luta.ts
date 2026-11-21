@@ -76,7 +76,7 @@ export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado';
 
 export interface EventoLuta {
   id: number;
-  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado' | 'riposta' | 'quebra' | 'aliado';
+  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado' | 'riposta' | 'quebra' | 'aliado' | 'plano';
   valor?: number;
   lado: 'jogador' | 'inimigo';
   ate: number;
@@ -297,4 +297,16 @@ export function passoLuta(s0: EstadoLuta, a: AtributosLuta = ATRIBUTOS_INICIAIS,
     return { ...s, inimigo: { ...i, estado: 'sinal', estadoAte: tempo + ataqueAtual(s).sinalMs } };
   }
   return s;
+}
+
+/**
+ * Os PLANOS do Octavius: de vez em quando aparece no cenário um barril, uma rede, o
+ * gancho do guindaste... Tocar nele acerta o inimigo (não importa se ele está na guarda)
+ * e deixa ele tonto. É o jeito do Octavius lutar: usar o que tiver em volta.
+ */
+export function usarPlano(s: EstadoLuta, a: AtributosLuta = ATRIBUTOS_INICIAIS): EstadoLuta {
+  if (s.fim) return s;
+  const r = bater({ ...s, inimigo: { ...s.inimigo, guardas: 0 } }, 12 * (1 + (a.forca - 1) * 0.2));
+  if (r.fim) return evento(r, 'plano', 'inimigo');
+  return ganharAnimo(evento({ ...r, inimigo: { ...r.inimigo, estado: 'atordoado', estadoAte: s.tempo + 1000, combo: 0, contra: false } }, 'plano', 'inimigo'), 10, a);
 }

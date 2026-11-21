@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
-import { agir, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
+import { agir, usarPlano, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import {
@@ -117,6 +117,7 @@ const SOM: Partial<Record<string, NomeSom>> = {
   cansado: 'falha',
   riposta: 'pesada',
   quebra: 'refuta',
+  plano: 'catapulta',
   aliado: 'fanfarra',
 };
 const TEXTO: Record<string, string> = {
@@ -129,9 +130,19 @@ const TEXTO: Record<string, string> = {
   contra: '⚠ CONTRA-ATAQUE!',
   cansado: 'SEM FÔLEGO',
   riposta: '⚡ CONTRA-ATAQUE!',
+  plano: '⚓ PLANO B!',
   quebra: '💥 GUARDA QUEBRADA!',
   aliado: '',
 };
+
+/** O que pode aparecer no cenário para o Octavius usar (no porto, no navio...). */
+const PLANOS = [
+  { icone: '🛢️', nome: 'ROLAR O BARRIL' },
+  { icone: '🕸️', nome: 'REDE DE PESCA' },
+  { icone: '🪝', nome: 'GANCHO DO GUINDASTE' },
+  { icone: '🪢', nome: 'PUXAR A CORDA' },
+  { icone: '📦', nome: 'CAIXOTE NA CABEÇA' },
+];
 
 /** Faíscas voando para todos os lados, um corte e um anel: o impacto de um golpe. */
 function Impacto({ x, cor, corte = false, grande = false }: { x: string; cor: string; corte?: boolean; grande?: boolean }) {
@@ -187,6 +198,9 @@ export function LutaHistoria({
 }) {
   const def = INIMIGOS[inimigo]!;
   const noColiseu = lugar === 'coliseu-arena' || lugar === 'coliseu-noite';
+  // O Octavius luta com PLANOS: coisas do cenário que aparecem e dá para usar.
+  const comPlanos = heroi === 'octavius' && !treino;
+  const [planosUsados, setPlanosUsados] = useState<number[]>([]);
   const [feitos, setFeitos] = useState(0);
   const [fase, setFase] = useState<'antes' | 'luta' | 'depois' | 'derrota'>(antes?.length ? 'antes' : 'luta');
   const [e, setE] = useState<EstadoLuta>(() => novaLuta(def, atributos));
@@ -207,7 +221,7 @@ export function LutaHistoria({
       if (ev.id <= visto.current) continue;
       const som = SOM[ev.tipo];
       if (som) tocar(som);
-      if (ev.tipo === 'acerto' || ev.tipo === 'especial') setCombo((c) => c + 1);
+      if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
       if (treino && ev.tipo === treino.evento) setFeitos((n) => n + 1);
     }
@@ -392,6 +406,34 @@ export function LutaHistoria({
           </div>
         )}
 
+        {/* Os PLANOS do Octavius: a cada 7 segundos aparece algo no cenário para usar */}
+        {comPlanos && fase === 'luta' && !vencido && (() => {
+          const vez = Math.floor(e.tempo / 7000);
+          const resto = e.tempo % 7000;
+          if (vez < 1 || resto < 3800 || planosUsados.includes(vez)) return null;
+          const item = PLANOS[vez % PLANOS.length]!;
+          return (
+            <button
+              key={vez}
+              type="button"
+              onPointerDown={(ev) => {
+                ev.preventDefault();
+                desbloquear();
+                setPlanosUsados((u) => [...u, vez]);
+                setE((s) => usarPlano(s, atributos));
+              }}
+              className="surgir absolute z-20 flex -translate-x-1/2 flex-col items-center border-2 border-[#f2c14e] bg-black/80 px-2 py-1"
+              style={{ left: `${44 + (vez % 3) * 5}%`, top: `${30 + (vez % 2) * 12}%` }}
+              aria-label={`Usar o plano: ${item.nome}`}
+            >
+              <span className="piscar text-2xl sm:text-4xl" aria-hidden>
+                {item.icone}
+              </span>
+              <span className="whitespace-nowrap font-pixel text-[7px] text-[#f2c14e] sm:text-[9px]">PLANO: {item.nome}</span>
+            </button>
+          );
+        })()}
+
         {/* Treino do Ludus: o objetivo e quanto falta */}
         {treino && fase === 'luta' && (
           <span className="absolute left-1/2 top-[30%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-[#c8962a] bg-black/80 px-2 py-1 font-pixel text-[8px] text-[#f2c14e] sm:text-[11px]">
@@ -408,6 +450,7 @@ export function LutaHistoria({
           if (ev.tipo === 'especial' || ev.tipo === 'aliado') return <Impacto key={`fx${ev.id}`} x="70%" cor="#f2c14e" corte grande />;
           if (ev.tipo === 'riposta') return <Impacto key={`fx${ev.id}`} x="66%" cor="#9fe8ff" corte grande />;
           if (ev.tipo === 'quebra') return <Impacto key={`fx${ev.id}`} x="68%" cor="#ff8a3a" grande />;
+          if (ev.tipo === 'plano') return <Impacto key={`fx${ev.id}`} x="70%" cor="#c8962a" grande />;
           return null;
         })}
         {e.eventos.some((ev) => ev.tipo === 'dano' || ev.tipo === 'contra') && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
@@ -458,6 +501,7 @@ export function LutaHistoria({
                 setTentativas((t) => t + 1);
                 setE(novaLuta(def, atributos));
                 setCombo(0);
+                setPlanosUsados([]);
                 setFase('luta');
               }}
               className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent"

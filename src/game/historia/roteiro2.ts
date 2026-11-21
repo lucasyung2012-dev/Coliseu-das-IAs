@@ -334,12 +334,95 @@ export const CAP4_CASSIUS: Capitulo = {
       depois: [{ quem: 'cassius', texto: 'Uma patrulha inteira aqui embaixo. O Censor sabe que os Copistas existem.' }],
     },
     {
+      tipo: 'desafio',
+      id: 'c4-furtivo',
+      lugar: 'catacumbas',
+      desafio: 'furtivo',
+      vigia: 'a lanterna da patrulha',
+      objetivo: 'Passe pela patrulha sem ser visto. Esconda-se atrás dos nichos.',
+      antes: [
+        { quem: 'cassius', texto: 'Mais lanternas lá na frente. Uma patrulha inteira, varrendo o túnel com luz.' },
+        { quem: 'cassius', texto: 'Se eu lutar com todos, alguém vai correr para avisar o Censor. Melhor passar no escuro.' },
+      ],
+      depois: [
+        { quem: 'cassius', texto: 'Passei. Eles nem viram a sombra.' },
+        { quem: 'cassius', texto: 'Ali no chão... uma pena de carvão, desenhada às pressas. E pegadas pequenas. A Lívia passou por aqui correndo.' },
+      ],
+    },
+    {
+      tipo: 'explorar',
+      id: 'c4-ossario',
+      lugar: 'catacumbas',
+      objetivo: 'Siga os rastros da Lívia pelo ossário.',
+      pontos: [
+        {
+          id: 'pegadas',
+          x: 26,
+          rotulo: 'Pegadas pequenas',
+          icone: '👣',
+          obrigatorio: true,
+          falas: [
+            { quem: 'cassius', texto: 'Pegadas de sandália. Uma tropeçou aqui. Ela estava com pressa... ou com medo.' },
+            { quem: 'cassius', texto: 'E outras marcas em volta: patinhas de metal. Centenas.' },
+          ],
+        },
+        {
+          id: 'bilhete',
+          x: 54,
+          rotulo: 'Papel dobrado',
+          icone: '📝',
+          obrigatorio: true,
+          falas: [
+            { quem: 'livia', texto: '(Escrito com a letra da Lívia) "Mestre Cass: se achar isto, estou no fundo, perto da luz roxa. Os ratos obedecem a um maior. NÃO acorde o maior."' },
+            { quem: 'cassius', texto: '...Que maior?' },
+          ],
+        },
+        {
+          id: 'ninho',
+          x: 82,
+          rotulo: 'Monte de sucata',
+          icone: '⚙️',
+          obrigatorio: true,
+          falas: [
+            { quem: 'cassius', texto: 'Um monte de engrenagens, cabos roídos e pergaminhos rasgados. Parece... um ninho.' },
+            { quem: 'cassius', texto: 'E o ninho está se mexendo.' },
+          ],
+        },
+      ],
+    },
+    {
       tipo: 'luta',
       id: 'c4-luta-rato-rei',
       lugar: 'catacumbas',
       inimigo: 'rato-rei',
-      antes: [{ quem: 'cassius', texto: 'O chão treme. Os ratos se juntam num só... uma coroa de engrenagens. O Rato-Rei.' }],
+      antes: [{ quem: 'cassius', texto: 'Os ratos se juntam num só... uma coroa de engrenagens. O maior. O Rato-Rei.' }],
       depois: [{ quem: 'cassius', texto: 'O caminho está livre. E lá no fundo, uma luz violeta.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'c4-luz-violeta',
+      quadros: [
+        { lugar: 'catacumbas-arquivo', efeito: 'zoom', som: 'passos', personagens: [{ quem: 'cassius', de: -12, x: 30 }], texto: 'O túnel se abre numa sala enorme. Prateleiras até o teto, e um zumbido que dá arrepio.' },
+        {
+          lugar: 'catacumbas-arquivo',
+          personagens: [
+            { quem: 'cassius', x: 30 },
+            { quem: 'livia', de: 112, x: 62, espelhar: true, tamanho: 9 },
+          ],
+          texto: 'Entre as prateleiras, uma menina corre na direção dele, com uma bolsa cheia de pergaminhos.',
+        },
+        {
+          lugar: 'catacumbas-arquivo',
+          efeito: 'tremor',
+          som: 'pesada',
+          personagens: [
+            { quem: 'cassius', x: 30 },
+            { quem: 'livia', x: 50, espelhar: true, tamanho: 9 },
+            { quem: 'guarda', de: 116, x: 76, espelhar: true },
+          ],
+          texto: 'E atrás dela, o Sargento da Patrulha, com a clava levantada.',
+        },
+      ],
     },
     {
       tipo: 'luta',
@@ -524,8 +607,29 @@ export const CAP5_CASSIUS: Capitulo = {
       id: 'c5-onda1',
       lugar: 'forum',
       inimigo: 'pretoriano-escudeiro',
-      antes: [{ quem: 'livia', texto: '"Pergunta número dois: quem decidiu que perguntar é perigoso?"' }],
+      antes: [
+        { quem: 'livia', texto: '"Pergunta número dois: quem decidiu que perguntar é perigoso?"' },
+        { quem: 'guarda', texto: 'Parede de escudos! Cerquem a tribuna!' },
+      ],
       depois: [{ quem: 'povo', texto: '...É. Quem decidiu?' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'c5-murmurio',
+      quadros: [
+        {
+          lugar: 'forum',
+          personagens: [
+            { quem: 'cassius', x: 34 },
+            { quem: 'livia', x: 48, tamanho: 9 },
+            { quem: 'crianca', de: 112, x: 70, espelhar: true, tamanho: 8 },
+          ],
+          texto: 'Da multidão sai um menino. O mesmo menino que Cassius salvou da carroça.',
+        },
+        { lugar: 'forum', quem: 'crianca', personagens: [{ quem: 'crianca', x: 70, espelhar: true, tamanho: 8, efeito: 'brilhar' }], texto: 'Eu sei a resposta! Ninguém decidiu. A gente só parou de perguntar!' },
+        { lugar: 'forum', efeito: 'tremor', som: 'plateia', texto: 'Um murmúrio corre pelo Fórum. Gente cochichando. Gente concordando. Gente discordando, pela primeira vez em anos.' },
+        { lugar: 'forum', efeito: 'tremor', som: 'trombeta', personagens: [{ quem: 'guarda', de: 116, x: 74, espelhar: true }], texto: 'A Guarda manda reforços. Lanceiros de elite, os mais rápidos de Roma.' },
+      ],
     },
     {
       tipo: 'luta',
@@ -533,10 +637,46 @@ export const CAP5_CASSIUS: Capitulo = {
       lugar: 'forum',
       inimigo: 'pretoriano-lanceiro-elite',
       antes: [{ quem: 'livia', texto: '"Pergunta número três: dá para discordar de alguém e continuar sendo amigo dele?"' }],
+      depois: [{ quem: 'cassius', texto: 'Eles não param de vir. E agora estão mirando na Lívia!' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'c5-marinha',
+      quadros: [
+        {
+          lugar: 'forum',
+          som: 'trombeta',
+          personagens: [
+            { quem: 'cassius', x: 30 },
+            { quem: 'octavius', de: 116, x: 62, espelhar: true },
+          ],
+          texto: 'Chegou a marinha! Desculpem o atraso: o Plano A era chegar pelo rio, o B era pelo esgoto. Adivinhem qual deu certo.',
+          quem: 'octavius',
+        },
+        { lugar: 'forum', quem: 'cassius', personagens: [{ quem: 'cassius', x: 30 }, { quem: 'octavius', x: 62, espelhar: true }], texto: 'Pelo cheiro, o B.' },
+        {
+          lugar: 'forum',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'cassius', x: 30 },
+            { quem: 'octavius', x: 62, espelhar: true, efeito: 'brilhar' },
+          ],
+          texto: 'Os meus marinheiros seguram o lado do mercado. Mas a Guarda subiu nos telhados: vão jogar de tudo na Lívia. Protege ela!',
+        },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'c5-proteger',
+      lugar: 'forum',
+      desafio: 'proteger',
+      antes: [
+        { quem: 'livia', texto: '"Pergunta número quatro: por que a gente tem medo de quem pensa diferente?"' },
+        { quem: 'cassius', texto: 'Tomates, pedras, tochas... e flechas! Ninguém interrompe essa leitura.' },
+      ],
       depois: [
-        { quem: 'octavius', texto: 'Chegou a marinha! Desculpem o atraso: o Plano A era chegar pelo rio, o B era pelo esgoto. Adivinhem qual deu certo.' },
-        { quem: 'cassius', texto: 'Pelo cheiro, o B.' },
-        { quem: 'octavius', texto: 'Segura a frente, Cassius! Os meus marinheiros seguram o lado do mercado!' },
+        { quem: 'livia', texto: '"...e se o medo for só falta de conversa?" Página virada, Mestre Cass!' },
+        { quem: 'povo', texto: 'Deixem a menina ler!' },
       ],
     },
     {
@@ -548,26 +688,59 @@ export const CAP5_CASSIUS: Capitulo = {
         { quem: 'guarda', texto: 'Queimem o livro! Ordem do Censor!' },
         { quem: 'cassius', texto: 'De novo esse negócio de queimar livro? Não. Nunca mais.' },
       ],
-      depois: [{ quem: 'fio', texto: '♪ Água que corre não pede licença... ♪' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'c5-cancao',
+      quadros: [
+        { lugar: 'forum', quem: 'fio', personagens: [{ quem: 'fio', de: -8, x: 40, tamanho: 8, efeito: 'brilhar' }], texto: '♪ Água que corre não pede licença... ♪' },
+        { lugar: 'forum', quem: 'povo', texto: 'É a música da Eco! A que proibiram!' },
+        {
+          lugar: 'forum',
+          efeito: 'festa',
+          som: 'plateia',
+          personagens: [
+            { quem: 'fio', x: 40, tamanho: 8, efeito: 'brilhar' },
+            { quem: 'crianca', x: 56, tamanho: 8 },
+            { quem: 'livia', x: 70, tamanho: 9 },
+          ],
+          texto: 'Uma voz. Depois dez. Depois cem. O Fórum inteiro canta a música da Eco, desafinado e alto.',
+        },
+        { lugar: 'forum', quem: 'fio', personagens: [{ quem: 'fio', x: 50, tamanho: 8, efeito: 'tremer' }], texto: 'Tá ouvindo, Eco? Agora todo mundo sabe a sua música.' },
+        { lugar: 'forum', efeito: 'tremor', som: 'pesada', texto: 'E, como resposta, os tambores da Centúria de Aço.' },
+      ],
     },
     {
       tipo: 'luta',
       id: 'c5-onda4',
       lugar: 'forum',
       inimigo: 'centuriao-de-aco',
-      antes: [
-        { quem: 'povo', texto: 'É a música da Eco! A que proibiram!' },
-        { quem: 'guarda', texto: 'Silêncio! Centúria, avançar!' },
-      ],
+      antes: [{ quem: 'guarda', texto: 'Silêncio! Centúria, avançar!' }],
       depois: [{ quem: 'povo', texto: '♪ ...e quem tem sede não pede desculpa! ♪' }],
+    },
+    {
+      tipo: 'conversa',
+      id: 'c5-decuriao',
+      lugar: 'forum',
+      falas: [
+        { quem: 'decuriao', texto: 'Parem de cantar! Isso é uma ordem!' },
+        { quem: 'povo', texto: 'Por quê?' },
+        { quem: 'decuriao', texto: 'Porque... porque a Lei manda!' },
+        { quem: 'povo', texto: 'E por que a Lei manda?' },
+        { quem: 'decuriao', texto: '...' },
+        { quem: 'cassius', texto: 'Percebeu, Decurião? Você nunca perguntou. Ninguém nunca deixou.' },
+        { quem: 'decuriao', texto: 'De novo você, gladiador. Da última vez eu te pus na carroça. Desta vez, eu te ponho no chão.' },
+      ],
     },
     {
       tipo: 'luta',
       id: 'c5-onda5',
       lugar: 'forum',
       inimigo: 'pretoriano-veterano',
-      antes: [{ quem: 'decuriao', texto: 'De novo você, gladiador. Da última vez eu te pus na carroça. Desta vez, eu te ponho no chão.' }],
-      depois: [{ quem: 'decuriao', texto: 'Eu... eu só cumpria ordens...' }],
+      depois: [
+        { quem: 'decuriao', texto: 'Eu... eu só cumpria ordens...' },
+        { quem: 'cassius', texto: 'Eu sei. Agora você pode começar a fazer perguntas.' },
+      ],
     },
     {
       tipo: 'cutscene',
@@ -697,12 +870,60 @@ export const CAP6_CASSIUS: Capitulo = {
       depois: [{ quem: 'povo', texto: 'CAS-SIUS! CAS-SIUS!' }],
     },
     {
+      tipo: 'cutscene',
+      id: 'c6-censor-irrita',
+      quadros: [
+        { lugar: 'camarote', quem: 'censor', personagens: [{ quem: 'censor', x: 50, tamanho: 24 }], texto: 'Eles gritam o nome dele. Desliguem os gritos.' },
+        { lugar: 'camarote', quem: 'arauto', texto: 'Majestade, não dá para desligar uma plateia.' },
+        { lugar: 'camarote', quem: 'censor', efeito: 'tremor', som: 'pesada', personagens: [{ quem: 'censor', x: 50, tamanho: 24, efeito: 'tremer' }], texto: 'Então liguem as armadilhas do chão.' },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'c6-armadilhas',
+      lugar: 'coliseu-arena',
+      desafio: 'armadilhas',
+      antes: [
+        { quem: 'arauto', texto: 'Intervalo surpresa! O CHÃO DA MORTE!' },
+        { quem: 'brutus', texto: '(Do túnel) Lata! O chão acende antes dos espetos subirem! Olha os pés, não a plateia!' },
+      ],
+      depois: [
+        { quem: 'povo', texto: 'ELE DANÇOU NOS ESPETOS! CAS-SIUS!' },
+        { quem: 'brutus', texto: 'Hunf. Eu demorei vinte lutas para aprender isso.' },
+      ],
+    },
+    {
       tipo: 'luta',
       id: 'c6-mirmilao',
       lugar: 'coliseu-arena',
       inimigo: 'mirmilao-bronze',
       antes: [{ quem: 'arauto', texto: 'Segundo campeão: o Mirmilão de Bronze! Lento, mas cada golpe dele derruba uma coluna!' }],
       depois: [{ quem: 'livia', texto: '(Da plateia) ESSE É O MEU MESTRE!' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'c6-intervalo',
+      quadros: [
+        {
+          lugar: 'coliseu-tunel',
+          personagens: [
+            { quem: 'cassius', de: 112, x: 40, espelhar: true },
+            { quem: 'brutus', x: 66, espelhar: true, tamanho: 18 },
+          ],
+          texto: 'Entre uma luta e outra, Cassius volta ao túnel para respirar. Brutus joga um balde de água fria na cabeça dele.',
+        },
+        { lugar: 'coliseu-tunel', quem: 'brutus', personagens: [{ quem: 'brutus', x: 50, tamanho: 18 }], texto: 'O próximo é o Dimáquero. Cinco cortes seguidos. Bloqueia o PRIMEIRO e segura firme: o escudo aguenta o resto.' },
+        {
+          lugar: 'ludus-celas',
+          personagens: [
+            { quem: 'octavius', x: 36 },
+            { quem: 'helios', x: 62, espelhar: true },
+          ],
+          texto: 'Nas celas debaixo da arena, Octavius e Helios ouvem a plateia pelas grades.',
+        },
+        { lugar: 'ludus-celas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 36, efeito: 'brilhar' }], texto: 'Ouviu isso? Estão gritando o nome dele. Eu quero que gritem o meu também. Plano: sair desta cela.' },
+        { lugar: 'ludus-celas', quem: 'helios', personagens: [{ quem: 'helios', x: 62, espelhar: true, efeito: 'brilhar' }], texto: 'Calma. As estrelas ainda não chegaram no lugar. Quando o leão rugir, é a nossa vez.' },
+      ],
     },
     {
       tipo: 'luta',
@@ -870,6 +1091,9 @@ export const FINAL_CASSIUS: Capitulo = {
 };
 
 // ---------- Octavius, Capítulo 1: Ordem Impossível ----------
+// Refeito em 21/11/2026 (o Lucas achou parecido demais com o do Cassius e com lutas seguidas):
+// agora tem a menina Nina e os refugiados, o desafio dos planos, passar escondido pelo farol,
+// girar o guincho da corrente, e o Octavius luta com PLANOS (coisas do cenário).
 
 export const CAP1_OCTAVIUS: Capitulo = {
   numero: 1,
@@ -880,12 +1104,18 @@ export const CAP1_OCTAVIUS: Capitulo = {
       tipo: 'cutscene',
       id: 'o1-abertura',
       quadros: [
-        { lugar: 'porto-docas', efeito: 'panoramica', som: 'trombeta', texto: 'Porto de Óstia, fim de tarde. A porta de Roma para o mar. Navios de ferro, guindastes e gaivotas.' },
+        { lugar: 'porto-docas', efeito: 'panoramica', som: 'trombeta', texto: 'Porto de Óstia, fim de tarde. A porta de Roma para o mar. Navios de ferro, guindastes que rangem e gaivotas brigando por sardinha.' },
         {
           lugar: 'porto-docas',
           som: 'passos',
           personagens: [{ quem: 'octavius', de: -12, x: 36 }],
-          texto: 'Octavius, o comandante da frota, faz a ronda de todo dia. Ele conhece cada navio pelo barulho do motor.',
+          texto: 'Octavius, o comandante da frota, faz a ronda de todo dia. Ele conhece cada navio pelo barulho do motor. E cada gaivota pelo nome.',
+        },
+        {
+          lugar: 'porto-docas',
+          quem: 'octavius',
+          personagens: [{ quem: 'octavius', x: 36, efeito: 'brilhar' }],
+          texto: 'Boa tarde, Gaivota Número Sete. Não, eu não tenho sardinha. Plano B: tenho meio pão.',
         },
         {
           lugar: 'porto-docas',
@@ -911,8 +1141,27 @@ export const CAP1_OCTAVIUS: Capitulo = {
           personagens: [
             { quem: 'octavius', x: 36 },
             { quem: 'marco', x: 62, espelhar: true, tamanho: 12 },
+            { quem: 'nina', de: 112, x: 78, espelhar: true, tamanho: 8 },
           ],
-          texto: 'Amanhã a gente parte. Duzentas pessoas a bordo: gente que pensou diferente e quer recomeçar longe do Censor.',
+          texto: 'Amanhã a gente parte. Duzentas pessoas a bordo, gente que pensou diferente e quer recomeçar longe do Censor. Essa aí é a Nina, a mais pequena e a mais perguntadeira.',
+        },
+        {
+          lugar: 'porto-docas',
+          quem: 'nina',
+          personagens: [
+            { quem: 'octavius', x: 36 },
+            { quem: 'nina', x: 60, espelhar: true, tamanho: 8 },
+          ],
+          texto: 'Moço de metal, é verdade que você manda em todos os navios? Então por que você não vem com a gente?',
+        },
+        {
+          lugar: 'porto-docas',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'octavius', x: 36 },
+            { quem: 'nina', x: 60, espelhar: true, tamanho: 8 },
+          ],
+          texto: 'Porque alguém precisa ficar e cuidar do porto. Mas eu prometo: o Esperança sai daqui inteirinho. Palavra de comandante.',
         },
       ],
     },
@@ -920,30 +1169,43 @@ export const CAP1_OCTAVIUS: Capitulo = {
       tipo: 'explorar',
       id: 'o1-cais',
       lugar: 'porto-docas',
-      objetivo: 'Faça a ronda no cais e leia a ordem que acabou de chegar.',
+      objetivo: 'Faça a ronda no cais. Um mensageiro do Censor está procurando você.',
       pontos: [
         {
           id: 'corrente',
-          x: 20,
+          x: 18,
           rotulo: 'A grande corrente',
           icone: '⛓️',
           falas: [
-            { quem: 'octavius', texto: 'A corrente do porto. Fecha a entrada do mar de noite. Quem controla o guincho, controla quem sai.' },
+            { quem: 'octavius', texto: 'A corrente do porto. De noite ela fecha a entrada do mar. Quem controla o guincho, controla quem sai.' },
             { quem: 'octavius', texto: 'Anotado. Nunca se sabe quando um plano vai precisar de uma corrente gigante.' },
           ],
         },
         {
-          id: 'navio',
-          x: 46,
-          rotulo: 'O navio de guerra',
-          icone: '🚢',
+          id: 'farol',
+          x: 34,
+          rotulo: 'O farol',
+          icone: '🗼',
           falas: [
-            { quem: 'octavius', texto: 'O navio de guerra do Censor. Ferro, canhões e o Almirante Ferrugem no comando. Nem gaivota pousa ali.' },
+            { quem: 'octavius', texto: 'O farol do porto. De noite, a luz dele varre o cais de um lado para o outro. Ninguém passa sem ser visto.' },
+            { quem: 'octavius', texto: 'Ninguém que ande na hora errada, pelo menos.' },
+          ],
+        },
+        {
+          id: 'refugiados',
+          x: 52,
+          rotulo: 'Refugiados',
+          icone: '🧳',
+          personagem: 'nina',
+          falas: [
+            { quem: 'nina', texto: 'Sabe por que a gente vai embora? Meu pai perguntou na escola por que o céu é azul. O professor disse "porque o Censor quer".' },
+            { quem: 'nina', texto: 'Aí meu pai perguntou "e antes do Censor, o céu era de que cor?". No dia seguinte, a gente teve que fugir.' },
+            { quem: 'octavius', texto: '...É uma ótima pergunta, Nina. A resposta certa é: azul. Sempre foi.' },
           ],
         },
         {
           id: 'ordem',
-          x: 74,
+          x: 76,
           rotulo: 'Mensageiro',
           icone: '📜',
           personagem: 'guarda',
@@ -952,9 +1214,25 @@ export const CAP1_OCTAVIUS: Capitulo = {
             { quem: 'guarda', texto: 'Ordem do Censor para o Comandante da Frota. Leitura imediata.' },
             { quem: 'octavius', texto: '"O navio Esperança leva pessoas que discordam da Lei. Ele não deve chegar a lugar nenhum. Afunde-o ao amanhecer."' },
             { quem: 'octavius', texto: '...' },
-            { quem: 'octavius', texto: 'Plano A: obedecer. Plano B... é bem melhor.' },
+            { quem: 'guarda', texto: 'Alguma pergunta, Comandante?' },
+            { quem: 'octavius', texto: 'Perguntas são proibidas, não são? Então nenhuma. Pode ir.' },
           ],
         },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o1-decisao',
+      quadros: [
+        { lugar: 'porto', efeito: 'escuro', texto: 'O sol se põe. Octavius fica sozinho no fim do cais, com a ordem na mão.' },
+        {
+          lugar: 'porto',
+          quem: 'octavius',
+          personagens: [{ quem: 'octavius', x: 40 }],
+          texto: 'Plano A: obedecer. Afundar duzentas pessoas porque elas fizeram perguntas.',
+        },
+        { lugar: 'porto', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40, efeito: 'tremer' }], texto: 'Uma delas perguntou por que o céu é azul.' },
+        { lugar: 'porto', quem: 'octavius', efeito: 'clarao', som: 'fanfarra', personagens: [{ quem: 'octavius', x: 40, efeito: 'brilhar' }], texto: 'Plano B... é bem melhor.' },
       ],
     },
     {
@@ -963,9 +1241,32 @@ export const CAP1_OCTAVIUS: Capitulo = {
       lugar: 'porto-docas',
       desafio: 'escolher-plano',
       antes: [
-        { quem: 'octavius', texto: 'Certo. Para o Esperança fugir esta noite, eu preciso de um plano para cada problema. Rápido, antes que alguém desconfie.' },
+        { quem: 'octavius', texto: 'Para o Esperança fugir esta noite, eu preciso de um plano para cada problema. Rápido, antes que alguém desconfie.' },
         { quem: 'octavius', texto: 'Plano A, B ou C. Um deles sempre funciona. Os outros... geralmente explodem.' },
       ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o1-noite',
+      quadros: [
+        { lugar: 'porto', efeito: 'escuro', som: 'portao', texto: 'Meia-noite. As lanternas do porto se apagam uma por uma. Ninguém sabe por quê. Quer dizer, quase ninguém.' },
+        {
+          lugar: 'porto-docas',
+          efeito: 'escuro',
+          personagens: [{ quem: 'octavius', de: -12, x: 14 }],
+          texto: 'Só o farol continua aceso, girando. E o guincho da corrente fica do outro lado do cais.',
+        },
+      ],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o1-farol',
+      lugar: 'porto-docas',
+      desafio: 'furtivo',
+      vigia: 'o farol',
+      objetivo: 'Atravesse o cais até o guincho sem a luz do farol te pegar.',
+      antes: [{ quem: 'octavius', texto: 'Quando a luz vier, eu viro estátua. Quando ela for embora, eu ando. Simples. Teoricamente.' }],
+      depois: [{ quem: 'octavius', texto: 'Cheguei. E... ops. Tem alguém de guarda no guincho.' }],
     },
     {
       tipo: 'luta',
@@ -973,35 +1274,101 @@ export const CAP1_OCTAVIUS: Capitulo = {
       lugar: 'porto-docas',
       inimigo: 'marinheiro-ferro',
       antes: [
-        { quem: 'marinheiro', texto: 'Comandante. O Almirante mandou vigiar o senhor. Volte para o quartel.' },
-        { quem: 'octavius', texto: 'Ah, o quartel. Lugar ótimo. Pena que eu tenho um compromisso com aquela corrente ali.' },
+        { quem: 'marinheiro', texto: 'Comandante? A essa hora? O Almirante mandou vigiar o senhor. Volte para o quartel.' },
+        { quem: 'octavius', texto: 'Ah, o quartel. Lugar ótimo. Pena que eu tenho um compromisso com aquela corrente.' },
+        { quem: 'octavius', texto: '(Fique de olho no cenário: quando aparecer um PLANO, toque nele! Barril, rede, caixote... tudo vale.)' },
       ],
       depois: [{ quem: 'octavius', texto: 'Desculpa, marujo. Não é nada pessoal. É só o Plano B.' }],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o1-nina',
+      lugar: 'porto-docas',
+      falas: [
+        { quem: 'nina', texto: 'Psiu! Moço de metal! Aqui atrás dos barris!' },
+        { quem: 'octavius', texto: 'Nina?! Você devia estar no navio!' },
+        { quem: 'nina', texto: 'Eu vi você apagando as lanternas. Eu sabia que era um plano. Posso ajudar?' },
+        { quem: 'octavius', texto: 'Pode. Volta para o navio e diz para o Marco: "o pássaro vai cantar". Ele vai entender.' },
+        { quem: 'nina', texto: 'Que pássaro?' },
+        { quem: 'octavius', texto: 'Nenhum. É uma senha. Senha boa não faz sentido. Vai!' },
+        { quem: 'marinheiro', texto: '(Lá de longe) Quem está aí?!' },
+      ],
     },
     {
       tipo: 'luta',
       id: 'o1-luta2',
       lugar: 'porto-docas',
       inimigo: 'marinheiro-arpao',
-      antes: [{ quem: 'octavius', texto: 'Um arpoador. Quando o arpão brilhar vermelho, nada de escudo: pula para o lado!' }],
-      depois: [{ quem: 'marco', texto: 'Comandante! A tripulação está a bordo! Falta só abrir a corrente!' }],
+      antes: [{ quem: 'octavius', texto: 'Um arpoador! Quando o arpão brilhar vermelho, nada de escudo: pula para o lado!' }],
+      depois: [{ quem: 'marco', texto: '(Lá do Esperança, cantando bem alto e bem desafinado) ♪ O pássaro vai cantaaaar! ♪' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o1-guincho',
+      quadros: [
+        {
+          lugar: 'porto-docas',
+          personagens: [
+            { quem: 'octavius', x: 24 },
+            { quem: 'marinheiro', x: 62, espelhar: true },
+          ],
+          texto: 'O guincho da corrente. Em cima dele, um Artilheiro de Ferro com um canhãozinho no ombro.',
+        },
+        {
+          lugar: 'porto-docas',
+          quem: 'octavius',
+          personagens: [
+            { quem: 'octavius', x: 24 },
+            { quem: 'marinheiro', x: 62, espelhar: true },
+          ],
+          texto: 'Boa noite! Pesquisa rápida: o senhor prefere sair pelo Plano A, que é andando, ou pelo Plano B, que é voando?',
+        },
+      ],
     },
     {
       tipo: 'luta',
       id: 'o1-luta3',
       lugar: 'porto-docas',
       inimigo: 'marinheiro-canhao',
-      antes: [{ quem: 'octavius', texto: 'Um artilheiro no guincho da corrente. Claro. Por que seria fácil?' }],
-      depois: [{ quem: 'octavius', texto: 'O guincho é meu! Gira, gira, gira...' }],
+      depois: [{ quem: 'octavius', texto: 'Escolheu o B. Ótima escolha. Agora: a corrente.' }],
+    },
+    {
+      tipo: 'desafio',
+      id: 'o1-gira',
+      lugar: 'porto-docas',
+      desafio: 'ritmo',
+      objetivo: 'Gire o guincho no tempo certo para baixar a corrente.',
+      acao: 'GIRAR',
+      quantos: 8,
+      antes: [{ quem: 'octavius', texto: 'O guincho tem engrenagens velhas. Se eu girar fora do tempo, ele trava e faz um barulho que acorda Roma inteira.' }],
+      depois: [
+        { quem: 'octavius', texto: 'CREC... CREC... CRAAAANC! A corrente afunda na água. O mar está aberto!' },
+        { quem: 'marco', texto: 'Velas, seus preguiçosos! VELAS! O Esperança vai sair!' },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'o1-alarme',
+      quadros: [
+        { lugar: 'porto-docas', efeito: 'tremor', som: 'trombeta', texto: 'Mas o barulho da corrente caindo acordou o porto. Sinos. Apitos. Passos de ferro.' },
+        {
+          lugar: 'porto-docas',
+          personagens: [
+            { quem: 'octavius', x: 30 },
+            { quem: 'marinheiro', de: 116, x: 70, espelhar: true, tamanho: 17 },
+          ],
+          texto: 'O Contramestre de Ferro, o braço direito do Almirante, com uma âncora girando na mão.',
+        },
+      ],
     },
     {
       tipo: 'luta',
       id: 'o1-luta4',
       lugar: 'porto-docas',
       inimigo: 'contramestre-ferro',
-      antes: [{ quem: 'marinheiro', texto: 'TRAIÇÃO NO CAIS! O Comandante está soltando a corrente!' }],
+      antes: [{ quem: 'marinheiro', texto: 'TRAIÇÃO NO CAIS! O Comandante soltou a corrente!' }],
       depois: [
-        { quem: 'octavius', texto: 'A corrente caiu! Marco, VAI! Agora!' },
+        { quem: 'octavius', texto: 'Marco, VAI! Agora!' },
         { quem: 'marco', texto: 'E você, garoto?' },
         { quem: 'octavius', texto: 'Alguém tem que segurar o navio de guerra. E eu tenho um plano. Mais ou menos.' },
       ],
@@ -1010,8 +1377,14 @@ export const CAP1_OCTAVIUS: Capitulo = {
       tipo: 'cutscene',
       id: 'o1-abordagem',
       quadros: [
-        { lugar: 'porto', efeito: 'zoom', som: 'catapulta', texto: 'O Esperança passa pela entrada do porto, devagar, com as velas cheias. E o navio de guerra liga as caldeiras para ir atrás.' },
-        { lugar: 'navio-conves', efeito: 'tremor', som: 'pesada', personagens: [{ quem: 'octavius', de: -12, x: 30 }], texto: 'Octavius pula para o convés do navio de guerra. Sozinho.' },
+        { lugar: 'porto', efeito: 'zoom', som: 'catapulta', texto: 'O Esperança passa pela entrada do porto, com as velas cheias. E o navio de guerra liga as caldeiras para ir atrás.' },
+        {
+          lugar: 'porto',
+          quem: 'nina',
+          personagens: [{ quem: 'nina', x: 40, tamanho: 8, efeito: 'brilhar' }],
+          texto: '(Da popa do Esperança) MOÇO DE METAL! O CÉU É AZUL! SEMPRE FOI!',
+        },
+        { lugar: 'navio-conves', efeito: 'tremor', som: 'pesada', personagens: [{ quem: 'octavius', de: -12, x: 30 }], texto: 'Octavius pula para o convés do navio de guerra. Sozinho. No meio da tempestade.' },
         {
           lugar: 'navio-conves',
           quem: 'almirante',
@@ -1028,7 +1401,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
             { quem: 'octavius', x: 30, efeito: 'brilhar' },
             { quem: 'almirante', x: 70, espelhar: true, tamanho: 18 },
           ],
-          texto: 'Almirante Ferrugem! Que honra. Sabe qual é o meu plano? Segurar o senhor aqui até o Esperança sumir no horizonte.',
+          texto: 'Almirante Ferrugem! Que honra. Meu plano é simples: segurar o senhor aqui até o Esperança sumir no horizonte.',
         },
       ],
     },
@@ -1037,14 +1410,14 @@ export const CAP1_OCTAVIUS: Capitulo = {
       id: 'o1-chefao',
       lugar: 'navio-conves',
       inimigo: 'almirante-ferrugem',
-      antes: [{ quem: 'octavius', texto: 'Quando o braço-canhão dele brilhar: esquiva. Sempre tem um Plano B.' }],
+      antes: [{ quem: 'octavius', texto: 'Quando o braço-canhão dele brilhar: esquiva. E fique de olho nos planos do convés: tem corda, barril e gancho por todo lado.' }],
       depois: [{ quem: 'almirante', texto: 'Você... ganhou a luta... mas perdeu o navio, Comandante. Olhe para trás.' }],
     },
     {
       tipo: 'cutscene',
       id: 'o1-fim',
       quadros: [
-        { lugar: 'porto', efeito: 'zoom', texto: 'Longe, no horizonte, as lanternas do Esperança somem no escuro. Duzentas pessoas livres.' },
+        { lugar: 'porto', efeito: 'zoom', texto: 'Longe, no horizonte, as lanternas do Esperança somem no escuro. Duzentas pessoas livres. E uma menina que sabe a cor do céu.' },
         { lugar: 'navio-conves', efeito: 'tremor', som: 'pesada', texto: 'Mas o navio de guerra virou na direção das pedras. Sem ninguém no leme, o ferro range e a água sobe.' },
         { lugar: 'navio-conves', quem: 'octavius', personagens: [{ quem: 'octavius', x: 50, efeito: 'tremer' }], texto: 'Hã. Esse era o Plano C. Eu não tinha Plano C.' },
         {

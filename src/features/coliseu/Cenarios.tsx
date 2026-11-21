@@ -431,6 +431,9 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={ECO} paleta={PALETA_ECO} espelhar={espelhar} />;
     case 'crianca':
       return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
+    case 'nina':
+      // A menina refugiada do Esperança: o mesmo desenho do menino, com cabelo ruivo e roupa amarela.
+      return <Sprite grade={CRIANCA} paleta={{ ...PALETA_CRIANCA, H: '#c8501a', T: '#e8b42a', P: '#f0c098' }} espelhar={espelhar} />;
     case 'brutus':
       return <Sprite grade={BRUTUS} paleta={PALETA_BRUTUS} espelhar={espelhar} />;
     case 'sucata':

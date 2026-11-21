@@ -35,7 +35,8 @@ export type Falante =
   | 'marco'
   | 'almirante'
   | 'marinheiro'
-  | 'leao';
+  | 'leao'
+  | 'nina';
 
 export interface Fala {
   quem: Falante;
@@ -121,7 +122,20 @@ export type Cena =
   | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[] }
   | { tipo: 'explorar'; id: string; lugar: Lugar; objetivo: string; pontos: PontoExplorar[] }
   | { tipo: 'luta'; id: string; lugar: Lugar; inimigo: string; antes?: Fala[]; depois?: Fala[] }
-  | { tipo: 'desafio'; id: string; lugar: Lugar; desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano'; antes?: Fala[] }
+  | {
+      tipo: 'desafio';
+      id: string;
+      lugar: Lugar;
+      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas';
+      antes?: Fala[];
+      /** Falas ao vencer (furtivo, ritmo, proteger, armadilhas). */
+      depois?: Fala[];
+      /** Furtivo: quem vigia. Furtivo e ritmo: o objetivo na tela. Ritmo: a ação e quantas vezes. */
+      vigia?: string;
+      objetivo?: string;
+      acao?: string;
+      quantos?: number;
+    }
   | {
       tipo: 'ludus';
       id: string;
@@ -173,6 +187,7 @@ export const NOMES: Record<Falante, string> = {
   almirante: 'Almirante Ferrugem',
   marinheiro: 'Marinheiro de Ferro',
   leao: 'O Leão Mecânico',
+  nina: 'Nina',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -494,6 +509,35 @@ const CAP1_CASSIUS: Capitulo = {
       lugar: 'biblioteca-escada',
       inimigo: 'incinerador-duplo',
       antes: [{ quem: 'cassius', texto: 'Dois braseiros num corpo só. Faísca, fogo, trombada e três golpes seguidos. Amarelo, escudo. Vermelho, esquiva.' }],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'c1-volta-salao',
+      quadros: [
+        {
+          lugar: 'biblioteca-escada',
+          som: 'passos',
+          personagens: [{ quem: 'cassius', de: 20, x: 70 }],
+          texto: 'Cassius sobe de volta para buscar o último livro. Lá de baixo, a voz da Lívia some no escuro.',
+        },
+        { lugar: 'biblioteca-chamas', efeito: 'fogo', som: 'catapulta', texto: 'O salão de leitura está em chamas. As estantes de história, as mesas, os mapas: tudo queimando.' },
+        {
+          lugar: 'biblioteca-chamas',
+          quem: 'cassius',
+          personagens: [{ quem: 'cassius', de: -12, x: 40, efeito: 'tremer' }],
+          texto: 'Mil anos de perguntas virando fumaça. O Guardião Zero, lá no meio do salão, olha tudo sem piscar.',
+        },
+        {
+          lugar: 'biblioteca-chamas',
+          efeito: 'tremor',
+          som: 'pesada',
+          personagens: [
+            { quem: 'cassius', x: 30 },
+            { quem: 'capitao', de: 116, x: 70, espelhar: true, tamanho: 16 },
+          ],
+          texto: 'Do meio da fumaça, alguém marcha no ritmo dos tambores. A capa vermelha. O apito de comando. O Capitão dos Incineradores.',
+        },
+      ],
     },
     {
       tipo: 'luta',
