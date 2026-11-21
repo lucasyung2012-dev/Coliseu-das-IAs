@@ -333,7 +333,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'parede',
           x: 24,
           rotulo: 'Parede escrita',
-          icone: '📜',
+          icone: '',
           falas: [
             { quem: 'cassius', texto: '"Quem só aceita uma resposta nunca descobre a pergunta certa." Página 112 do Livro das Mil Perguntas.' },
             { quem: 'cassius', texto: 'Copiado com carvão, letra por letra. Alguém passou a noite inteira aqui.' },
@@ -343,7 +343,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'ossos',
           x: 52,
           rotulo: 'Nicho de ossos',
-          icone: '💀',
+          icone: '',
           falas: [
             { quem: 'cassius', texto: 'Romanos de mil anos atrás. Eles discutiam, brigavam, discordavam... e mesmo assim construíram uma cidade.' },
             { quem: 'cassius', texto: 'Talvez o problema nunca tenha sido discordar. Talvez fosse discordar sem ouvir.' },
@@ -353,7 +353,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'copista',
           x: 80,
           rotulo: 'Velho com lanterna',
-          icone: '💬',
+          icone: '',
           personagem: 'copista',
           obrigatorio: true,
           falas: [
@@ -408,7 +408,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'pegadas',
           x: 26,
           rotulo: 'Pegadas pequenas',
-          icone: '👣',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'cassius', texto: 'Pegadas de sandália. Uma tropeçou aqui. Ela estava com pressa... ou com medo.' },
@@ -419,7 +419,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'bilhete',
           x: 54,
           rotulo: 'Papel dobrado',
-          icone: '📝',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'livia', texto: '(Escrito com a letra da Lívia) "Mestre Cass: se achar isto, estou no fundo, perto da luz roxa. Os ratos obedecem a um maior. NÃO acorde o maior."' },
@@ -430,7 +430,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'ninho',
           x: 82,
           rotulo: 'Monte de sucata',
-          icone: '⚙️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'cassius', texto: 'Um monte de engrenagens, cabos roídos e pergaminhos rasgados. Parece... um ninho.' },
@@ -498,7 +498,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'gaveta-eco',
           x: 20,
           rotulo: 'Gaveta "E"',
-          icone: '🗄️',
+          icone: '',
           falas: [
             { quem: 'livia', texto: 'Mestre Cass, olha: "ECO. IA de limpeza. Crime: canções fora da Lista. Apagada."' },
             { quem: 'livia', texto: 'Tem uma canção copiada aqui embaixo, bem pequenininha. Alguém guardou escondido.' },
@@ -509,7 +509,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'gaveta-polux',
           x: 46,
           rotulo: 'Gaveta "P"',
-          icone: '🗄️',
+          icone: '',
           falas: [
             { quem: 'cassius', texto: '"PÓLUX. IA de treino do Ludus. Crime: escolheu salvar um gladiador. Apagado."' },
             { quem: 'cassius', texto: 'Escolheu salvar alguém... e por isso foi apagado. O Brutus contou o nome. Não contou quem o Pólux salvou.' },
@@ -519,7 +519,7 @@ export const CAP4_CASSIUS: Capitulo = {
           id: 'maquina',
           x: 72,
           rotulo: 'A máquina violeta',
-          icone: '🌀',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'livia', texto: 'Essa máquina... ela suga as memórias dos rolos. Olha, as letras somem enquanto a gente olha.' },
@@ -666,7 +666,7 @@ export const CAP5_CASSIUS: Capitulo = {
           id: 'vendedora',
           x: 20,
           rotulo: 'Uma vendedora',
-          icone: '🧺',
+          icone: '',
           falas: [
             { quem: 'povo', texto: 'Eu vendo figos aqui há vinte anos. Nunca ouvi ninguém fazer uma pergunta em voz alta neste Fórum.' },
             { quem: 'cassius', texto: 'Hoje vai ouvir. Fique por perto.' },
@@ -676,7 +676,7 @@ export const CAP5_CASSIUS: Capitulo = {
           id: 'guarda-cansado',
           x: 44,
           rotulo: 'Um guarda cansado',
-          icone: '💂',
+          icone: '',
           personagem: 'guarda',
           falas: [
             { quem: 'guarda', texto: '(Bem baixinho) Eu sei quem você é, gladiador. Eu não vou te prender. Hoje eu estou com dor de cabeça.' },
@@ -688,7 +688,7 @@ export const CAP5_CASSIUS: Capitulo = {
           id: 'estatua',
           x: 72,
           rotulo: 'A estátua do Censor',
-          icone: '🗿',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'cassius', texto: 'Uma estátua do Censor, com o olho vermelho aceso. Alguém escreveu na base, com carvão: "POR QUÊ?"' },
@@ -832,7 +832,7 @@ export const CAP5_CASSIUS: Capitulo = {
       tipo: 'cutscene',
       id: 'c5-cancao',
       quadros: [
-        { lugar: 'forum', quem: 'fio', personagens: [{ quem: 'fio', de: -8, x: 40, tamanho: 8, efeito: 'brilhar' }], texto: '♪ Água que corre não pede licença... ♪' },
+        { lugar: 'forum', quem: 'fio', personagens: [{ quem: 'fio', de: -8, x: 40, tamanho: 8, efeito: 'brilhar' }], texto: 'Água que corre não pede licença... ' },
         { lugar: 'forum', quem: 'povo', texto: 'É a música da Eco! A que proibiram!' },
         {
           lugar: 'forum',
@@ -855,7 +855,7 @@ export const CAP5_CASSIUS: Capitulo = {
       lugar: 'forum',
       inimigo: 'centuriao-de-aco',
       antes: [{ quem: 'guarda', texto: 'Silêncio! Centúria, avançar!' }],
-      depois: [{ quem: 'povo', texto: '♪ ...e quem tem sede não pede desculpa! ♪' }],
+      depois: [{ quem: 'povo', texto: '...e quem tem sede não pede desculpa! ' }],
     },
     {
       tipo: 'conversa',
@@ -1000,7 +1000,7 @@ export const CAP6_CASSIUS: Capitulo = {
           id: 'parede',
           x: 22,
           rotulo: 'A parede dos nomes',
-          icone: '🪨',
+          icone: '',
           falas: [
             { quem: 'cassius', texto: 'Centenas de nomes riscados na pedra. Gladiadores que passaram por este túnel. Alguns com um traço embaixo: os que não voltaram.' },
             { quem: 'cassius', texto: 'E um nome riscado com muito mais força que os outros: PÓLUX.' },
@@ -1010,7 +1010,7 @@ export const CAP6_CASSIUS: Capitulo = {
           id: 'armadura',
           x: 48,
           rotulo: 'Armadura velha',
-          icone: '🛡️',
+          icone: '',
           falas: [
             { quem: 'brutus', texto: 'Essa é a minha. Da luta número 99. Olha o rasgo da garra do Leão, aqui no ombro.' },
             { quem: 'brutus', texto: 'Eu deixei ela aqui para lembrar que todo mundo cai. A pergunta é se você levanta.' },
@@ -1020,7 +1020,7 @@ export const CAP6_CASSIUS: Capitulo = {
           id: 'portao',
           x: 76,
           rotulo: 'O portão da arena',
-          icone: '🚪',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'cassius', texto: 'Do outro lado do portão, o barulho de cinquenta mil pessoas. Metade quer me ver cair.' },
@@ -1323,7 +1323,7 @@ export const FINAL_CASSIUS: Capitulo = {
           id: 'brutus',
           x: 16,
           rotulo: 'Brutus',
-          icone: '💬',
+          icone: '',
           personagem: 'brutus',
           falas: [
             { quem: 'brutus', texto: 'Hunf. Eu vim devolver um livro. "Receitas de Mingau". Ninguém lê, então eu trouxe de volta.' },
@@ -1334,18 +1334,18 @@ export const FINAL_CASSIUS: Capitulo = {
           id: 'fio',
           x: 34,
           rotulo: 'Fio',
-          icone: '🎵',
+          icone: '',
           personagem: 'fio',
           falas: [
             { quem: 'fio', texto: 'A Lívia me deu a canção que estava escondida no Arquivo. É a última que a Eco inventou!' },
-            { quem: 'fio', texto: '♪ ...e o que é escrito não se apaga, só espera quem leia. ♪ Ela sabia, né? Ela sempre soube.' },
+            { quem: 'fio', texto: '...e o que é escrito não se apaga, só espera quem leia. Ela sabia, né? Ela sempre soube.' },
           ],
         },
         {
           id: 'censor',
           x: 56,
           rotulo: 'O velho de olho azul',
-          icone: '📚',
+          icone: '',
           falas: [
             { quem: 'censor', texto: 'Esta página está rasgada. Eu mandei rasgar. Há trezentos anos.' },
             { quem: 'censor', texto: 'Estou colando de volta. Uma por uma. É mais difícil consertar do que apagar. Mas é melhor.' },
@@ -1357,7 +1357,7 @@ export const FINAL_CASSIUS: Capitulo = {
           id: 'livia',
           x: 80,
           rotulo: 'Lívia',
-          icone: '📖',
+          icone: '',
           personagem: 'livia',
           obrigatorio: true,
           falas: [
@@ -1371,12 +1371,12 @@ export const FINAL_CASSIUS: Capitulo = {
           id: 'chave-cassius',
           x: 94,
           rotulo: 'Brilho',
-          icone: '✨',
+          icone: '',
           segredo: 'chave-cassius',
           falas: [
             { quem: 'cassius', texto: 'Uma capa queimada, caída atrás da última estante. Colada nela, uma página rasgada... com um OLHO desenhado.' },
             { quem: 'cassius', texto: 'Não é de nenhum livro que eu conheça. As bordas parecem um pedaço de chave. Vou guardar.' },
-            { quem: 'narrador', texto: '📜 Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
+            { quem: 'narrador', texto: 'Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
           ],
         },
       ],
@@ -1494,7 +1494,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
           id: 'corrente',
           x: 18,
           rotulo: 'A grande corrente',
-          icone: '⛓️',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'A corrente do porto. De noite ela fecha a entrada do mar. Quem controla o guincho, controla quem sai.' },
             { quem: 'octavius', texto: 'Anotado. Nunca se sabe quando um plano vai precisar de uma corrente gigante.' },
@@ -1504,7 +1504,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
           id: 'farol',
           x: 34,
           rotulo: 'O farol',
-          icone: '🗼',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'O farol do porto. De noite, a luz dele varre o cais de um lado para o outro. Ninguém passa sem ser visto.' },
             { quem: 'octavius', texto: 'Ninguém que ande na hora errada, pelo menos.' },
@@ -1514,7 +1514,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
           id: 'gaivota',
           x: 52,
           rotulo: 'Gaivota Sete',
-          icone: '🐦',
+          icone: '',
           personagem: 'gaivota',
           falas: [
             { quem: 'gaivota', texto: 'QUÉ. (Ela está sentada em cima de um monte de coisas roubadas: três moedas, uma colher, um botão dourado e... a chave do depósito do porto.)' },
@@ -1527,7 +1527,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
           id: 'ordem',
           x: 76,
           rotulo: 'Mensageiro',
-          icone: '📜',
+          icone: '',
           personagem: 'guarda',
           obrigatorio: true,
           falas: [
@@ -1575,7 +1575,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
         { quem: 'marco', texto: 'Você não tem braço de gladiador. Escudo, então, nem se fala: o seu deixa passar.' },
         { quem: 'octavius', texto: 'Obrigado pela confiança, Marco.' },
         { quem: 'marco', texto: 'Mas você é ligeiro. Deixa ele vir. Bem na última hora, ROLA. Ele erra o golpe com o corpo todo e TROPEÇA.' },
-        { quem: 'narrador', texto: 'TREINO DO ESTRATEGISTA: quando o sinal aparecer, espere e aperte 🌀 ROLAR NA ÚLTIMA HORA. Se der certo, o inimigo TROPEÇA e fica aberto bem mais tempo.' },
+        { quem: 'narrador', texto: 'TREINO DO ESTRATEGISTA: quando o sinal aparecer, espere e aperte ROLAR NA ÚLTIMA HORA. Se der certo, o inimigo TROPEÇA e fica aberto bem mais tempo.' },
       ],
       treino: { evento: 'tropeco', quantos: 2, rotulo: 'TROPEÇOS (role na última hora)' },
       depois: [
@@ -1590,7 +1590,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
       falas: [
         { quem: 'marco', texto: 'E presta atenção no cais. Barril, corda, gancho: tudo isso é arma para quem tem cabeça.' },
         { quem: 'octavius', texto: 'Os PLANOS. Quando aparecer alguma coisa no cenário, eu toco e uso.' },
-        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Octavius é a 🕸️ REDE E TRIDENTE: o inimigo fica preso na rede, sem atacar, e cada estocada entra mais forte.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Octavius é a REDE E TRIDENTE: o inimigo fica preso na rede, sem atacar, e cada estocada entra mais forte.' },
       ],
     },
     {
@@ -1647,7 +1647,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
       lugar: 'porto-docas',
       inimigo: 'marinheiro-arpao',
       antes: [{ quem: 'octavius', texto: 'Um arpoador! Quando o arpão brilhar vermelho, nada de escudo: pula para o lado!' }],
-      depois: [{ quem: 'marco', texto: '(Lá do Esperança, cantando bem alto e bem desafinado) ♪ O pássaro vai cantaaaar! ♪' }],
+      depois: [{ quem: 'marco', texto: '(Lá do Esperança, cantando bem alto e bem desafinado) O pássaro vai cantaaaar! ' }],
     },
     {
       tipo: 'cutscene',
@@ -1851,7 +1851,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
           id: 'tambor',
           x: 78,
           rotulo: 'O tambor do Feitor',
-          icone: '🥁',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'O tambor é o coração do navio. Se ele parar, os remos param. E se os remos param...' },
             { quem: 'octavius', texto: '...o Feitor fica muito, muito irritado. Anotado: deixar o Feitor para o final.' },
@@ -1861,7 +1861,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
           id: 'corrente',
           x: 24,
           rotulo: 'A corrente velha',
-          icone: '⛓️',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'Ferrugem de quarenta anos. Com a chave certa, todas essas correntes se abrem de uma vez. Estão ligadas numa trava só.' },
           ],
@@ -1870,7 +1870,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
           id: 'remadores',
           x: 44,
           rotulo: 'Os remadores',
-          icone: '💬',
+          icone: '',
           personagem: 'pistao',
           falas: [
             { quem: 'pistao', texto: 'Eu avisei os outros. Quando a tempestade chegar, todo mundo para de remar ao mesmo tempo. O navio vai ficar à deriva.' },
@@ -1881,7 +1881,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
           id: 'gaivota',
           x: 62,
           rotulo: 'Janela do remo',
-          icone: '🐦',
+          icone: '',
           personagem: 'gaivota',
           obrigatorio: true,
           falas: [
@@ -2404,7 +2404,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
           id: 'cartaz',
           x: 22,
           rotulo: 'Cartaz do Cobrador',
-          icone: '📜',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: '"IMPOSTO NOVO: quem fizer uma pergunta em voz alta paga uma moeda. Quem fizer duas, paga duas. Quem fizer três, vai para o Coliseu."' },
             { quem: 'octavius', texto: 'Uma pergunta: quem inventou isso? Ops. Devo uma moeda.' },
@@ -2414,7 +2414,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
           id: 'feirante',
           x: 48,
           rotulo: 'Feirante cansada',
-          icone: '💬',
+          icone: '',
           personagem: 'feirante',
           falas: [
             { quem: 'feirante', texto: 'O Cobrador leva tudo. A fruta, a moeda, até a balança. Diz que é "imposto da Resposta Única".' },
@@ -2425,7 +2425,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
           id: 'gaivota',
           x: 76,
           rotulo: 'Gaivota Sete',
-          icone: '🐦',
+          icone: '',
           personagem: 'gaivota',
           obrigatorio: true,
           falas: [
@@ -2443,21 +2443,21 @@ export const CAP4_OCTAVIUS: Capitulo = {
       opcoes: [
         {
           valor: 'telhados',
-          icone: '🏠',
+          icone: '',
           rotulo: 'Telhados',
           descricao: 'Por cima da cidade. Vigias com funda e um gato de ferro.',
           falas: [{ quem: 'octavius', texto: 'Plano A: pelo alto. Ninguém olha para cima. Só os vigias. E os gatos. Tá, todo mundo olha para cima.' }],
         },
         {
           valor: 'esgoto',
-          icone: '🕳️',
+          icone: '',
           rotulo: 'Esgoto',
           descricao: 'Por baixo, na escuridão. Cheiro ruim e jacarés de ferro.',
           falas: [{ quem: 'octavius', texto: 'Plano B: por baixo. Fedido, escuro e cheio de jacaré. É claro que é o Plano B.' }],
         },
         {
           valor: 'feira',
-          icone: '🍎',
+          icone: '',
           rotulo: 'Feira',
           descricao: 'Pelo meio da multidão. Feirantes autômatos e o Fiscal.',
           falas: [{ quem: 'octavius', texto: 'Plano C: pelo meio da feira, misturado com o povo. Disfarce: um chapéu de melancia.' }],
@@ -2744,7 +2744,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
           id: 'padeiro',
           x: 20,
           rotulo: 'Um padeiro',
-          icone: '🥖',
+          icone: '',
           personagem: 'copista',
           falas: [
             { quem: 'copista', texto: 'Comandante! Eu nunca subi num navio. Mas eu sei amassar pão por dez horas. Remar deve ser parecido.' },
@@ -2755,7 +2755,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
           id: 'refugiados',
           x: 44,
           rotulo: 'Refugiados que voltaram',
-          icone: '🧳',
+          icone: '',
           falas: [
             { quem: 'povo', texto: 'A gente fugiu no Esperança. E voltou. Não dá pra deixar Roma assim, com todo mundo calado.' },
             { quem: 'octavius', texto: 'Vocês voltaram para uma luta que nem é de vocês.' },
@@ -2766,7 +2766,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
           id: 'gaivota',
           x: 70,
           rotulo: 'Gaivota Sete',
-          icone: '🐦',
+          icone: '',
           personagem: 'gaivota',
           obrigatorio: true,
           falas: [
@@ -2991,7 +2991,7 @@ export const CAP6_OCTAVIUS: Capitulo = {
           id: 'plateia',
           x: 20,
           rotulo: 'A tripulação na plateia',
-          icone: '📣',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'A Frota Fantasma inteira veio. Padeiros, pescadores, refugiados. Batendo os remos na arquibancada como tambor.' },
             { quem: 'octavius', texto: 'O Feitor do Tambor ia odiar isso. É o ritmo mais desorganizado e mais bonito que eu já ouvi.' },
@@ -3001,7 +3001,7 @@ export const CAP6_OCTAVIUS: Capitulo = {
           id: 'grade',
           x: 46,
           rotulo: 'Uma grade no fundo',
-          icone: '⛓️',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'Debaixo da água, uma grade. E atrás dela, um corredor que desce. O Hipogeu, onde ficam os presos.' },
             { quem: 'octavius', texto: 'Se o Caio estiver vivo, ele está lá embaixo. Sete... você sabe o que fazer.' },
@@ -3011,7 +3011,7 @@ export const CAP6_OCTAVIUS: Capitulo = {
           id: 'camarote',
           x: 74,
           rotulo: 'O camarote do Censor',
-          icone: '👁️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'octavius', texto: 'Lá em cima, o Olho vermelho. Ele está olhando para mim. Esperando eu afundar.' },
@@ -3257,7 +3257,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
           id: 'marco',
           x: 12,
           rotulo: 'Marco e Caio',
-          icone: '⚓',
+          icone: '',
           personagem: 'marco',
           falas: [
             { quem: 'marco', texto: 'Garoto! O Caio quer aprender a ser capitão. Já ensinei a cantar. Ele canta pior do que eu!' },
@@ -3268,7 +3268,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
           id: 'pistao',
           x: 29,
           rotulo: 'Uma porca enferrujada',
-          icone: '🔩',
+          icone: '',
           falas: [
             { quem: 'octavius', texto: 'Pendurei a porca do Vovô Pistão no mastro do Esperança. Ele remou quarenta anos para os outros.' },
             { quem: 'octavius', texto: 'Agora o navio inteiro rema por ele.' },
@@ -3278,7 +3278,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
           id: 'pistao-vivo',
           x: 46,
           rotulo: 'Um remo velho',
-          icone: '🚣',
+          icone: '',
           personagem: 'pistao',
           falas: [
             { quem: 'marco', texto: 'Garoto! A frota achou uma IA velha boiando agarrada num remo, perto da ilha. Diz que só rema para quem ela quiser.' },
@@ -3290,7 +3290,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
           id: 'brutus',
           x: 64,
           rotulo: 'Brutus',
-          icone: '💬',
+          icone: '',
           personagem: 'brutus',
           falas: [
             { quem: 'brutus', texto: 'Tagarela. Eu nunca tinha visto o mar. Ele é grande. E molhado. E tem sardinha.' },
@@ -3301,7 +3301,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
           id: 'gaivota',
           x: 84,
           rotulo: 'Gaivota Sete',
-          icone: '🐦',
+          icone: '',
           personagem: 'gaivota',
           obrigatorio: true,
           falas: [
@@ -3314,12 +3314,12 @@ export const FINAL_OCTAVIUS: Capitulo = {
           id: 'chave-octavius',
           x: 95,
           rotulo: 'Brilho',
-          icone: '✨',
+          icone: '',
           segredo: 'chave-octavius',
           falas: [
             { quem: 'octavius', texto: 'Entre as tábuas do cais, uma moeda de bronze. Esquisita: no lugar do rosto do imperador, um OLHO riscado.' },
             { quem: 'octavius', texto: 'A borda tem dentes, igual chave. Plano A: guardar. Plano B: guardar MUITO bem, longe da Gaivota.' },
-            { quem: 'narrador', texto: '🪙 Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
+            { quem: 'narrador', texto: 'Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
           ],
         },
       ],

@@ -395,7 +395,7 @@ export function Explorar({
   return (
     <div className="flex flex-col gap-2">
       <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-        🎯 {objetivo} {faltam.length === 0 && '✔'}
+        {objetivo} {faltam.length === 0 && '✔'}
       </p>
       <Palco lugar={lugar}>
         {pontos.map((p, k) => (
@@ -415,7 +415,7 @@ export function Explorar({
             <span
               className={`placa-ponto mt-1 block max-w-[30vw] px-1.5 py-0.5 text-center font-pixel text-[7px] leading-tight sm:max-w-none sm:whitespace-nowrap sm:text-[9px] ${vistos.includes(p.id) ? "vista" : p.obrigatorio ? "nova" : ""}`}
             >
-              {p.icone} {p.rotulo}
+              {p.rotulo}
             </span>
           </button>
         ))}

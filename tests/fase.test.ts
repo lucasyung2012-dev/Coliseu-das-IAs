@@ -19,7 +19,7 @@ const pequena: Fase = {
   objetivo: '',
   plataformas: [{ x: 30, w: 14, y: 8, tipo: 'mesa' }],
   perigos: [{ x: 60, w: 10, tipo: 'fogo', acesoMs: 0, apagadoMs: 0 }],
-  coletaveis: [{ id: 'livro', x: 36, y: 10, icone: '📕', nome: 'Livro' }],
+  coletaveis: [{ id: 'livro', x: 36, y: 10, icone: '', nome: 'Livro' }],
   comentarios: [{ id: 'oi', x: 20, quem: 'cassius', texto: 'Oi' }],
   saida: { x: 190, rotulo: 'SAÍDA' },
   precisa: 1,

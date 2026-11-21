@@ -11,6 +11,7 @@ import { tocar } from '@/ui/somHistoria';
 import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { CenarioHistoria } from './Cenarios';
 import { Portoes } from './Portoes';
+import Icone from '@/ui/pixel/Icones';
 import { LinhaDoTempo } from './LinhaDoTempo';
 import { FaseAberta } from './FaseAberta';
 import { MenuPausa, PausaContexto } from './Pausa';
@@ -77,7 +78,7 @@ export default function ColiseuHistoria() {
     setTela({ tipo: 'jogo', id: novo.id });
   };
 
-  // O menu de pausa (☰ MENU ou Esc): pausa a luta e a fase.
+  // O menu de pausa (MENU ou Esc): pausa a luta e a fase.
   const [pausado, setPausado] = useState(false);
   useEffect(() => {
     if (tela.tipo !== 'jogo') return;
@@ -124,14 +125,14 @@ export default function ColiseuHistoria() {
               className="pixel-box px-3 py-1.5 font-pixel text-[10px] text-[#f2c14e]"
               aria-label="Abrir o menu (pausa)"
             >
-              ☰ MENU
+              MENU
             </button>
           ) : (
             <Link to="/" className="font-pixel text-[10px] text-muted hover:text-accent">
               ◀ INÍCIO
             </Link>
           )}
-          <p className="font-pixel text-[10px] text-[#f2c14e]">🏛️ COLISEU · MODO HISTÓRIA</p>
+          <p className="font-pixel text-[10px] text-[#f2c14e]">COLISEU · MODO HISTÓRIA</p>
         </div>
 
         {tela.tipo === 'prologo' && <Cutscene quadros={PROLOGO} onFim={fimDoPrologo} />}
@@ -152,7 +153,7 @@ export default function ColiseuHistoria() {
                 <div className="absolute right-2 top-2 flex gap-1 text-sm opacity-70 sm:text-base" aria-label="Pedaços da chave">
                   {PEDACOS_DA_CHAVE.map((k) => (
                     <span key={k.id} title={(p.historiaSegredos ?? []).includes(k.id) ? k.nome : '?'} className={(p.historiaSegredos ?? []).includes(k.id) ? '' : 'opacity-20 grayscale'}>
-                      {k.icone}
+                      <Icone nome={k.icone} className="w-5 sm:w-6" />
                     </span>
                   ))}
                 </div>
@@ -282,7 +283,7 @@ export default function ColiseuHistoria() {
                     </span>
                     <span className="font-pixel text-[8px] text-[#f2c14e]">"{NOME_DO_CAMINHO[ia].toUpperCase()}"</span>
                     <span className="text-xs text-muted">{CRIME[ia]}</span>
-                    <span className="font-pixel text-[9px]">{aberto ? '▶ COMEÇAR' : '🔒 EM BREVE'}</span>
+                    <span className="font-pixel text-[9px]">{aberto ? '▶ COMEÇAR' : 'EM BREVE'}</span>
                   </button>
                 );
               })}
@@ -333,7 +334,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
     return (
       <Palco lugar={save.secreto ? 'coliseu-livre' : 'rua-noite'}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 p-4 text-center">
-          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{!completo ? 'CONTINUA EM BREVE' : save.secreto ? '🏆 OS TRÊS: SEGREDO COMPLETO!' : '🏆 CAMINHO COMPLETO!'}</p>
+          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{!completo ? 'CONTINUA EM BREVE' : save.secreto ? 'OS TRÊS: SEGREDO COMPLETO!' : 'CAMINHO COMPLETO!'}</p>
           <p className="max-w-md text-sm text-white/80">
             {!completo
               ? `O Capítulo ${save.capitulo} ainda está sendo construído. O seu save está guardado: quando ele chegar, é só continuar daqui.`
@@ -373,7 +374,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
           <span className="font-pixel text-[10px] text-white/70">
             {save.secreto ? 'CASSIUS · OCTAVIUS · HELIOS' : `${PERSONAGENS[save.gladiador].gladiador.toUpperCase()} · ${NOME_DO_CAMINHO[save.gladiador].toUpperCase()}`}
           </span>
-          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">{save.secreto ? '🔑 CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
+          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">{save.secreto ? 'CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
           <span className="font-pixel text-sm text-white sm:text-xl">{cap.titulo.toUpperCase()}</span>
           <span className="text-xs text-white/60">{cap.lugar}</span>
           <span className="piscar mt-3 font-pixel text-[9px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
@@ -554,7 +555,7 @@ function CartaoSave({
         </div>
         <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
           <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">
-            {completo ? '🏆 CAMINHO COMPLETO' : `CAPÍTULO ${s.capitulo}`}
+            {completo ? 'CAMINHO COMPLETO' : `CAPÍTULO ${s.capitulo}`}
           </span>
           {!completo && <span className="block text-xs text-white/85 [text-shadow:1px_1px_0_#000] sm:text-sm">{cap ? cap.titulo : 'em breve'}</span>}
         </div>
@@ -573,11 +574,11 @@ function CartaoSave({
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted">
           <span>
-            🕒 {quando.toLocaleDateString('pt-BR')} às {quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            {quando.toLocaleDateString('pt-BR')} às {quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
           </span>
           {s.capitulo >= 3 && (
             <span>
-              ❤️ {at.vida} · 💪 {at.forca} · 🛡️ {at.defesa} · ⚙️ {s.pecas ?? 0}
+              VIDA {at.vida} · FORÇA {at.forca} · DEFESA {at.defesa} · PEÇAS {s.pecas ?? 0}
             </span>
           )}
         </div>
@@ -597,7 +598,7 @@ function CartaoSave({
               ▶ CONTINUAR
             </button>
             <button type="button" onClick={onPedirApagar} aria-label="Apagar save" className="px-3 py-2 text-base text-muted hover:text-accent-2">
-              🗑
+              APAGAR
             </button>
           </div>
         )}
@@ -644,11 +645,11 @@ function CartaoSecreto({
           ))}
         </div>
         <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
-          <span className="w-fit border-2 border-black bg-[#f2c14e] px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]">🔑 CAPÍTULO SECRETO</span>
+          <span className="w-fit border-2 border-black bg-[#f2c14e] px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]">CAPÍTULO SECRETO</span>
           <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">"OS TRÊS"</span>
         </div>
         <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
-          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{completo ? '🏆 SEGREDO COMPLETO' : (LUGAR_SECRETO[lugar] ?? 'O HIPOGEU')}</span>
+          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{completo ? 'SEGREDO COMPLETO' : (LUGAR_SECRETO[lugar] ?? 'O HIPOGEU')}</span>
           <span className="block text-xs text-white/85 [text-shadow:1px_1px_0_#000] sm:text-sm">Cassius, Octavius e Helios juntos</span>
         </div>
       </div>
@@ -657,7 +658,7 @@ function CartaoSecreto({
           <div className="h-full bg-[#f2c14e]" style={{ width: `${Math.round((feitas / total) * 100)}%` }} />
         </div>
         <span className="text-[11px] text-muted">
-          🕒 {quando.toLocaleDateString('pt-BR')} às {quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          {quando.toLocaleDateString('pt-BR')} às {quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
         </span>
         {apagando ? (
           <div className="flex flex-wrap items-center gap-2">
@@ -675,7 +676,7 @@ function CartaoSecreto({
               ▶ CONTINUAR
             </button>
             <button type="button" onClick={onPedirApagar} aria-label="Apagar save" className="px-3 py-2 text-base text-muted hover:text-accent-2">
-              🗑
+              APAGAR
             </button>
           </div>
         )}

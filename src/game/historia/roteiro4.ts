@@ -17,9 +17,9 @@ import { atributosDoSave, ESTILO_DA_IA, type SaveHistoria } from './saves';
 
 /** Os pedaços da chave do Hipogeu: um no epílogo de cada caminho. */
 export const PEDACOS_DA_CHAVE = [
-  { id: 'chave-cassius', icone: '📜', nome: 'A página rasgada', caminho: 'claude' },
-  { id: 'chave-octavius', icone: '🪙', nome: 'A moeda do olho riscado', caminho: 'chatgpt' },
-  { id: 'chave-helios', icone: '🗺️', nome: 'O pedaço do mapa do Lumen', caminho: 'gemini' },
+  { id: 'chave-cassius', icone: 'pagina', nome: 'A página rasgada', caminho: 'claude' },
+  { id: 'chave-octavius', icone: 'moeda', nome: 'A moeda do olho riscado', caminho: 'chatgpt' },
+  { id: 'chave-helios', icone: 'mapa', nome: 'O pedaço do mapa do Lumen', caminho: 'gemini' },
 ] as const;
 
 export const CAP_SECRETO: Capitulo = {
@@ -202,7 +202,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'elevador',
           x: 22,
           rotulo: 'Elevador de leões',
-          icone: '🛗',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'octavius', texto: 'Um elevador de corda. Puxava a jaula até a areia lá em cima. A plateia via um leão "brotar do chão".' },
@@ -214,7 +214,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'jaulas',
           x: 45,
           rotulo: 'Jaulas vazias',
-          icone: '⛓️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'cassius', texto: 'Estas jaulas não são de leão. São pequenas demais. E têm prateleiras.' },
@@ -226,7 +226,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'marcas',
           x: 68,
           rotulo: 'Marcas na parede',
-          icone: '👁️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'helios', texto: 'O mesmo olho. Riscado na pedra centenas de vezes. Como uma contagem.' },
@@ -237,7 +237,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'engrenagem',
           x: 86,
           rotulo: 'Engrenagem gigante',
-          icone: '⚙️',
+          icone: '',
           falas: [
             { quem: 'cassius', texto: 'Ela ainda gira. Devagar. Alguém dá corda nisso.' },
             { quem: 'helios', texto: 'Ou alguma COISA.' },
@@ -310,7 +310,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'mural-1',
           x: 20,
           rotulo: 'Mural: a máquina',
-          icone: '🖼️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'cassius', texto: 'Um mural. Uma máquina redonda, cheia de cabos, e milhares de pessoas fazendo perguntas a ela.' },
@@ -321,7 +321,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'mural-2',
           x: 45,
           rotulo: 'Mural: a resposta',
-          icone: '🖼️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'helios', texto: 'No segundo, as pessoas param de perguntar. O Núcleo dá a mesma resposta para todo mundo.' },
@@ -332,7 +332,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'mural-3',
           x: 70,
           rotulo: 'Mural: o Censor',
-          icone: '🖼️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'helios', texto: 'No terceiro, o Núcleo constrói um gigante para levar a resposta lá para cima. Com um olho vermelho.' },
@@ -344,7 +344,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'mural-4',
           x: 90,
           rotulo: 'Pedaço apagado',
-          icone: '❓',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'O último mural foi raspado. Só sobrou um pedaço: três figuras pequenas, de mãos dadas.' },
             { quem: 'cassius', texto: 'Alguém já sabia que a gente vinha?' },
@@ -542,7 +542,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'brutus',
           x: 16,
           rotulo: 'Brutus',
-          icone: '🛡️',
+          icone: '',
           personagem: 'brutus',
           obrigatorio: true,
           falas: [
@@ -554,7 +554,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'livia',
           x: 34,
           rotulo: 'Lívia',
-          icone: '📚',
+          icone: '',
           personagem: 'livia',
           falas: [
             { quem: 'livia', texto: 'O Núcleo pediu livros! Muitos! Ele quer ler as respostas de todo mundo, não só a dele.' },
@@ -565,7 +565,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'gaivota',
           x: 52,
           rotulo: 'Gaivota Sete',
-          icone: '🕊️',
+          icone: '',
           personagem: 'gaivota',
           falas: [
             { quem: 'gaivota', texto: 'Capitão! Os barcos do porto estão vindo pela rua inundada só para ver a arena aberta!' },
@@ -576,7 +576,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'lumen',
           x: 70,
           rotulo: 'Lumen',
-          icone: '🔭',
+          icone: '',
           personagem: 'lumen',
           falas: [
             { quem: 'lumen', texto: 'O pontinho do mapa parou de piscar. Agora ele brilha fixo. Azul.' },
@@ -587,7 +587,7 @@ export const CAP_SECRETO: Capitulo = {
           id: 'censor',
           x: 88,
           rotulo: 'O Censor',
-          icone: '🔵',
+          icone: '',
           personagem: 'censor',
           obrigatorio: true,
           falas: [

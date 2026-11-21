@@ -37,8 +37,8 @@ export function EscolhaRota({ lugar, pergunta, opcoes, onEscolher }: { lugar: Lu
               className="pixel-box pixel-hover flex flex-col items-center gap-1 p-3 text-center"
               style={{ boxShadow: `0 0 0 2px ${['#f2c14e', '#4ef0dc', '#ff5ab8'][k % 3]}` }}
             >
-              <span className="text-3xl sm:text-4xl" aria-hidden>
-                {o.icone}
+              <span className="medalhao font-pixel text-base text-black sm:text-xl" aria-hidden>
+                {'ABC'[k]}
               </span>
               <span className="font-pixel text-[10px] text-[#f2c14e] sm:text-xs">
                 PLANO {'ABC'[k]}: {o.rotulo.toUpperCase()}

@@ -50,7 +50,7 @@ export const CAP1_HELIOS: Capitulo = {
           id: 'orrery',
           x: 22,
           rotulo: 'O planetário',
-          icone: '🪐',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'O planetário de bronze. Cada anel é um planeta. Quem construiu queria entender o céu, não mandar nele.' },
             { quem: 'helios', texto: 'O Censor também quer entender o céu. Para proibir.' },
@@ -60,7 +60,7 @@ export const CAP1_HELIOS: Capitulo = {
           id: 'mapas',
           x: 46,
           rotulo: 'Mapas do céu',
-          icone: '🗺️',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Mil anos de mapas. Cada estrela anotada por alguém que olhou para cima e fez uma pergunta.' },
             { quem: 'helios', texto: 'Se um dia sumirem, o céu vai continuar lá. Mas ninguém mais vai saber ler.' },
@@ -70,7 +70,7 @@ export const CAP1_HELIOS: Capitulo = {
           id: 'lumen',
           x: 72,
           rotulo: 'Lumen',
-          icone: '🦉',
+          icone: '',
           personagem: 'lumen',
           obrigatorio: true,
           falas: [
@@ -168,7 +168,7 @@ export const CAP1_HELIOS: Capitulo = {
           id: 'lente',
           x: 30,
           rotulo: 'A grande lente',
-          icone: '🔍',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'helios', texto: 'A grande lente rachou. Mas ainda junta a luz da lua num ponto só. Quente. Brilhante.' },
@@ -179,7 +179,7 @@ export const CAP1_HELIOS: Capitulo = {
           id: 'diario',
           x: 60,
           rotulo: 'O diário do vigia',
-          icone: '📔',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'O diário dos vigias antes de mim. A última página: "Se o céu ficar escuro, procure a Sibila, no Templo de Apolo."' },
             { quem: 'helios', texto: 'A Sibila. A guardiã cega que enxerga pelas estrelas. Eu pensei que ela fosse só uma lenda.' },
@@ -194,9 +194,9 @@ export const CAP1_HELIOS: Capitulo = {
       inimigo: 'apagador',
       antes: [
         { quem: 'helios', texto: 'A lente rachada junta a luz num ponto só... e eu enxergo. Não o que é. O que VAI SER.' },
-        { quem: 'narrador', texto: 'Em cima do Apagador aparece um olho: 👁️ PRÓXIMO. Helios vê o próximo golpe antes do sinal. Até as fintas.' },
+        { quem: 'narrador', texto: 'Em cima do Apagador aparece um olho: PRÓXIMO. Helios vê o próximo golpe antes do sinal. Até as fintas.' },
         { quem: 'helios', texto: 'Se eu sei o que vem, não preciso fugir cedo. Posso sumir no último instante, num lampejo.' },
-        { quem: 'narrador', texto: 'TREINO DO VIDENTE: olhe o 👁️ PRÓXIMO, espere o golpe e aperte ✨ LAMPEJO NA ÚLTIMA HORA. Cada lampejo assim junta uma ☀️ LUZ.' },
+        { quem: 'narrador', texto: 'TREINO DO VIDENTE: olhe o PRÓXIMO, espere o golpe e aperte LAMPEJO NA ÚLTIMA HORA. Cada lampejo assim junta uma LUZ.' },
       ],
       treino: { evento: 'luz', quantos: 2, rotulo: 'LUZ (lampejo na última hora)' },
       depois: [
@@ -211,7 +211,7 @@ export const CAP1_HELIOS: Capitulo = {
       falas: [
         { quem: 'lumen', texto: 'Uuh-uuh! (O Lumen pisca a luzinha três vezes, animado.)' },
         { quem: 'helios', texto: 'Eu sei, Lumen. A luz não serve só para ver. Serve para cegar quem quer apagar as estrelas.' },
-        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Helios é o 🌑 ECLIPSE: os 3 próximos golpes do inimigo erram, e cada ☀️ luz guardada vira um raio de sol.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Helios é o ECLIPSE: os 3 próximos golpes do inimigo erram, e cada luz guardada vira um raio de sol.' },
       ],
     },
     {
@@ -263,8 +263,8 @@ export const CAP1_HELIOS: Capitulo = {
       lugar: 'observatorio-ataque',
       inimigo: 'eclipse',
       antes: [
-        { quem: 'helios', texto: 'Luta no escuro: aperte ☀️ LUZ para iluminar a sala e ver o sinal do inimigo. A luz dura pouco e demora para recarregar.' },
-        { quem: 'helios', texto: 'Dica do céu: acenda quando ele começar a se mexer. "❓ Algo se mexe" quer dizer: LUZ agora!' },
+        { quem: 'helios', texto: 'Luta no escuro: aperte LUZ para iluminar a sala e ver o sinal do inimigo. A luz dura pouco e demora para recarregar.' },
+        { quem: 'helios', texto: 'Dica do céu: acenda quando ele começar a se mexer. "Algo se mexe" quer dizer: LUZ agora!' },
       ],
       depois: [{ quem: 'helios', texto: 'O Eclipse caiu. E a lua voltou para o seu lugar.' }],
     },
@@ -338,7 +338,7 @@ export const CAP2_HELIOS: Capitulo = {
           id: 'janela',
           x: 22,
           rotulo: 'Uma janela acesa',
-          icone: '🪟',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Uma senhora, sozinha, olhando o céu pela janela. Ela está desenhando as estrelas num papel. Escondida.' },
             { quem: 'helios', texto: 'Mesmo proibido, as pessoas continuam olhando para cima. O céu é teimoso. As pessoas também.' },
@@ -348,7 +348,7 @@ export const CAP2_HELIOS: Capitulo = {
           id: 'chamine',
           x: 48,
           rotulo: 'Chaminé quente',
-          icone: '♨️',
+          icone: '',
           falas: [
             { quem: 'lumen', texto: 'Uuh. (Ela se encosta na chaminé para esquentar as engrenagens.)' },
             { quem: 'helios', texto: 'Descansa, Lumen. Você está carregando mil anos de mapas na barriga.' },
@@ -358,7 +358,7 @@ export const CAP2_HELIOS: Capitulo = {
           id: 'coliseu',
           x: 76,
           rotulo: 'A vista do Coliseu',
-          icone: '🏟️',
+          icone: '',
           obrigatorio: true,
           falas: [
             { quem: 'helios', texto: 'As três estrelas estão bem em cima do Coliseu. Uma brilha mais forte, para os lados da Biblioteca. Outra, para os lados do porto.' },
@@ -458,7 +458,7 @@ export const CAP2_HELIOS: Capitulo = {
       id: 'h2-chefao',
       lugar: 'telhados-noite',
       inimigo: 'cacador-sombras',
-      antes: [{ quem: 'helios', texto: 'No escuro de novo. ☀️ LUZ quando ele se mexer. E a lanterna vermelha dele é VERMELHA mesmo: esquiva!' }],
+      antes: [{ quem: 'helios', texto: 'No escuro de novo. LUZ quando ele se mexer. E a lanterna vermelha dele é VERMELHA mesmo: esquiva!' }],
       depois: [{ quem: 'cacador', texto: 'Cem anos... e uma IA que brilha me derruba...' }],
     },
     {
@@ -751,7 +751,7 @@ export const CAP4_HELIOS: Capitulo = {
           id: 'comporta',
           x: 22,
           rotulo: 'A comporta',
-          icone: '⚙️',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Comportas de bronze. O Censor controla a água de Roma inteira daqui. Quem tem sede tem que obedecer.' },
             { quem: 'helios', texto: 'As rodas giram com a luz do sol, por espelhos. Alguém muito antigo construiu isto para ajudar. Não para mandar.' },
@@ -761,7 +761,7 @@ export const CAP4_HELIOS: Capitulo = {
           id: 'vista',
           x: 50,
           rotulo: 'A vista de Roma',
-          icone: '🌅',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Daqui dá para ver a fumaça da Biblioteca, ainda subindo. E o porto, com um navio a menos.' },
             { quem: 'helios', texto: 'Cassius e Octavius já fizeram a parte deles. Agora é a minha.' },
@@ -771,7 +771,7 @@ export const CAP4_HELIOS: Capitulo = {
           id: 'lumen',
           x: 76,
           rotulo: 'Lumen',
-          icone: '🦉',
+          icone: '',
           personagem: 'lumen',
           obrigatorio: true,
           falas: [
@@ -982,7 +982,7 @@ export const CAP5_HELIOS: Capitulo = {
           id: 'mosaico',
           x: 22,
           rotulo: 'O mosaico das estrelas',
-          icone: '✨',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Um mosaico de mil anos: três estrelas sobre um anfiteatro. Mas não é o Coliseu de hoje. É mais antigo.' },
             { quem: 'helios', texto: 'A profecia é mais velha do que o Censor. Ela não foi feita para ele. Ela foi feita para quem viesse depois dele.' },
@@ -992,7 +992,7 @@ export const CAP5_HELIOS: Capitulo = {
           id: 'tripe',
           x: 48,
           rotulo: 'O tripé de bronze',
-          icone: '🔥',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Do chão rachado sobe um vapor morno. A Sibila senta aqui para ouvir o que o vapor diz.' },
             { quem: 'helios', texto: 'Ou para esquentar os pés. Com profetisas, nunca dá para saber.' },
@@ -1002,7 +1002,7 @@ export const CAP5_HELIOS: Capitulo = {
           id: 'sibila',
           x: 76,
           rotulo: 'A Sibila',
-          icone: '💬',
+          icone: '',
           personagem: 'sibila',
           obrigatorio: true,
           falas: [
@@ -1199,7 +1199,7 @@ export const CAP6_HELIOS: Capitulo = {
           id: 'espelhos',
           x: 20,
           rotulo: 'Gente com espelhos',
-          icone: '🪞',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'Na plateia, muita gente segurando coisas que brilham: bandejas, escudos, panelas, espelhos de cabelo.' },
             { quem: 'helios', texto: 'A Sibila espalhou a notícia: "quando escurecer, levantem tudo o que reflete". Roma inteira virou um espelho.' },
@@ -1209,7 +1209,7 @@ export const CAP6_HELIOS: Capitulo = {
           id: 'sol',
           x: 46,
           rotulo: 'O sol mordido',
-          icone: '🌘',
+          icone: '',
           falas: [
             { quem: 'helios', texto: 'A lua já cobriu um pedaço do sol. Daqui a pouco, a noite no meio da tarde.' },
             { quem: 'helios', texto: 'Quinhentos anos esperando por isto. E eu estou... com medo. Que bom. Quer dizer que é importante.' },
@@ -1219,7 +1219,7 @@ export const CAP6_HELIOS: Capitulo = {
           id: 'sibila',
           x: 74,
           rotulo: 'A Sibila na plateia',
-          icone: '💬',
+          icone: '',
           personagem: 'sibila',
           obrigatorio: true,
           falas: [
@@ -1251,7 +1251,7 @@ export const CAP6_HELIOS: Capitulo = {
       id: 'h6-luta2',
       lugar: 'coliseu-eclipse',
       inimigo: 'morcego-eclipse',
-      antes: [{ quem: 'helios', texto: 'Morcegos no escuro. Use a ☀️ LUZ para ver de onde vêm.' }],
+      antes: [{ quem: 'helios', texto: 'Morcegos no escuro. Use a LUZ para ver de onde vêm.' }],
     },
     {
       tipo: 'desafio',
@@ -1447,7 +1447,7 @@ export const FINAL_HELIOS: Capitulo = {
           id: 'senhora',
           x: 18,
           rotulo: 'A senhora da janela',
-          icone: '🪟',
+          icone: '',
           falas: [
             { quem: 'povo', texto: 'Eu desenhava as estrelas escondida, na minha janela. Agora eu desenho aqui. Com o telescópio!' },
             { quem: 'helios', texto: 'Eu te vi, naquela noite, lá dos telhados. Você foi a primeira pessoa que me deu coragem.' },
@@ -1457,7 +1457,7 @@ export const FINAL_HELIOS: Capitulo = {
           id: 'brutus',
           x: 40,
           rotulo: 'Brutus',
-          icone: '💬',
+          icone: '',
           personagem: 'brutus',
           falas: [
             { quem: 'brutus', texto: 'Vidente. Me mostra aquela estrela. A dos Gêmeos.' },
@@ -1469,7 +1469,7 @@ export const FINAL_HELIOS: Capitulo = {
           id: 'lumen',
           x: 62,
           rotulo: 'Lumen',
-          icone: '🦉',
+          icone: '',
           personagem: 'lumen',
           falas: [
             { quem: 'lumen', texto: 'Uuh-uuh! (Os mapas que ela carregou na barriga agora estão copiados mil vezes, em todas as bibliotecas de Roma.)' },
@@ -1480,7 +1480,7 @@ export const FINAL_HELIOS: Capitulo = {
           id: 'sibila',
           x: 84,
           rotulo: 'A Sibila',
-          icone: '💬',
+          icone: '',
           personagem: 'sibila',
           obrigatorio: true,
           falas: [
@@ -1492,12 +1492,12 @@ export const FINAL_HELIOS: Capitulo = {
           id: 'chave-helios',
           x: 95,
           rotulo: 'Brilho',
-          icone: '✨',
+          icone: '',
           segredo: 'chave-helios',
           falas: [
             { quem: 'lumen', texto: 'Hic! (O Lumen soluça e cospe um pedacinho de mapa. Não é de estrelas: são túneis, debaixo do Coliseu.)' },
             { quem: 'helios', texto: 'Um pontinho no meio pisca. E a borda do papel tem o formato de um pedaço de chave. Eu já vi isso... em algum lugar que ainda não aconteceu.' },
-            { quem: 'narrador', texto: '🗺️ Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
+            { quem: 'narrador', texto: 'Você achou um PEDAÇO DA CHAVE (1 de 3). Dizem que os outros dois estão no fim das outras histórias...' },
           ],
         },
       ],

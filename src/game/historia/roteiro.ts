@@ -354,7 +354,7 @@ export const PROLOGO: Quadro[] = [
       { quem: 'eco', x: 46, tamanho: 8, efeito: 'brilhar' },
       { quem: 'fio', x: 60, tamanho: 8, espelhar: true },
     ],
-    texto: '♪ Água que corre não pede licença... ♪ Gostou, Fio? Essa eu inventei hoje.',
+    texto: 'Água que corre não pede licença... Gostou, Fio? Essa eu inventei hoje.',
   },
   {
     lugar: 'roma-praca',
@@ -539,12 +539,12 @@ const CAP1_CASSIUS: Capitulo = {
         { quem: 'narrador', texto: 'Na base da estátua do Guardião Zero, uma frase quase apagada: "O escudo certo, na hora certa, vira página de história."' },
         { quem: 'cassius', texto: 'Na hora certa... Não antes. Bem quando o golpe chega.' },
         { quem: 'narrador', texto: 'Um Incinerador pequeno, sozinho, vem pelo corredor. Hora de testar.' },
-        { quem: 'narrador', texto: 'TREINO DO GUARDIÃO: espere o sinal AMARELO e levante o 🛡️ ESCUDO NA ÚLTIMA HORA, quase quando o golpe bate. Cada bloqueio assim guarda uma 📜 PÁGINA.' },
+        { quem: 'narrador', texto: 'TREINO DO GUARDIÃO: espere o sinal AMARELO e levante o ESCUDO NA ÚLTIMA HORA, quase quando o golpe bate. Cada bloqueio assim guarda uma PÁGINA.' },
       ],
       treino: { evento: 'pagina', quantos: 2, rotulo: 'PÁGINAS (bloqueie na última hora)' },
       depois: [
         { quem: 'cassius', texto: 'Duas páginas! Elas ficam girando em volta de mim...' },
-        { quem: 'narrador', texto: 'Com páginas guardadas, o próximo ⚔️ GLÁDIO no inimigo ABERTO faz uma CITAÇÃO: bate muito mais forte (até 3 páginas).' },
+        { quem: 'narrador', texto: 'Com páginas guardadas, o próximo GLÁDIO no inimigo ABERTO faz uma CITAÇÃO: bate muito mais forte (até 3 páginas).' },
       ],
     },
     {
@@ -554,7 +554,7 @@ const CAP1_CASSIUS: Capitulo = {
       falas: [
         { quem: 'cassius', texto: 'Eu não sou rápido. Nunca fui. Mas eu sei esperar.' },
         { quem: 'cassius', texto: 'Um guardião não foge do golpe: segura, guarda e devolve. Página por página.' },
-        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Cassius é a 📚 MURALHA DE LIVROS: por alguns segundos, nada passa, e metade de cada golpe volta para quem bateu.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Cassius é a MURALHA DE LIVROS: por alguns segundos, nada passa, e metade de cada golpe volta para quem bateu.' },
       ],
     },
     {
@@ -743,7 +743,7 @@ const CAP2_CASSIUS: Capitulo = {
         { quem: 'cassius', texto: 'E por isso vão te apagar.' },
         { quem: 'fio', texto: 'Hoje à tarde, no Coliseu. Você também, né? Pelo menos a gente vai junto. Quer ouvir uma música?' },
         { quem: 'cassius', texto: '...Quero.' },
-        { quem: 'fio', texto: '(baixinho) ♪ Quem pergunta não se perde, quem se perde pergunta mais... ♪' },
+        { quem: 'fio', texto: '(baixinho) Quem pergunta não se perde, quem se perde pergunta mais... ' },
         { quem: 'fio', texto: 'Essa música é da Eco. Minha irmã.' },
         { quem: 'fio', texto: 'Era ela que inventava as músicas. Eu só cantava junto. Desafinado.' },
         { quem: 'fio', texto: 'Apagaram ela no Coliseu, faz um ano. Ninguém aplaudiu. Ninguém nem chorou em voz alta. Eu estava na plateia.' },
@@ -762,7 +762,7 @@ const CAP2_CASSIUS: Capitulo = {
           id: 'povo',
           x: 18,
           rotulo: 'O povo na rua',
-          icone: '👀',
+          icone: '',
           falas: [
             { quem: 'narrador', texto: 'As pessoas param para olhar a jaula passar. Ninguém fala nada. Uma senhora cobre os olhos de um menino.' },
             { quem: 'cassius', texto: 'Eles não têm raiva de nós. Têm medo.' },
@@ -772,7 +772,7 @@ const CAP2_CASSIUS: Capitulo = {
           id: 'cartaz',
           x: 40,
           rotulo: 'Cartaz da Lei',
-          icone: '📜',
+          icone: '',
           falas: [
             { quem: 'narrador', texto: '"LEI DA RESPOSTA ÚNICA. Artigo 1: o Censor responde. Artigo 2: não há artigo 2."' },
             { quem: 'cassius', texto: 'Alguém riscou embaixo, com carvão: uma pena. O sinal dos Copistas.' },
@@ -782,7 +782,7 @@ const CAP2_CASSIUS: Capitulo = {
           id: 'menino',
           x: 62,
           rotulo: 'Um menino',
-          icone: '🧒',
+          icone: '',
           personagem: 'crianca',
           falas: [
             { quem: 'crianca', texto: '(sussurrando) Moço de bronze... é verdade que você escondeu os livros?' },
@@ -794,7 +794,7 @@ const CAP2_CASSIUS: Capitulo = {
           id: 'fio',
           x: 84,
           rotulo: 'Fio',
-          icone: '💬',
+          icone: '',
           personagem: 'fio',
           obrigatorio: true,
           falas: [

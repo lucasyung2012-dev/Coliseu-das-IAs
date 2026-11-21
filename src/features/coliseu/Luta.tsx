@@ -277,37 +277,37 @@ const SOM: Partial<Record<string, SomHistoria>> = {
  */
 const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [string, string]; esquiva: [string, string]; especial: [string, string]; icones: Record<'golpe' | 'escudo' | 'esquiva' | 'especial', string>; dica: string; cor: string }> = {
   guardiao: {
-    golpe: ['⚔️', 'GLÁDIO'],
-    escudo: ['🛡️', 'ESCUDO'],
-    esquiva: ['💨', 'ESQUIVA'],
-    especial: ['📚', 'MURALHA'],
+    golpe: ['', 'GLÁDIO'],
+    escudo: ['', 'ESCUDO'],
+    esquiva: ['', 'ESQUIVA'],
+    especial: ['', 'MURALHA'],
     icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'esquiva', especial: 'muralha' },
-    dica: 'GUARDIÃO: bloqueie NA ÚLTIMA HORA para guardar 📜 páginas; o próximo golpe no ABERTO cita todas e bate muito. Esquiva pesada. MURALHA: tudo bloqueado e metade volta.',
+    dica: 'GUARDIÃO: bloqueie NA ÚLTIMA HORA para guardar páginas; o próximo golpe no ABERTO cita todas e bate muito. Esquiva pesada. MURALHA: tudo bloqueado e metade volta.',
     cor: '#e0782c',
   },
   estrategista: {
-    golpe: ['🔱', 'TRIDENTE'],
-    escudo: ['🪵', 'APARAR'],
-    esquiva: ['🌀', 'ROLAR'],
-    especial: ['🕸️', 'REDE'],
+    golpe: ['', 'TRIDENTE'],
+    escudo: ['', 'APARAR'],
+    esquiva: ['', 'ROLAR'],
+    especial: ['', 'REDE'],
     icones: { golpe: 'tridente', escudo: 'aparar', esquiva: 'rolar', especial: 'rede' },
     dica: 'ESTRATEGISTA: role NA ÚLTIMA HORA e ele TROPEÇA (fica aberto muito tempo). Aparar deixa passar um pouco. Use os PLANOS do cenário. REDE: preso e sem atacar.',
     cor: '#2aa08a',
   },
   vidente: {
-    golpe: ['🗡️', 'LANÇA'],
-    escudo: ['🪞', 'ESPELHO'],
-    esquiva: ['✨', 'LAMPEJO'],
-    especial: ['🌑', 'ECLIPSE'],
+    golpe: ['', 'LANÇA'],
+    escudo: ['', 'ESPELHO'],
+    esquiva: ['', 'LAMPEJO'],
+    especial: ['', 'ECLIPSE'],
     icones: { golpe: 'lanca', escudo: 'espelho', esquiva: 'lampejo', especial: 'eclipse' },
-    dica: 'VIDENTE: você vê o PRÓXIMO golpe (até as fintas). Lampejo NA ÚLTIMA HORA junta ☀️ luz. Menos vida. ECLIPSE: os 3 próximos golpes erram, e a luz vira raio.',
+    dica: 'VIDENTE: você vê o PRÓXIMO golpe (até as fintas). Lampejo NA ÚLTIMA HORA junta luz. Menos vida. ECLIPSE: os 3 próximos golpes erram, e a luz vira raio.',
     cor: '#f2c14e',
   },
   neutro: {
-    golpe: ['⚔️', 'GOLPE'],
-    escudo: ['🛡️', 'ESCUDO'],
-    esquiva: ['💨', 'ESQUIVA'],
-    especial: ['⭐', 'ESPECIAL'],
+    golpe: ['', 'GOLPE'],
+    escudo: ['', 'ESCUDO'],
+    esquiva: ['', 'ESQUIVA'],
+    especial: ['', 'ESPECIAL'],
     icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'esquiva', especial: 'especial' },
     dica: '',
     cor: '#f2c14e',
@@ -324,34 +324,34 @@ const NOME_ESPECIAL: Partial<Record<EventoLuta['tipo'], string>> = {
 const TEXTO: Record<string, string> = {
   bloqueio: 'BLOQUEOU!',
   esquiva: 'ESQUIVOU!',
-  especial: '⭐ ESPECIAL!',
+  especial: 'ESPECIAL!',
   guarda: 'NA GUARDA',
-  fase: '🔥 FURIOSO!',
+  fase: 'FURIOSO!',
   finta: 'FINTA!',
-  contra: '⚠ CONTRA-ATAQUE!',
+  contra: 'CONTRA-ATAQUE!',
   cansado: 'SEM FÔLEGO',
-  riposta: '⚡ CONTRA-ATAQUE!',
-  plano: '⚓ PLANO B!',
-  reflexo: '☀️ REFLETIU!',
-  quebra: '💥 GUARDA QUEBRADA!',
+  riposta: 'CONTRA-ATAQUE!',
+  plano: 'PLANO B!',
+  reflexo: 'REFLETIU!',
+  quebra: 'GUARDA QUEBRADA!',
   aliado: '',
-  pagina: '+📜 PÁGINA!',
-  citacao: '📜 CITAÇÃO!',
+  pagina: '+PÁGINA!',
+  citacao: 'CITAÇÃO!',
   muralha: '',
-  tropeco: '🌀 TROPEÇOU!',
+  tropeco: 'TROPEÇOU!',
   rede: '',
-  luz: '+☀️ LUZ!',
+  luz: '+LUZ!',
   eclipse: '',
-  erro: '✖ ERROU!',
+  erro: 'X ERROU!',
 };
 
 /** O que pode aparecer no cenário para o Octavius usar (no porto, no navio...). */
 const PLANOS = [
-  { icone: '🛢️', nome: 'ROLAR O BARRIL' },
-  { icone: '🕸️', nome: 'REDE DE PESCA' },
-  { icone: '🪝', nome: 'GANCHO DO GUINDASTE' },
-  { icone: '🪢', nome: 'PUXAR A CORDA' },
-  { icone: '📦', nome: 'CAIXOTE NA CABEÇA' },
+  { icone: 'barril', nome: 'ROLAR O BARRIL' },
+  { icone: 'rede', nome: 'REDE DE PESCA' },
+  { icone: 'gancho', nome: 'GANCHO DO GUINDASTE' },
+  { icone: 'corda', nome: 'PUXAR A CORDA' },
+  { icone: 'caixote', nome: 'CAIXOTE NA CABEÇA' },
 ];
 
 /** Faíscas voando para todos os lados, um corte e um anel: o impacto de um golpe. */
@@ -378,7 +378,7 @@ function Impacto({ x, cor, corte = false, grande = false }: { x: string; cor: st
 
 /**
  * A luta do modo História: falas antes, a luta, falas depois. Perdeu? Tenta de novo.
- * Controles: ⚔️ golpe, 🛡️ escudo, 💨 esquiva e ⭐ especial (Ânimo cheio).
+ * Controles: golpe, escudo, esquiva e especial (Ânimo cheio).
  * Teclado: J golpe, K escudo, L esquiva, espaço especial.
  * No Coliseu, o Ânimo vem da PLATEIA: ela começa vaiando e muda de lado com as boas jogadas.
  */
@@ -442,7 +442,7 @@ export function LutaHistoria({
   // Golpes seguidos sem apanhar (o COMBO na tela).
   const [combo, setCombo] = useState(0);
 
-  // O menu de pausa (☰ MENU ou Esc) para o relógio da luta.
+  // O menu de pausa (MENU ou Esc) para o relógio da luta.
   const pausado = usePausado();
   useEffect(() => {
     if (fase !== 'luta' || pausado) return;
@@ -564,14 +564,14 @@ export function LutaHistoria({
             <Barra valor={j.folego} max={FOLEGO_MAX} cor={j.folego < 25 ? '#ff8a3a' : '#5ab0ff'} rotulo="Fôlego" fina />
             <Barra valor={e.animo} max={ANIMO_MAX} cor={cheio ? '#f2c14e' : '#c8962a'} rotulo={noColiseu ? 'Plateia' : 'Ânimo'} />
             <span className={`font-pixel text-[6px] sm:text-[8px] ${cheio ? 'piscar text-[#f2c14e]' : 'text-white/70'}`}>
-              {cheio ? (noColiseu ? '📣 A PLATEIA GRITA SEU NOME!' : '⭐ ÂNIMO CHEIO!') : noColiseu ? (plateiaLado ? '👏 A PLATEIA MUDOU DE LADO' : '👎 A PLATEIA VAIA') : 'ÂNIMO'}
+              {cheio ? (noColiseu ? 'A PLATEIA GRITA SEU NOME!' : 'ÂNIMO CHEIO!') : noColiseu ? (plateiaLado ? 'A PLATEIA MUDOU DE LADO' : 'A PLATEIA VAIA') : 'ÂNIMO'}
             </span>
             {/* O que o jeito de lutar guardou: páginas (Cassius), luz (Helios), rede (Octavius) */}
             {estilo === 'guardiao' && (
               <span className="flex items-center gap-0.5 text-xs sm:text-base" aria-label={`Páginas: ${rec.paginas} de 3`}>
                 {[0, 1, 2].map((k) => (
                   <span key={k} className={k < rec.paginas ? 'recurso-cheio' : 'opacity-25 grayscale'}>
-                    📜
+                    <Icone nome="pagina" className="w-3 sm:w-5" />
                   </span>
                 ))}
                 {naMuralha && <span className="piscar ml-1 font-pixel text-[6px] text-[#e0782c] sm:text-[8px]">MURALHA!</span>}
@@ -581,19 +581,19 @@ export function LutaHistoria({
               <span className="flex items-center gap-0.5 text-xs sm:text-base" aria-label={`Luz: ${rec.luz} de 3`}>
                 {[0, 1, 2].map((k) => (
                   <span key={k} className={k < rec.luz ? 'recurso-cheio' : 'opacity-25 grayscale'}>
-                    ☀️
+                    <Icone nome="sol" className="w-3 sm:w-5" />
                   </span>
                 ))}
-                {rec.cego > 0 && <span className="ml-1 font-pixel text-[6px] text-[#b89aff] sm:text-[8px]">🌑 ×{rec.cego}</span>}
+                {rec.cego > 0 && <span className="ml-1 font-pixel text-[6px] text-[#b89aff] sm:text-[8px]">×{rec.cego}</span>}
               </span>
             )}
             {estilo === 'estrategista' && (
-              <span className="font-pixel text-[6px] text-[#2aa08a] sm:text-[8px]">{naRede ? '🕸️ PRESO NA REDE!' : '🌀 ROLE NA HORA: ELE TROPEÇA'}</span>
+              <span className="font-pixel text-[6px] text-[#2aa08a] sm:text-[8px]">{naRede ? 'PRESO NA REDE!' : 'ROLE NA HORA: ELE TROPEÇA'}</span>
             )}
           </div>
           <div className="flex flex-col items-end gap-1">
             <span className="font-pixel text-[7px] text-white [text-shadow:1px_1px_0_#000] sm:text-[9px]">
-              {def.chefao && '👑 '}
+              {def.chefao && ''}
               {def.nome.toUpperCase()}
               {def.trocaDeFase && ` · FASE ${i.fase + 1}`}
             </span>
@@ -643,7 +643,7 @@ export function LutaHistoria({
           {estilo === 'guardiao' &&
             Array.from({ length: rec.paginas }, (_, k) => (
               <span key={k} className="orbita-recurso absolute left-1/2 top-[30%] text-xs sm:text-lg" style={{ animationDelay: `${k * -600}ms` }} aria-hidden>
-                📜
+                <Icone nome="pagina" className="w-3 sm:w-5" />
               </span>
             ))}
           {estilo === 'vidente' &&
@@ -687,19 +687,19 @@ export function LutaHistoria({
               className="absolute -top-[22%] left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-black px-1 font-pixel text-[7px] text-black sm:text-[10px]"
               style={{ background: corSinal }}
             >
-              ! {at.tipo === 'corpo' || at.tipo === 'finta' ? '🛡️ DEFENDA' : '💨 ESQUIVE'}
+              ! {at.tipo === 'corpo' || at.tipo === 'finta' ? 'DEFENDA' : 'ESQUIVE'}
               {i.contra && ' (RÁPIDO!)'}
             </span>
           )}
           {(i.estado === 'aberto' || i.estado === 'atordoado') && (
             <span className="absolute -top-[22%] left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-black bg-[#4ad46a] px-1 font-pixel text-[7px] text-black sm:text-[10px]">
-              {i.estado === 'atordoado' ? (naRede ? '🕸️ PRESO!' : '💫 TONTO!') : '⚔️ ABERTO!'}
+              {i.estado === 'atordoado' ? (naRede ? 'PRESO!' : 'TONTO!') : 'ABERTO!'}
             </span>
           )}
           {/* Vidente: vê o PRÓXIMO golpe antes do sinal (até a finta) */}
           {estilo === 'vidente' && i.estado === 'espera' && aceso && !vencido && fase === 'luta' && (
             <span className="visao-proxima absolute -top-[22%] left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-[#ffe08a] bg-black/80 px-1 font-pixel text-[6px] text-[#ffe08a] sm:text-[9px]">
-              👁️ PRÓXIMO: {at.tipo === 'finta' ? '🎭 FINTA' : at.tipo === 'corpo' ? `${bot.escudo[0]} ESPELHO` : `${bot.esquiva[0]} LAMPEJO`}
+              PRÓXIMO: {at.tipo === 'finta' ? 'FINTA' : at.tipo === 'corpo' ? `${bot.escudo[0]} ESPELHO` : `${bot.esquiva[0]} LAMPEJO`}
               {(at.combo ?? 1) > 1 && ` ×${at.combo}`}
             </span>
           )}
@@ -721,7 +721,7 @@ export function LutaHistoria({
           <>
             <div className="eclipse-tela pointer-events-none absolute inset-0 z-[14]" aria-hidden />
             <span className="pointer-events-none absolute left-[70%] top-[18%] z-20 -translate-x-1/2 font-pixel text-[8px] text-[#d8c8ff] [text-shadow:1px_1px_0_#000] sm:text-xs">
-              🌑 CEGO: {'✖'.repeat(rec.cego)}
+              CEGO: {'X'.repeat(rec.cego)}
             </span>
           </>
         )}
@@ -746,7 +746,7 @@ export function LutaHistoria({
               <Retrato quem={quemAjuda} azul={quemAjuda === 'censor'} />
             </div>
             <span className="lute-entra absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap font-pixel text-xs text-[#f2c14e] [text-shadow:2px_2px_0_#000] sm:text-xl">
-              {quemAjuda === 'octavius' ? '⚓ OCTAVIUS: CARGA EM EQUIPE!' : quemAjuda === 'helios' ? '☀️ HELIOS: RAIO DE SOL!' : quemAjuda === 'censor' ? '🔵 O CENSOR: A LUZ AZUL!' : '📚 CASSIUS: ESCUDO DE LIVROS!'}
+              {quemAjuda === 'octavius' ? 'OCTAVIUS: CARGA EM EQUIPE!' : quemAjuda === 'helios' ? 'HELIOS: RAIO DE SOL!' : quemAjuda === 'censor' ? 'O CENSOR: A LUZ AZUL!' : 'CASSIUS: ESCUDO DE LIVROS!'}
             </span>
           </div>
         )}
@@ -760,7 +760,7 @@ export function LutaHistoria({
           />
         )}
         {escuro && fase === 'luta' && !aceso && sinal && (
-          <span className="pointer-events-none absolute left-[70%] top-[30%] z-20 -translate-x-1/2 font-pixel text-[9px] text-white/80 sm:text-xs">❓ ALGO SE MEXE... (LUZ!)</span>
+          <span className="pointer-events-none absolute left-[70%] top-[30%] z-20 -translate-x-1/2 font-pixel text-[9px] text-white/80 sm:text-xs">ALGO SE MEXE... (LUZ!)</span>
         )}
 
         {/* Os PLANOS do Octavius: a cada 7 segundos aparece algo no cenário para usar */}
@@ -784,7 +784,7 @@ export function LutaHistoria({
               aria-label={`Usar o plano: ${item.nome}`}
             >
               <span className="piscar text-2xl sm:text-4xl" aria-hidden>
-                {item.icone}
+                <Icone nome={item.icone} className="w-10 sm:w-14" />
               </span>
               <span className="whitespace-nowrap font-pixel text-[7px] text-[#f2c14e] sm:text-[9px]">PLANO: {item.nome}</span>
             </button>
@@ -794,7 +794,7 @@ export function LutaHistoria({
         {/* Treino do Ludus: o objetivo e quanto falta */}
         {treino && fase === 'luta' && (
           <span className="absolute left-1/2 top-[30%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-[#c8962a] bg-black/80 px-2 py-1 font-pixel text-[8px] text-[#f2c14e] sm:text-[11px]">
-            🏋️ {treino.rotulo}: {Math.min(feitos, treino.quantos)}/{treino.quantos}
+            {treino.rotulo}: {Math.min(feitos, treino.quantos)}/{treino.quantos}
           </span>
         )}
 
@@ -852,7 +852,7 @@ export function LutaHistoria({
               color: ev.tipo === 'dano' || ev.tipo === 'contra' ? '#ff5a5a' : ev.tipo === 'guarda' || ev.tipo === 'cansado' ? '#bbb' : '#f2c14e',
             }}
           >
-            {ev.tipo === "acerto" || ev.tipo === "dano" ? (ev.valor ? `-${ev.valor}` : "🛡 NADA ENTRA!") : TEXTO[ev.tipo]}
+            {ev.tipo === "acerto" || ev.tipo === "dano" ? (ev.valor ? `-${ev.valor}` : "NADA ENTRA!") : TEXTO[ev.tipo]}
           </span>
         ))}
 
@@ -954,7 +954,7 @@ export function LutaHistoria({
           className={`pixel-box select-none py-3 font-pixel text-[10px] text-[#ffe08a] disabled:opacity-40 sm:text-xs ${podeLuz && !aceso ? 'animate-pulse' : ''}`}
           style={{ boxShadow: '0 0 0 2px #ffe08a' }}
         >
-          ☀️ LUZ {aceso ? '(ACESA)' : podeLuz ? '(PRONTA: toque para ver o sinal)' : '(recarregando...)'} · tecla U
+          LUZ {aceso ? '(ACESA)' : podeLuz ? '(PRONTA: toque para ver o sinal)' : '(recarregando...)'} · tecla U
         </button>
       )}
       {bot.dica && (
@@ -963,7 +963,7 @@ export function LutaHistoria({
         </p>
       )}
       <p className="dica-luta text-center text-[10px] text-muted">
-        Amarelo: {bot.escudo[0]} · Vermelho: {bot.esquiva[0]} · {bot.golpe[0]} no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas · teclado: J, K, L e espaço
+        Amarelo: {bot.escudo[1]} · Vermelho: {bot.esquiva[1]} · {bot.golpe[1]} no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas · teclado: J, K, L e espaço
       </p>
     </div>
   );

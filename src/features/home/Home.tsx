@@ -105,7 +105,7 @@ function PortalArcade({ rota, frase }: { rota: string; frase: string }) {
     >
       <div className="tela-crt pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative flex flex-col items-center gap-4 text-center">
-        <p className="font-pixel text-[9px] tracking-[0.3em] text-accent-2 sm:text-[10px]">★ 1 OU 2 JOGADORES ★</p>
+        <p className="font-pixel text-[9px] tracking-[0.3em] text-accent-2 sm:text-[10px]">1 OU 2 JOGADORES </p>
         <h2 className="neon letreiro font-pixel text-2xl leading-snug text-accent sm:text-4xl">Imperium Arcade</h2>
         <p className="-mt-2 font-pixel text-[8px] tracking-[0.2em] text-[rgb(242_193_78)] sm:text-[10px]">ONDE AS LENDAS DO COLISEU GANHAM VIDA</p>
         <div className="flex items-end gap-4 sm:gap-10">

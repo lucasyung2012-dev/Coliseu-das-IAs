@@ -139,11 +139,11 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🎯 {fase.objetivo}</p>
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">{fase.objetivo}</p>
         <p className="font-pixel text-[9px] text-white sm:text-[10px]" aria-label={`Coletados: ${s.coletados.length} de ${fase.coletaveis.length}`}>
           {fase.coletaveis.map((c) => (
             <span key={c.id} className={s.coletados.includes(c.id) ? 'recurso-cheio' : 'opacity-25 grayscale'}>
-              {c.icone}
+              <Icone nome="livro" className="inline-block w-4 sm:w-5" />
             </span>
           ))}
         </p>
@@ -209,7 +209,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           {fase.coletaveis.map((c) =>
             s.coletados.includes(c.id) ? null : (
               <span key={c.id} className="coletavel-fase absolute text-lg sm:text-3xl" style={{ left: emX(c.x), bottom: emY(c.y) }} title={c.nome} aria-label={c.nome}>
-                {c.icone}
+                <Icone nome="livro" className="w-6 sm:w-10" />
               </span>
             ),
           )}
@@ -222,17 +222,13 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                   <Retrato quem={c.personagem} espelhar={s.x < c.x} />
                 </div>
               </div>
-            ) : c.icone ? (
-              <span key={c.id} className="absolute -translate-x-1/2 text-xl opacity-80 sm:text-3xl" style={{ left: emX(c.x), bottom: emY(20) }} aria-hidden>
-                {c.icone}
-              </span>
             ) : null,
           )}
 
           {/* A saída */}
           <div className="absolute -translate-x-1/2 text-center" style={{ left: emX(fase.saida.x), bottom: `${CHAO}%` }}>
             <span className={`block text-2xl sm:text-4xl ${aberta ? 'piscar' : ''}`} aria-hidden>
-              {aberta ? '🚪' : '🔒'}
+              {aberta ? '' : ''}
             </span>
             <span className="placa-ponto block whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px]">
               {aberta ? fase.saida.rotulo : `SALVE ${fase.precisa} LIVROS`}
@@ -271,7 +267,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
 
         {acabou && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/75 p-3 text-center">
-            <p className="font-pixel text-sm text-[#f2c14e] sm:text-xl">📚 {s.coletados.length} DE {fase.coletaveis.length} LIVROS SALVOS!</p>
+            <p className="font-pixel text-sm text-[#f2c14e] sm:text-xl">{s.coletados.length} DE {fase.coletaveis.length} LIVROS SALVOS!</p>
             <p className="text-sm text-white/80">{s.coletados.length === fase.coletaveis.length ? 'Todos! O Guardião Zero ficaria orgulhoso.' : 'Os que ficaram para trás viraram cinza... mas esses, ninguém apaga.'}</p>
             <button type="button" autoFocus onClick={onFim} className="pixel-box px-4 py-2 font-pixel text-[10px] text-[#f2c14e]">
               SEGUIR ▶
