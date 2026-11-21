@@ -50,7 +50,7 @@ describe('App', () => {
     // O prólogo é uma cutscene (o texto aparece letra por letra); dá para pular.
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
     expect(screen.getByRole('button', { name: /OCTAVIUS/ })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /HELIOS/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /HELIOS/ })).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: /CASSIUS/ }));
     expect(screen.getByText('A NOITE DAS CHAMAS')).toBeInTheDocument();
     // O save foi criado e aparece na lista ao voltar.

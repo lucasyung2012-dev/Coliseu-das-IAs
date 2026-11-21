@@ -49,7 +49,8 @@ export type SomHistoria =
   | 'quebra'
   | 'plano'
   | 'aliado'
-  | 'guarda';
+  | 'guarda'
+  | 'reflexo';
 
 type Audio = { c: AudioContext; saida: GainNode };
 
@@ -326,6 +327,13 @@ const SONS: Record<SomHistoria, (a: Audio) => void> = {
   aliado: (a) => {
     SONS.trombeta(a);
     SONS.especial(a);
+  },
+  reflexo: (a) => {
+    // Espelho de Sol: um brilho que sobe e o golpe voltando.
+    const e = eco(a, 0.09, 0.4);
+    [NOTA.A5, NOTA.D5, NOTA.A4].forEach((f, i) => nota(a, { freq: f * 2, dur: 0.4, tipo: 'sine', vol: 0.08, atraso: i * 0.04 }, e));
+    metal(a, 700, 0.5, 0.1);
+    baque(a, 110, 0.4, 0.08, 0.2);
   },
   guarda: (a) => {
     nota(a, { freq: 300, dur: 0.06, tipo: 'square', vol: 0.06, corte: 1200 });

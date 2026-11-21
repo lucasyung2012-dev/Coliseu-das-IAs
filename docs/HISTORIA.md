@@ -191,13 +191,29 @@ Total do caminho: **22 batalhas, 4 chefões e o final**. Cada capítulo tem **in
 
 **Capítulo 2: As Galés.** Acorrentado no porão, remando no ritmo do Feitor do Tambor. Conhece os remadores esquecidos, entre eles o **Vovô Pistão**, uma IA de remo presa ali há quarenta anos. A Gaivota Sete rouba a chave. Plano: motim. Lutas pelo porão e pela cozinha, a tempestade no convés (amarrar as cordas antes de cada onda), o Capataz, e o Feitor do Tambor, que ataca no ritmo do tambor. O navio afunda perto de Roma; o Vovô Pistão empurra o Octavius para fora. Na praia, a Guarda o encontra e o leva para o Ludus.
 
-### 5.3 Caminho do Helios: "As Três Estrelas" (resumo)
-1. **O Céu Proibido** (Observatório): o Censor manda destruir os telescópios, porque "as estrelas dão ideias". Lutas contra os **Apagadores de Estrelas**, drones que escurecem tudo. Chefão: o **Eclipse**, uma máquina-escudo que bloqueia a luz (luta no escuro, usando a luz como arma).
-2. **Fuga pelos Telhados:** perseguição pelos telhados de Roma à noite. É capturado de propósito, porque a profecia mandava.
-3. **O Ludus:** o primeiro a chegar. Ele já "sabe" que os outros vêm (o mesmo capítulo dos outros caminhos, visto por ele).
-4. **O Aqueduto:** atravessar o aqueduto até o Templo de Apolo. Desafios de **refletir a luz** com espelhos. Chefão: o **Guardião do Aqueduto**.
-5. **O Oráculo de Bronze** (Templo de Apolo): a Sibila revela o significado real da profecia e o **ponto fraco do Censor**: o núcleo dele fica no **Hipogeu**, os túneis debaixo da arena. Chefão: a **Sibila Corrompida**, a cópia do Censor dentro do templo.
-6. **Noite de Eclipse** (Coliseu): lutas na arena sob o eclipse. Vai para o final.
+### 5.3 Caminho do Helios: "As Três Estrelas" (aprovado pelo Lucas em 21/11/2026)
+
+| | Cassius | Octavius | **Helios** |
+|---|---|---|---|
+| Jeito | sério, protege | engraçado, planos | **misterioso, calmo, parece saber o futuro** |
+| Aliada | Lívia (menina) | Marco Remo (capitão velho) | **A Sibila**, a velha guardiã cega do Templo de Apolo, que fala por enigmas |
+| Mascote | — | Gaivota Sete | **Lumen**, uma coruja mecânica de bronze que enxerga no escuro |
+| Golpe do Ludus | contra-ataque, quebra-guarda | esquiva dupla | **ESPELHO DE SOL**: levantar o escudo bem na hora do golpe reflete o ataque de volta (até o fogo) |
+| Como luta | escudo e contra-ataque | planos do cenário | **LUZ**: nas lutas no escuro, o botão ☀️ LUZ ilumina a arena por alguns segundos e mostra o sinal do inimigo |
+
+**As batalhas do caminho** (pedido do Lucas: mais lutas): **28 lutas, 5 chefões e o final**, sempre com cena, exploração ou minigame entre uma luta e outra.
+
+| Capítulo | Onde | Lutas | Chefão | Minigames |
+|---|---|---|---|---|
+| 1. O Céu Proibido | Observatório | 5 (Apagadores de Estrelas, Morcegos, Pretorianos Noturnos) | **O Eclipse** (luta no escuro) | apontar o telescópio |
+| 2. Fuga pelos Telhados | telhados de Roma à noite | 5 | **O Caçador de Sombras** (no escuro) | saltar de telhado em telhado |
+| 3. O Ludus | Ludus (a mesma noite, vista por ele) | 3 | — | **Espelhos de Bronze**, **O Mapa do Céu** e o minigame dos três |
+| 4. O Aqueduto | o aqueduto até o Templo | 5 | **O Guardião do Aqueduto** | refletir a luz com espelhos |
+| 5. O Oráculo de Bronze | Templo de Apolo | 5 | **A Sibila Corrompida** | os enigmas da Sibila |
+| 6. Noite de Eclipse | Coliseu, sob o eclipse | 5 | **O Gigante das Sombras** (no escuro) | guiar a luz no escuro (espelhos) |
+| Final | Coliseu | — | o Censor (com o Cassius e o Octavius) | — |
+
+No Capítulo 5, a Sibila revela o **ponto fraco do Censor**: o núcleo dele fica no **Hipogeu**, debaixo da arena (prepara o capítulo secreto).
 
 ### 5.4 O final: A Queda do Censor (Coliseu, nos três caminhos)
 - **Cutscene:** os três entram na arena juntos. O Censor desce do camarote e **se monta numa forma gigante**, um titã enferrujado feito das peças do próprio Coliseu.

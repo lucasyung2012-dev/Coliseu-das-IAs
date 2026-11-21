@@ -1,0 +1,645 @@
+/*
+ * Animações de ambiente dos cenários do quinto bloco de capítulos (320 × 180): o caminho do Helios
+ * pelo Observatório, pelos telhados, pelo aqueduto, pelo Templo de Apolo e pelo Coliseu no eclipse.
+ * Toda classe e todo keyframe começam com "c5-" para não colidir com o resto do jogo.
+ * Atenção: animar opacity num elemento sobrescreve o atributo opacity dele;
+ * por isso as classes que mexem em opacity vão em grupos (<g>) ou em retângulos sem opacity própria.
+ * Nos elementos de SVG, px nas transformações vale como unidade do desenho.
+ */
+
+/* Halo de luz respirando devagar */
+.c5-pulsar {
+  animation: c5-pulsar 2.6s ease-in-out infinite alternate;
+}
+@keyframes c5-pulsar {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Luz de vela, tocha e brasa tremendo */
+.c5-tremor {
+  animation: c5-tremor 0.9s steps(3) infinite alternate;
+}
+@keyframes c5-tremor {
+  0% {
+    opacity: 0.7;
+  }
+  40% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.95;
+  }
+}
+
+/* Olho do Censor brilhando */
+.c5-olho {
+  animation: c5-olho 2.4s steps(3) infinite alternate;
+}
+@keyframes c5-olho {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Engrenagens e rodas girando (a origem vem no estilo, em unidades do desenho) */
+.c5-gira {
+  animation: c5-gira 12s steps(48) infinite;
+}
+@keyframes c5-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estrela piscando */
+.c5-estrela {
+  animation: c5-estrela 3.4s steps(2) infinite alternate;
+}
+@keyframes c5-estrela {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Chama de vela: estica pela base, em passos (retrô) */
+.c5-vela {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c5-vela 0.6s steps(2) infinite alternate;
+}
+@keyframes c5-vela {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(0.8, 1.3);
+  }
+}
+
+/* Labareda (tocha, carta queimando) */
+.c5-chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c5-chama 0.45s steps(2) infinite alternate;
+}
+@keyframes c5-chama {
+  from {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.9, 1.25);
+    opacity: 0.85;
+  }
+}
+
+/* Fumaça de chaminé e de incêndio subindo devagar e sumindo */
+.c5-fumaca {
+  opacity: 0;
+  animation: c5-fumaca 5s steps(20) infinite;
+}
+@keyframes c5-fumaca {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(7px, -30px);
+    opacity: 0;
+  }
+}
+
+/* Fio de vapor ou de fumaça de vela apagada: sobe rápido e some */
+.c5-vapor {
+  opacity: 0;
+  animation: c5-vapor 2.8s steps(14) infinite;
+}
+@keyframes c5-vapor {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(1px, -12px);
+    opacity: 0;
+  }
+}
+
+/* Vapor do oráculo: sobe alto e devagar, torcendo um pouco */
+.c5-exalar {
+  opacity: 0;
+  animation: c5-exalar 6s steps(30) infinite;
+}
+@keyframes c5-exalar {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(-4px, -22px);
+  }
+  100% {
+    transform: translate(2px, -46px);
+    opacity: 0;
+  }
+}
+
+/* Incenso: sobe em fita, balançando de um lado para o outro */
+.c5-incenso {
+  opacity: 0;
+  animation: c5-incenso 7s steps(28) infinite;
+}
+@keyframes c5-incenso {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  40% {
+    transform: translate(3px, -20px);
+  }
+  70% {
+    transform: translate(-2px, -38px);
+  }
+  100% {
+    transform: translate(4px, -54px);
+    opacity: 0;
+  }
+}
+
+/* Rastro de fumaça do drone: cai e some */
+.c5-rastro {
+  opacity: 0;
+  animation: c5-rastro 2.4s steps(12) infinite;
+}
+@keyframes c5-rastro {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(-4px, 12px);
+    opacity: 0;
+  }
+}
+
+/* Faísca que salta para a direita e cai apagando */
+.c5-faisca {
+  opacity: 0;
+  animation: c5-faisca 1.6s steps(10) infinite;
+}
+@keyframes c5-faisca {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(4px, -5px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(9px, 14px);
+    opacity: 0;
+  }
+}
+
+/* Faísca que salta para a esquerda */
+.c5-faisca-volta {
+  opacity: 0;
+  animation: c5-faisca-volta 1.8s steps(10) infinite;
+}
+@keyframes c5-faisca-volta {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  30% {
+    transform: translate(-4px, -6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-8px, 16px);
+    opacity: 0;
+  }
+}
+
+/* Drone de fumaça pairando */
+.c5-drone {
+  animation: c5-drone 3s steps(6) infinite alternate;
+}
+@keyframes c5-drone {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(3px, -2px);
+  }
+  100% {
+    transform: translate(-2px, 2px);
+  }
+}
+
+/* Luz de alarme vermelha piscando */
+.c5-alerta {
+  animation: c5-alerta 0.9s steps(2) infinite alternate;
+}
+@keyframes c5-alerta {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Planeta do planetário andando na elipse: começa na ponta direita da órbita;
+ * --rx e --ry (raios, em unidades do desenho) vêm no estilo de cada planeta.
+ */
+.c5-orbita {
+  animation: c5-orbita 10s linear infinite;
+}
+@keyframes c5-orbita {
+  0% {
+    transform: translate(0, 0);
+  }
+  12.5% {
+    transform: translate(calc(var(--rx) * -0.293), calc(var(--ry) * 0.707));
+  }
+  25% {
+    transform: translate(calc(var(--rx) * -1), var(--ry));
+  }
+  37.5% {
+    transform: translate(calc(var(--rx) * -1.707), calc(var(--ry) * 0.707));
+  }
+  50% {
+    transform: translate(calc(var(--rx) * -2), 0);
+  }
+  62.5% {
+    transform: translate(calc(var(--rx) * -1.707), calc(var(--ry) * -0.707));
+  }
+  75% {
+    transform: translate(calc(var(--rx) * -1), calc(var(--ry) * -1));
+  }
+  87.5% {
+    transform: translate(calc(var(--rx) * -0.293), calc(var(--ry) * -0.707));
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Feixe de luz (luar, raios do sol, espelhos, holofote) respirando */
+.c5-feixe {
+  animation: c5-feixe 5s ease-in-out infinite alternate;
+}
+@keyframes c5-feixe {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Nuvens e fumaça do alto andando devagar */
+.c5-nuvem {
+  animation: c5-nuvem 40s steps(30) infinite alternate;
+}
+@keyframes c5-nuvem {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-24px);
+  }
+}
+
+/* Dirigível de patrulha do Censor indo e voltando */
+.c5-patrulha {
+  animation: c5-patrulha 30s steps(60) infinite alternate;
+}
+@keyframes c5-patrulha {
+  from {
+    transform: translateX(-40px);
+  }
+  to {
+    transform: translateX(20px);
+  }
+}
+
+/* Roupa no varal balançando no vento */
+.c5-roupa {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c5-roupa 2.4s steps(3) infinite alternate;
+}
+@keyframes c5-roupa {
+  from {
+    transform: skewX(-6deg);
+  }
+  to {
+    transform: skewX(6deg);
+  }
+}
+
+/* Lanterna da ronda andando lá embaixo no beco */
+.c5-ronda {
+  animation: c5-ronda 9s steps(18) infinite alternate;
+}
+@keyframes c5-ronda {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(14px);
+  }
+}
+
+/* Olhos do gato que piscam de vez em quando */
+.c5-piscar {
+  animation: c5-piscar 5s steps(1) infinite;
+}
+@keyframes c5-piscar {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0;
+  }
+  97% {
+    opacity: 1;
+  }
+}
+
+/* Névoa da manhã sobre a cidade */
+.c5-neblina {
+  animation: c5-neblina 18s ease-in-out infinite alternate;
+}
+@keyframes c5-neblina {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(16px);
+  }
+}
+
+/* Água correndo no canal: as listras andam 16 px (o espaço entre elas) e recomeçam */
+.c5-correr {
+  animation: c5-correr 1.6s steps(8) infinite;
+}
+@keyframes c5-correr {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(16px);
+  }
+}
+
+/* Copa da oliveira balançando com o vento */
+.c5-folha {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c5-folha 3.6s steps(3) infinite alternate;
+}
+@keyframes c5-folha {
+  from {
+    transform: skewX(-2deg);
+  }
+  to {
+    transform: skewX(2deg);
+  }
+}
+
+/* Folha caindo da oliveira, rodopiando até o chão */
+.c5-cair {
+  opacity: 0;
+  animation: c5-cair 9s steps(36) infinite;
+}
+@keyframes c5-cair {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  35% {
+    transform: translate(6px, 20px);
+  }
+  65% {
+    transform: translate(-2px, 44px);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(8px, 66px);
+    opacity: 0;
+  }
+}
+
+/* Poeira dourada flutuando no feixe de luz */
+.c5-poeira {
+  animation: c5-poeira 4.2s steps(8) infinite alternate;
+}
+@keyframes c5-poeira {
+  from {
+    transform: translate(0, 0);
+    opacity: 0.2;
+  }
+  to {
+    transform: translate(2px, -3px);
+    opacity: 1;
+  }
+}
+
+/* Coroa do eclipse pulsando em volta do sol negro */
+.c5-coroa {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: c5-coroa 4s ease-in-out infinite alternate;
+}
+@keyframes c5-coroa {
+  from {
+    transform: scale(0.94);
+    opacity: 0.75;
+  }
+  to {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* Plateia mexendo a cabeça */
+.c5-multidao {
+  animation: c5-multidao 1.4s steps(1) infinite;
+}
+@keyframes c5-multidao {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Faixas de sombra do eclipse ondulando pela areia */
+.c5-faixas {
+  animation: c5-faixas 3s steps(6) infinite alternate;
+}
+@keyframes c5-faixas {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(24px, 3px);
+  }
+}
+
+/* Pássaros cruzando o céu, subindo e descendo */
+.c5-passaro {
+  animation: c5-passaro 20s linear infinite;
+}
+@keyframes c5-passaro {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(90px, -5px);
+  }
+  50% {
+    transform: translate(180px, 3px);
+  }
+  75% {
+    transform: translate(270px, -4px);
+  }
+  100% {
+    transform: translate(370px, 2px);
+  }
+}
+
+/* Asas batendo (vira de cabeça para baixo pela base) */
+.c5-asa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c5-asa 0.35s steps(1) infinite;
+}
+@keyframes c5-asa {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(-1);
+  }
+}
+
+/* Faísca de brilho (vidro, água, anel de diamante) que acende de vez em quando */
+.c5-brilho {
+  opacity: 0;
+  animation: c5-brilho 3.2s steps(1) infinite;
+}
+@keyframes c5-brilho {
+  0%,
+  78% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  84% {
+    opacity: 1;
+  }
+  90%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Menos movimento: tudo parado, no estado mais legível */
+.menos-movimento .c5-pulsar,
+.menos-movimento .c5-tremor,
+.menos-movimento .c5-olho,
+.menos-movimento .c5-gira,
+.menos-movimento .c5-estrela,
+.menos-movimento .c5-vela,
+.menos-movimento .c5-chama,
+.menos-movimento .c5-fumaca,
+.menos-movimento .c5-vapor,
+.menos-movimento .c5-exalar,
+.menos-movimento .c5-incenso,
+.menos-movimento .c5-rastro,
+.menos-movimento .c5-faisca,
+.menos-movimento .c5-faisca-volta,
+.menos-movimento .c5-drone,
+.menos-movimento .c5-alerta,
+.menos-movimento .c5-orbita,
+.menos-movimento .c5-feixe,
+.menos-movimento .c5-nuvem,
+.menos-movimento .c5-patrulha,
+.menos-movimento .c5-roupa,
+.menos-movimento .c5-ronda,
+.menos-movimento .c5-piscar,
+.menos-movimento .c5-neblina,
+.menos-movimento .c5-correr,
+.menos-movimento .c5-folha,
+.menos-movimento .c5-cair,
+.menos-movimento .c5-poeira,
+.menos-movimento .c5-coroa,
+.menos-movimento .c5-multidao,
+.menos-movimento .c5-faixas,
+.menos-movimento .c5-passaro,
+.menos-movimento .c5-asa,
+.menos-movimento .c5-brilho {
+  animation: none;
+}
+.menos-movimento .c5-fumaca,
+.menos-movimento .c5-vapor,
+.menos-movimento .c5-exalar,
+.menos-movimento .c5-incenso,
+.menos-movimento .c5-rastro {
+  opacity: 0.5;
+}
+.menos-movimento .c5-faisca,
+.menos-movimento .c5-faisca-volta,
+.menos-movimento .c5-brilho,
+.menos-movimento .c5-cair {
+  opacity: 0;
+}

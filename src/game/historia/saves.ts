@@ -41,7 +41,7 @@ export const FERREIRO: { id: Equipamento; nome: string; icone: string; custo: nu
 ];
 
 /** Caminhos que já dá para jogar. */
-export const CAMINHOS_ABERTOS: IaId[] = ['claude', 'chatgpt'];
+export const CAMINHOS_ABERTOS: IaId[] = ['claude', 'chatgpt', 'gemini'];
 
 export const NOME_DO_CAMINHO: Record<IaId, string> = {
   claude: 'Os Livros Não Queimam',

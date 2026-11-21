@@ -3,6 +3,7 @@ import type { SomHistoria } from '@/ui/somHistoria';
 import type { Tecnica } from './luta';
 import type { Equipamento } from './saves';
 import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP4_OCTAVIUS, CAP5_OCTAVIUS, CAP6_OCTAVIUS, FINAL_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
+import { CAP1_HELIOS, CAP2_HELIOS, CAP3_HELIOS, CAP4_HELIOS, CAP5_HELIOS, CAP6_HELIOS, FINAL_HELIOS } from './roteiro3';
 
 /**
  * O roteiro do modo História em forma de dados (docs/HISTORIA.md): cada capítulo é
@@ -44,7 +45,12 @@ export type Falante =
   | 'rufus'
   | 'caio'
   | 'cobrador'
-  | 'imediato';
+  | 'imediato'
+  | 'sibila'
+  | 'lumen'
+  | 'cacador'
+  | 'guardiao'
+  | 'sacerdote';
 
 export interface Fala {
   quem: Falante;
@@ -92,7 +98,14 @@ export type Lugar =
   | 'cofre-cobrador'
   | 'frota-noite'
   | 'mar-batalha'
-  | 'coliseu-inundado';
+  | 'coliseu-inundado'
+  | 'observatorio-dentro'
+  | 'observatorio-ataque'
+  | 'telhados-noite'
+  | 'aqueduto'
+  | 'templo-apolo'
+  | 'templo-oraculo'
+  | 'coliseu-eclipse';
 
 /** Um personagem em cena numa cutscene. */
 export interface EmCena {
@@ -159,7 +172,7 @@ export type Cena = (
       tipo: 'desafio';
       id: string;
       lugar: Lugar;
-      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas' | 'forja' | 'memoria' | 'corrida' | 'torre' | 'trio' | 'remar' | 'tempestade' | 'perseguicao' | 'canhoes' | 'estrelas' | 'barcos';
+      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas' | 'forja' | 'memoria' | 'corrida' | 'torre' | 'trio' | 'remar' | 'tempestade' | 'perseguicao' | 'canhoes' | 'estrelas' | 'barcos' | 'telescopio' | 'saltos' | 'espelhos' | 'mapa-ceu' | 'enigmas';
       antes?: Fala[];
       /** Falas ao vencer (furtivo, ritmo, proteger, armadilhas). */
       depois?: Fala[];
@@ -168,6 +181,8 @@ export type Cena = (
       objetivo?: string;
       acao?: string;
       quantos?: number;
+      /** Espelhos: o nível (1 a 3). */
+      nivel?: number;
     }
   | {
       tipo: 'ludus';
@@ -243,6 +258,11 @@ export const NOMES: Record<Falante, string> = {
   caio: 'Caio',
   cobrador: 'O Cobrador',
   imediato: 'Imediato de Ferro',
+  sibila: 'A Sibila',
+  lumen: 'Lumen',
+  cacador: 'O Caçador de Sombras',
+  guardiao: 'O Guardião do Aqueduto',
+  sacerdote: 'Sacerdote de Bronze',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -1001,5 +1021,5 @@ const CAP2_CASSIUS: Capitulo = {
 export const CAPITULOS: Record<IaId, Capitulo[]> = {
   claude: [CAP1_CASSIUS, CAP2_CASSIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS],
   chatgpt: [CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP4_OCTAVIUS, CAP5_OCTAVIUS, CAP6_OCTAVIUS, FINAL_OCTAVIUS],
-  gemini: [],
+  gemini: [CAP1_HELIOS, CAP2_HELIOS, CAP3_HELIOS, CAP4_HELIOS, CAP5_HELIOS, CAP6_HELIOS, FINAL_HELIOS],
 };

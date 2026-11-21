@@ -17,6 +17,7 @@ import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from
 import { Ludus } from './Ludus';
 import { EscolhaRota } from './EscolhaRota';
 import { MinigameBarcos, MinigameCanhoes, MinigameEstrelas, MinigamePerseguicao } from './MinigamesOctavius';
+import { MinigameEnigmas, MinigameEspelhos, MinigameMapaCeu, MinigameSaltos, MinigameTelescopio } from './MinigamesHelios';
 import { MinigameCorrida, MinigameForja, MinigameMemoria, MinigameTorre, MinigameTrio } from './MinigamesLudus';
 import { DesafioRemar, DesafioTempestade } from './MinigamesMar';
 
@@ -318,6 +319,12 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'telescopio') return <MinigameTelescopio lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'saltos') return <MinigameSaltos lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'espelhos')
+    return <MinigameEspelhos lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} nivel={cena.nivel} titulo={cena.objetivo} onFim={() => proxima()} />;
+  if (cena.desafio === 'mapa-ceu') return <MinigameMapaCeu lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'enigmas') return <MinigameEnigmas lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'perseguicao') return <MinigamePerseguicao lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'canhoes') return <MinigameCanhoes lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'estrelas') return <MinigameEstrelas lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;

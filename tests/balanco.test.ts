@@ -62,7 +62,7 @@ const ATRIBUTOS: Record<number, AtributosLuta> = {
   7: { vida: 140, forca: 3, defesa: 3, carisma: 2, tecnicas: ['contra-ataque', 'quebra-guarda'] },
 };
 
-const lutas = [...CAPITULOS.claude, ...CAPITULOS.chatgpt].flatMap((cap) =>
+const lutas = [...CAPITULOS.claude, ...CAPITULOS.chatgpt, ...CAPITULOS.gemini].flatMap((cap) =>
   cap.cenas.flatMap((c) => (c.tipo === 'luta' ? [{ cap: cap.numero, inimigo: c.inimigo }] : [])),
 );
 

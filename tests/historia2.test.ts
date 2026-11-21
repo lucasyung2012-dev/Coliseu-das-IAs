@@ -107,7 +107,7 @@ describe('os capítulos', () => {
 
   it('nunca duas lutas seguidas sem nada no meio (pedido do Lucas)', () => {
     // Em capítulos com ESCOLHA, cada rota é conferida separada (só as cenas daquela rota).
-    for (const cap of [...CAPITULOS.claude, ...CAPITULOS.chatgpt]) {
+    for (const cap of [...CAPITULOS.claude, ...CAPITULOS.chatgpt, ...CAPITULOS.gemini]) {
       for (const esc of versoes(cap)) {
         const cenas = cap.cenas.filter((c) => cenaValida(c, esc));
         cenas.forEach((c, k) => {
@@ -202,5 +202,44 @@ describe('os capítulos', () => {
     expect(cap.cenas.some((c) => c.tipo === 'desafio' && c.desafio === 'escolher-plano')).toBe(true);
     const lutas = cap.cenas.filter((c) => c.tipo === 'luta');
     expect(lutas[lutas.length - 1]).toMatchObject({ inimigo: 'almirante-ferrugem' });
+  });
+});
+
+describe('o caminho do Helios', () => {
+  it('6 capítulos e o final; 5 lutas por capítulo (3 no Ludus) além dos chefões, e alguns no escuro', () => {
+    const caps = CAPITULOS.gemini;
+    expect(caps.map((c) => c.numero)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    const comuns = (n: number) => caps[n - 1]!.cenas.filter((c) => c.tipo === 'luta' && !INIMIGOS[c.inimigo]!.chefao).length;
+    expect([1, 2, 3, 4, 5, 6].map(comuns)).toEqual([5, 5, 3, 5, 5, 5]);
+    const chefes = caps.flatMap((c) => c.cenas).flatMap((c) => (c.tipo === 'luta' && INIMIGOS[c.inimigo]!.chefao ? [c.inimigo] : []));
+    expect(chefes).toEqual(['eclipse', 'cacador-sombras', 'guardiao-aqueduto', 'sibila-corrompida', 'gigante-sombras', 'censor-tita-helios']);
+    expect(INIMIGOS.eclipse!.escuro).toBe(true);
+  });
+
+  it('o Ludus do Helios ensina o ESPELHO DE SOL e tem os minigames dele', () => {
+    const cap = CAPITULOS.gemini[2]!;
+    expect(cap.cenas.some((c) => c.tipo === 'ludus' && c.obrigatorio === 'espelho-de-sol')).toBe(true);
+    const desafios = cap.cenas.flatMap((c) => (c.tipo === 'desafio' ? [c.desafio] : []));
+    expect(desafios).toEqual(expect.arrayContaining(['espelhos', 'mapa-ceu', 'trio']));
+  });
+
+  it('ESPELHO DE SOL: escudo bem na hora reflete até o fogo; escudo cedo demais não', () => {
+    const a = { ...ATRIBUTOS_INICIAIS, tecnicas: ['espelho-de-sol' as const] };
+    const def = { id: 't', nome: 'T', vida: 100, fases: [{ ataques: [{ nome: 'F', tipo: 'fogo' as const, sinalMs: 900, dano: 20, abertoMs: 900 }], pausaMs: [800, 800] as [number, number] }] };
+    const ate = (s: EstadoLuta, faltam: number) => {
+      let r = s;
+      for (let i = 0; i < 300 && !(r.inimigo.estado === 'sinal' && r.tempo + faltam >= r.inimigo.estadoAte); i++) r = passoLuta(r, a, () => 0);
+      return r;
+    };
+    const impacto = (s: EstadoLuta) => {
+      let r = s;
+      for (let i = 0; i < 300 && r.inimigo.estado === 'sinal'; i++) r = passoLuta(r, a, () => 0);
+      return r;
+    };
+    const naHora = impacto(agir(ate(novaLuta(def, a), 150), 'escudo', a));
+    expect(naHora.jogador.vida).toBe(100);
+    expect(naHora.inimigo.vida).toBe(84);
+    const cedo = impacto(agir(ate(novaLuta(def, a), 400), 'escudo', a));
+    expect(cedo.jogador.vida).toBeLessThan(100);
   });
 });

@@ -66,17 +66,19 @@ export interface DefInimigo {
   aliados?: string[];
   /** Peças de máquina que ele deixa para o ferreiro (padrão: 2; chefão: 6). */
   pecas?: number;
+  /** Luta no escuro (Helios): a tela fica escura e o sinal só aparece com a LUZ. */
+  escuro?: boolean;
 }
 
 /** Golpes que o Brutus ensina no Ludus. */
-export type Tecnica = 'contra-ataque' | 'quebra-guarda' | 'esquiva-dupla';
+export type Tecnica = 'contra-ataque' | 'quebra-guarda' | 'esquiva-dupla' | 'espelho-de-sol';
 
 export type AcaoJogador = 'parado' | 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'ferido';
 export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado';
 
 export interface EventoLuta {
   id: number;
-  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado' | 'riposta' | 'quebra' | 'aliado' | 'plano';
+  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado' | 'riposta' | 'quebra' | 'aliado' | 'plano' | 'reflexo';
   valor?: number;
   lado: 'jogador' | 'inimigo';
   ate: number;
@@ -264,6 +266,14 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
     return { ...r, inimigo: { ...r.inimigo, estado: 'espera', ataque: r.inimigo.ataque + 1, proximoEm: s.tempo + fase.pausaMs[0] * 0.5 } };
   }
   const fazendo = s.tempo < j.acaoAte ? j.acao : 'parado';
+  // ESPELHO DE SOL (Helios): escudo levantado bem na hora do golpe (até 260 ms antes) reflete o
+  // ataque, até o fogo e a investida. O inimigo leva o golpe de volta e fica tonto.
+  if (fazendo === 'escudo' && a.tecnicas?.includes('espelho-de-sol') && s.tempo - j.acaoDesde <= 260) {
+    let r = bater(s, at.dano * 0.8 * (1 + (a.forca - 1) * 0.2));
+    r = ganharAnimo(evento(r, 'reflexo', 'inimigo'), 12, a);
+    if (r.fim) return r;
+    return protegerCombo(depoisDoGolpe(r, at, at.abertoMs + 300), 'escudo');
+  }
   if (fazendo === 'esquiva' || fazendo === 'especial') {
     // Esquivou: escapa de tudo; no último golpe do combo, ele fica mais tempo aberto.
     const esquivou = ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a);

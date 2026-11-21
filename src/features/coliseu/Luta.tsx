@@ -89,6 +89,32 @@ import {
   TRITAO_MECANICO,
   VIGIA_TELHADO,
 } from '@/ui/pixel/historia4';
+import {
+  APAGADOR,
+  APAGADOR_GRANDE,
+  CACADOR_SOMBRAS,
+  ECLIPSE,
+  ESTATUA_VIVA,
+  GIGANTE_SOMBRAS,
+  GUARDA_AQUEDUTO,
+  GUARDIAO_AQUEDUTO,
+  MORCEGO_MECANICO,
+  PALETA_APAGADOR,
+  PALETA_APAGADOR_GRANDE,
+  PALETA_CACADOR,
+  PALETA_ESTATUA,
+  PALETA_GUARDA_AQUEDUTO,
+  PALETA_MORCEGO,
+  PALETA_PRETORIANO_NOTURNO,
+  PALETA_SACERDOTE,
+  paletaEclipse,
+  paletaGiganteSombras,
+  paletaGuardiaoAqueduto,
+  paletaSibilaCorrompida,
+  PRETORIANO_NOTURNO,
+  SACERDOTE_BRONZE,
+  SIBILA_CORROMPIDA,
+} from '@/ui/pixel/historia5';
 import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
@@ -147,17 +173,50 @@ const VISUAL: Record<string, { grade: string[]; paleta: Paleta; largura: number 
   mergulhador: { grade: MERGULHADOR, paleta: PALETA_MERGULHADOR, largura: 17 },
   'mergulhador-elite': { grade: MERGULHADOR, paleta: { ...PALETA_MERGULHADOR, E: '#ffd04a' }, largura: 18 },
   'campeao-naval': { grade: CAMPEAO_NAVAL, paleta: PALETA_CAMPEAO_NAVAL, largura: 20 },
+  apagador: { grade: APAGADOR, paleta: PALETA_APAGADOR, largura: 15 },
+  'morcego-mecanico': { grade: MORCEGO_MECANICO, paleta: PALETA_MORCEGO, largura: 16 },
+  'pretoriano-noturno': { grade: PRETORIANO_NOTURNO, paleta: PALETA_PRETORIANO_NOTURNO, largura: 15 },
+  'apagador-grande': { grade: APAGADOR_GRANDE, paleta: PALETA_APAGADOR_GRANDE, largura: 18 },
+  'morcego-enxame': { grade: MORCEGO_MECANICO, paleta: { ...PALETA_MORCEGO, E: '#ffd04a' }, largura: 20 },
+  'vigia-noturno': { grade: PRETORIANO_NOTURNO, paleta: { ...PALETA_PRETORIANO_NOTURNO, E: '#ffd04a' }, largura: 15 },
+  'morcego-gigante': { grade: MORCEGO_MECANICO, paleta: PALETA_MORCEGO, largura: 22 },
+  'pretoriano-besteiro': { grade: PRETORIANO_NOTURNO, paleta: PALETA_PRETORIANO_NOTURNO, largura: 16 },
+  'cacador-aprendiz': { grade: CACADOR_SOMBRAS, paleta: { ...PALETA_CACADOR, E: '#ffd04a' }, largura: 16 },
+  'gato-telhado': { grade: GATO_FERRO, paleta: { ...PALETA_GATO_FERRO, E: '#ffd04a' }, largura: 20 },
+  'cacador-sombras': { grade: CACADOR_SOMBRAS, paleta: PALETA_CACADOR, largura: 20 },
+  'carcereiro-noturno': { grade: PRETORIANO_NOTURNO, paleta: { ...PALETA_PRETORIANO_NOTURNO, E: '#ff8a3a' }, largura: 16 },
+  'apagador-espiao': { grade: APAGADOR, paleta: PALETA_APAGADOR, largura: 16 },
+  'estatua-treino': { grade: ESTATUA_VIVA, paleta: { ...PALETA_ESTATUA, E: '#ffd04a' }, largura: 17 },
+  'guarda-aqueduto': { grade: GUARDA_AQUEDUTO, paleta: PALETA_GUARDA_AQUEDUTO, largura: 16 },
+  'morcego-aqueduto': { grade: MORCEGO_MECANICO, paleta: PALETA_MORCEGO, largura: 18 },
+  'guarda-comporta': { grade: GUARDA_AQUEDUTO, paleta: { ...PALETA_GUARDA_AQUEDUTO, E: '#ffd04a' }, largura: 17 },
+  'apagador-aqueduto': { grade: APAGADOR_GRANDE, paleta: PALETA_APAGADOR_GRANDE, largura: 18 },
+  'pretoriano-noturno-elite': { grade: PRETORIANO_NOTURNO, paleta: { ...PALETA_PRETORIANO_NOTURNO, E: '#ffd04a' }, largura: 17 },
+  'sacerdote-bronze': { grade: SACERDOTE_BRONZE, paleta: PALETA_SACERDOTE, largura: 15 },
+  'estatua-viva': { grade: ESTATUA_VIVA, paleta: PALETA_ESTATUA, largura: 17 },
+  'sacerdote-incenso': { grade: SACERDOTE_BRONZE, paleta: { ...PALETA_SACERDOTE, E: '#ffd04a' }, largura: 16 },
+  'estatua-arqueira': { grade: ESTATUA_VIVA, paleta: PALETA_ESTATUA, largura: 17 },
+  'sacerdote-supremo': { grade: SACERDOTE_BRONZE, paleta: { ...PALETA_SACERDOTE, E: '#ff3a3a' }, largura: 19 },
+  'apagador-colosso': { grade: APAGADOR_GRANDE, paleta: { ...PALETA_APAGADOR_GRANDE, E: '#ffd04a' }, largura: 22 },
+  'morcego-eclipse': { grade: MORCEGO_MECANICO, paleta: PALETA_MORCEGO, largura: 22 },
+  'gladiador-sombra': { grade: CACADOR_SOMBRAS, paleta: PALETA_CACADOR, largura: 18 },
+  'pretoriano-eclipse': { grade: PRETORIANO_NOTURNO, paleta: PALETA_PRETORIANO_NOTURNO, largura: 17 },
+  'campeao-sombrio': { grade: CACADOR_SOMBRAS, paleta: { ...PALETA_CACADOR, E: '#ff3a3a' }, largura: 21 },
 };
 
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */
-const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, cobrador: 22, leviata: 34, 'almirante-aco': 24 };
+const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, 'censor-tita-helios': 38, eclipse: 26, 'guardiao-aqueduto': 26, 'sibila-corrompida': 20, 'gigante-sombras': 32, cobrador: 22, leviata: 34, 'almirante-aco': 24 };
 
 function SpriteInimigo({ e }: { e: EstadoLuta }) {
   const sinalFogo = e.inimigo.estado === 'sinal' && ataqueAtual(e).tipo === 'fogo';
   if (e.def.id === 'fornalha') return <Sprite grade={FORNALHA} paleta={paletaFornalha(sinalFogo, e.inimigo.fase)} espelhar />;
   if (e.def.id === 'arquivista') return <Sprite grade={ARQUIVISTA} paleta={paletaArquivista(false)} espelhar />;
   if (e.def.id === 'leao-mecanico') return <Sprite grade={LEAO_MECANICO} paleta={paletaLeao(e.inimigo.fase > 0 || sinalFogo)} espelhar />;
-  if (e.def.id === 'censor-tita' || e.def.id === 'censor-tita-octavius') return <Sprite grade={CENSOR_TITA} paleta={paletaTita(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'eclipse') return <Sprite grade={ECLIPSE} paleta={paletaEclipse(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'guardiao-aqueduto') return <Sprite grade={GUARDIAO_AQUEDUTO} paleta={paletaGuardiaoAqueduto(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'sibila-corrompida') return <Sprite grade={SIBILA_CORROMPIDA} paleta={paletaSibilaCorrompida(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'gigante-sombras') return <Sprite grade={GIGANTE_SOMBRAS} paleta={paletaGiganteSombras(e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'censor-tita' || e.def.id === 'censor-tita-octavius' || e.def.id === 'censor-tita-helios') return <Sprite grade={CENSOR_TITA} paleta={paletaTita(e.inimigo.fase)} espelhar />;
   if (e.def.id === 'cobrador') return <Sprite grade={COBRADOR} paleta={paletaCobrador(e.inimigo.fase > 0 || sinalFogo)} espelhar />;
   if (e.def.id === 'leviata') return <Sprite grade={LEVIATA} paleta={paletaLeviata(e.inimigo.fase)} espelhar />;
   if (e.def.id === 'almirante-aco') return <Sprite grade={ALMIRANTE_ACO} paleta={paletaAlmiranteAco(e.inimigo.fase)} espelhar />;
@@ -187,6 +246,7 @@ const SOM: Partial<Record<string, SomHistoria>> = {
   riposta: 'riposta',
   quebra: 'quebra',
   plano: 'plano',
+  reflexo: 'reflexo',
   aliado: 'aliado',
 };
 const TEXTO: Record<string, string> = {
@@ -200,6 +260,7 @@ const TEXTO: Record<string, string> = {
   cansado: 'SEM FÔLEGO',
   riposta: '⚡ CONTRA-ATAQUE!',
   plano: '⚓ PLANO B!',
+  reflexo: '☀️ REFLETIU!',
   quebra: '💥 GUARDA QUEBRADA!',
   aliado: '',
 };
@@ -270,6 +331,11 @@ export function LutaHistoria({
   // O Octavius luta com PLANOS: coisas do cenário que aparecem e dá para usar.
   const comPlanos = heroi === 'octavius' && !treino;
   const [planosUsados, setPlanosUsados] = useState<number[]>([]);
+  // Luta no escuro (Helios): só se vê o sinal com a LUZ (dura 2,5 s e recarrega em 6 s).
+  const escuro = !!def.escuro;
+  const [luzAte, setLuzAte] = useState(0);
+  const [luzPronta, setLuzPronta] = useState(0);
+  const acenderRef = useRef<() => void>(() => undefined);
   const [feitos, setFeitos] = useState(0);
   const [fase, setFase] = useState<'antes' | 'luta' | 'depois' | 'derrota'>(antes?.length ? 'antes' : 'luta');
   const [e, setE] = useState<EstadoLuta>(() => novaLuta(def, atributos));
@@ -326,6 +392,7 @@ export function LutaHistoria({
       if (k === 'j' || k === 'arrowright') apertar('golpe');
       else if (k === 'k' || k === 'arrowdown') apertar('escudo');
       else if (k === 'l' || k === 'arrowleft') apertar('esquiva');
+      else if (k === 'u') acenderRef.current();
       else if (k === ' ') {
         ev.preventDefault();
         apertar('especial');
@@ -350,6 +417,16 @@ export function LutaHistoria({
   const vencido = e.fim === 'vitoria';
   // O Arquivista: nas fintas, quem treme são as cópias falsas; a verdadeira fica parada.
   const ilusao = !!def.ilusoes && sinal && at.tipo === 'finta';
+  // No escuro, o sinal do inimigo só aparece com a LUZ acesa.
+  const aceso = !escuro || e.tempo < luzAte;
+  const podeLuz = escuro && fase === 'luta' && e.tempo >= luzPronta;
+  acenderRef.current = () => {
+    if (!podeLuz) return;
+    desbloquear();
+    tocar('reflexo');
+    setLuzAte(e.tempo + 2500);
+    setLuzPronta(e.tempo + 6000);
+  };
   const aliado = e.eventos.find((ev) => ev.tipo === 'aliado');
   const quemAjuda = aliado && def.aliados ? (def.aliados[aliado.valor ?? 0] as Falante | undefined) : undefined;
 
@@ -365,7 +442,7 @@ export function LutaHistoria({
     <div className="flex flex-col gap-2">
       <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer-forte' : ''}>
         {/* Placar: vida dos dois, o fôlego e o Ânimo (ou a plateia, no Coliseu) */}
-        <div className="absolute inset-x-2 top-2 z-10 grid grid-cols-2 gap-3">
+        <div className="absolute inset-x-2 top-2 z-20 grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
             <span className="font-pixel text-[7px] text-white [text-shadow:1px_1px_0_#000] sm:text-[9px]">{heroi.toUpperCase()}</span>
             <Barra valor={j.vida} max={j.vidaMax} cor="#4ad46a" rotulo="Sua vida" />
@@ -420,7 +497,7 @@ export function LutaHistoria({
             width: `${largura}%`,
             translate: apanhou && !vencido ? '8% 0' : undefined,
             transition: 'translate 90ms ease-out',
-            filter: apanhou ? 'brightness(2.6)' : sinal && !ilusao ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
+            filter: apanhou ? 'brightness(2.6)' : !aceso ? 'brightness(0.35)' : sinal && !ilusao ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
           }}
         >
           <SpriteInimigo e={e} />
@@ -434,7 +511,7 @@ export function LutaHistoria({
                 aria-hidden
               />
             ))}
-          {sinal && !ilusao && (
+          {sinal && !ilusao && aceso && (
             <span
               className="absolute -top-[22%] left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-black px-1 font-pixel text-[7px] text-black sm:text-[10px]"
               style={{ background: corSinal }}
@@ -473,6 +550,18 @@ export function LutaHistoria({
               {quemAjuda === 'octavius' ? '⚓ OCTAVIUS: CARGA EM EQUIPE!' : quemAjuda === 'helios' ? '☀️ HELIOS: RAIO DE SOL!' : '📚 CASSIUS: ESCUDO DE LIVROS!'}
             </span>
           </div>
+        )}
+
+        {/* No escuro: tudo apagado, só um círculo de luz em volta do herói (ou a arena toda com a LUZ) */}
+        {escuro && fase === 'luta' && (
+          <div
+            className="pointer-events-none absolute inset-0 z-[15] transition-opacity duration-300"
+            style={{ background: 'radial-gradient(circle at 22% 70%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.92) 32%)', opacity: aceso ? 0 : 1 }}
+            aria-hidden
+          />
+        )}
+        {escuro && fase === 'luta' && !aceso && sinal && (
+          <span className="pointer-events-none absolute left-[70%] top-[30%] z-20 -translate-x-1/2 font-pixel text-[9px] text-white/80 sm:text-xs">❓ ALGO SE MEXE... (LUZ!)</span>
         )}
 
         {/* Os PLANOS do Octavius: a cada 7 segundos aparece algo no cenário para usar */}
@@ -520,6 +609,7 @@ export function LutaHistoria({
           if (ev.tipo === 'riposta') return <Impacto key={`fx${ev.id}`} x="66%" cor="#9fe8ff" corte grande />;
           if (ev.tipo === 'quebra') return <Impacto key={`fx${ev.id}`} x="68%" cor="#ff8a3a" grande />;
           if (ev.tipo === 'plano') return <Impacto key={`fx${ev.id}`} x="70%" cor="#c8962a" grande />;
+          if (ev.tipo === 'reflexo') return <Impacto key={`fx${ev.id}`} x="66%" cor="#ffe08a" corte grande />;
           return null;
         })}
         {e.eventos.some((ev) => ev.tipo === 'dano' || ev.tipo === 'contra') && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
@@ -571,6 +661,8 @@ export function LutaHistoria({
                 setE(novaLuta(def, atributos));
                 setCombo(0);
                 setPlanosUsados([]);
+                setLuzAte(0);
+                setLuzPronta(0);
                 setFase('luta');
               }}
               className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent"
@@ -612,6 +704,21 @@ export function LutaHistoria({
           </button>
         ))}
       </div>
+      {/* Helios no escuro: a LUZ mostra o sinal do inimigo por alguns segundos */}
+      {escuro && (
+        <button
+          type="button"
+          disabled={!podeLuz}
+          onPointerDown={(ev) => {
+            ev.preventDefault();
+            acenderRef.current();
+          }}
+          className={`pixel-box select-none py-3 font-pixel text-[10px] text-[#ffe08a] disabled:opacity-40 sm:text-xs ${podeLuz && !aceso ? 'piscar' : ''}`}
+          style={{ boxShadow: '0 0 0 2px #ffe08a' }}
+        >
+          ☀️ LUZ {aceso ? '(ACESA)' : podeLuz ? '(PRONTA: toque para ver o sinal)' : '(recarregando...)'} · tecla U
+        </button>
+      )}
       <p className="dica-luta text-center text-[10px] text-muted">
         Amarelo: 🛡️ · Vermelho: 💨 · ⚔️ no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas · teclado: J, K, L e espaço
       </p>

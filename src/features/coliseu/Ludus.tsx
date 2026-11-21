@@ -57,6 +57,16 @@ const TREINOS_GOLPE: Record<Tecnica, DefTreino> = {
     rotulo: 'GUARDAS QUEBRADAS',
     explica: 'Enquanto eu estiver na guarda (sem sinal, sem ABERTO): ⚔️ ⚔️ ⚔️ rápido! Duas vezes.',
   },
+  'espelho-de-sol': {
+    id: 'espelho-de-sol',
+    nome: 'ESPELHO DE SOL',
+    icone: '☀️',
+    efeito: 'Escudo levantado bem na hora do golpe reflete o ataque de volta (até o fogo)',
+    evento: 'reflexo',
+    quantos: 3,
+    rotulo: 'REFLEXOS',
+    explica: 'Vidente, você vê as coisas antes de acontecer, né? Então levanta o 🛡️ BEM na hora em que a minha espada chegar. Nem antes, nem depois. Três vezes.',
+  },
   'esquiva-dupla': {
     id: 'esquiva-dupla',
     nome: 'ESQUIVA DUPLA',
