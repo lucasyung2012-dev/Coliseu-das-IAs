@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { alternarSom, desbloquear, mudarVolume, useSomLigado, useVolume } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
+import { alternarMusica, useMusicaLigada } from '@/ui/musica';
 
 /**
  * O MENU DE PAUSA do modo História (pedido do Lucas, 22/11/2026: "como todos os jogos têm,
@@ -18,6 +19,7 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
   const [salvo, setSalvo] = useState(false);
   const som = useSomLigado();
   const volume = useVolume();
+  const musica = useMusicaLigada();
   const [auto, setAuto] = useState(() => {
     try {
       return localStorage.getItem('coliseu.cutscene.auto') === '1';
@@ -90,6 +92,9 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
           <div className="flex flex-col gap-3">
             <button type="button" className={item} onClick={() => (alternarSom(), clique())}>
               {som ? '🔊 SOM: LIGADO' : '🔇 SOM: DESLIGADO'}
+            </button>
+            <button type="button" className={item} onClick={() => (alternarMusica(), clique())}>
+              {musica ? '🎵 MÚSICA: LIGADA' : '🔕 MÚSICA: DESLIGADA'}
             </button>
             <label className="flex flex-col gap-1 font-pixel text-[9px] text-[#f4e2b4]">
               VOLUME: {Math.round(volume * 100)}%

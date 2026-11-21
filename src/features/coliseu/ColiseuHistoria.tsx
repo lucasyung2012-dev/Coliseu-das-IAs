@@ -14,6 +14,8 @@ import { Portoes } from './Portoes';
 import { LinhaDoTempo } from './LinhaDoTempo';
 import { FaseAberta } from './FaseAberta';
 import { MenuPausa, PausaContexto } from './Pausa';
+import { abafarMusica, temaDoLugar, useMusica, type TemaMusica } from '@/ui/musica';
+import { INIMIGOS } from '@/game/historia/inimigos';
 import { FASES } from '@/game/historia/fases';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
@@ -84,6 +86,20 @@ export default function ColiseuHistoria() {
   }, [tela.tipo]);
 
   const save = tela.tipo === 'jogo' ? saves.find((s) => s.id === tela.id) : undefined;
+
+  // A música de fundo: o tema do lugar da cena (na luta, mais rápida; contra chefão, o tema dele).
+  // Fica aqui (e não em cada cena) para não recomeçar a cada fala: só troca quando o tema muda.
+  const musica: { tema: TemaMusica; luta: boolean } | null = (() => {
+    if (tela.tipo === 'prologo') return { tema: 'rua', luta: false };
+    if (tela.tipo !== 'jogo' || !save) return null;
+    const c = capitulosDoSave(save)[save.capitulo - 1]?.cenas[save.cena];
+    if (!c) return { tema: 'livre', luta: false };
+    const luta = c.tipo === 'luta';
+    if (luta && INIMIGOS[c.inimigo]?.chefao) return { tema: 'chefao', luta: true };
+    return { tema: temaDoLugar(lugarDaCena(c)), luta };
+  })();
+  useMusica(musica?.tema ?? null, musica?.luta ?? false);
+  useEffect(() => abafarMusica(pausado), [pausado]);
   // O save aberto sumiu (apagado em outro aparelho, por exemplo): volta para a lista em vez de ficar em branco.
   useEffect(() => {
     if (tela.tipo === 'jogo' && !save) setTela({ tipo: 'saves' });

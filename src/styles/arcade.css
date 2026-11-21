@@ -1532,3 +1532,20 @@
 @keyframes coletavel-fase { from { translate: -50% 0; } to { translate: -50% -18%; } }
 .balao-fase { animation: caixa-cutscene 0.25s ease-out; }
 @media (prefers-reduced-motion: reduce) { .chama-fase, .fumaca-fase, .coletavel-fase { animation: none; } }
+
+/* O primeiro plano (fundo em camadas): coisas na frente balançando e partículas flutuando. */
+.balanca-frente { transform-origin: 50% 0; animation: balanca-frente 3.2s ease-in-out infinite alternate; }
+@keyframes balanca-frente { from { rotate: -4deg; } to { rotate: 4deg; } }
+.particula-frente { width: 4px; height: 4px; animation: particula-frente 4s ease-in-out infinite; }
+@media (min-width: 640px) { .particula-frente { width: 6px; height: 6px; } }
+.particula-brasa { background: #ffb03a; box-shadow: 0 0 6px #ff6a1a; }
+.particula-poeira { background: rgba(230, 210, 170, 0.45); }
+.particula-respingo { background: rgba(170, 220, 255, 0.6); border-radius: 9999px; }
+.particula-brilho { background: #fff4c0; box-shadow: 0 0 6px #ffe08a; }
+@keyframes particula-frente {
+  0% { translate: 0 0; opacity: 0; }
+  20% { opacity: 1; }
+  100% { translate: 12px -40px; opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .balanca-frente, .particula-frente { animation: none; } }
+.menos-movimento .balanca-frente, .menos-movimento .particula-frente { animation: none; }

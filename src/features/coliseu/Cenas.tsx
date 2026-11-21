@@ -4,6 +4,7 @@ import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
 import { CenarioHistoria, Retrato } from './Cenarios';
+import { PrimeiroPlano } from './PrimeiroPlano';
 
 /**
  * A caixa de fala: retrato, nome e o texto aparecendo letra por letra, com a "voz"
@@ -353,6 +354,8 @@ export function Explorar({
             </span>
           </button>
         ))}
+        {/* a camada da frente, que se mexe um pouco quando o gladiador anda (profundidade) */}
+        <PrimeiroPlano lugar={lugar} camera={(x - 50) * 0.3} />
         {/* o gladiador */}
         <div
           className="absolute bottom-[14%] z-10 w-[12%] -translate-x-1/2 ease-linear"

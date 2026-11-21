@@ -5,6 +5,7 @@ import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
 import { CenarioHistoria, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
+import { PrimeiroPlano } from './PrimeiroPlano';
 
 /**
  * A FASE ABERTA (teste, 22/11/2026): o lugar é maior que a tela e a câmera segue o
@@ -218,6 +219,9 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
             </div>
           </div>
         </div>
+
+        {/* A camada da frente: anda mais rápido que o fundo (dá profundidade) */}
+        <PrimeiroPlano lugar={fase.telas[Math.min(fase.telas.length - 1, Math.floor(s.x / 100))] ?? fase.telas[0]!} camera={camera} />
 
         {/* O balão de quem está falando (fica na tela, não no mundo) */}
         {falando && (

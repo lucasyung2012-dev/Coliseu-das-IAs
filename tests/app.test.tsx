@@ -54,7 +54,9 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /CASSIUS/ }));
     expect(screen.getByText('A NOITE DAS CHAMAS')).toBeInTheDocument();
     // O save foi criado e aparece na lista ao voltar.
-    fireEvent.click(screen.getByRole('button', { name: /SAVES/ }));
+    // O menu de pausa (☰ MENU) tem a saída para os saves.
+    fireEvent.click(screen.getByRole('button', { name: /Abrir o menu/ }));
+    fireEvent.click(screen.getByRole('button', { name: /SAIR PARA OS SAVES/ }));
     expect(screen.getByRole('button', { name: /CONTINUAR/ })).toBeInTheDocument();
   });
 
