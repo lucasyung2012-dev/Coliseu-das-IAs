@@ -267,7 +267,7 @@ describe('duelo jogável (protótipo)', () => {
 
   it('Duelo online: a sala abre com CRIAR SALA e ENTRAR NA SALA, e avisa código errado', () => {
     abrir('/arena/duelo/online');
-    expect(screen.getByRole('heading', { name: /DUELO ONLINE/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /JOGAR ONLINE/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /CRIAR SALA/ })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/ENTRAR NA SALA/), { target: { value: '42' } });
     fireEvent.click(screen.getByRole('button', { name: /ENTRAR ▶/ }));

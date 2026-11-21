@@ -20,11 +20,14 @@ const PAUSA_VOTO = 700;
 export default function VereditoTribunal({
   estado: e,
   treino,
+  amistosa = false,
   onRevanche,
   onSair,
 }: {
   estado: EstadoTribunal;
   treino: boolean;
+  /** Tribunal online: amistoso, não registra a partida (nem troféus nem histórico). */
+  amistosa?: boolean;
   onRevanche: () => void;
   onSair: () => void;
 }) {
@@ -40,6 +43,10 @@ export default function VereditoTribunal({
   useEffect(() => {
     if (registrada.current) return;
     registrada.current = true;
+    if (amistosa) {
+      tocar('martelo');
+      return;
+    }
     const antes = recordeDe(obterProgresso(), e.ia);
     setPartida(
       registrarPartida({
@@ -124,6 +131,7 @@ export default function VereditoTribunal({
           <p className="text-sm text-muted">
             {v.jogador} voto{v.jogador === 1 ? '' : 's'} para {voce.gladiador} · {v.rival} para {dele.gladiador}
           </p>
+          {amistosa && <p className="font-pixel text-xs sm:text-sm">PARTIDA ONLINE · AMISTOSA</p>}
           {partida && (
             <p className="font-pixel text-xs tabular-nums sm:text-sm">
               {treino ? 'MODO TREINO · NÃO VALE TROFÉUS' : <>🏆 {partida.trofeus > 0 ? `+${partida.trofeus}` : partida.trofeus} · ⭐ +{partida.xp} XP</>}

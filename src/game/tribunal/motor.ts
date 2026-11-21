@@ -98,6 +98,15 @@ export interface EstadoTribunal {
   avisos: string[];
   rodadas: Rodada[];
   fase: 'escolha' | 'revelacao' | 'fim';
+  /**
+   * Tribunal online: os dois lados são pessoas. Os dois escolhem ao mesmo tempo
+   * (escondido) e a rodada só se resolve quando os dois escolheram.
+   */
+  doisHumanos?: boolean;
+  escolhaJogador?: string | null;
+  escolhaRival?: string | null;
+  /** O rival (pessoa) usou a Visão neste tempo: ele escolhe depois e vê a sua carta. */
+  visaoRival?: boolean;
 }
 
 export const ladoRival = (l: LadoId): LadoId => (l === 'favor' ? 'contra' : 'favor');
@@ -112,6 +121,8 @@ export interface Inicio {
   acerto?: number;
   dilema?: Dilema;
   lado?: LadoId;
+  /** Tribunal online: o rival é uma pessoa (sem a IA escolhendo nem usando habilidade). */
+  doisHumanos?: boolean;
 }
 
 export function novaPartida(ini: Inicio, aleatorio: Aleatorio = Math.random): EstadoTribunal {
@@ -138,6 +149,7 @@ export function novaPartida(ini: Inicio, aleatorio: Aleatorio = Math.random): Es
     avisos: [],
     rodadas: [],
     fase: 'escolha',
+    ...(ini.doisHumanos ? { doisHumanos: true, escolhaJogador: null, escolhaRival: null, visaoRival: false } : {}),
   };
   return iniciarTempo(base, 0, aleatorio);
 }
@@ -158,6 +170,8 @@ function iniciarTempo(e: EstadoTribunal, tempo: number, aleatorio: Aleatorio): E
     avisos: [],
     fase: 'escolha',
   };
+  // Duas pessoas: ninguém escolhe sozinho; os dois começam o tempo sem escolha.
+  if (s.doisHumanos) return { ...s, escolhaJogador: null, escolhaRival: null, visaoRival: false };
   s = habilidadeDoRival(s);
   if (!s.rivalRespondeDepois) s = { ...s, cartaRival: escolherCartaRival(s, aleatorio) };
   return s;
@@ -232,6 +246,8 @@ export function usarHabilidade(e: EstadoTribunal, h: Habilidade, aleatorio: Alea
     return { ...e, habilidadeUsada: true, mao: e.mao.map((c) => (c.id === h.cartaId ? nova : c)), reserva: e.reserva.slice(1) };
   }
   if (h.tipo === 'visao' && e.ia === 'gemini') {
+    // Duas pessoas: a Visão faz o outro escolher primeiro; você vê a carta dele e responde.
+    if (e.doisHumanos) return { ...e, habilidadeUsada: true, visao: true };
     // Se o rival ia responder depois, a Visão obriga ele a escolher agora.
     const cartaRival = e.cartaRival ?? escolherCartaRival(e, aleatorio);
     return { ...e, habilidadeUsada: true, visao: true, cartaRival, rivalRespondeDepois: false };

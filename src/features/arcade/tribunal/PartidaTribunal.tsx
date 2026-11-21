@@ -17,7 +17,11 @@ import {
   TOTAL_TEMPOS,
   usarHabilidade,
   type EstadoTribunal,
+  type Habilidade,
 } from '@/game/tribunal/motor';
+import { escolher, espelhar, habilidadeDoLado, podeEscolher, tempoEsgotado, type LadoTribunal } from '@/game/tribunal/online';
+import type { CartaoCombatente } from '@/game/duelo/online';
+import type { Sala } from '@/services/sala';
 import { GladiadorPixel, JuradoPixel, PretorPixel } from '@/ui/pixel/Personagens';
 import GladiadorEnfeitado, { useAparencia } from '@/ui/pixel/GladiadorEnfeitado';
 import { PATENTES } from '@/game/ligas';
@@ -38,17 +42,26 @@ interface Props {
   jurados: JuradoId[];
   onRevanche: () => void;
   onSair: () => void;
+  /**
+   * Tribunal online: quem criou a sala é o juiz (lado "jogador" do motor) e guarda
+   * a partida; o convidado (lado "rival") vê a partida espelhada e só manda as jogadas.
+   */
+  online?: { papel: 'anfitriao' | 'convidado'; sala: Sala; inicial: EstadoTribunal; cartaoRival: CartaoCombatente };
 }
 
-export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair }: Props) {
+export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair, online }: Props) {
   const { trofeus } = useProgresso();
   const dificuldade = useDificuldade();
-  // O modo (valendo troféus ou treino) fica fixo do começo ao fim da partida.
-  const [ranqueado] = useState(() => modoRanqueado());
-  const [e, setE] = useState<EstadoTribunal>(() =>
-    novaPartida({ ia, rival, jurados, trofeus: trofeus[ia], acerto: ranqueado ? undefined : ACERTO_TREINO[dificuldade] }),
+  const convidado = online?.papel === 'convidado';
+  const meuLado: LadoTribunal = convidado ? 'rival' : 'jogador';
+  // O modo (valendo troféus ou treino) fica fixo do começo ao fim da partida. Online é amistoso.
+  const [ranqueado] = useState(() => !online && modoRanqueado());
+  const [estado, setE] = useState<EstadoTribunal>(
+    () => online?.inicial ?? novaPartida({ ia, rival, jurados, trofeus: trofeus[ia], acerto: ranqueado ? undefined : ACERTO_TREINO[dificuldade] }),
   );
-  const [comecou, setComecou] = useState(false);
+  // O que esta tela mostra: o convidado vê tudo espelhado, como se fosse o "jogador".
+  const e = convidado ? espelhar(estado) : estado;
+  const [comecou, setComecou] = useState(!!online);
   const [escolhida, setEscolhida] = useState<string | null>(null);
   const [modoHabilidade, setModoHabilidade] = useState(false);
   const [restante, setRestante] = useState(SEGUNDOS);
@@ -61,20 +74,57 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
   // O relógio é zerado nos botões que abrem um tempo (Começar e Próximo tempo),
   // nunca aqui, para o efeito de "tempo esgotado" não ver o valor velho.
   // Com o tutorial aberto, o relógio para.
+  // Online, só o juiz conta o tempo (o convidado recebe o relógio junto com a partida)
+  // e o tutorial de um não para o relógio do outro.
   useEffect(() => {
-    if (!comecou || e.fase !== 'escolha' || tutorial.aberto) return;
+    if (!comecou || e.fase !== 'escolha' || (!online && tutorial.aberto) || convidado) return;
     const id = window.setInterval(() => setRestante((r) => r - 1), 1000);
     return () => window.clearInterval(id);
   }, [comecou, e.fase, e.tempo, tutorial.aberto]);
 
   useEffect(() => {
-    if (restante <= 0 && e.fase === 'escolha' && comecou) {
+    if (restante <= 0 && e.fase === 'escolha' && comecou && !convidado) {
       tocar('martelo');
-      setE((s) => jogarAleatoria(s));
+      setE((s) => (online ? tempoEsgotado(s) : jogarAleatoria(s)));
       setEscolhida(null);
       setModoHabilidade(false);
     }
   }, [restante, e.fase, comecou]);
+
+  // Online. Juiz: manda a partida e o relógio a cada mudança e aplica as jogadas do convidado.
+  // Convidado: recebe a partida e o relógio.
+  useEffect(() => {
+    if (online?.papel === 'anfitriao') online.sala.enviar({ t: 'estado-tribunal', e: estado, restante });
+  }, [estado, restante]);
+  useEffect(() => {
+    if (!online) return;
+    return online.sala.ouvir((m) => {
+      if (online.papel === 'convidado' && m.t === 'estado-tribunal') {
+        setE(m.e);
+        setRestante(m.restante);
+      }
+      if (online.papel === 'anfitriao' && m.t === 'acao-tribunal') {
+        const a = m.acao;
+        setE((s) => (a.tipo === 'carta' ? escolher(s, 'rival', a.id) : habilidadeDoLado(s, 'rival', a.h)));
+      }
+    });
+  }, []);
+
+  /** Escolher a minha carta: sozinho, joga contra a IA; online, escolhe escondido. */
+  const jogarMinha = (id: string) => {
+    if (!online) setE((s) => jogarCarta(s, id));
+    else if (convidado) online.sala.enviar({ t: 'acao-tribunal', acao: { tipo: 'carta', id } });
+    else setE((s) => escolher(s, 'jogador', id));
+  };
+  const usarMinha = (h: Habilidade) => {
+    if (!online) setE((s) => usarHabilidade(s, h));
+    else if (convidado) online.sala.enviar({ t: 'acao-tribunal', acao: { tipo: 'habilidade', h } });
+    else setE((s) => habilidadeDoLado(s, 'jogador', h));
+  };
+  const jaEscolhi = !!online && !!e.escolhaJogador;
+  const possoEscolher = !online || podeEscolher(estado, meuLado);
+  // A carta do outro que a Visão mostra: sozinho, a do rival; online, a que o outro escolheu.
+  const cartaVista = online ? (e.escolhaRival ? (e.maoRival.find((c) => c.id === e.escolhaRival) ?? null) : null) : e.cartaRival;
 
   useEffect(() => {
     if (e.fase === 'revelacao') tocar('vs');
@@ -85,7 +135,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
   const ultima = e.rodadas[e.rodadas.length - 1];
 
   if (e.fase === 'fim') {
-    return <VereditoTribunal estado={e} treino={!ranqueado} onRevanche={onRevanche} onSair={onSair} />;
+    return <VereditoTribunal estado={e} treino={!ranqueado} amistosa={!!online} onRevanche={onRevanche} onSair={onSair} />;
   }
 
   if (!comecou) {
@@ -114,7 +164,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
     if (!escolhida) return;
     desbloquear();
     tocar('clique');
-    setE((s) => jogarCarta(s, escolhida));
+    jogarMinha(escolhida);
     setEscolhida(null);
     setModoHabilidade(false);
   };
@@ -122,7 +172,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
   const habilidade = () => {
     desbloquear();
     tocar('selecionar');
-    if (ia === 'gemini') setE((s) => usarHabilidade(s, { tipo: 'visao' }));
+    if (ia === 'gemini') usarMinha({ tipo: 'visao' });
     else setModoHabilidade((m) => !m);
   };
 
@@ -133,7 +183,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
         <BotaoComoJogar onClick={tutorial.abrir} />
       </div>
       {/* Quem é quem: você (verde) contra o rival (vermelho), com a IA e o lado de cada um */}
-      <FaixaCombatentes e={e} />
+      <FaixaCombatentes e={e} aparenciaRival={online?.cartaoRival} />
 
       {/* Tempo, dilema e cronômetro, com o Pretor anunciando o tempo */}
       <div className="pixel-box flex items-center gap-3 p-3">
@@ -172,7 +222,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
             alvo={modoHabilidade && ia === 'claude' && ponteiro(e, j) < 0}
             onAlvo={() => {
               tocar('jurado');
-              setE((s) => usarHabilidade(s, { tipo: 'diplomacia', jurado: j }));
+              usarMinha({ tipo: 'diplomacia', jurado: j });
               setModoHabilidade(false);
             }}
           />
@@ -181,12 +231,12 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
 
       {e.fase === 'escolha' && (
         <>
-          {e.visao && e.cartaRival && (
+          {e.visao && cartaVista && (
             <div className="flex flex-col gap-2">
               <p className="font-pixel text-[9px]" style={{ color: VERMELHO }}>
                 👁 VISÃO: A CARTA QUE {dele.gladiador.toUpperCase()} VAI JOGAR
               </p>
-              <CartaView carta={e.cartaRival} e={e} cor={VERMELHO} doRival />
+              <CartaView carta={cartaVista} e={e} cor={VERMELHO} doRival />
             </div>
           )}
 
@@ -197,7 +247,12 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
             />
           )}
 
-          <section aria-label="Sua mão" className="grid gap-3 sm:grid-cols-2">
+          {/* Online: o que está acontecendo do outro lado */}
+          {online && e.visao && !cartaVista && <Aviso texto={`👁 Visão: espere ${dele.gladiador} escolher. Você vai ver a carta dele antes de escolher a sua.`} cor={VERDE} />}
+          {online && e.visaoRival && !jaEscolhi && <Aviso texto={`${dele.gladiador} usou Visão: escolha primeiro. Ele vai ver a sua carta antes de responder!`} cor={VERMELHO} />}
+          {jaEscolhi && <Aviso texto={`✔ Carta escolhida. Esperando ${dele.gladiador} escolher…`} cor={VERDE} />}
+
+          <section aria-label="Sua mão" className={`grid gap-3 sm:grid-cols-2 ${jaEscolhi ? 'pointer-events-none opacity-50' : ''}`}>
             {e.mao.map((c) => (
               <CartaView
                 key={c.id}
@@ -210,7 +265,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
                   desbloquear();
                   if (modoHabilidade && ia === 'chatgpt') {
                     tocar('selecionar');
-                    setE((s) => usarHabilidade(s, { tipo: 'improviso', cartaId: c.id }));
+                    usarMinha({ tipo: 'improviso', cartaId: c.id });
                     setModoHabilidade(false);
                     return;
                   }
@@ -225,7 +280,7 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
             <button
               type="button"
               onClick={habilidade}
-              disabled={!podeUsarHabilidade(e)}
+              disabled={!podeUsarHabilidade(e) || jaEscolhi}
               className="pixel-box pixel-hover px-3 py-2 font-pixel text-[10px] disabled:opacity-40"
               style={{ color: corDe(ia) }}
             >
@@ -234,10 +289,10 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
             <button
               type="button"
               onClick={apresentar}
-              disabled={!escolhida}
+              disabled={!escolhida || !possoEscolher}
               className="pixel-box pixel-hover px-5 py-3 font-pixel text-xs text-accent disabled:opacity-40"
             >
-              ⚖ APRESENTAR CARTA
+              {jaEscolhi ? '✔ CARTA APRESENTADA' : '⚖ APRESENTAR CARTA'}
             </button>
           </div>
         </>
@@ -259,19 +314,24 @@ export default function PartidaTribunal({ ia, rival, jurados, onRevanche, onSair
               <CartaView carta={ultima.cartaRival} e={e} cor={VERMELHO} tempoFixo={ultima.tempo} doRival revelada />
             </div>
           </div>
-          <button
-            type="button"
-            autoFocus
-            onClick={() => {
-              desbloquear();
-              tocar(e.tempo + 1 < TOTAL_TEMPOS ? 'clique' : 'martelo');
-              setRestante(SEGUNDOS);
-              setE((s) => avancar(s));
-            }}
-            className="pixel-box pixel-hover self-end px-5 py-3 font-pixel text-xs text-accent"
-          >
-            {e.tempo + 1 < TOTAL_TEMPOS ? `▶ TEMPO ${e.tempo + 2}` : '⚖ OUVIR O VEREDITO'}
-          </button>
+          {convidado ? (
+            // Online: quem criou a sala passa para o próximo tempo.
+            <p className="piscar self-end font-pixel text-[9px] text-muted">ESPERANDO {dele.gladiador.toUpperCase()} CONTINUAR…</p>
+          ) : (
+            <button
+              type="button"
+              autoFocus
+              onClick={() => {
+                desbloquear();
+                tocar(e.tempo + 1 < TOTAL_TEMPOS ? 'clique' : 'martelo');
+                setRestante(SEGUNDOS);
+                setE((s) => avancar(s));
+              }}
+              className="pixel-box pixel-hover self-end px-5 py-3 font-pixel text-xs text-accent"
+            >
+              {e.tempo + 1 < TOTAL_TEMPOS ? `▶ TEMPO ${e.tempo + 2}` : '⚖ OUVIR O VEREDITO'}
+            </button>
+          )}
         </>
       )}
     </div>
@@ -446,14 +506,14 @@ function CartaView(props: {
  * Faixa de quem é quem, presente no briefing e em toda a partida: você (verde)
  * contra o rival (vermelho), com o gladiador, a IA, o lado e a opinião de cada um.
  */
-function FaixaCombatentes({ e, comTese = false }: { e: EstadoTribunal; comTese?: boolean }) {
+function FaixaCombatentes({ e, comTese = false, aparenciaRival }: { e: EstadoTribunal; comTese?: boolean; aparenciaRival?: CartaoCombatente }) {
   // O rival luta na mesma liga do jogador.
   const { liga } = useAparencia(e.ia);
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-stretch gap-2 sm:gap-3">
       <Combatente id={e.ia} quem="voce" liga={liga} lado={e.dilema.lados[e.ladoJogador]} comTese={comTese} />
       <p className="self-center font-pixel text-sm text-[rgb(242_193_78)] sm:text-xl">VS</p>
-      <Combatente id={e.rival} quem="rival" liga={liga} lado={e.dilema.lados[ladoRival(e.ladoJogador)]} comTese={comTese} />
+      <Combatente id={e.rival} quem="rival" liga={liga} lado={e.dilema.lados[ladoRival(e.ladoJogador)]} comTese={comTese} aparencia={aparenciaRival} />
     </div>
   );
 }
@@ -464,12 +524,15 @@ function Combatente({
   liga,
   lado,
   comTese,
+  aparencia,
 }: {
   id: IaId;
   quem: 'voce' | 'rival';
   liga: number;
   lado: { nome: string; tese: string };
   comTese: boolean;
+  /** Online: o rival é uma pessoa e aparece com as conquistas dela. */
+  aparencia?: CartaoCombatente;
 }) {
   const p = PERSONAGENS[id];
   const cor = quem === 'voce' ? VERDE : VERMELHO;
@@ -479,7 +542,7 @@ function Combatente({
       style={{ boxShadow: `0 0 0 3px ${cor}, 0 0 22px -6px ${cor}` }}
     >
       <div className="w-9 shrink-0 sm:w-14">
-        {quem === 'voce' ? <GladiadorEnfeitado ia={id} parado /> : <GladiadorPixel ia={id} liga={liga} espelhar />}
+        {quem === 'voce' ? <GladiadorEnfeitado ia={id} parado /> : aparencia ? <GladiadorEnfeitado ia={id} parado espelhar aparencia={aparencia} /> : <GladiadorPixel ia={id} liga={liga} espelhar />}
       </div>
       <div className="min-w-0">
         <p className="font-pixel text-[8px] sm:text-[10px]" style={{ color: cor }}>

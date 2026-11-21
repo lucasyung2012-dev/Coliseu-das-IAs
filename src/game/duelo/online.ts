@@ -10,9 +10,10 @@ import type { Visual } from '../maestria';
 import type { VisualColiseu } from '../coliseu';
 import type { LadoId } from '../tribunal/dilemas';
 import type { EstadoDuelo, TipoCarta } from './motor';
+import type { EstadoTribunal, Habilidade } from '../tribunal/motor';
 
 /** Muda quando as mensagens mudarem: aparelhos com versões diferentes não se misturam. */
-export const VERSAO_ONLINE = 2;
+export const VERSAO_ONLINE = 3;
 
 export interface CartaoCombatente {
   versao: number;
@@ -31,11 +32,20 @@ export interface CartaoCombatente {
 
 export type AcaoOnline = { tipo: 'carta'; id: string; carga: number } | { tipo: 'golpe' };
 
+/** Jogadas do convidado no Tribunal online. */
+export type AcaoTribunal = { tipo: 'carta'; id: string } | { tipo: 'habilidade'; h: Habilidade };
+
+export type ModoOnline = 'duelo' | 'tribunal';
+
 export type MensagemOnline =
   | { t: 'ola'; cartao: CartaoCombatente }
   | { t: 'comecar'; config: { lado: LadoId; dilema: number }; inicial: EstadoDuelo }
   | { t: 'acao'; acao: AcaoOnline }
   | { t: 'estado'; e: EstadoDuelo }
+  | { t: 'modo'; modo: ModoOnline }
+  | { t: 'comecar-tribunal'; inicial: EstadoTribunal }
+  | { t: 'estado-tribunal'; e: EstadoTribunal; restante: number }
+  | { t: 'acao-tribunal'; acao: AcaoTribunal }
   | { t: 'revanche' }
   | { t: 'sair' }
   /** Só local: o outro aparelho está com outra versão do jogo (precisa recarregar). */
@@ -82,6 +92,7 @@ export function lerMensagem(bruto: unknown): MensagemOnline | null {
     if (!c || c.versao !== VERSAO_ONLINE || !['claude', 'chatgpt', 'gemini'].includes(c.ia as string) || !Array.isArray(c.baralho)) return null;
     return bruto as MensagemOnline;
   }
-  if (m.t === 'comecar' || m.t === 'acao' || m.t === 'estado' || m.t === 'revanche' || m.t === 'sair') return bruto as MensagemOnline;
+  const conhecidas = ['comecar', 'acao', 'estado', 'modo', 'comecar-tribunal', 'estado-tribunal', 'acao-tribunal', 'revanche', 'sair'];
+  if (typeof m.t === 'string' && conhecidas.includes(m.t)) return bruto as MensagemOnline;
   return null;
 }
