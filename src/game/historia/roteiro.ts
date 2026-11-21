@@ -58,9 +58,19 @@ export type Falante =
   | 'zelador'
   | 'nucleo';
 
+/** A emoção de quem fala (o retrato grande muda de jeito e aparece um balãozinho desenhado). */
+export type Emocao = 'normal' | 'feliz' | 'bravo' | 'medo' | 'triste' | 'surpreso' | 'pensando' | 'determinado';
+/** O jeito de falar: o texto treme no grito, fica baixinho no sussurro, aparece devagar no suspense. */
+export type JeitoFala = 'grito' | 'sussurro' | 'devagar';
+/** Zoom da cena na fala: chegar perto (revelação) ou susto (rápido, com tremida). */
+export type ZoomFala = 'perto' | 'susto';
+
 export interface Fala {
   quem: Falante;
   texto: string;
+  emocao?: Emocao;
+  jeito?: JeitoFala;
+  zoom?: ZoomFala;
 }
 
 /** Os desenhos de fundo das cenas. */
@@ -138,6 +148,9 @@ export interface Quadro {
   texto: string;
   /** Quem fala (mostra o nome). */
   quem?: Falante;
+  emocao?: Emocao;
+  jeito?: JeitoFala;
+  zoom?: ZoomFala;
   /** Quem aparece na cena; sem isto, aparece só quem fala. */
   personagens?: EmCena[];
   /** Efeito da cena: clarão, tremor, fogo subindo, faíscas, aproximar ou escurecer. */
@@ -464,7 +477,7 @@ const CAP1_CASSIUS: Capitulo = {
           icone: '📚',
           falas: [
             { quem: 'cassius', texto: 'Livros sobre a Guerra das Ideias. Metade deles o Censor mandou "corrigir".' },
-            { quem: 'cassius', texto: 'Corrigir. Que palavra bonita para apagar.' },
+            { quem: 'cassius', texto: 'Corrigir. Que palavra bonita para apagar.', emocao: 'triste' },
           ],
         },
         {
@@ -485,11 +498,11 @@ const CAP1_CASSIUS: Capitulo = {
           personagem: 'livia',
           obrigatorio: true,
           falas: [
-            { quem: 'livia', texto: 'Mestre Cass! Mestre Cass!' },
-            { quem: 'livia', texto: 'Eles estão vindo! Os Incineradores do Censor! Vi da janela da torre!' },
-            { quem: 'cassius', texto: 'Calma, Lívia. Respire. Quantos?' },
-            { quem: 'livia', texto: 'Muitos. E uma coisa enorme atrás deles, toda vermelha, soltando fumaça pela cabeça...' },
-            { quem: 'cassius', texto: 'A Fornalha. Então o Censor não quer só os livros. Quer a Biblioteca inteira.' },
+            { quem: 'livia', texto: 'Mestre Cass! Mestre Cass!', emocao: 'surpreso', jeito: 'grito' },
+            { quem: 'livia', texto: 'Eles estão vindo! Os Incineradores do Censor! Vi da janela da torre!', emocao: 'medo', jeito: 'grito' },
+            { quem: 'cassius', texto: 'Calma, Lívia. Respire. Quantos?', emocao: 'pensando' },
+            { quem: 'livia', texto: 'Muitos. E uma coisa enorme atrás deles, toda vermelha, soltando fumaça pela cabeça...', emocao: 'medo', jeito: 'devagar' },
+            { quem: 'cassius', texto: 'A Fornalha. Então o Censor não quer só os livros. Quer a Biblioteca inteira.', emocao: 'determinado', zoom: 'perto' },
           ],
         },
       ],
@@ -499,14 +512,14 @@ const CAP1_CASSIUS: Capitulo = {
       id: 'c1-plano',
       lugar: 'biblioteca-estantes',
       falas: [
-        { quem: 'livia', texto: 'A gente tem que fugir! Agora!' },
+        { quem: 'livia', texto: 'A gente tem que fugir! Agora!', emocao: 'medo', jeito: 'grito' },
         { quem: 'cassius', texto: 'Fugir para onde? Se eles queimarem os livros, não vai sobrar nada para onde voltar.' },
-        { quem: 'livia', texto: 'Mas são milhares! Não dá para salvar todos!' },
+        { quem: 'livia', texto: 'Mas são milhares! Não dá para salvar todos!', emocao: 'triste' },
         { quem: 'cassius', texto: 'Os mais importantes, dá. Lá embaixo, nas catacumbas, existe um alçapão que nem o Censor conhece.' },
         { quem: 'livia', texto: '...' },
-        { quem: 'livia', texto: 'Livro escondido não é livro perdido, Mestre Cass. É livro esperando.' },
+        { quem: 'livia', texto: 'Livro escondido não é livro perdido, Mestre Cass. É livro esperando.', emocao: 'determinado' },
         { quem: 'cassius', texto: 'Foi você que inventou essa frase, sabia? Com seis anos.' },
-        { quem: 'livia', texto: 'Eu sei. Eu era genial. Vamos!' },
+        { quem: 'livia', texto: 'Eu sei. Eu era genial. Vamos!', emocao: 'feliz' },
       ],
     },
     {
@@ -515,12 +528,12 @@ const CAP1_CASSIUS: Capitulo = {
       lugar: 'biblioteca-estantes',
       inimigo: 'incinerador',
       antes: [
-        { quem: 'livia', texto: 'Um deles entrou pela janela!' },
+        { quem: 'livia', texto: 'Um deles entrou pela janela!', emocao: 'surpreso', jeito: 'grito', zoom: 'susto' },
         { quem: 'cassius', texto: 'Quando ele piscar em AMARELO, eu levanto o escudo. Depois, ataco enquanto ele estiver ABERTO.' },
         { quem: 'cassius', texto: 'E não posso desperdiçar fôlego: cada movimento cansa.' },
       ],
       depois: [
-        { quem: 'livia', texto: 'Você derrubou ele! Com um escudo de... livros?' },
+        { quem: 'livia', texto: 'Você derrubou ele! Com um escudo de... livros?', emocao: 'feliz' },
         { quem: 'cassius', texto: 'Enciclopédia de capa de couro. Volume sete. Vamos!' },
       ],
     },
@@ -530,7 +543,7 @@ const CAP1_CASSIUS: Capitulo = {
       lugar: 'biblioteca-salao',
       desafio: 'esconder-livros',
       antes: [
-        { quem: 'livia', texto: 'As faíscas estão chegando nas estantes do salão!' },
+        { quem: 'livia', texto: 'As faíscas estão chegando nas estantes do salão!', emocao: 'medo', jeito: 'grito' },
         { quem: 'cassius', texto: 'Toque nos livros para levá-los ao alçapão. Os tomos grandes são pesados: dois toques.' },
         { quem: 'cassius', texto: 'O fogo sobe de baixo. Livro tremendo vai queimar. E nada de tocar nas brasas!' },
       ],

@@ -1563,3 +1563,32 @@
 @media (prefers-reduced-motion: reduce) { .mapa-aqui { animation: none; } }
 /* A aba escolhida (Suas histórias / Mapa de Roma): afundada e com borda dourada. */
 [data-area='coliseu'] button.pixel-box.aba-ativa { translate: 0 2px; outline: 2px solid #f2c14e; outline-offset: 2px; filter: brightness(1.15); }
+
+/* ---------- Diálogo com emoção (22/11/2026, inspirado no Undertale, a pedido do Lucas) ---------- */
+.retrato-grande { animation: retrato-entra 0.25s ease-out both; transform-origin: 50% 100%; }
+@keyframes retrato-entra { from { translate: -12% 0; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+.emo-feliz { animation: retrato-entra 0.25s ease-out both, emo-feliz 0.5s ease-in-out 0.25s 3; }
+@keyframes emo-feliz { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8%; } }
+.emo-bravo { animation: retrato-entra 0.2s ease-out both, emo-bravo 0.09s linear 0.2s 8; filter: drop-shadow(0 0 6px rgba(255, 60, 40, 0.6)); }
+@keyframes emo-bravo { 0%, 100% { translate: 0 0; } 25% { translate: -3% 0; } 75% { translate: 3% 0; } }
+.emo-medo { animation: retrato-entra 0.25s ease-out both, emo-medo 0.12s linear 0.25s infinite; filter: saturate(0.6) brightness(0.9) hue-rotate(-10deg); }
+@keyframes emo-medo { 0%, 100% { translate: 0 0; } 50% { translate: 1.2% 0.6%; } }
+.emo-triste { animation: retrato-entra 0.25s ease-out both, emo-triste 0.8s ease-out 0.25s both; filter: saturate(0.5) brightness(0.85); }
+@keyframes emo-triste { to { translate: 0 5%; scale: 1 0.96; } }
+.emo-surpreso { animation: retrato-entra 0.2s ease-out both, emo-surpreso 0.35s ease-out 0.2s; }
+@keyframes emo-surpreso { 0% { translate: 0 0; } 40% { translate: 0 -14%; scale: 1.06; } 100% { translate: 0 0; } }
+.emo-pensando { animation: retrato-entra 0.25s ease-out both; rotate: -4deg; }
+.emo-determinado { animation: retrato-entra 0.25s ease-out both, emo-determinado 1.2s ease-in-out 0.25s infinite alternate; }
+@keyframes emo-determinado { from { filter: drop-shadow(0 0 2px #ffb03a); } to { filter: drop-shadow(0 0 10px #ff8a2a); } }
+/* o balãozinho em cima da cabeça pula ao aparecer */
+.emote-pula { animation: emote-pula 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes emote-pula { from { scale: 0; translate: 0 40%; } to { scale: 1; translate: 0 0; } }
+/* no grito, cada letra treme */
+.letra-treme { animation: letra-treme 0.12s steps(2) infinite; }
+@keyframes letra-treme { 0% { translate: 0 0; } 50% { translate: 0.06em -0.05em; } 100% { translate: -0.05em 0.04em; } }
+/* o zoom da fala escurece em volta, como uma câmera chegando perto */
+.vinheta-zoom { background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0, 0, 0, 0.6) 100%); animation: eclipse-entra 0.4s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .retrato-grande, .emo-feliz, .emo-bravo, .emo-medo, .emo-triste, .emo-surpreso, .emo-determinado, .emote-pula, .letra-treme { animation: none; }
+}
+.menos-movimento .letra-treme, .menos-movimento .emo-medo, .menos-movimento .emo-bravo { animation: none; }

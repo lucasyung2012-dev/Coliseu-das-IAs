@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { NOMES, type EmCena, type Fala, type Falante, type Lugar, type PontoExplorar, type Quadro } from '@/game/historia/roteiro';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { NOMES, type EmCena, type Emocao, type Fala, type Falante, type JeitoFala, type Lugar, type PontoExplorar, type Quadro, type ZoomFala } from '@/game/historia/roteiro';
+import Emote from '@/ui/pixel/Emotes';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
@@ -9,35 +10,88 @@ import { CenarioHistoria, Retrato } from './Cenarios';
  * A caixa de fala: retrato, nome e o texto aparecendo letra por letra, com a "voz"
  * do personagem (um barulhinho próprio). Toque para completar; toque de novo para seguir.
  */
-export function CaixaFala({ fala, onSeguir }: { fala: Fala; onSeguir: () => void }) {
-  const [mostrado, completo, completar] = useDigitando(fala.texto, 0, fala.quem);
+/**
+ * A emoção e o jeito de falar de uma fala: o que o roteiro mandou ou, se não mandou,
+ * um palpite pelo texto (grito = palavra em MAIÚSCULAS com "!", dúvida = termina em "?").
+ */
+export function emocaoDa(f: { quem?: Falante; texto: string; emocao?: Emocao; jeito?: JeitoFala }): { emocao: Emocao; jeito?: JeitoFala } {
+  if (!f.quem || f.quem === 'narrador') return { emocao: 'normal', jeito: f.jeito };
+  const grita = /!/.test(f.texto) && /\b[A-ZÁÉÍÓÚÂÊÔÃÕÇ]{4,}\b/.test(f.texto);
+  const jeito = f.jeito ?? (grita ? 'grito' : undefined);
+  if (f.emocao) return { emocao: f.emocao, jeito };
+  return { emocao: /\?\s*$/.test(f.texto) ? 'pensando' : 'normal', jeito };
+}
+
+/** O texto com emoção: no grito, cada letra treme. */
+function TextoComEmocao({ texto, jeito }: { texto: string; jeito?: JeitoFala }) {
+  if (jeito !== 'grito') return <>{texto}</>;
   return (
-    <button
-      type="button"
-      autoFocus
-      onClick={() => {
-        desbloquear();
-        if (!completo) return completar();
-        tocar('pagina');
-        onSeguir();
-      }}
-      className="absolute inset-x-2 bottom-2 z-20 flex items-end gap-3 border-2 border-[#c8962a] bg-black/85 p-2 text-left sm:inset-x-4 sm:bottom-4 sm:p-3"
-    >
-      {fala.quem !== 'narrador' && (
-        <span className="w-10 shrink-0 sm:w-16" aria-hidden>
-          <Retrato quem={fala.quem} />
+    <>
+      {texto.split('').map((c, k) => (
+        <span key={k} className="letra-treme inline-block whitespace-pre" style={{ animationDelay: `${(k * 53) % 300}ms` }}>
+          {c}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** O retrato grande de quem fala, que muda de jeito com a emoção, e o balãozinho em cima. */
+export function RetratoGrande({ quem, emocao }: { quem: Falante; emocao: Emocao }) {
+  return (
+    <span key={`${quem}-${emocao}`} className={`retrato-grande relative block w-full emo-${emocao}`} aria-hidden>
+      {emocao !== 'normal' && (
+        <span className="emote-pula absolute -top-[18%] right-[-4%] z-10 block w-[36%]">
+          <Emote emocao={emocao} />
         </span>
       )}
-      <span className="min-w-0 flex-1">
+      <Retrato quem={quem} />
+    </span>
+  );
+}
+
+/** O zoom da cena (pedido pela fala: chegar perto numa revelação, ou susto). */
+const ZoomContexto = createContext<(z: ZoomFala | null) => void>(() => undefined);
+
+export function CaixaFala({ fala, onSeguir }: { fala: Fala; onSeguir: () => void }) {
+  const { emocao, jeito } = emocaoDa(fala);
+  const [mostrado, completo, completar] = useDigitando(fala.texto, 0, fala.quem, jeito === 'devagar' ? 70 : jeito === 'grito' ? 22 : 28);
+  const mudarZoom = useContext(ZoomContexto);
+  useEffect(() => {
+    mudarZoom(fala.zoom ?? null);
+    return () => mudarZoom(null);
+  }, []);
+  const comRetrato = fala.quem !== 'narrador' && fala.quem !== 'povo';
+  return (
+    <div className="absolute inset-x-2 bottom-2 z-20 flex items-end gap-2 sm:inset-x-4 sm:bottom-4 sm:gap-3">
+      {/* O personagem grande, do lado da caixa (no zoom, ele fica ainda maior) */}
+      {comRetrato && (
+        <span className={`retrato-fala shrink-0 ${fala.zoom ? 'w-[30%] sm:w-[24%]' : 'w-[24%] sm:w-[19%]'}`}>
+          <RetratoGrande quem={fala.quem} emocao={emocao} />
+        </span>
+      )}
+      <button
+        type="button"
+        autoFocus
+        onClick={() => {
+          desbloquear();
+          if (!completo) return completar();
+          tocar('pagina');
+          onSeguir();
+        }}
+        className={`caixa-fala min-w-0 flex-1 border-4 border-double bg-black/90 p-2 text-left sm:p-3 ${jeito === 'grito' ? 'border-[#ff7a5a]' : 'border-[#e8d8b0]'}`}
+      >
         {NOMES[fala.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[fala.quem].toUpperCase()}</span>}
-        <span className={`mt-1 block text-sm leading-snug sm:text-base ${fala.quem === 'narrador' ? 'italic text-muted' : 'text-white'}`}>
-          {mostrado}
+        <span
+          className={`mt-1 block leading-snug ${fala.quem === 'narrador' ? 'italic text-white/70' : 'text-white'} ${jeito === 'sussurro' ? 'text-xs italic text-white/70 sm:text-sm' : jeito === 'grito' ? 'text-base font-bold sm:text-lg' : 'text-sm sm:text-base'}`}
+        >
+          <TextoComEmocao texto={mostrado} jeito={jeito} />
           {/* o resto do texto, invisível, para a caixa não mudar de tamanho enquanto digita */}
           <span className="invisible">{fala.texto.slice(mostrado.length)}</span>
         </span>
-      </span>
-      <span className={`shrink-0 font-pixel text-[9px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>▶</span>
-    </button>
+        <span className={`mt-1 block text-right font-pixel text-[9px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>▼</span>
+      </button>
+    </div>
   );
 }
 
@@ -54,16 +108,23 @@ export function Falas({ falas, onFim }: { falas: Fala[]; onFim: () => void }) {
 
 /** O palco das cenas: o cenário em pixel, sempre no mesmo formato. */
 export function Palco({ lugar, children, className = '' }: { lugar: Lugar; children?: ReactNode; className?: string }) {
+  // O zoom que a fala pediu: o cenário chega perto (ou dá o susto) e escurece em volta.
+  const [zoom, setZoom] = useState<ZoomFala | null>(null);
   return (
-    <div className={`pixel-box palco-historia relative w-full overflow-hidden ${className}`}>
-      <CenarioHistoria lugar={lugar} />
-      {children}
-    </div>
+    <ZoomContexto.Provider value={setZoom}>
+      <div className={`pixel-box palco-historia relative w-full overflow-hidden ${zoom === 'susto' ? 'tremer-forte' : ''} ${className}`}>
+        <div className={`absolute inset-0 transition-transform duration-700 ease-out ${zoom === 'perto' ? 'scale-[1.18]' : zoom === 'susto' ? 'scale-[1.28] duration-150' : 'scale-100'}`}>
+          <CenarioHistoria lugar={lugar} />
+        </div>
+        {zoom && <div className="vinheta-zoom pointer-events-none absolute inset-0 z-[9]" aria-hidden />}
+        {children}
+      </div>
+    </ZoomContexto.Provider>
   );
 }
 
 /** Texto aparecendo letra por letra (o toque completa na hora), com a voz de quem fala. */
-function useDigitando(texto: string, chave: number, quem?: Falante): [string, boolean, () => void] {
+function useDigitando(texto: string, chave: number, quem?: Falante, msPorLetra = 28): [string, boolean, () => void] {
   const [n, setN] = useState(0);
   useEffect(() => {
     setN(0);
@@ -71,7 +132,7 @@ function useDigitando(texto: string, chave: number, quem?: Falante): [string, bo
       setN(texto.length);
       return;
     }
-    const id = window.setInterval(() => setN((x) => (x >= texto.length ? x : x + 1)), 28);
+    const id = window.setInterval(() => setN((x) => (x >= texto.length ? x : x + 1)), msPorLetra);
     return () => window.clearInterval(id);
   }, [chave, texto]);
   // Cada letra nova faz a "voz" (só enquanto está digitando, não quando o toque completa).
@@ -166,7 +227,8 @@ function Ator({ p, falando, outrosFalam }: { p: EmCena; falando?: boolean; outro
 export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => void }) {
   const [i, setI] = useState(0);
   const q = quadros[i];
-  const [mostrado, completo, completar] = useDigitando(q?.texto ?? '', i, q?.quem);
+  const emocaoQ = q ? emocaoDa(q) : { emocao: 'normal' as Emocao, jeito: undefined };
+  const [mostrado, completo, completar] = useDigitando(q?.texto ?? '', i, q?.quem, emocaoQ.jeito === 'devagar' ? 70 : emocaoQ.jeito === 'grito' ? 22 : 28);
   // AUTO: a cena segue sozinha depois de ler (fica lembrado neste aparelho).
   const [auto, setAuto] = useState(() => {
     try {
@@ -201,9 +263,9 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
   const variosEmCena = elenco.length > 1 && !!q.quem;
   return (
     <div className="flex flex-col gap-2">
-    <div className={`pixel-box palco-historia relative w-full overflow-hidden ${q.efeito === 'tremor' ? 'tremer-forte' : ''}`}>
+    <div className={`pixel-box palco-historia relative w-full overflow-hidden ${q.efeito === "tremor" || q.zoom === "susto" ? "tremer-forte" : ""}`}>
       {/* o cenário, com a câmera se mexendo devagar durante o plano inteiro */}
-      <div key={`bg-${plano}`} className={`absolute inset-0 ${efeitoPlano === 'zoom' ? 'cena-aproxima' : efeitoPlano === 'panoramica' ? 'cena-panorama' : 'cena-respira'}`}>
+      <div key={`bg-${plano}`} className={`absolute inset-0 transition-transform duration-700 ease-out ${q.zoom === "perto" ? "scale-[1.18]" : q.zoom === "susto" ? "scale-[1.28] duration-150" : ""} ${efeitoPlano === 'zoom' ? 'cena-aproxima' : efeitoPlano === 'panoramica' ? 'cena-panorama' : 'cena-respira'}`}>
         <CenarioHistoria lugar={q.lugar} />
       </div>
       {/* os personagens em cena (quem continua no quadro seguinte anda até o novo lugar) */}
@@ -266,16 +328,20 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
     </div>
     {/* O texto fica embaixo da cena, para não cobrir os personagens; com o retrato de quem fala */}
     {!titulo && (
-      <button key={`caixa-${i}`} type="button" autoFocus onClick={seguir} className="caixa-cutscene flex w-full items-center gap-3 border-2 border-[#c8962a] bg-black/85 p-3 text-left">
+      <button key={`caixa-${i}`} type="button" autoFocus onClick={seguir} className={`caixa-cutscene flex w-full items-end gap-3 border-4 border-double bg-black/90 p-3 text-left ${emocaoQ.jeito === 'grito' ? 'border-[#ff7a5a]' : 'border-[#e8d8b0]'}`}>
         {q.quem && q.quem !== 'narrador' && q.quem !== 'povo' && (
-          <span key={q.quem} className="surgir w-12 shrink-0 sm:w-16" aria-hidden>
-            <Retrato quem={q.quem} />
+          <span className="w-16 shrink-0 sm:w-24">
+            <RetratoGrande quem={q.quem} emocao={emocaoQ.emocao} />
           </span>
         )}
         <span className={`min-w-0 flex-1 ${q.quem && q.quem !== 'narrador' ? '' : 'text-center'}`}>
           {q.quem && NOMES[q.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[q.quem].toUpperCase()}</span>}
-          <span className={`block min-h-[3.9em] text-sm leading-snug sm:min-h-[2.6em] sm:text-lg ${q.quem ? 'text-white' : 'italic text-white/90'}`}>{mostrado}</span>
-          <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>{auto ? 'AUTO ●' : 'TOQUE PARA SEGUIR ▶'}</span>
+          <span
+            className={`block min-h-[3.9em] leading-snug sm:min-h-[2.6em] ${q.quem ? 'text-white' : 'italic text-white/90'} ${emocaoQ.jeito === 'sussurro' ? 'text-xs italic text-white/70 sm:text-base' : emocaoQ.jeito === 'grito' ? 'text-base font-bold sm:text-xl' : 'text-sm sm:text-lg'}`}
+          >
+            <TextoComEmocao texto={mostrado} jeito={emocaoQ.jeito} />
+          </span>
+          <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>{auto ? 'AUTO' : 'TOQUE PARA SEGUIR ▼'}</span>
         </span>
       </button>
     )}
