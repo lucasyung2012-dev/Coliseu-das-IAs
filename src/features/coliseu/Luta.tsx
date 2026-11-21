@@ -47,6 +47,7 @@ import {
   RETIARIO_MECANICO,
 } from '@/ui/pixel/historia2';
 import { BRUTUS, PALETA_BRUTUS } from '@/ui/pixel/historia';
+import { CAPATAZ, COZINHEIRO_BORDO, FEITOR_TAMBOR, GUARDA_CHICOTE, PALETA_CAPATAZ, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GUARDA_CHICOTE } from '@/ui/pixel/historia3';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
@@ -81,6 +82,11 @@ const VISUAL: Record<string, { grade: string[]; paleta: Paleta; largura: number 
   'marinheiro-canhao': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO }, largura: 16 },
   'contramestre-ferro': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO }, largura: 18 },
   'almirante-ferrugem': { grade: ALMIRANTE_FERRUGEM, paleta: PALETA_ALMIRANTE, largura: 22 },
+  'guarda-chicote': { grade: GUARDA_CHICOTE, paleta: PALETA_GUARDA_CHICOTE, largura: 15 },
+  'cozinheiro-bordo': { grade: COZINHEIRO_BORDO, paleta: PALETA_COZINHEIRO, largura: 17 },
+  'marujo-ferro': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO, E: '#ffd04a' }, largura: 16 },
+  capataz: { grade: CAPATAZ, paleta: PALETA_CAPATAZ, largura: 18 },
+  'feitor-tambor': { grade: FEITOR_TAMBOR, paleta: PALETA_FEITOR, largura: 24 },
 };
 
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */

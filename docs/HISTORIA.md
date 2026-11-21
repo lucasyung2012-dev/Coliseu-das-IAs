@@ -162,13 +162,34 @@ Total do caminho: **22 batalhas, 4 chefões e o final**. Cada capítulo tem **in
 - **Lutas em sequência:** os campeões do Censor e o **Leão Mecânico**, um chefão de garras e rugido que abala a arena.
 - **Vai para o final** (seção 5.4).
 
-### 5.2 Caminho do Octavius: "Plano B" (resumo)
-1. **Ordem Impossível** (Porto de Óstia): desobedecer à ordem, soltar a corrente do porto para o *Esperança* fugir. Lutas nas docas contra os **Marinheiros de Ferro**. Chefão: o **Almirante Ferrugem** no convés do navio de guerra. Fim: o *Esperança* escapa, e Octavius é capturado no mar.
-2. **As Galés:** preso remando num navio de guerra (desafio de **remar no ritmo**). Motim no convés e tempestade. Naufrágio perto de Roma.
-3. **O Ludus:** chega ferido (é a mesma noite do caminho do Cassius, vista do outro lado).
-4. **O Mercado das Engrenagens** (bairro da Subura): fugir pela cidade escolhendo **plano A, B ou C** (cada rota tem lutas diferentes). Chefão: o **Cobrador**, uma máquina de cobrar impostos.
-5. **A Frota Fantasma:** retomar os navios e trazer os refugiados de volta como aliados. Ajuda o Cassius no Fórum (cruzamento). Helios guia pelas estrelas.
-6. **A Naumaquia** (Coliseu): o Coliseu é **inundado para uma batalha naval**, como os romanos faziam de verdade. Lutas no convés dentro da arena. Vai para o final.
+### 5.2 Caminho do Octavius: "Plano B" (aprovado pelo Lucas em 21/11/2026)
+
+**Cada caminho é diferente** (pedido do Lucas): o Octavius não tem uma criança ajudando. O jeito dele é outro:
+
+| | Cassius | Octavius |
+|---|---|---|
+| Jeito | sério, protege os outros | engraçado, cheio de planos (A, B, C...) |
+| Aliado principal | Lívia, a menina que ele ensinou a ler | **Marco Remo**, capitão velho e rabugento que trata o Octavius como filho teimoso. É ele quem salva o Octavius, não o contrário. O filho do Marco foi preso há anos por perguntar "de que cor era o céu antes do Censor" |
+| Mascote | — | **Gaivota Sete**: uma gaivota que segue o Octavius e rouba coisas na hora certa (chaves, sardinhas, o chapéu do Almirante) |
+| Como luta | CONTRA-ATAQUE e QUEBRA-GUARDA | **PLANOS**: no meio da luta aparecem coisas do cenário (barril, rede, gancho, corda, caixote); tocar nelas acerta e deixa o inimigo tonto |
+| Minigames | esconder livros, ler marcas, proteger a leitura | escolher planos, farol, guincho, remar no tambor, tempestade, perseguição, canhões, navegar pelas estrelas, pular de barco em barco |
+| Lugares | Biblioteca, catacumbas, Fórum | porto, mar, galés, mercado da Subura, Coliseu inundado |
+
+**As batalhas do caminho** (mais lutas que o Cassius, pedido do Lucas): **22 lutas, 5 chefões e o final**, sempre com cena ou minigame entre uma luta e outra.
+
+| Capítulo | Onde | Lutas | Chefão | Minigames |
+|---|---|---|---|---|
+| 1. Ordem Impossível | Porto de Óstia | 4 (Marinheiros de Ferro, Arpoador, Artilheiro, Contramestre) | **Almirante Ferrugem** | escolher planos, passar escondido pelo farol, girar o guincho da corrente |
+| 2. As Galés | o navio de guerra (porão dos remos e convés na tempestade) | 4 (Guarda do Chicote, Cozinheiro de Bordo, Marujo de Ferro, Capataz) | **O Feitor do Tambor** | remar no ritmo do tambor, tempestade (amarrar as cordas antes da onda) |
+| 3. O Ludus | Ludus (a mesma noite do Cassius, vista pelo Octavius) | 2 (o Touro de Bronze e uma briga nas celas) | — | 2 minigames do Octavius + o minigame dos três (ver a seção 6) |
+| 4. O Mercado das Engrenagens | bairro da Subura | 4 (mudam com a rota: telhados, esgoto ou feira) | **O Cobrador** (máquina de cobrar impostos) | perseguição pelas ruas, escolher a rota A, B ou C |
+| 5. A Frota Fantasma | o mar, à noite | 4 | **Almirante Ferrugem reconstruído** | batalha de canhões, navegar pelas estrelas com o Helios; ajuda o Cassius no Fórum (cruzamento) |
+| 6. A Naumaquia | Coliseu inundado | 4 (em cima de barcos dentro da arena) | **O Leviatã Mecânico** | pular de barco em barco |
+| Final | Coliseu | — | o Censor (os três juntos) | o mesmo final, visto pelo Octavius |
+
+**Capítulo 1: Ordem Impossível.** O Octavius faz a ronda no porto, conversa com o Marco Remo e a Gaivota Sete, e recebe a ordem de afundar o *Esperança*. O Marco conta a história do filho e da pergunta sobre o céu. Octavius decide: Plano B. Escolhe os planos, apaga as lanternas, passa escondido pelo farol, luta com os marinheiros (usando os PLANOS do cenário), gira o guincho, derruba o Contramestre e segura o Almirante Ferrugem no convés enquanto o *Esperança* foge. O navio de guerra bate nas pedras; ele é preso e mandado para as galés.
+
+**Capítulo 2: As Galés.** Acorrentado no porão, remando no ritmo do Feitor do Tambor. Conhece os remadores esquecidos, entre eles o **Vovô Pistão**, uma IA de remo presa ali há quarenta anos. A Gaivota Sete rouba a chave. Plano: motim. Lutas pelo porão e pela cozinha, a tempestade no convés (amarrar as cordas antes de cada onda), o Capataz, e o Feitor do Tambor, que ataca no ritmo do tambor. O navio afunda perto de Roma; o Vovô Pistão empurra o Octavius para fora. Na praia, a Guarda o encontra e o leva para o Ludus.
 
 ### 5.3 Caminho do Helios: "As Três Estrelas" (resumo)
 1. **O Céu Proibido** (Observatório): o Censor manda destruir os telescópios, porque "as estrelas dão ideias". Lutas contra os **Apagadores de Estrelas**, drones que escurecem tudo. Chefão: o **Eclipse**, uma máquina-escudo que bloqueia a luz (luta no escuro, usando a luz como arma).
@@ -199,11 +220,22 @@ Só abre depois de terminar **os três caminhos**. No **Hipogeu**, debaixo da ar
 
 Abre no capítulo 3 e fica disponível entre os capítulos.
 - **Conversas:** com os outros dois gladiadores, Brutus, Lívia e outros prisioneiros. A história anda aqui, e algumas conversas só aparecem depois de certos capítulos.
-- **Treinos com o Lanista:** minigames curtos que **ensinam golpes novos** (contra-ataque, esquiva dupla, golpe giratório, quebra-escudo...). **Alguns chefões só caem com o golpe certo.**
-- **Atributos do gladiador:** **Força** (dano), **Defesa** (aguenta mais), **Fôlego** (mais golpes seguidos) e **Carisma** (enche o Ânimo e a plateia mais rápido). Sobem com treinos e vitórias.
-- **O ferreiro:** os inimigos deixam **peças de máquina**; o ferreiro transforma as peças em equipamento (escudos, braceletes, elmos) que muda o visual e dá pequenos bônus **só na história**.
+- **Treinos com o Lanista:** lutas curtas contra o Brutus que **ensinam golpes novos**. Cassius: CONTRA-ATAQUE e QUEBRA-GUARDA. Octavius: ESQUIVA DUPLA. **Alguns chefões só caem com o golpe certo** (o Pretor de Aço e a quebra-guarda).
+- **Atributos do gladiador:** **Força** (dano), **Defesa** (aguenta mais), **Vida** e **Carisma** (enche o Ânimo e a plateia mais rápido). Sobem com os treinos (um de cada por capítulo) e com o equipamento.
+- **O ferreiro:** os inimigos deixam **peças de máquina**; o ferreiro transforma as peças em equipamento (bracelete, escudo reforçado, capa vermelha, peitoral). O Brutus dá o **elmo das 99 vitórias** antes da Grande Arena. Só vale na história.
 
----
+### Os minigames do Capítulo 3 (pedido do Lucas, 21/11/2026)
+No Capítulo 3 de cada caminho, os três se encontram no Ludus. Cada gladiador tem **2 minigames só dele** e existe **1 minigame dos três juntos**. Você joga com a IA que escolheu: no minigame dos três, **você controla só a sua** e os outros dois fazem a parte deles sozinhos.
+
+| Gladiador | Minigame 1 | Minigame 2 |
+|---|---|---|
+| Cassius | **A Forja do Brutus**: martelar a armadura no ritmo do martelo do Brutus | **Memória dos Golpes**: o Brutus mostra uma sequência de golpes (⚔️ 🛡️ 💨) e você repete, cada vez mais longa |
+| Octavius | **Corrida do Pátio**: atravessar o pátio pulando e abaixando dos obstáculos que o Brutus joga | **Torre de Caixotes**: empilhar caixotes balançando para alcançar a janela da cela (o plano de fuga que dá errado) |
+| Helios | **Espelhos de Bronze**: girar espelhos para levar a luz até o alvo | **O Mapa do Céu**: ligar as estrelas na ordem certa antes de a nuvem cobrir |
+
+**Os Três contra a Muralha (minigame conjunto):** o Brutus solta uma muralha de bonecos de treino em três faixas. Cada IA cuida de uma faixa do jeito dela: Cassius **segura** com o escudo, Octavius **derruba** com um plano, Helios **ilumina** os bonecos escondidos. Você joga a faixa do seu gladiador; se a sua faixa aguentar até o fim, os três passam.
+
+**No capítulo secreto (depois de terminar os três caminhos):** antes da batalha final, o Ludus abre de novo e você joga **Os Três contra a Muralha controlando os três**, trocando de faixa. Depois, na luta contra o Núcleo, você **troca de gladiador** no meio da batalha.
 
 ## 7. O que a história dá para o Arcade (só visual)
 

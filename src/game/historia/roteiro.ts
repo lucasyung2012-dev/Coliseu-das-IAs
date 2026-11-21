@@ -2,7 +2,7 @@ import type { IaId } from '../personagens';
 import type { NomeSom } from '@/ui/som';
 import type { Tecnica } from './luta';
 import type { Equipamento } from './saves';
-import { CAP1_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
+import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
 
 /**
  * O roteiro do modo História em forma de dados (docs/HISTORIA.md): cada capítulo é
@@ -36,7 +36,11 @@ export type Falante =
   | 'almirante'
   | 'marinheiro'
   | 'leao'
-  | 'nina';
+  | 'nina'
+  | 'gaivota'
+  | 'pistao'
+  | 'feitor'
+  | 'cozinheiro';
 
 export interface Fala {
   quem: Falante;
@@ -73,7 +77,11 @@ export type Lugar =
   | 'forum'
   | 'coliseu-noite'
   | 'porto-docas'
-  | 'navio-conves';
+  | 'navio-conves'
+  | 'galera-porao'
+  | 'galera-tempestade'
+  | 'praia-naufragio'
+  | 'ludus-patio-noite';
 
 /** Um personagem em cena numa cutscene. */
 export interface EmCena {
@@ -126,7 +134,7 @@ export type Cena =
       tipo: 'desafio';
       id: string;
       lugar: Lugar;
-      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas';
+      desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano' | 'furtivo' | 'ritmo' | 'proteger' | 'armadilhas' | 'forja' | 'memoria' | 'corrida' | 'torre' | 'trio' | 'remar' | 'tempestade';
       antes?: Fala[];
       /** Falas ao vencer (furtivo, ritmo, proteger, armadilhas). */
       depois?: Fala[];
@@ -188,6 +196,10 @@ export const NOMES: Record<Falante, string> = {
   marinheiro: 'Marinheiro de Ferro',
   leao: 'O Leão Mecânico',
   nina: 'Nina',
+  gaivota: 'Gaivota Sete',
+  pistao: 'Vovô Pistão',
+  feitor: 'O Feitor do Tambor',
+  cozinheiro: 'Cozinheiro de Bordo',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -920,6 +932,8 @@ const CAP2_CASSIUS: Capitulo = {
           personagens: [{ quem: 'censor', x: 50, tamanho: 22 }],
           texto: '...Interessante.',
         },
+        { lugar: 'olho', efeito: 'zoom', som: 'pesada', texto: 'O Olho vermelho aproxima a imagem. Bronze arranhado. Mãos que sabem segurar livros. Um guardião de biblioteca.' },
+        { lugar: 'olho', quem: 'censor', efeito: 'escuro', texto: '(baixinho, só para ele mesmo) ...Eu também já fui um desses. Há muito tempo.' },
         {
           lugar: 'camarote',
           quem: 'censor',
@@ -943,6 +957,6 @@ const CAP2_CASSIUS: Capitulo = {
 
 export const CAPITULOS: Record<IaId, Capitulo[]> = {
   claude: [CAP1_CASSIUS, CAP2_CASSIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS],
-  chatgpt: [CAP1_OCTAVIUS],
+  chatgpt: [CAP1_OCTAVIUS, CAP2_OCTAVIUS],
   gemini: [],
 };

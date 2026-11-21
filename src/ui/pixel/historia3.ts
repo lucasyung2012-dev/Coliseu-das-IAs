@@ -1,0 +1,678 @@
+import { desenhar, xadrez } from './desenho';
+
+/**
+ * Terceira leva de personagens do modo História em pixel: o caminho de Octavius no mar
+ * (a galé do Censor, o porão dos remadores, a cozinha de bordo e o Leviatã), mais o
+ * Touro de Bronze de Brutus, o Cobrador e dois aliados (a gaivota Sete e o Vovô Pistão).
+ * Mesmo estilo de historia.ts e historia2.ts: formas grossas, 2 a 3 tons por material,
+ * olhos acesos (vermelho nas máquinas do Censor) e contorno K automático. Todos virados
+ * para a direita; a tela de luta espelha os inimigos.
+ */
+
+// ---------- Aliados ----------
+
+// Gaivota Sete: a ajudante cômica de Octavius, olhar de quem aprontou e uma sardinha roubada no bico.
+export const GAIVOTA = desenhar(18, 14, [
+  // cauda
+  ['g', 0, 4, 3, 2],
+  ['G', 0, 5, 2, 1],
+  // corpo e asa
+  ['W', 3, 3, 9, 5],
+  ['g', 4, 3, 7, 2],
+  ['G', 3, 5, 5, 1],
+  ['w', 5, 7, 6, 1],
+  // cabeça com sobrancelha marota
+  ['W', 10, 0, 4, 5],
+  ['G', 12, 0, 2, 1],
+  ['K', 13, 1],
+  // bico com a sardinha pendurada
+  ['B', 14, 2, 2, 1],
+  ['b', 14, 3, 2, 1],
+  ['S', 15, 4, 1, 3],
+  ['s', 15, 7, 1, 1],
+  // pernas e pés
+  ['B', 6, 8, 1, 2],
+  ['B', 9, 8, 1, 2],
+  ['B', 6, 10, 2, 1],
+  ['B', 9, 10, 2, 1],
+]);
+export const PALETA_GAIVOTA = {
+  W: '#f8f8f8',
+  w: '#c8ccd8',
+  g: '#9aa0b0',
+  G: '#5a6070',
+  B: '#ff9a2a',
+  b: '#c8601a',
+  S: '#a8c8e0',
+  s: '#6a8aa8',
+  K: '#140c22',
+};
+
+// Vovô Pistão: velha IA remadora acorrentada aos remos há 40 anos, enferrujada, curvada, remendada com corda e de olhos bondosos.
+export const PISTAO = desenhar(22, 30, [
+  // chaminé pequena na cabeça
+  ['G', 13, 5, 2, 2],
+  // corcunda enferrujada
+  ['M', 3, 6, 10, 10],
+  ['W', 3, 6, 10, 1],
+  ['R', 4, 7, 3, 2],
+  ['r', 8, 12, 2, 2],
+  // remendo de corda
+  ['N', 4, 10, 8, 1],
+  ['n', 5, 10],
+  ['n', 7, 10],
+  ['n', 9, 10],
+  ['n', 11, 10],
+  // cabeça baixa, olhos redondos e bondosos, sorriso
+  ['M', 12, 7, 6, 6],
+  ['W', 12, 7, 6, 1],
+  ['A', 14, 9, 2, 2],
+  ['a', 14, 9],
+  ['m', 15, 12, 2, 1],
+  // tronco
+  ['M', 5, 15, 9, 6],
+  ['R', 6, 17, 2, 1],
+  // braço de trás pequeno
+  ['M', 2, 14, 2, 5],
+  ['m', 2, 19, 2, 1],
+  // grande braço-pistão até o chão
+  ['G', 12, 13, 3, 3],
+  ['C', 13, 14, 5, 7],
+  ['c', 17, 14, 1, 7],
+  ['Y', 13, 15, 5, 1],
+  ['Y', 13, 19, 5, 1],
+  ['S', 14, 21, 3, 3],
+  ['M', 13, 24, 5, 3],
+  ['m', 13, 26, 5, 1],
+  // pernas, grilhão e corrente
+  ['M', 6, 21, 3, 4],
+  ['M', 10, 21, 3, 4],
+  ['Y', 6, 23, 3, 1],
+  ['G', 5, 25, 5, 2],
+  ['G', 10, 25, 3, 2],
+  ['g', 4, 24],
+  ['g', 3, 25],
+  ['g', 2, 26],
+  ['g', 1, 26],
+  ['g', 0, 25],
+]);
+export const PALETA_PISTAO = {
+  M: '#8a6a50',
+  W: '#b89878',
+  m: '#4a3428',
+  R: '#b8501a',
+  r: '#7a3010',
+  N: '#c8a86a',
+  n: '#8a6a3a',
+  A: '#7ad8ff',
+  a: '#ffffff',
+  G: '#3a3a44',
+  g: '#7a7a84',
+  C: '#9a8a70',
+  c: '#5a4a3a',
+  S: '#d0d8e0',
+  Y: '#c8962a',
+  K: '#140c22',
+};
+
+// ---------- A galé do Censor ----------
+
+// O Feitor do Tambor (chefão): capataz-autômato gigante com tambor de guerra na barriga, dois braços-maço, máscara de ferro e correntes nos ombros.
+export const FEITOR_TAMBOR = desenhar(38, 44, [
+  // maço de trás erguido
+  ['L', 3, 8, 2, 12],
+  ['H', 0, 3, 7, 5],
+  ['J', 0, 3, 7, 1],
+  ['h', 0, 7, 7, 1],
+  // maço da frente erguido
+  ['L', 31, 8, 2, 12],
+  ['H', 29, 3, 7, 5],
+  ['J', 29, 3, 7, 1],
+  ['h', 29, 7, 7, 1],
+  // cabeça com máscara de ferro e olho vermelho
+  ['M', 13, 0, 10, 9],
+  ['W', 13, 0, 10, 1],
+  ['I', 15, 2, 7, 6],
+  ['O', 16, 4, 5, 2],
+  ['E', 18, 4, 2, 2],
+  ['m', 16, 7, 5, 1],
+  // ombros largos com correntes
+  ['M', 5, 9, 26, 6],
+  ['W', 5, 9, 26, 1],
+  ['C', 6, 10],
+  ['c', 7, 11],
+  ['C', 8, 12],
+  ['c', 9, 13],
+  ['C', 29, 10],
+  ['c', 28, 11],
+  ['C', 27, 12],
+  ['c', 26, 13],
+  ['C', 5, 15],
+  ['c', 5, 16],
+  ['C', 30, 15],
+  ['c', 30, 16],
+  // braços
+  ['M', 3, 14, 4, 6],
+  ['m', 2, 20, 4, 3],
+  ['M', 30, 14, 4, 6],
+  ['m', 30, 20, 4, 3],
+  // tronco com o tambor de guerra na barriga
+  ['M', 8, 15, 20, 20],
+  ['m', 8, 15, 20, 1],
+  ['Y', 13, 16, 10, 1],
+  ['Y', 11, 17, 14, 1],
+  ['Y', 10, 18, 16, 12],
+  ['Y', 11, 30, 14, 1],
+  ['Y', 13, 31, 10, 1],
+  ['D', 12, 19, 12, 10],
+  ['D', 14, 18, 8, 1],
+  ['D', 14, 29, 8, 1],
+  ['d', 12, 27, 12, 2],
+  ['d', 14, 29, 8, 1],
+  ['w', 14, 20, 3, 1],
+  ['g', 11, 20],
+  ['g', 24, 20],
+  ['g', 11, 27],
+  ['g', 24, 27],
+  // cinto
+  ['B', 8, 33, 20, 2],
+  // pernas e pés
+  ['M', 11, 35, 5, 4],
+  ['M', 20, 35, 5, 4],
+  ['G', 9, 39, 8, 3],
+  ['G', 19, 39, 8, 3],
+]);
+export const PALETA_FEITOR = {
+  M: '#5a5048',
+  W: '#9a8a78',
+  m: '#34302c',
+  I: '#3a3a44',
+  O: '#120808',
+  E: '#ff2a2a',
+  C: '#9a9aa4',
+  c: '#5a5a64',
+  Y: '#c8962a',
+  D: '#d8b888',
+  d: '#a8885a',
+  w: '#f0e0c0',
+  g: '#ffe08a',
+  H: '#6a4426',
+  h: '#3a2414',
+  J: '#a87a4a',
+  L: '#8a5a30',
+  B: '#4a3020',
+  G: '#2a2a34',
+  K: '#140c22',
+};
+
+// Guarda do Chicote: autômato de vigia da galé, chicote enrolado na mão da frente e lanterna na de trás.
+export const GUARDA_CHICOTE = desenhar(26, 34, [
+  // elmo e viseira
+  ['M', 8, 0, 8, 8],
+  ['W', 8, 0, 8, 1],
+  ['O', 11, 3, 5, 2],
+  ['E', 13, 3, 2, 1],
+  ['m', 9, 6, 6, 1],
+  // braço de trás com a lanterna
+  ['M', 4, 9, 3, 6],
+  ['m', 3, 15, 3, 2],
+  ['G', 3, 17, 3, 1],
+  ['G', 2, 18, 5, 1],
+  ['A', 2, 19, 5, 4],
+  ['a', 3, 20, 3, 2],
+  ['G', 2, 23, 5, 1],
+  // tronco
+  ['M', 7, 8, 10, 11],
+  ['m', 7, 12, 10, 1],
+  ['m', 7, 15, 10, 1],
+  ['g', 9, 10],
+  ['g', 15, 10],
+  // cinto e saia de tiras
+  ['B', 6, 19, 12, 2],
+  ['Y', 11, 19, 2, 2],
+  ['L', 7, 21, 10, 3],
+  ['B', 9, 21, 1, 3],
+  ['B', 13, 21, 1, 3],
+  // pernas e botas
+  ['M', 8, 24, 3, 5],
+  ['M', 13, 24, 3, 5],
+  ['G', 7, 29, 5, 2],
+  ['G', 12, 29, 5, 2],
+  // braço da frente com o chicote enrolado
+  ['M', 17, 9, 3, 5],
+  ['m', 18, 14, 3, 2],
+  ['N', 19, 13, 2, 3],
+  ['H', 17, 16, 6, 1],
+  ['H', 17, 17, 1, 3],
+  ['H', 22, 17, 1, 3],
+  ['H', 17, 20, 6, 1],
+  ['H', 19, 18, 2, 1],
+  ['H', 21, 21, 1, 3],
+  ['H', 22, 24, 1, 2],
+]);
+export const PALETA_GUARDA_CHICOTE = {
+  M: '#6a6a78',
+  W: '#a8a8b8',
+  m: '#3a3a48',
+  O: '#140c14',
+  E: '#ff2a2a',
+  g: '#c8a060',
+  B: '#4a3020',
+  Y: '#c8962a',
+  L: '#7a5a30',
+  G: '#2a2a34',
+  A: '#ffb02a',
+  a: '#fff0a0',
+  H: '#8a5a2a',
+  N: '#3a2414',
+  K: '#140c22',
+};
+
+// Cozinheiro de Bordo: autômato redondo e cômico, chapéu de chef, bigode, frigideira com ovo e concha, avental manchado.
+export const COZINHEIRO_BORDO = desenhar(28, 32, [
+  // chapéu de chef
+  ['W', 8, 0, 10, 4],
+  ['W', 7, 1, 12, 3],
+  ['w', 12, 0, 1, 3],
+  ['w', 8, 4, 10, 2],
+  // cabeça com olho vermelho e bigode
+  ['M', 7, 6, 12, 6],
+  ['S', 7, 6, 12, 1],
+  ['O', 13, 7, 4, 3],
+  ['E', 14, 8, 2, 1],
+  ['k', 12, 10, 6, 1],
+  ['k', 11, 11, 2, 1],
+  ['k', 17, 11, 2, 1],
+  // corpo redondo
+  ['M', 5, 12, 16, 2],
+  ['M', 3, 14, 20, 10],
+  ['M', 5, 24, 16, 2],
+  ['m', 3, 22, 4, 2],
+  ['m', 19, 22, 4, 2],
+  // avental manchado
+  ['B', 3, 16, 20, 1],
+  ['A', 7, 14, 12, 12],
+  ['s', 9, 17, 2, 2],
+  ['s', 14, 21, 3, 1],
+  ['r', 16, 15, 2, 1],
+  ['r', 10, 23],
+  // pernas curtas
+  ['m', 8, 26, 3, 2],
+  ['m', 15, 26, 3, 2],
+  ['G', 7, 28, 5, 2],
+  ['G', 14, 28, 5, 2],
+  // braço de trás com a frigideira e o ovo
+  ['M', 1, 14, 3, 4],
+  ['m', 1, 12, 2, 2],
+  ['H', 1, 8, 1, 4],
+  ['P', 0, 4, 6, 4],
+  ['p', 1, 5, 4, 2],
+  ['A', 1, 5, 3, 2],
+  ['Y', 2, 5],
+  // braço da frente com a concha
+  ['M', 21, 14, 3, 3],
+  ['m', 23, 13, 2, 2],
+  ['S', 24, 4, 1, 9],
+  ['S', 22, 2, 4, 2],
+  ['s', 23, 3, 2, 1],
+  ['r', 23, 1],
+]);
+export const PALETA_COZINHEIRO = {
+  W: '#f8f8f8',
+  w: '#c8ccd8',
+  M: '#8a92a0',
+  S: '#d0d8e0',
+  m: '#4a5060',
+  O: '#140c14',
+  E: '#ff2a2a',
+  k: '#2a1a14',
+  B: '#4a3020',
+  A: '#f0ece0',
+  s: '#a8885a',
+  r: '#c8502a',
+  G: '#2a2a34',
+  H: '#6a4426',
+  P: '#3a3a44',
+  p: '#141418',
+  Y: '#f2c14e',
+  K: '#140c22',
+};
+
+// Capataz: feitor de elite da galé, armadura pesada, faixa vermelha e dois chicotes (um estalando no alto).
+export const CAPATAZ = desenhar(30, 36, [
+  // penacho e elmo
+  ['P', 10, 0, 8, 2],
+  ['S', 9, 2, 10, 8],
+  ['W', 9, 2, 10, 1],
+  ['O', 12, 5, 6, 2],
+  ['E', 14, 5],
+  ['E', 16, 5],
+  ['s', 9, 7, 2, 3],
+  // braço de trás com chicote caído
+  ['S', 4, 14, 3, 6],
+  ['m', 3, 20, 3, 2],
+  ['N', 3, 19, 1, 2],
+  ['H', 2, 22, 1, 3],
+  ['H', 1, 25, 1, 3],
+  ['H', 2, 28, 1, 2],
+  ['H', 1, 30, 1, 2],
+  // tronco blindado
+  ['S', 9, 10, 11, 12],
+  ['s', 10, 13, 9, 1],
+  ['s', 10, 16, 9, 1],
+  // ombreiras
+  ['S', 5, 10, 6, 4],
+  ['S', 18, 10, 6, 4],
+  ['W', 5, 10, 6, 1],
+  ['W', 18, 10, 6, 1],
+  ['g', 7, 12],
+  ['g', 21, 12],
+  // faixa vermelha em diagonal
+  ['R', 9, 12, 2, 2],
+  ['R', 11, 14, 2, 2],
+  ['R', 13, 16, 2, 2],
+  ['R', 15, 18, 2, 2],
+  ['R', 17, 20, 2, 2],
+  // cinto, saia e ponta da faixa
+  ['B', 8, 22, 13, 2],
+  ['L', 8, 24, 13, 3],
+  ['B', 10, 24, 1, 3],
+  ['B', 14, 24, 1, 3],
+  ['B', 18, 24, 1, 3],
+  ['R', 7, 23, 2, 5],
+  ['r', 7, 27, 2, 1],
+  // pernas e botas
+  ['S', 9, 27, 4, 4],
+  ['S', 16, 27, 4, 4],
+  ['s', 9, 29, 4, 1],
+  ['s', 16, 29, 4, 1],
+  ['G', 8, 31, 6, 2],
+  ['G', 15, 31, 6, 2],
+  // braço da frente com chicote estalando
+  ['S', 20, 14, 3, 4],
+  ['m', 22, 12, 3, 3],
+  ['N', 23, 9, 2, 3],
+  ['H', 24, 7, 1, 2],
+  ['H', 25, 5, 1, 2],
+  ['H', 26, 3, 1, 2],
+  ['H', 27, 4, 1, 7],
+  ['H', 26, 11, 1, 2],
+  ['Y', 26, 13],
+]);
+export const PALETA_CAPATAZ = {
+  P: '#c0283c',
+  S: '#7a8090',
+  W: '#c0c8d8',
+  s: '#4a5060',
+  O: '#140c14',
+  E: '#ff2a2a',
+  m: '#3a3e4a',
+  N: '#3a2414',
+  H: '#8a5a2a',
+  g: '#ffe08a',
+  R: '#b8202c',
+  r: '#7a1018',
+  B: '#4a3020',
+  L: '#7a5a30',
+  G: '#2a2a34',
+  Y: '#fff0a0',
+  K: '#140c22',
+};
+
+// ---------- Outros chefões ----------
+
+// O Touro de Bronze: touro-autômato de treino de Brutus, chifres grandes, cabeça baixa e vapor saindo das narinas.
+export const TOURO_BRONZE = desenhar(40, 28, [
+  // cauda com borla
+  ['m', 2, 7, 2, 1],
+  ['m', 1, 8, 1, 5],
+  ['Y', 0, 13, 2, 2],
+  // corpo e cupim
+  ['M', 3, 6, 22, 11],
+  ['W', 3, 6, 22, 1],
+  ['M', 17, 3, 9, 4],
+  ['W', 17, 3, 9, 1],
+  ['m', 10, 7, 1, 9],
+  ['m', 18, 7, 1, 9],
+  ['m', 4, 16, 20, 1],
+  ['g', 5, 9],
+  ['g', 13, 9],
+  ['g', 21, 9],
+  ['g', 5, 14],
+  ['g', 13, 14],
+  ['g', 21, 14],
+  // chifres
+  ['H', 25, 5, 2, 2],
+  ['H', 24, 3, 2, 2],
+  ['H', 25, 1, 2, 2],
+  ['h', 26, 0],
+  ['H', 29, 5, 3, 2],
+  ['H', 31, 3, 2, 2],
+  ['H', 32, 1, 2, 2],
+  ['h', 33, 0],
+  // cabeça baixa em investida
+  ['M', 24, 7, 8, 9],
+  ['W', 24, 7, 8, 1],
+  ['E', 27, 9, 2, 2],
+  ['M', 30, 11, 5, 6],
+  ['m', 30, 16, 5, 1],
+  ['O', 33, 12],
+  ['O', 33, 14],
+  ['Y', 33, 16, 2, 2],
+  // vapor das narinas
+  ['V', 35, 11, 2, 2],
+  ['V', 36, 9, 2, 2],
+  ['v', 35, 14, 2, 1],
+  ['V', 36, 15, 2, 2],
+  // patas, pistões e cascos
+  ['M', 4, 17, 4, 6],
+  ['m', 9, 17, 3, 5],
+  ['m', 18, 17, 3, 5],
+  ['M', 22, 17, 4, 6],
+  ['S', 5, 19, 2, 1],
+  ['S', 23, 19, 2, 1],
+  ['G', 3, 23, 6, 2],
+  ['G', 8, 22, 5, 2],
+  ['G', 17, 22, 5, 2],
+  ['G', 21, 23, 6, 2],
+]);
+export const PALETA_TOURO = {
+  M: '#b8782a',
+  W: '#f0c070',
+  m: '#7a4a1a',
+  g: '#ffe08a',
+  H: '#e8e0c8',
+  h: '#ffffff',
+  E: '#ff3a2a',
+  O: '#1a0a06',
+  Y: '#d0d8e0',
+  V: '#e8eef4',
+  v: '#b8c4d0',
+  S: '#d0d8e0',
+  G: '#4a3020',
+  K: '#140c22',
+};
+
+// O Cobrador (chefão): máquina de cobrar impostos, cartola, boca de fenda de moeda, ábaco no peito, braço-livro-caixa e punhos de saco de dinheiro.
+export const COBRADOR = desenhar(34, 42, [
+  // cartola
+  ['H', 10, 0, 10, 4],
+  ['Y', 10, 3, 10, 1],
+  ['H', 8, 4, 14, 1],
+  // cabeça com monóculo e boca de fenda de moeda
+  ['M', 9, 5, 12, 9],
+  ['W', 9, 5, 12, 1],
+  ['Y', 15, 6, 4, 4],
+  ['E', 16, 7, 2, 2],
+  ['O', 12, 10, 7, 3],
+  ['F', 13, 11, 5, 1],
+  ['f', 13, 12, 5, 1],
+  // tronco com ábaco no peito
+  ['M', 6, 14, 20, 16],
+  ['W', 6, 14, 20, 1],
+  ['B', 8, 16, 14, 10],
+  ['O', 9, 17, 12, 8],
+  ['b', 9, 18, 12, 1],
+  ['b', 9, 20, 12, 1],
+  ['b', 9, 22, 12, 1],
+  ['b', 9, 24, 12, 1],
+  ['A', 10, 18, 2, 1],
+  ['a', 16, 18, 3, 1],
+  ['a', 9, 20, 1, 1],
+  ['A', 13, 20, 3, 1],
+  ['A', 18, 22, 3, 1],
+  ['a', 10, 22, 2, 1],
+  ['a', 12, 24, 4, 1],
+  ['A', 19, 24, 2, 1],
+  // cinto com fivela de moeda
+  ['B', 6, 30, 20, 2],
+  ['Y', 15, 30, 2, 2],
+  // pernas e pés
+  ['M', 9, 32, 5, 5],
+  ['M', 18, 32, 5, 5],
+  ['G', 8, 37, 7, 2],
+  ['G', 17, 37, 7, 2],
+  // braço de trás: livro-caixa preso ao antebraço e punho de saco
+  ['M', 2, 15, 4, 6],
+  ['L', 0, 20, 6, 7],
+  ['l', 1, 21, 4, 5],
+  ['b', 2, 22, 3, 1],
+  ['b', 2, 24, 3, 1],
+  ['Y', 2, 27, 3, 1],
+  ['N', 1, 28, 5, 4],
+  ['n', 1, 31, 5, 1],
+  // braço da frente com punho de saco de dinheiro
+  ['M', 26, 15, 4, 5],
+  ['N', 28, 19, 2, 2],
+  ['Y', 27, 21, 4, 1],
+  ['N', 26, 22, 6, 7],
+  ['n', 26, 28, 6, 1],
+  ['Y', 28, 23, 1, 4],
+  ['Y', 27, 24, 3, 1],
+  ['Y', 27, 26, 3, 1],
+]);
+/** Com furia=true a fenda de moeda fica em brasa e o olho arde. */
+export const paletaCobrador = (furia: boolean) => ({
+  H: '#1a1a24',
+  Y: '#e0b040',
+  M: '#8a7a4a',
+  W: '#c8b880',
+  E: furia ? '#fff0a0' : '#ff2a2a',
+  O: '#120808',
+  F: furia ? '#ff3a1a' : '#ffd04a',
+  f: furia ? '#ffb02a' : '#a8802a',
+  B: '#4a3020',
+  b: '#c8b890',
+  A: '#c0283c',
+  a: '#2a8a5a',
+  L: '#5a2a14',
+  l: '#e8dcb8',
+  N: '#a88a5a',
+  n: '#7a5a3a',
+  G: '#2a2a34',
+  K: '#140c22',
+});
+
+// O Leviatã Mecânico (chefão): serpente marinha de ferro surgindo do mar, anéis segmentados, cabeça com barbatanas, olho vermelho e borrifos.
+export const LEVIATA = desenhar(54, 44, [
+  // primeiro anel saindo da água
+  ['M', 2, 26, 6, 10],
+  ['M', 4, 22, 10, 5],
+  ['M', 12, 26, 6, 10],
+  ['W', 4, 22, 10, 1],
+  ['m', 2, 29, 6, 1],
+  ['m', 2, 32, 6, 1],
+  ['m', 12, 29, 6, 1],
+  ['m', 12, 32, 6, 1],
+  ['m', 8, 23, 1, 4],
+  ['g', 4, 27],
+  ['g', 14, 27],
+  // pescoço erguido
+  ['M', 22, 24, 9, 12],
+  ['M', 24, 16, 8, 9],
+  ['M', 27, 10, 8, 7],
+  ['W', 24, 16, 1, 8],
+  ['W', 27, 10, 1, 6],
+  ['m', 22, 28, 9, 1],
+  ['m', 22, 32, 9, 1],
+  ['m', 24, 19, 8, 1],
+  ['m', 24, 22, 8, 1],
+  ['m', 27, 13, 8, 1],
+  ['P', 29, 25, 2, 11],
+  ['P', 30, 17, 2, 8],
+  ['P', 33, 11, 2, 6],
+  ['g', 23, 30],
+  ['g', 26, 20],
+  // cauda com barbatana à direita
+  ['M', 44, 28, 4, 8],
+  ['M', 46, 24, 4, 5],
+  ['m', 44, 31, 4, 1],
+  ['N', 48, 20, 3, 5],
+  ['n', 48, 24, 3, 1],
+  // cabeça com barbatanas
+  ['N', 34, 0, 3, 4],
+  ['N', 37, 1, 3, 3],
+  ['N', 40, 2, 2, 2],
+  ['n', 34, 3, 8, 1],
+  ['M', 32, 4, 14, 10],
+  ['W', 32, 4, 12, 1],
+  ['M', 44, 7, 5, 6],
+  ['N', 31, 8, 3, 5],
+  ['n', 31, 12, 3, 1],
+  ['O', 37, 6, 4, 3],
+  ['E', 37, 6, 3, 2],
+  ['e', 38, 6],
+  // boca aberta com dentes
+  ['O', 40, 12, 9, 2],
+  ['T', 41, 12],
+  ['T', 44, 12],
+  ['T', 47, 12],
+  ['T', 42, 13],
+  ['T', 46, 13],
+  ['M', 38, 14, 11, 2],
+  ['m', 38, 15, 11, 1],
+  // placas rachadas e respiros (vapor a partir da fase 1)
+  ['c', 5, 24, 1, 2],
+  ['c', 14, 28, 1, 3],
+  ['c', 25, 20, 1, 2],
+  ['c', 26, 29, 2, 1],
+  ['c', 33, 8, 2, 1],
+  ['v', 6, 25, 2, 1],
+  ['v', 15, 30, 2, 1],
+  ['v', 25, 26, 2, 1],
+  ['v', 28, 14, 2, 1],
+  // borrifos de água
+  ['F', 19, 31, 2, 4],
+  ['F', 17, 33, 2, 2],
+  ['F', 32, 31, 2, 4],
+  ['F', 34, 33, 2, 2],
+  ['F', 41, 32, 2, 3],
+  // mar
+  ['A', 0, 36, 52, 6],
+  ['a', 0, 36, 52, 1],
+  ...xadrez('a', 1, 39, 50, 1),
+  ['F', 2, 35, 4, 1],
+  ['F', 14, 35, 5, 1],
+  ['F', 30, 35, 4, 1],
+  ['F', 44, 35, 5, 1],
+]);
+/** fase 0 normal; 1+ placas rachadas em brasa e vapor saindo dos respiros. */
+export const paletaLeviata = (fase: number) => ({
+  M: '#4a5a68',
+  W: '#8aa0b0',
+  m: '#2a3440',
+  P: '#6a7a88',
+  N: '#2a8a8a',
+  n: '#1a5a5a',
+  O: '#120808',
+  E: fase >= 1 ? '#ff5a3a' : '#ff2a2a',
+  e: fase >= 1 ? '#ffffff' : '#ffd0d0',
+  T: '#e8e8e0',
+  g: '#c8a060',
+  A: '#1a4a8a',
+  a: '#4a8ad8',
+  F: '#e8f4ff',
+  c: fase >= 1 ? '#ff8a2a' : '#2a3440',
+  v: fase >= 1 ? '#e8eef4' : '#2a3440',
+  K: '#140c22',
+});

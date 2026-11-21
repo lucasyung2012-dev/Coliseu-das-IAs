@@ -1,0 +1,678 @@
+/*
+ * Animações de ambiente dos cenários do terceiro bloco de capítulos (320 × 180): o caminho do Octavius.
+ * Toda classe e todo keyframe começam com "c3-" para não colidir com o resto do jogo.
+ * Atenção: animar opacity num elemento sobrescreve o atributo opacity dele;
+ * por isso as classes que mexem em opacity vão em grupos (<g>) ou em retângulos sem opacity própria.
+ * Nos elementos de SVG, px nas transformações vale como unidade do desenho.
+ */
+
+/* Chama: estica para cima a partir da base, em dois passos (retrô) */
+.c3-chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c3-chama 0.5s steps(2) infinite alternate;
+}
+@keyframes c3-chama {
+  from {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.92, 1.2);
+    opacity: 0.85;
+  }
+}
+
+/* Halo de luz respirando devagar */
+.c3-pulsar {
+  animation: c3-pulsar 2.6s ease-in-out infinite alternate;
+}
+@keyframes c3-pulsar {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Poeira flutuando na luz */
+.c3-poeira {
+  opacity: 0;
+  animation: c3-poeira 7s steps(28) infinite;
+}
+@keyframes c3-poeira {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(6px, -18px);
+    opacity: 0;
+  }
+}
+
+/* Fagulha subindo da tocha */
+.c3-brasa {
+  opacity: 0;
+  animation: c3-brasa 3.2s steps(24) infinite;
+}
+@keyframes c3-brasa {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(3px, -16px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-2px, -28px);
+    opacity: 0;
+  }
+}
+
+/* Lanterna pendurada balançando com o mar (gira pelo topo) */
+.c3-balancar {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c3-balancar 3.2s ease-in-out infinite alternate;
+}
+@keyframes c3-balancar {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+/* Estandarte ondulando */
+.c3-bandeira {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c3-bandeira 3.2s steps(4) infinite alternate;
+}
+@keyframes c3-bandeira {
+  from {
+    transform: skewX(-3deg);
+  }
+  to {
+    transform: skewX(3deg);
+  }
+}
+
+/* Vela rasgada estufando e batendo no vento da tempestade */
+.c3-vela {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c3-vela 1.2s steps(3) infinite alternate;
+}
+@keyframes c3-vela {
+  from {
+    transform: skewX(-3deg) scaleY(1);
+  }
+  to {
+    transform: skewX(4deg) scaleY(1.05);
+  }
+}
+
+/* Tiras soltas da vela tremulando forte */
+.c3-farrapo {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c3-farrapo 0.5s steps(2) infinite alternate;
+}
+@keyframes c3-farrapo {
+  from {
+    transform: skewX(-14deg);
+  }
+  to {
+    transform: skewX(14deg);
+  }
+}
+
+/* Cabo solto chicoteando (a origem vem no estilo, em unidades do desenho) */
+.c3-chicote {
+  animation: c3-chicote 0.9s steps(3) infinite alternate;
+}
+@keyframes c3-chicote {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+/* Nuvens andando devagar */
+.c3-nuvem {
+  animation: c3-nuvem 40s steps(30) infinite alternate;
+}
+@keyframes c3-nuvem {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-30px);
+  }
+}
+
+/* Gaivotas planando de um lado ao outro, subindo e descendo */
+.c3-gaivota {
+  animation: c3-gaivota 18s linear infinite;
+}
+@keyframes c3-gaivota {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(90px, -6px);
+  }
+  50% {
+    transform: translate(180px, 4px);
+  }
+  75% {
+    transform: translate(270px, -4px);
+  }
+  100% {
+    transform: translate(370px, 2px);
+  }
+}
+
+/* Asas batendo (vira de cabeça para baixo pela base) */
+.c3-asa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c3-asa 0.3s steps(1) infinite;
+}
+@keyframes c3-asa {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(-1);
+  }
+}
+
+/* Gota caindo do teto do porão até a poça (128 px abaixo) */
+.c3-gota {
+  animation: c3-gota 2.4s steps(20) infinite;
+}
+@keyframes c3-gota {
+  0%,
+  30% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  88% {
+    transform: translate(0, 126px);
+    opacity: 1;
+  }
+  90%,
+  100% {
+    transform: translate(0, 128px);
+    opacity: 0;
+  }
+}
+
+/* Ondinha na poça quando a gota cai (mesmo ritmo da gota) */
+.c3-ondinha {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: c3-ondinha 2.4s steps(6) infinite;
+}
+@keyframes c3-ondinha {
+  0%,
+  88% {
+    transform: scaleX(0.3);
+    opacity: 0;
+  }
+  90% {
+    transform: scaleX(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1.6);
+    opacity: 0;
+  }
+}
+
+/* Água escorrendo pelo costado, da portinhola até o chão */
+.c3-escorre {
+  animation: c3-escorre 1.8s steps(12) infinite;
+}
+@keyframes c3-escorre {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  90% {
+    transform: translateY(38px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+/* Estrelas miúdas piscando */
+.c3-estrela {
+  animation: c3-estrela 3s steps(3) infinite alternate;
+}
+@keyframes c3-estrela {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* As três estrelas alinhadas: brilho forte que respira devagar */
+.c3-cintilar {
+  animation: c3-cintilar 2.2s ease-in-out infinite alternate;
+}
+@keyframes c3-cintilar {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* Luzinhas e olhos no escuro que piscam de vez em quando */
+.c3-piscar {
+  animation: c3-piscar 5s steps(1) infinite;
+}
+@keyframes c3-piscar {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0;
+  }
+}
+
+/* Olho do Censor brilhando */
+.c3-olho {
+  animation: c3-olho 2.4s steps(3) infinite alternate;
+}
+@keyframes c3-olho {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Luz do dia entrando pela grade do teto do porão */
+.c3-feixe {
+  animation: c3-feixe 5s ease-in-out infinite alternate;
+}
+@keyframes c3-feixe {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Engrenagens girando (a origem vem no estilo, em unidades do desenho) */
+.c3-gira {
+  animation: c3-gira 12s steps(48) infinite;
+}
+@keyframes c3-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Brilho na água (reflexo do sol, chão molhado, mar pela portinhola) */
+.c3-agua {
+  animation: c3-agua 1.8s steps(3) infinite alternate;
+}
+@keyframes c3-agua {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Ondas miúdas do mar revolto */
+.c3-onda {
+  animation: c3-onda 2.2s steps(6) infinite alternate;
+}
+@keyframes c3-onda {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-10px, 2px);
+  }
+}
+
+/* Vagalhões enormes subindo e descendo */
+.c3-vaga {
+  animation: c3-vaga 3.6s ease-in-out infinite alternate;
+}
+@keyframes c3-vaga {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-6px, 5px);
+  }
+}
+
+/* Onda estourando por cima da amurada */
+.c3-espuma {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: c3-espuma 4s steps(8) infinite;
+}
+@keyframes c3-espuma {
+  0%,
+  55% {
+    transform: scale(0.3, 0.2);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(0.8, 1);
+    opacity: 1;
+  }
+  85% {
+    transform: scale(1.2, 1.3);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.4, 1);
+    opacity: 0;
+  }
+}
+
+/* Chuva caindo em diagonal (anda um "andar" de 60 px e recomeça) */
+.c3-chuva {
+  animation: c3-chuva 0.4s linear infinite;
+}
+@keyframes c3-chuva {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-10px, 60px);
+  }
+}
+
+/* Clarão do relâmpago na cena toda */
+.c3-relampago {
+  opacity: 0;
+  animation: c3-relampago 7s steps(1) infinite;
+}
+@keyframes c3-relampago {
+  0%,
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 0.35;
+  }
+  91% {
+    opacity: 0;
+  }
+  92% {
+    opacity: 0.25;
+  }
+  94% {
+    opacity: 0;
+  }
+}
+
+/* O raio em si: aparece inteiro junto com o clarão (mesmo tempo de 7 s) */
+.c3-raio {
+  opacity: 0;
+  animation: c3-raio 7s steps(1) infinite;
+}
+@keyframes c3-raio {
+  0%,
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 1;
+  }
+  91% {
+    opacity: 0.3;
+  }
+  92% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0;
+  }
+}
+
+/*
+ * Ritmo da galera: o tambor bate a cada 1,6 s e os remos vão e voltam no mesmo compasso.
+ * Remo do porão: gira em volta da portinhola (origem no estilo, em unidades do desenho).
+ */
+.c3-remo {
+  animation: c3-remo 1.6s ease-in-out infinite alternate;
+}
+@keyframes c3-remo {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+/* Corpo do remador indo e voltando junto com o remo */
+.c3-remador {
+  animation: c3-remador 1.6s steps(3) infinite alternate;
+}
+@keyframes c3-remador {
+  from {
+    transform: translateX(-1px);
+  }
+  to {
+    transform: translateX(1px);
+  }
+}
+
+/* Remos para fora do casco, no convés (origem no estilo) */
+.c3-remo-fora {
+  animation: c3-remo-fora 1.6s ease-in-out infinite alternate;
+}
+@keyframes c3-remo-fora {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+/* Tambor tremendo a cada batida */
+.c3-tambor {
+  animation: c3-tambor 1.6s steps(1) infinite;
+}
+@keyframes c3-tambor {
+  0% {
+    transform: translate(0, 1px);
+  }
+  4% {
+    transform: translate(1px, 0);
+  }
+  8% {
+    transform: translate(-1px, 0);
+  }
+  12%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Braço do tamborileiro autômato: sobe devagar e desce de uma vez (origem no estilo) */
+.c3-malho {
+  animation: c3-malho 1.6s linear infinite;
+}
+@keyframes c3-malho {
+  0%,
+  8% {
+    transform: rotate(0deg);
+  }
+  60%,
+  92% {
+    transform: rotate(28deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Estalo da batida em volta do couro do tambor */
+.c3-batida {
+  opacity: 0;
+  animation: c3-batida 1.6s steps(1) infinite;
+}
+@keyframes c3-batida {
+  0% {
+    opacity: 1;
+  }
+  10%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Espuma da onda subindo e descendo na areia */
+.c3-mare {
+  animation: c3-mare 3s ease-in-out infinite alternate;
+}
+@keyframes c3-mare {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-4px, 3px);
+  }
+}
+.c3-mare-volta {
+  animation: c3-mare-volta 3.6s ease-in-out infinite alternate;
+}
+@keyframes c3-mare-volta {
+  from {
+    transform: translate(0, 0);
+    opacity: 0.9;
+  }
+  to {
+    transform: translate(5px, -2px);
+    opacity: 0.4;
+  }
+}
+
+/* Destroços boiando */
+.c3-boiar {
+  animation: c3-boiar 2.4s steps(2) infinite alternate;
+}
+@keyframes c3-boiar {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(2px);
+  }
+}
+
+/* Caranguejo andando de lado, com paradas */
+.c3-caranguejo {
+  animation: c3-caranguejo 9s steps(28) infinite;
+}
+@keyframes c3-caranguejo {
+  0%,
+  20% {
+    transform: translateX(0);
+  }
+  50%,
+  70% {
+    transform: translateX(16px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Menos movimento: tudo parado (partículas ficam visíveis, paradas; clarões, estalos e gotas somem) */
+.menos-movimento .c3-chama,
+.menos-movimento .c3-pulsar,
+.menos-movimento .c3-poeira,
+.menos-movimento .c3-brasa,
+.menos-movimento .c3-balancar,
+.menos-movimento .c3-bandeira,
+.menos-movimento .c3-vela,
+.menos-movimento .c3-farrapo,
+.menos-movimento .c3-chicote,
+.menos-movimento .c3-nuvem,
+.menos-movimento .c3-gaivota,
+.menos-movimento .c3-asa,
+.menos-movimento .c3-gota,
+.menos-movimento .c3-ondinha,
+.menos-movimento .c3-escorre,
+.menos-movimento .c3-estrela,
+.menos-movimento .c3-cintilar,
+.menos-movimento .c3-piscar,
+.menos-movimento .c3-olho,
+.menos-movimento .c3-feixe,
+.menos-movimento .c3-gira,
+.menos-movimento .c3-agua,
+.menos-movimento .c3-onda,
+.menos-movimento .c3-vaga,
+.menos-movimento .c3-espuma,
+.menos-movimento .c3-chuva,
+.menos-movimento .c3-relampago,
+.menos-movimento .c3-raio,
+.menos-movimento .c3-remo,
+.menos-movimento .c3-remador,
+.menos-movimento .c3-remo-fora,
+.menos-movimento .c3-tambor,
+.menos-movimento .c3-malho,
+.menos-movimento .c3-batida,
+.menos-movimento .c3-mare,
+.menos-movimento .c3-mare-volta,
+.menos-movimento .c3-boiar,
+.menos-movimento .c3-caranguejo {
+  animation: none;
+}
+.menos-movimento .c3-poeira,
+.menos-movimento .c3-brasa {
+  opacity: 0.7;
+}
+.menos-movimento .c3-espuma {
+  opacity: 0;
+}

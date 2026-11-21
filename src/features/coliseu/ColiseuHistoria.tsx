@@ -12,6 +12,8 @@ import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
 import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
 import { Ludus } from './Ludus';
+import { MinigameCorrida, MinigameForja, MinigameMemoria, MinigameTorre, MinigameTrio } from './MinigamesLudus';
+import { DesafioRemar, DesafioTempestade } from './MinigamesMar';
 
 /**
  * O Coliseu: o modo História (docs/HISTORIA.md). Prólogo, saves (quantos quiser,
@@ -306,6 +308,13 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
     );
   if (cena.desafio === 'proteger') return <DesafioProteger lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
   if (cena.desafio === 'armadilhas') return <DesafioArmadilhas lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'forja') return <MinigameForja lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'memoria') return <MinigameMemoria lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'corrida') return <MinigameCorrida lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'torre') return <MinigameTorre lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
+  if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={proxima} />;
   if (cena.desafio === 'ler-marcas') return <DesafioMarcas lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   if (cena.desafio === 'escolher-plano') return <DesafioPlanos lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;

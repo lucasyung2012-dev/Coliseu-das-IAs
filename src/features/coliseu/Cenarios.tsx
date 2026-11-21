@@ -2,6 +2,7 @@ import type { Falante, Lugar } from '@/game/historia/roteiro';
 import { CenaColiseu } from '../arcade/cenas/Cenarios';
 import { desenhoCapitulo } from './cenarios/capitulos';
 import { desenhoCapitulo2 } from './cenarios/capitulos2';
+import { desenhoCapitulo3 } from './cenarios/capitulos3';
 import { desenhoPrologo } from './cenarios/prologo';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
@@ -42,6 +43,7 @@ import {
   paletaLeao,
   PRETOR_DE_ACO,
 } from '@/ui/pixel/historia2';
+import { COZINHEIRO_BORDO, FEITOR_TAMBOR, GAIVOTA, PALETA_COZINHEIRO, PALETA_FEITOR, PALETA_GAIVOTA, PALETA_PISTAO, PISTAO } from '@/ui/pixel/historia3';
 
 /**
  * Os cenários do modo História, em pixel (160 × 90, ampliados sem suavizar).
@@ -54,7 +56,7 @@ export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
   // A Grande Arena dos Jogos da Resposta Única: a arena imperial, lotada e em festa.
   if (lugar === 'coliseu-noite') return <CenaColiseu corA="#f08c50" corB="#c0283c" arena="imperial" viva festa />;
   // Os cenários novos, em 320 × 180 (o dobro de detalhe).
-  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar);
+  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar);
   if (hd)
     return (
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
@@ -431,6 +433,14 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={ECO} paleta={PALETA_ECO} espelhar={espelhar} />;
     case 'crianca':
       return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
+    case 'gaivota':
+      return <Sprite grade={GAIVOTA} paleta={PALETA_GAIVOTA} espelhar={espelhar} />;
+    case 'pistao':
+      return <Sprite grade={PISTAO} paleta={PALETA_PISTAO} espelhar={espelhar} />;
+    case 'feitor':
+      return <Sprite grade={FEITOR_TAMBOR} paleta={PALETA_FEITOR} espelhar={espelhar} />;
+    case 'cozinheiro':
+      return <Sprite grade={COZINHEIRO_BORDO} paleta={PALETA_COZINHEIRO} espelhar={espelhar} />;
     case 'nina':
       // A menina refugiada do Esperança: o mesmo desenho do menino, com cabelo ruivo e roupa amarela.
       return <Sprite grade={CRIANCA} paleta={{ ...PALETA_CRIANCA, H: '#c8501a', T: '#e8b42a', P: '#f0c098' }} espelhar={espelhar} />;

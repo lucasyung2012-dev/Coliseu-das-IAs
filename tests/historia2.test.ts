@@ -111,6 +111,31 @@ describe('os capítulos', () => {
     for (const d of ['furtivo', 'ritmo', 'proteger', 'armadilhas'] as const) expect(desafios).toContain(d);
   });
 
+  it('o Ludus do Cassius tem 2 minigames dele (forja e memória) e o dos três juntos', () => {
+    const cap3 = CAPITULOS.claude[2]!.cenas.flatMap((c) => (c.tipo === 'desafio' ? [c.desafio] : []));
+    expect(cap3).toEqual(expect.arrayContaining(['forja', 'memoria', 'trio']));
+  });
+
+  it('cada caminho tem a sua história: o Octavius não tem criança ajudando; tem o Marco e a Gaivota Sete', () => {
+    const quem = CAPITULOS.chatgpt.flatMap((c) => c.cenas).flatMap((c) =>
+      c.tipo === 'cutscene' ? c.quadros.flatMap((q) => [q.quem, ...(q.personagens ?? []).map((p) => p.quem)]) : c.tipo === 'conversa' ? c.falas.map((f) => f.quem) : [],
+    );
+    expect(quem).not.toContain('nina');
+    expect(quem).not.toContain('livia');
+    expect(quem).toContain('marco');
+    expect(quem).toContain('gaivota');
+  });
+
+  it('o Capítulo 2 do Octavius: As Galés, 4 lutas e o Feitor do Tambor, com remar e tempestade', () => {
+    const cap = CAPITULOS.chatgpt[1]!;
+    expect(cap.titulo).toBe('As Galés');
+    const lutas = cap.cenas.filter((c) => c.tipo === 'luta');
+    expect(lutas).toHaveLength(5);
+    expect(lutas[4]).toMatchObject({ inimigo: 'feitor-tambor' });
+    const desafios = cap.cenas.flatMap((c) => (c.tipo === 'desafio' ? [c.desafio] : []));
+    expect(desafios).toEqual(expect.arrayContaining(['remar', 'tempestade']));
+  });
+
   it('o Octavius já pode ser jogado: Capítulo 1 com o desafio dos planos e o Almirante Ferrugem', () => {
     expect(CAMINHOS_ABERTOS).toContain('chatgpt');
     const cap = CAPITULOS.chatgpt[0]!;

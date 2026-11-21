@@ -377,4 +377,54 @@ export const INIMIGOS: Record<string, DefInimigo> = {
       { ataques: [fogo('Bordada', 650, 14, 1000, 3, 360), golpe('Sabre furioso', 550, 10, 900, 3, 300), investida('Abalroar', 650, 24, 1100), finta(500)], pausaMs: [600, 950] },
     ],
   },
+
+  // ---------- Caminho do Octavius: Capítulo 2, As Galés ----------
+  'guarda-chicote': {
+    id: 'guarda-chicote',
+    nome: 'Guarda do Chicote',
+    vida: 70,
+    contra: 13,
+    fases: [{ ataques: [investida('Chicotada longa', 750, 16, 950), golpe('Lanterna', 650, 12, 800), finta(600), golpe('Chicote duplo', 650, 9, 850, 2, 360)], pausaMs: [800, 1200] }],
+  },
+  'cozinheiro-bordo': {
+    id: 'cozinheiro-bordo',
+    nome: 'Cozinheiro de Bordo',
+    vida: 80,
+    contra: 14,
+    fases: [{ ataques: [golpe('Frigideira', 700, 14, 900), fogo('Sopa fervendo', 800, 18, 1000), golpe('Concha, concha, concha', 600, 8, 900, 3, 320), finta(550)], pausaMs: [750, 1100] }],
+  },
+  'marujo-ferro': {
+    id: 'marujo-ferro',
+    nome: 'Marujo de Ferro',
+    vida: 92,
+    contra: 15,
+    fases: [{ ataques: [golpe('Gancho', 620, 14, 800), investida('Âncora no convés', 700, 19, 1000), finta(500), golpe('Gancho duplo', 600, 10, 850, 2, 330), fogo('Lampião quebrado', 700, 16, 900)], pausaMs: [700, 1050] }],
+  },
+  capataz: {
+    id: 'capataz',
+    nome: 'O Capataz das Galés',
+    vida: 110,
+    contra: 17,
+    pecas: 3,
+    trocaDeFase: [0.5],
+    fases: [
+      { ataques: [investida('Dois chicotes', 700, 18, 950), golpe('Corrente', 600, 13, 800), finta(500), golpe('Chicote em cruz', 600, 9, 850, 2, 320)], pausaMs: [700, 1000] },
+      { ataques: [golpe('Tempestade de chicotes', 520, 8, 900, 4, 270), investida('Dois chicotes', 600, 20, 950), finta(450)], pausaMs: [550, 850] },
+    ],
+  },
+  // Chefão: o Feitor do Tambor. Ataca no ritmo do tambor dele: as batidas viram golpes,
+  // cada fase mais rápida. Na última, o tambor solta ondas de choque (VERMELHO).
+  'feitor-tambor': {
+    id: 'feitor-tambor',
+    nome: 'O Feitor do Tambor',
+    vida: 200,
+    chefao: true,
+    contra: 18,
+    trocaDeFase: [0.66, 0.33],
+    fases: [
+      { ataques: [golpe('TUM', 800, 13, 900), golpe('TUM-TUM', 750, 10, 950, 2, 450), finta(700), investida('Baqueta na cabeça', 850, 20, 1100)], pausaMs: [900, 1200] },
+      { ataques: [golpe('TUM-TUM-TUM', 650, 9, 950, 3, 380), fogo('Onda do tambor', 800, 20, 1100), finta(550), investida('Baqueta na cabeça', 700, 22, 1100)], pausaMs: [700, 1000] },
+      { ataques: [fogo('Rufar de guerra', 700, 14, 1000, 3, 360), golpe('TUM! TUM! TUM! TUM!', 520, 8, 950, 4, 300), finta(450), investida('Baqueta dupla', 600, 24, 1100)], pausaMs: [550, 850] },
+    ],
+  },
 };
