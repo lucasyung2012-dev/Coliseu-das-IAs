@@ -1274,3 +1274,70 @@
 @media (prefers-reduced-motion: reduce) {
   .comemora-tres { animation: none; }
 }
+
+/* ---------- O botão do Coliseu na tela inicial (CenaPortalColiseu) ---------- */
+.portal-cena svg * { transform-box: view-box; }
+.pc-gladiador {
+  --porta: 30%;
+  left: var(--fim);
+  bottom: 5%;
+  translate: -50% 0;
+  animation: pc-sai 1.9s ease-out var(--d) both;
+}
+@media (min-width: 640px) {
+  .pc-gladiador { --porta: 37%; }
+}
+@keyframes pc-sai {
+  0% { left: 50%; bottom: var(--porta); scale: 0.45; filter: brightness(0.2); opacity: 0; }
+  10% { opacity: 1; }
+  100% { left: var(--fim); bottom: 5%; scale: 1; filter: brightness(1); opacity: 1; }
+}
+.pc-passo {
+  transform-origin: 50% 100%;
+  animation: pc-bob 0.32s ease-in-out var(--d) 6, pc-respira 2.6s ease-in-out calc(var(--d) + 2.1s) infinite;
+}
+@keyframes pc-bob { 50% { translate: 0 -6%; } }
+@keyframes pc-respira { 50% { scale: 1 1.03; } }
+.pc-poeira { opacity: 0; animation: pc-poeira 0.8s ease-out calc(var(--d) + 1.8s) both; }
+@keyframes pc-poeira {
+  0% { opacity: 0.8; scale: 0.3 0.6; }
+  100% { opacity: 0; scale: 1.5 1; }
+}
+.pc-grade { animation: pc-grade-sobe 1s ease-in 0.1s both; }
+@keyframes pc-grade-sobe { to { transform: translateY(-66px); } }
+.pc-olho { transform-origin: 160px 24px; animation: pc-pisca 5s ease-in-out infinite; }
+@keyframes pc-pisca {
+  0%, 90%, 100% { transform: scaleY(1); }
+  94% { transform: scaleY(0.1); }
+}
+.pc-olho-luz { animation: pc-brilho 2.4s ease-in-out infinite; }
+.pc-tocha-luz, .pc-tunel { animation: pc-brilho 1.3s ease-in-out infinite; }
+@keyframes pc-brilho {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+.pc-chama { animation: pc-chama 0.45s steps(2) infinite; }
+@keyframes pc-chama {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scale(0.85, 1.2); }
+}
+.pc-estrela { animation: pc-estrela 3s ease-in-out infinite; }
+@keyframes pc-estrela {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.pc-estrela-grande { animation: pc-brilho 2s ease-in-out infinite; }
+.pc-povo { animation: pc-povo 1.2s steps(2) infinite; }
+@keyframes pc-povo { 50% { transform: translateY(-1px); } }
+.pc-bandeira { animation: pc-bandeira 3s ease-in-out infinite; }
+@keyframes pc-bandeira {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+.pc-janela { animation: pc-brilho 2.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .portal-cena *, .portal-cena { animation: none !important; }
+  .pc-grade { transform: translateY(-66px); }
+}
+.menos-movimento .portal-cena * { animation: none !important; }
+.menos-movimento .pc-grade { transform: translateY(-66px); }

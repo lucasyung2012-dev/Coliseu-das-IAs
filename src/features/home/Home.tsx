@@ -7,6 +7,7 @@ import { desbloquear, tocar } from '@/ui/som';
 import { tocar as tocarHistoria } from '@/ui/somHistoria';
 import { CenarioHistoria } from '../coliseu/Cenarios';
 import { Portoes } from '../coliseu/Portoes';
+import CenaPortalColiseu from './CenaPortalColiseu';
 import { PORTAIS } from './areas';
 
 /**
@@ -69,25 +70,15 @@ function PortalColiseu({ rota, frase }: { rota: string; frase: string }) {
         className="portal-coliseu group animate-fade-up relative block overflow-hidden border-4 border-[#c8962a] bg-black text-fg"
         style={{ animationDelay: '150ms' }}
       >
-        <div className="relative aspect-square w-full sm:aspect-[16/7]">
-          <CenarioHistoria lugar="titulo" />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_40%,rgba(0,0,0,0.85)_100%)]" aria-hidden />
-          {/* os três condenados, na frente do Coliseu */}
-          <div className="absolute bottom-[44%] left-1/2 flex -translate-x-1/2 items-end gap-4 sm:bottom-[34%] sm:gap-8" aria-hidden>
-            {IAS.map((id, i) => (
-              <div key={id} className="w-14 transition-transform duration-300 group-hover:-translate-y-2 sm:w-16" style={{ transitionDelay: `${i * 70}ms` }}>
-                <div className="respirar" style={{ animationDelay: `${i * 250}ms` }}>
-                  <GladiadorPixel ia={id} espelhar={i === 2} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 p-3 text-center sm:p-5">
-            <p className="font-pixel text-[8px] tracking-[0.3em] text-[#ff5a5a] sm:text-[10px]">MODO HISTÓRIA</p>
-            <h2 className="font-pixel text-xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-4xl">O COLISEU</h2>
-            <p className="max-w-md text-xs text-white/80 sm:text-sm">{frase}</p>
-            <p className="piscar mt-1 border-2 border-[#f2c14e] bg-black/70 px-3 py-1 font-pixel text-[9px] text-[#f2c14e] sm:text-xs">▶ ENTRAR NO COLISEU</p>
-          </div>
+        {/* A cena: a grade sobe e os três saem do túnel para a areia */}
+        <div className="relative aspect-[16/11] w-full sm:aspect-[2/1]">
+          <CenaPortalColiseu />
+        </div>
+        <div className="flex flex-col items-center gap-1 border-t-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a140c,#120806)] p-3 text-center sm:p-5">
+          <p className="font-pixel text-[8px] tracking-[0.3em] text-[#ff5a5a] sm:text-[10px]">MODO HISTÓRIA</p>
+          <h2 className="font-pixel text-xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-4xl">O COLISEU</h2>
+          <p className="max-w-md text-xs text-white/80 sm:text-sm">{frase}</p>
+          <p className="piscar mt-1 border-2 border-[#f2c14e] bg-black/70 px-3 py-1 font-pixel text-[9px] text-[#f2c14e] sm:text-xs">▶ ENTRAR NO COLISEU</p>
         </div>
       </Link>
       {/* Os portões de pedra fechando (dentro do Coliseu, eles abrem) */}
