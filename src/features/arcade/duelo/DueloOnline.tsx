@@ -45,7 +45,7 @@ function embaralhar<T>(lista: T[]): T[] {
   return a;
 }
 
-export default function DueloOnline() {
+export default function DueloOnline({ modo }: { modo: ModoOnline }) {
   const p = useProgresso();
   const navegar = useNavigate();
   const [fase, setFase] = useState<Fase>({ tipo: 'inicio' });
@@ -57,8 +57,9 @@ export default function DueloOnline() {
   // Baralho confirmado na sala (pedido do Lucas: os dois confirmam antes de começar).
   const [pronto, setPronto] = useState(false);
   const [editando, setEditando] = useState(false);
-  // O que vão jogar: quem criou a sala escolhe (Duelo ou Tribunal).
-  const [modo, setModo] = useState<ModoOnline>('duelo');
+  // Cada combate tem o seu online (pedido do Lucas): esta página joga só Duelo ou só Tribunal.
+  const voltar = modo === 'duelo' ? { para: '/arena/duelo', nome: 'SALA DO DUELO' } : { para: '/arena', nome: 'ARCADE' };
+  const titulo = modo === 'duelo' ? '🌐 DUELO ONLINE' : '🌐 TRIBUNAL ONLINE';
   const sala = useRef<Sala | null>(null);
   const saindo = useRef(false);
 
@@ -87,12 +88,7 @@ export default function DueloOnline() {
   // Voltou para a sala (revanche) ou mudou o modo: os dois confirmam de novo.
   useEffect(() => {
     if (fase.tipo === 'sala') setPronto(false);
-  }, [fase.tipo, modo]);
-
-  // Quem criou a sala avisa o modo (quando o amigo chega e sempre que mudar).
-  useEffect(() => {
-    if (sala.current?.papel === 'anfitriao' && fase.tipo === 'sala') sala.current.enviar({ t: 'modo', modo });
-  }, [modo, fase.tipo, cartaoRival?.ia]);
+  }, [fase.tipo]);
 
   // Fechou a tela: fecha a sala.
   useEffect(
@@ -111,7 +107,6 @@ export default function DueloOnline() {
       if (m.t === 'versao-diferente') setErro('Os dois aparelhos estão com versões diferentes do jogo. Feche o jogo e abra de novo nos dois (ou recarregue a página) e crie outra sala.');
       if (m.t === 'comecar') setFase((f) => ({ tipo: 'jogando', config: m.config, inicial: m.inicial, rodada: f.tipo === 'jogando' ? f.rodada + 1 : 1 }));
       if (m.t === 'comecar-tribunal') setFase({ tipo: 'tribunal', inicial: m.inicial, rodada: Date.now() });
-      if (m.t === 'modo') setModo(m.modo);
       if (m.t === 'revanche') setFase({ tipo: 'sala' });
       if (m.t === 'sair') {
         s.fechar();
@@ -134,7 +129,7 @@ export default function DueloOnline() {
     for (let tentativa = 0; tentativa < 3; tentativa++) {
       const codigo = novoCodigo();
       try {
-        const s = await criarSala(codigo, () => setFase({ tipo: 'esperando', codigo }), () => saindo.current || sala.current !== null);
+        const s = await criarSala(modo, codigo, () => setFase({ tipo: 'esperando', codigo }), () => saindo.current || sala.current !== null);
         if (saindo.current) return s.fechar();
         tocar('fanfarra');
         return ligar(s);
@@ -159,7 +154,7 @@ export default function DueloOnline() {
     setErro('');
     setFase({ tipo: 'entrando' });
     try {
-      const s = await entrarNaSala(codigo);
+      const s = await entrarNaSala(modo, codigo);
       if (saindo.current) return s.fechar();
       tocar('fanfarra');
       ligar(s);
@@ -208,7 +203,7 @@ export default function DueloOnline() {
     saindo.current = true;
     sala.current?.enviar({ t: 'sair' });
     sala.current?.fechar();
-    navegar('/arena/duelo');
+    navegar(voltar.para);
   };
 
   return (
@@ -217,9 +212,9 @@ export default function DueloOnline() {
       <div className={`relative mx-auto flex ${fase.tipo === 'jogando' ? 'max-w-[1600px]' : fase.tipo === 'tribunal' ? 'max-w-5xl' : 'max-w-3xl'} flex-col gap-5 px-4 pb-16 pt-6 sm:px-8`}>
         <div className="flex items-center justify-between">
           <button type="button" onClick={sairDaSala} className="font-pixel text-[10px] text-muted hover:text-accent">
-            ◀ SALA DO DUELO
+            ◀ {voltar.nome}
           </button>
-          <p className="font-pixel text-[10px] text-accent-2">🌐 ONLINE</p>
+          <p className="font-pixel text-[10px] text-accent-2">{titulo}</p>
         </div>
 
         {fase.tipo === 'jogando' && cartaoRival && sala.current ? (
@@ -250,7 +245,7 @@ export default function DueloOnline() {
         ) : (
           <>
             <header className="text-center">
-              <h1 className="neon font-pixel text-lg text-accent sm:text-2xl">🌐 JOGAR ONLINE</h1>
+              <h1 className="neon font-pixel text-lg text-accent sm:text-2xl">{titulo}</h1>
               <p className="mt-2 text-sm text-muted">Cada um no seu aparelho. Crie uma sala e passe o código para o seu amigo, ou entre na sala dele. Partida amistosa: não vale troféus.</p>
             </header>
 
@@ -309,33 +304,6 @@ export default function DueloOnline() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <CartaoNaSala titulo="VOCÊ" cartao={meuCartao} meu />
                   {cartaoRival ? <CartaoNaSala titulo="SEU AMIGO" cartao={cartaoRival} /> : <p className="pixel-box piscar grid place-items-center p-6 font-pixel text-[9px] text-muted">CONECTANDO…</p>}
-                </div>
-
-                {/* O que vão jogar: quem criou a sala escolhe. */}
-                <div className="flex flex-wrap items-center justify-center gap-2" role="radiogroup" aria-label="Modo da partida">
-                  <span className="font-pixel text-[9px] text-muted">JOGAR:</span>
-                  {(
-                    [
-                      ['duelo', '⚔ DUELO'],
-                      ['tribunal', '⚖ TRIBUNAL'],
-                    ] as [ModoOnline, string][]
-                  ).map(([m, nome]) => (
-                    <button
-                      key={m}
-                      type="button"
-                      role="radio"
-                      aria-checked={modo === m}
-                      disabled={!anfitriao}
-                      onClick={() => {
-                        tocar('clique');
-                        setModo(m);
-                      }}
-                      className={`px-3 py-2 font-pixel text-[10px] ${modo === m ? 'bg-[rgb(242_193_78)] text-black' : 'pixel-box pixel-hover text-muted disabled:opacity-40'}`}
-                    >
-                      {nome}
-                    </button>
-                  ))}
-                  {!anfitriao && <span className="w-full text-center text-xs text-muted">Quem criou a sala escolhe o modo.</span>}
                 </div>
 
                 {/* Tribunal: não tem baralho; cada um só confirma que está pronto. */}
@@ -431,8 +399,8 @@ export default function DueloOnline() {
             {fase.tipo === 'fim' && (
               <section className="pixel-box flex flex-col items-center gap-3 p-6 text-center" role="status">
                 <p className="font-pixel text-sm text-accent-2">📴 {fase.mensagem.toUpperCase()}</p>
-                <Link to="/arena/duelo" className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
-                  ◀ VOLTAR À SALA DO DUELO
+                <Link to={voltar.para} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
+                  ◀ VOLTAR: {voltar.nome}
                 </Link>
               </section>
             )}

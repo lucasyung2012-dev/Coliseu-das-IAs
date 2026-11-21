@@ -5,7 +5,7 @@
  * O PeerJS só é carregado quando alguém abre a sala online.
  */
 import type { DataConnection, Peer as TipoPeer } from 'peerjs';
-import { lerMensagem, type MensagemOnline } from '@/game/duelo/online';
+import { lerMensagem, type MensagemOnline, type ModoOnline } from '@/game/duelo/online';
 
 const PREFIXO = 'coliseu-das-ias-v1-';
 
@@ -91,8 +91,8 @@ function embrulhar(peer: TipoPeer, conn: DataConnection, codigo: string, papel: 
  * Cria a sala com o código e espera o amigo entrar. `aoAbrir` avisa quando a sala
  * já está no ar (para mostrar o código); a promessa termina quando o amigo conecta.
  */
-export async function criarSala(codigo: string, aoAbrir: () => void, cancelado: () => boolean): Promise<Sala> {
-  const peer = await novoPeer(PREFIXO + codigo);
+export async function criarSala(modo: ModoOnline, codigo: string, aoAbrir: () => void, cancelado: () => boolean): Promise<Sala> {
+  const peer = await novoPeer(`${PREFIXO}${modo}-${codigo}`);
   aoAbrir();
   return new Promise((ok, falha) => {
     peer.on('connection', (conn) => {
@@ -108,13 +108,13 @@ export async function criarSala(codigo: string, aoAbrir: () => void, cancelado: 
 }
 
 /** Entra na sala do amigo pelo código. */
-export async function entrarNaSala(codigo: string): Promise<Sala> {
+export async function entrarNaSala(modo: ModoOnline, codigo: string): Promise<Sala> {
   const peer = await novoPeer();
   return new Promise((ok, falha) => {
-    const conn = peer.connect(PREFIXO + codigo, { reliable: true, serialization: 'json' });
+    const conn = peer.connect(`${PREFIXO}${modo}-${codigo}`, { reliable: true, serialization: 'json' });
     const desistir = window.setTimeout(() => {
       peer.destroy();
-      falha(new ErroSala('sala-nao-encontrada', 'Não achei essa sala. Confira o código com o seu amigo.'));
+      falha(new ErroSala('sala-nao-encontrada', 'Não achei essa sala. Confira o código e se o seu amigo criou a sala neste mesmo combate.'));
     }, 12_000);
     conn.on('open', () => {
       window.clearTimeout(desistir);
@@ -125,7 +125,7 @@ export async function entrarNaSala(codigo: string): Promise<Sala> {
       peer.destroy();
       falha(
         e.type === 'peer-unavailable'
-          ? new ErroSala('sala-nao-encontrada', 'Não achei essa sala. Confira o código com o seu amigo.')
+          ? new ErroSala('sala-nao-encontrada', 'Não achei essa sala. Confira o código e se o seu amigo criou a sala neste mesmo combate.')
           : new ErroSala('sem-internet', 'Não deu para conectar. Confira a internet e tente de novo.'),
       );
     });

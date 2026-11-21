@@ -31,7 +31,8 @@ export default function App() {
         <Route path="/arena/duelo" element={<SalaDoDuelo />} />
         <Route path="/arena/duelo/jogar" element={<EntradaCombate modo="duelo" />} />
         <Route path="/arena/duelo/2j" element={<DoisJogadores />} />
-        <Route path="/arena/duelo/online" element={<DueloOnline />} />
+        <Route path="/arena/duelo/online" element={<DueloOnline modo="duelo" />} />
+        <Route path="/arena/tribunal/online" element={<DueloOnline modo="tribunal" />} />
         <Route path="/arena/tribunal" element={<EntradaCombate modo="tribunal" />} />
         <Route path="/arena/baralho" element={<Navigate to="/arena/duelo" replace />} />
         <Route path="/arena/mapa/:ia" element={<MapaTrofeus />} />

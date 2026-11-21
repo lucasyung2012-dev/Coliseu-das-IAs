@@ -267,11 +267,20 @@ describe('duelo jogável (protótipo)', () => {
 
   it('Duelo online: a sala abre com CRIAR SALA e ENTRAR NA SALA, e avisa código errado', () => {
     abrir('/arena/duelo/online');
-    expect(screen.getByRole('heading', { name: /JOGAR ONLINE/ })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /DUELO ONLINE/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /CRIAR SALA/ })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/ENTRAR NA SALA/), { target: { value: '42' } });
     fireEvent.click(screen.getByRole('button', { name: /ENTRAR ▶/ }));
     expect(screen.getByRole('alert')).toHaveTextContent(/LEAO-42/);
+  });
+
+  it('Tribunal online fica no Tribunal: botão no Arcade e sala própria', () => {
+    sessionStorage.setItem('coliseu.boot.vista', '1');
+    abrir('/arena');
+    expect(screen.getByRole('link', { name: /TRIBUNAL ONLINE/ })).toHaveAttribute('href', '/arena/tribunal/online');
+    abrir('/arena/tribunal/online');
+    expect(screen.getByRole('heading', { name: /TRIBUNAL ONLINE/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /CRIAR SALA/ })).toBeInTheDocument();
   });
 
   it('tutorial na primeira vez, golpes no toque e no teclado, e o polegar do César no fim das rodadas', () => {

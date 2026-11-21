@@ -212,6 +212,18 @@ export default function ArcadeHub() {
               treino={treino}
               grande
             />
+            {/* O Tribunal online fica junto do Tribunal (o do Duelo fica na Sala do Duelo). */}
+            <Link
+              to="/arena/tribunal/online"
+              onClick={() => {
+                desbloquear();
+                tocar('clique');
+              }}
+              className="pixel-box pixel-hover -mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-3 text-center"
+            >
+              <span className="font-pixel text-xs text-fg">🌐 TRIBUNAL ONLINE</span>
+              <span className="font-pixel text-[8px] text-[rgb(242_193_78)]">COM UM AMIGO · CADA UM NO SEU APARELHO · AMISTOSO</span>
+            </Link>
             <CartaoModo
               rota="/arena/duelo"
               icone="⚔"
