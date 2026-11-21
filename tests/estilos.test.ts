@@ -1,4 +1,6 @@
 import { agir, ANIMO_MAX, ATRIBUTOS_INICIAIS, novaLuta, passoLuta, type AtributosLuta, type DefInimigo, type EstadoLuta } from '@/game/historia/luta';
+import { CAPITULOS } from '@/game/historia/roteiro';
+import { atributosDoSave, criarSave, ESTILO_DA_IA } from '@/game/historia/saves';
 
 /**
  * Os jeitos de lutar (pedido do Lucas, 21/11/2026): Cassius guardião, Octavius
@@ -102,5 +104,20 @@ describe('sem estilo, a luta continua igual', () => {
     const s = agir({ ...novaLuta(boneco()), animo: ANIMO_MAX }, 'especial');
     expect(500 - s.inimigo.vida).toBe(28);
     expect(s.estilo.paginas + s.estilo.luz + s.estilo.cego).toBe(0);
+  });
+});
+
+describe('o capítulo 1 ensina o jeito de lutar de cada um', () => {
+  it.each([
+    ['claude', 'pagina'],
+    ['chatgpt', 'tropeco'],
+    ['gemini', 'luz'],
+  ] as const)('%s: treino de %s', (ia, evento) => {
+    const cap1 = CAPITULOS[ia][0]!;
+    const treino = cap1.cenas.find((c) => c.tipo === 'luta' && c.treino);
+    expect(treino?.tipo === 'luta' && treino.treino?.evento).toBe(evento);
+    // E o estilo do save de verdade é o que esse treino ensina.
+    const a = atributosDoSave(criarSave(ia));
+    expect(a.estilo).toBe(ESTILO_DA_IA[ia]);
   });
 });

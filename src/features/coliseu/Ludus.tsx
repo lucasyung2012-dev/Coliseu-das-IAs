@@ -83,7 +83,7 @@ const TREINOS_ATRIBUTO: DefTreino[] = [
   { id: 'forca', nome: 'FORÇA', icone: '💪', efeito: '+1 Força (mais dano)', evento: 'acerto', quantos: 10, rotulo: 'GOLPES', explica: 'Acerta dez golpes em mim. Bate no ABERTO, que entra mais!' },
   { id: 'defesa', nome: 'DEFESA', icone: '🛡️', efeito: '+1 Defesa (apanha menos)', evento: 'bloqueio', quantos: 5, rotulo: 'BLOQUEIOS', explica: 'Bloqueia cinco golpes meus. Cuidado com as fintas!' },
   { id: 'vida', nome: 'RESISTÊNCIA', icone: '❤️', efeito: '+10 Vida', evento: 'esquiva', quantos: 5, rotulo: 'ESQUIVAS', explica: 'Esquiva cinco golpes meus. Pernas leves!' },
-  { id: 'carisma', nome: 'CARISMA', icone: '📣', efeito: '+1 Carisma (Ânimo e plateia enchem mais rápido)', evento: 'especial', quantos: 1, rotulo: 'ESPECIAIS', explica: 'Enche o Ânimo com boas jogadas e solta o ⭐ especial em mim.' },
+  { id: 'carisma', nome: 'CARISMA', icone: '📣', efeito: '+1 Carisma (Ânimo e plateia enchem mais rápido)', evento: 'especial', quantos: 1, rotulo: 'ESPECIAIS', explica: 'Enche o Ânimo com boas jogadas e solta o SEU especial em mim: a Muralha do Lata de Biblioteca, a Rede do Tagarela ou o Eclipse do Vidente.' },
 ];
 
 const NOME_HEROI: Partial<Record<Falante, string>> = { cassius: 'Lata', octavius: 'Tagarela', helios: 'Vidente' };

@@ -1,6 +1,6 @@
 import type { IaId } from '../personagens';
 import type { SomHistoria } from '@/ui/somHistoria';
-import type { Tecnica } from './luta';
+import type { EventoLuta, Tecnica } from './luta';
 import type { Equipamento } from './saves';
 import { CAP1_OCTAVIUS, CAP2_OCTAVIUS, CAP3_OCTAVIUS, CAP4_OCTAVIUS, CAP5_OCTAVIUS, CAP6_OCTAVIUS, FINAL_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
 import { CAP1_HELIOS, CAP2_HELIOS, CAP3_HELIOS, CAP4_HELIOS, CAP5_HELIOS, CAP6_HELIOS, FINAL_HELIOS } from './roteiro3';
@@ -178,7 +178,16 @@ export type Cena = (
   | { tipo: 'cutscene'; id: string; quadros: Quadro[] }
   | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[] }
   | { tipo: 'explorar'; id: string; lugar: Lugar; objetivo: string; pontos: PontoExplorar[] }
-  | { tipo: 'luta'; id: string; lugar: Lugar; inimigo: string; antes?: Fala[]; depois?: Fala[] }
+  | {
+      tipo: 'luta';
+      id: string;
+      lugar: Lugar;
+      inimigo: string;
+      antes?: Fala[];
+      depois?: Fala[];
+      /** Luta de treino: não dá para perder; acaba quando faz `quantos` vezes o `evento`. */
+      treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
+    }
   | {
       tipo: 'desafio';
       id: string;
@@ -570,6 +579,33 @@ const CAP1_CASSIUS: Capitulo = {
           obrigatorio: true,
           falas: [{ quem: 'cassius', texto: 'A escada para as catacumbas. A Lívia já deve estar lá embaixo.' }],
         },
+      ],
+    },
+    {
+      tipo: 'luta',
+      id: 'c1-treino-paginas',
+      lugar: 'biblioteca-salao',
+      inimigo: 'incinerador',
+      antes: [
+        { quem: 'narrador', texto: 'Na base da estátua do Guardião Zero, uma frase quase apagada: "O escudo certo, na hora certa, vira página de história."' },
+        { quem: 'cassius', texto: 'Na hora certa... Não antes. Bem quando o golpe chega.' },
+        { quem: 'narrador', texto: 'Um Incinerador pequeno, sozinho, vem pelo corredor. Hora de testar.' },
+        { quem: 'narrador', texto: 'TREINO DO GUARDIÃO: espere o sinal AMARELO e levante o 🛡️ ESCUDO NA ÚLTIMA HORA, quase quando o golpe bate. Cada bloqueio assim guarda uma 📜 PÁGINA.' },
+      ],
+      treino: { evento: 'pagina', quantos: 2, rotulo: 'PÁGINAS (bloqueie na última hora)' },
+      depois: [
+        { quem: 'cassius', texto: 'Duas páginas! Elas ficam girando em volta de mim...' },
+        { quem: 'narrador', texto: 'Com páginas guardadas, o próximo ⚔️ GLÁDIO no inimigo ABERTO faz uma CITAÇÃO: bate muito mais forte (até 3 páginas).' },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'c1-depois-treino',
+      lugar: 'biblioteca-salao',
+      falas: [
+        { quem: 'cassius', texto: 'Eu não sou rápido. Nunca fui. Mas eu sei esperar.' },
+        { quem: 'cassius', texto: 'Um guardião não foge do golpe: segura, guarda e devolve. Página por página.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Cassius é a 📚 MURALHA DE LIVROS: por alguns segundos, nada passa, e metade de cada golpe volta para quem bateu.' },
       ],
     },
     {

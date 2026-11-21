@@ -336,6 +336,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         depois={cena.depois}
         atributos={equipe?.cassius ?? atributosDoSave(save)}
         equipe={equipe}
+        treino={cena.treino}
         onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
         onFim={() => proxima()}
       />

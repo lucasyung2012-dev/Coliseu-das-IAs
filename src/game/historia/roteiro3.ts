@@ -189,6 +189,33 @@ export const CAP1_HELIOS: Capitulo = {
     },
     {
       tipo: 'luta',
+      id: 'h1-treino-luz',
+      lugar: 'observatorio-ataque',
+      inimigo: 'apagador',
+      antes: [
+        { quem: 'helios', texto: 'A lente rachada junta a luz num ponto só... e eu enxergo. Não o que é. O que VAI SER.' },
+        { quem: 'narrador', texto: 'Em cima do Apagador aparece um olho: 👁️ PRÓXIMO. Helios vê o próximo golpe antes do sinal. Até as fintas.' },
+        { quem: 'helios', texto: 'Se eu sei o que vem, não preciso fugir cedo. Posso sumir no último instante, num lampejo.' },
+        { quem: 'narrador', texto: 'TREINO DO VIDENTE: olhe o 👁️ PRÓXIMO, espere o golpe e aperte ✨ LAMPEJO NA ÚLTIMA HORA. Cada lampejo assim junta uma ☀️ LUZ.' },
+      ],
+      treino: { evento: 'luz', quantos: 2, rotulo: 'LUZ (lampejo na última hora)' },
+      depois: [
+        { quem: 'helios', texto: 'Duas luzes girando em volta de mim. Quentes, como a lente.' },
+        { quem: 'narrador', texto: 'Cuidado: Helios tem menos vida que os outros. Ele não aguenta apanhar muito. Enxergar antes é a defesa dele.' },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'h1-depois-treino',
+      lugar: 'observatorio-ataque',
+      falas: [
+        { quem: 'lumen', texto: 'Uuh-uuh! (O Lumen pisca a luzinha três vezes, animado.)' },
+        { quem: 'helios', texto: 'Eu sei, Lumen. A luz não serve só para ver. Serve para cegar quem quer apagar as estrelas.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Helios é o 🌑 ECLIPSE: os 3 próximos golpes do inimigo erram, e cada ☀️ luz guardada vira um raio de sol.' },
+      ],
+    },
+    {
+      tipo: 'luta',
       id: 'h1-luta4',
       lugar: 'observatorio-ataque',
       inimigo: 'apagador-grande',

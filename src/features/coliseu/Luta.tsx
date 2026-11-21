@@ -450,7 +450,8 @@ export function LutaHistoria({
       if (som) tocar(som);
       if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
-      if (treino && ev.tipo === treino.evento) setFeitos((n) => n + 1);
+      // No treino do ESPECIAL vale o especial de qualquer jeito de lutar (Muralha, Rede, Eclipse).
+      if (treino && (ev.tipo === treino.evento || (treino.evento === 'especial' && (ev.tipo === 'muralha' || ev.tipo === 'rede' || ev.tipo === 'eclipse')))) setFeitos((n) => n + 1);
     }
     visto.current = Math.max(visto.current, ...e.eventos.map((x) => x.id), 0);
     if (fase === 'luta' && e.fim === 'vitoria') {

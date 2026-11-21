@@ -1566,6 +1566,34 @@ export const CAP1_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      tipo: 'luta',
+      id: 'o1-treino-tropeco',
+      lugar: 'porto-docas',
+      inimigo: 'marinheiro-ferro',
+      antes: [
+        { quem: 'marco', texto: 'Garoto. Antes de qualquer plano, uma lição. Vê aquele marinheiro de ferro velho? A gente usa ele de boneco.' },
+        { quem: 'marco', texto: 'Você não tem braço de gladiador. Escudo, então, nem se fala: o seu deixa passar.' },
+        { quem: 'octavius', texto: 'Obrigado pela confiança, Marco.' },
+        { quem: 'marco', texto: 'Mas você é ligeiro. Deixa ele vir. Bem na última hora, ROLA. Ele erra o golpe com o corpo todo e TROPEÇA.' },
+        { quem: 'narrador', texto: 'TREINO DO ESTRATEGISTA: quando o sinal aparecer, espere e aperte 🌀 ROLAR NA ÚLTIMA HORA. Se der certo, o inimigo TROPEÇA e fica aberto bem mais tempo.' },
+      ],
+      treino: { evento: 'tropeco', quantos: 2, rotulo: 'TROPEÇOS (role na última hora)' },
+      depois: [
+        { quem: 'marco', texto: 'Isso! Ele caiu de cara no cais. Agora, enquanto ele levanta, é TRIDENTE nele.' },
+        { quem: 'octavius', texto: 'Plano A: fazer ele errar. Plano B: fazer ele errar de novo.' },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'o1-depois-treino',
+      lugar: 'porto-docas',
+      falas: [
+        { quem: 'marco', texto: 'E presta atenção no cais. Barril, corda, gancho: tudo isso é arma para quem tem cabeça.' },
+        { quem: 'octavius', texto: 'Os PLANOS. Quando aparecer alguma coisa no cenário, eu toco e uso.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Octavius é a 🕸️ REDE E TRIDENTE: o inimigo fica preso na rede, sem atacar, e cada estocada entra mais forte.' },
+      ],
+    },
+    {
       tipo: 'cutscene',
       id: 'o1-noite',
       quadros: [
