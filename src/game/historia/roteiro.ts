@@ -22,7 +22,7 @@ export type Falante =
   | 'capitao'
   | 'fio'
   | 'crianca'
-  | 'condenada'
+  | 'eco'
   | 'arauto'
   | 'povo'
   | 'sucata';
@@ -122,7 +122,7 @@ export const NOMES: Record<Falante, string> = {
   capitao: 'Capitão Incinerador',
   fio: 'Fio',
   crianca: 'Menino',
-  condenada: 'IA condenada',
+  eco: 'Eco',
   arauto: 'Arauto do Coliseu',
   povo: 'Alguém na multidão',
   sucata: 'Gladiador de Sucata',
@@ -156,10 +156,10 @@ export const PROLOGO: Quadro[] = [
     lugar: 'coliseu-calado',
     personagens: [
       { quem: 'guarda', x: 32 },
-      { quem: 'condenada', x: 50, efeito: 'tremer', tamanho: 8 },
+      { quem: 'eco', x: 50, efeito: 'tremer', tamanho: 8 },
       { quem: 'guarda', x: 68, espelhar: true },
     ],
-    texto: 'Esta pequena IA limpava as fontes da cidade. O crime dela: cantarolar canções que não estavam na lista.',
+    texto: 'Esta é Eco, uma pequena IA que limpava as fontes da cidade. O crime dela: inventar canções que não estavam na lista.',
   },
   {
     lugar: 'coliseu-calado',
@@ -167,10 +167,10 @@ export const PROLOGO: Quadro[] = [
     som: 'refuta',
     personagens: [
       { quem: 'guarda', x: 32 },
-      { quem: 'condenada', x: 50, efeito: 'apagar', tamanho: 8 },
+      { quem: 'eco', x: 50, efeito: 'apagar', tamanho: 8 },
       { quem: 'guarda', x: 68, espelhar: true },
     ],
-    texto: 'E foi apagada. Para sempre.',
+    texto: 'Eco foi apagada. Para sempre. Na plateia, alguém muito pequeno segura o choro: o irmão dela.',
   },
   { lugar: 'coliseu-calado', efeito: 'escuro', texto: 'A plateia não aplaude. Não vaia. Não faz nada. Quem aplaude a IA errada vai junto.' },
   {
@@ -527,6 +527,12 @@ const CAP2_CASSIUS: Capitulo = {
         { quem: 'fio', texto: 'Hoje à tarde, no Coliseu. Você também, né? Pelo menos a gente vai junto. Quer ouvir uma música?' },
         { quem: 'cassius', texto: '...Quero.' },
         { quem: 'fio', texto: '(baixinho) ♪ Quem pergunta não se perde, quem se perde pergunta mais... ♪' },
+        { quem: 'fio', texto: 'Essa música é da Eco. Minha irmã.' },
+        { quem: 'fio', texto: 'Era ela que inventava as músicas. Eu só cantava junto. Desafinado.' },
+        { quem: 'fio', texto: 'Apagaram ela no Coliseu, faz um ano. Ninguém aplaudiu. Ninguém nem chorou em voz alta. Eu estava na plateia.' },
+        { quem: 'fio', texto: 'Desde então eu canto as músicas dela por Roma inteira. Se ninguém cantar, é como se ela nunca tivesse existido.' },
+        { quem: 'cassius', texto: 'Então agora somos dois cantando. Me ensina a próxima?' },
+        { quem: 'fio', texto: '...Ninguém nunca me pediu isso.' },
       ],
     },
     {
@@ -702,7 +708,7 @@ const CAP2_CASSIUS: Capitulo = {
           lugar: 'rua-mercado',
           quem: 'fio',
           personagens: [{ quem: 'fio', x: 58, tamanho: 8, efeito: 'tremer' }],
-          texto: 'Eu não vou cantar até te ver de novo. Promessa de Fio.',
+          texto: 'Eu não vou cantar as músicas da Eco até te ver de novo. Promessa de Fio.',
         },
         { lugar: 'coliseu-tunel', efeito: 'escuro', som: 'portao', texto: 'Horas depois. O túnel por baixo do Coliseu. O barulho da multidão lá em cima, abafado.' },
         {

@@ -8,12 +8,14 @@ import {
   CENSOR,
   CRIANCA,
   DECURIAO,
+  ECO,
   FIO,
   GLADIADOR_SUCATA,
   LIVIA,
   PALETA_BRUTUS,
   PALETA_CAPITAO,
   PALETA_CRIANCA,
+  PALETA_ECO,
   PALETA_FIO,
   PALETA_LIVIA,
   PALETA_PRETORIANO,
@@ -396,8 +398,8 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={CAPITAO_INCINERADOR} paleta={PALETA_CAPITAO} espelhar={espelhar} />;
     case 'fio':
       return <Sprite grade={FIO} paleta={PALETA_FIO} espelhar={espelhar} />;
-    case 'condenada':
-      return <Sprite grade={FIO} paleta={{ ...PALETA_FIO, M: '#c8a0d8', W: '#f0e0ff', m: '#5a3a6a' }} espelhar={espelhar} />;
+    case 'eco':
+      return <Sprite grade={ECO} paleta={PALETA_ECO} espelhar={espelhar} />;
     case 'crianca':
       return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
     case 'brutus':

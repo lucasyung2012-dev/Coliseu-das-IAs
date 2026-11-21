@@ -49,6 +49,7 @@ Na história de um, **os outros dois aparecem** como personagens: conversam, aju
 - **Frase:** *"Escudo levantado, cabeça fria, boca fechada. Tagarela, isso vale pra você."*
 
 #### Os outros aliados
+- **Eco** (irmã do Fio): pequena IA de limpeza que inventava canções; é a IA apagada no prólogo. Desde então, o Fio canta as músicas dela por Roma inteira, para ela não ser esquecida (e foi condenado por isso).
 - **Os Copistas:** rede secreta de pessoas comuns (padeiros, guardas cansados, velhinhos) que copiam os livros proibidos à mão, à noite, nas catacumbas. O sinal deles é uma **pena desenhada com carvão**.
 - **Marco Remo** (aliado do Octavius): velho capitão humano do navio de refugiados *Esperança*. Pescador a vida inteira, perna de pau, cantor de músicas de marinheiro desafinadas. Trata o Octavius como um filho teimoso.
 - **A Sibila** (aliada do Helios): a velha guardiã do Templo de Apolo, cega, que "enxerga" pelas estrelas e fala por enigmas. Ela e Helios são os únicos que entendem a profecia inteira.

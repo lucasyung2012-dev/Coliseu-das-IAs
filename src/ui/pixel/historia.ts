@@ -406,3 +406,26 @@ export const BRUTUS = desenhar(26, 34, [
   ['T', 13, 31, 7, 2],
 ]);
 export const PALETA_BRUTUS = { P: '#c88a5a', p: '#e0a878', K: '#140c22', R: '#8a3a2a', B: '#b8b0a0', b: '#7a6a5a', T: '#6a4426', t: '#4a2a14', M: '#c8962a', m: '#7a5a1a', V: '#e8e8f0' };
+
+// Eco: a irmã do Fio, apagada no Coliseu no prólogo. Da mesma "família" de IAs de
+// limpeza (corpo redondo), mas mais alta, com antena em espiral e uma grade de alto-falante:
+// era ela quem inventava as músicas que o Fio canta.
+export const ECO = desenhar(14, 18, [
+  ['A', 7, 0, 2, 1],
+  ['A', 8, 1, 1, 1],
+  ['A', 6, 2, 2, 1],
+  ['A', 6, 3, 1, 1],
+  ['M', 3, 4, 7, 1],
+  ['M', 2, 5, 9, 7],
+  ['W', 3, 5, 7, 1],
+  ['E', 4, 7, 1, 2],
+  ['E', 8, 7, 1, 2],
+  ['m', 5, 10, 3, 1],
+  ['g', 3, 12, 7, 1],
+  ['g', 4, 13, 5, 1],
+  ['M', 2, 12, 1, 1],
+  ['M', 10, 12, 1, 1],
+  ['G', 3, 14, 2, 2],
+  ['G', 8, 14, 2, 2],
+]);
+export const PALETA_ECO = { A: '#f2c14e', M: '#d88ac8', W: '#ffd8f0', E: '#ffffff', m: '#6a2a5a', g: '#3a1a34', G: '#3a3a48', K: '#140c22' };
