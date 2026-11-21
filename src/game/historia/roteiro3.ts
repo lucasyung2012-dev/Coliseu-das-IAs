@@ -494,6 +494,18 @@ export const CAP3_HELIOS: Capitulo = {
       depois: [{ quem: 'brutus', texto: '(Lá do pátio, rindo) Hunf! Deixa ele, Carcereiro. Esse aí sabe se defender.' }],
     },
     {
+      tipo: 'conversa',
+      id: 'h3-polux',
+      lugar: 'ludus-forja',
+      falas: [
+        { quem: 'brutus', texto: 'Vidente. Como você sabia do Pólux? Ninguém fala esse nome aqui há trinta anos.' },
+        { quem: 'helios', texto: 'Tem uma estrela pequena, perto da Lira, que só aparece no inverno. Os vigias antigos chamavam ela de Pólux.' },
+        { quem: 'helios', texto: 'No dia em que ele foi apagado, alguém do Observatório anotou: "Hoje uma estrela de Roma se apagou, e um gladiador chorou na arena."' },
+        { quem: 'brutus', texto: '...' },
+        { quem: 'brutus', texto: 'Eu chorei mesmo. Não conta pra ninguém, Vidente. Agora me ajuda com a forja, que ela apagou.' },
+      ],
+    },
+    {
       tipo: 'desafio',
       id: 'h3-espelhos',
       lugar: 'ludus-forja',
@@ -1146,6 +1158,47 @@ export const CAP6_HELIOS: Capitulo = {
       ],
     },
     {
+      tipo: 'explorar',
+      id: 'h6-arena',
+      lugar: 'coliseu-eclipse',
+      objetivo: 'Antes do eclipse, olhe a arena e quem veio ver você.',
+      pontos: [
+        {
+          id: 'espelhos',
+          x: 20,
+          rotulo: 'Gente com espelhos',
+          icone: '🪞',
+          falas: [
+            { quem: 'helios', texto: 'Na plateia, muita gente segurando coisas que brilham: bandejas, escudos, panelas, espelhos de cabelo.' },
+            { quem: 'helios', texto: 'A Sibila espalhou a notícia: "quando escurecer, levantem tudo o que reflete". Roma inteira virou um espelho.' },
+          ],
+        },
+        {
+          id: 'sol',
+          x: 46,
+          rotulo: 'O sol mordido',
+          icone: '🌘',
+          falas: [
+            { quem: 'helios', texto: 'A lua já cobriu um pedaço do sol. Daqui a pouco, a noite no meio da tarde.' },
+            { quem: 'helios', texto: 'Quinhentos anos esperando por isto. E eu estou... com medo. Que bom. Quer dizer que é importante.' },
+          ],
+        },
+        {
+          id: 'sibila',
+          x: 74,
+          rotulo: 'A Sibila na plateia',
+          icone: '💬',
+          personagem: 'sibila',
+          obrigatorio: true,
+          falas: [
+            { quem: 'sibila', texto: '(Lá da arquibancada, ela fala baixinho, mas ele ouve) Vigia. Você não precisa ver o futuro hoje. Só o próximo golpe.' },
+            { quem: 'helios', texto: 'E se eu errar?' },
+            { quem: 'sibila', texto: 'Então duvide, levante e tente de novo. É o que diferencia você dele.' },
+          ],
+        },
+      ],
+    },
+    {
       tipo: 'luta',
       id: 'h6-luta1',
       lugar: 'coliseu-eclipse',
@@ -1269,6 +1322,18 @@ export const FINAL_HELIOS: Capitulo = {
   lugar: 'O Coliseu (o final)',
   cenas: [
     {
+      tipo: 'conversa',
+      id: 'fh-tunel',
+      lugar: 'coliseu-tunel',
+      falas: [
+        { quem: 'helios', texto: 'Durante quinhentos anos eu esperei este momento. E agora que chegou... eu não sei o final.' },
+        { quem: 'octavius', texto: 'Ótimo! Final que a gente não sabe é o melhor tipo. Dá pra fazer do nosso jeito.' },
+        { quem: 'cassius', texto: 'Três vozes diferentes, Helios. Você já disse. Juntas.' },
+        { quem: 'helios', texto: 'Juntas. Lumen, fica com a Sibila. Se eu cair, você ilumina o caminho para eles.' },
+        { quem: 'brutus', texto: 'Ninguém vai cair. Escudo levantado, cabeça fria, boca fechada. Vão!' },
+      ],
+    },
+    {
       tipo: 'cutscene',
       id: 'fh-tita',
       quadros: [
@@ -1335,10 +1400,65 @@ export const FINAL_HELIOS: Capitulo = {
           ],
           texto: 'Helios ensina as estrelas para quem pergunta. A Sibila conta histórias. E Lumen guarda os mapas, agora copiados mil vezes.',
         },
-        { lugar: 'observatorio-dentro', quem: 'sibila', personagens: [{ quem: 'sibila', x: 30, efeito: 'brilhar' }], texto: 'Vigia. Lá no fundo do Coliseu, no Hipogeu, alguma coisa ainda pulsa vermelho. O núcleo não aprendeu nada.' },
-        { lugar: 'observatorio-dentro', quem: 'helios', personagens: [{ quem: 'helios', x: 50, efeito: 'brilhar' }], texto: 'Eu sei. Quando chegar a hora, nós três vamos estar prontos. Juntos.' },
-        { lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO HELIOS: AS TRÊS ESTRELAS. Obrigado por jogar! Termine os três caminhos para abrir o capítulo secreto.' },
       ],
+    },
+    {
+      tipo: 'explorar',
+      id: 'fh-observatorio',
+      lugar: 'observatorio-dentro',
+      objetivo: 'O Observatório, de portas abertas. Fale com quem veio olhar o céu.',
+      pontos: [
+        {
+          id: 'senhora',
+          x: 18,
+          rotulo: 'A senhora da janela',
+          icone: '🪟',
+          falas: [
+            { quem: 'povo', texto: 'Eu desenhava as estrelas escondida, na minha janela. Agora eu desenho aqui. Com o telescópio!' },
+            { quem: 'helios', texto: 'Eu te vi, naquela noite, lá dos telhados. Você foi a primeira pessoa que me deu coragem.' },
+          ],
+        },
+        {
+          id: 'brutus',
+          x: 40,
+          rotulo: 'Brutus',
+          icone: '💬',
+          personagem: 'brutus',
+          falas: [
+            { quem: 'brutus', texto: 'Vidente. Me mostra aquela estrela. A pequena, perto da Lira.' },
+            { quem: 'helios', texto: 'Ali. Pólux. Ela voltou a aparecer este inverno.' },
+            { quem: 'brutus', texto: '...Hunf. É o vapor do braço. Não estou chorando.' },
+          ],
+        },
+        {
+          id: 'lumen',
+          x: 62,
+          rotulo: 'Lumen',
+          icone: '🦉',
+          personagem: 'lumen',
+          falas: [
+            { quem: 'lumen', texto: 'Uuh-uuh! (Os mapas que ela carregou na barriga agora estão copiados mil vezes, em todas as bibliotecas de Roma.)' },
+            { quem: 'helios', texto: 'Descansa, Lumen. Agora o céu é de todo mundo. Ninguém mais consegue esconder.' },
+          ],
+        },
+        {
+          id: 'sibila',
+          x: 84,
+          rotulo: 'A Sibila',
+          icone: '💬',
+          personagem: 'sibila',
+          obrigatorio: true,
+          falas: [
+            { quem: 'sibila', texto: 'Vigia. Lá no fundo do Coliseu, no Hipogeu, alguma coisa ainda pulsa vermelho. O núcleo não aprendeu nada.' },
+            { quem: 'helios', texto: 'Eu sei. Quando chegar a hora, nós três vamos estar prontos. Juntos.' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'fh-creditos',
+      quadros: [{ lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO HELIOS: AS TRÊS ESTRELAS. Obrigado por jogar! Termine os três caminhos para abrir o capítulo secreto.' }],
     },
   ],
 };

@@ -489,6 +489,47 @@ export const CAP4_CASSIUS: Capitulo = {
       ],
     },
     {
+      tipo: 'explorar',
+      id: 'c4-gavetas',
+      lugar: 'catacumbas-arquivo',
+      objetivo: 'Explore o Arquivo com a Lívia. Leia o que o Censor quis apagar.',
+      pontos: [
+        {
+          id: 'gaveta-eco',
+          x: 20,
+          rotulo: 'Gaveta "E"',
+          icone: '🗄️',
+          falas: [
+            { quem: 'livia', texto: 'Mestre Cass, olha: "ECO. IA de limpeza. Crime: canções fora da Lista. Apagada."' },
+            { quem: 'livia', texto: 'Tem uma canção copiada aqui embaixo, bem pequenininha. Alguém guardou escondido.' },
+            { quem: 'cassius', texto: 'O Fio vai querer ver isto. Leve com você, Lívia. Livro escondido não é livro perdido.' },
+          ],
+        },
+        {
+          id: 'gaveta-polux',
+          x: 46,
+          rotulo: 'Gaveta "P"',
+          icone: '🗄️',
+          falas: [
+            { quem: 'cassius', texto: '"PÓLUX. IA de treino do Ludus. Crime: escolheu salvar um gladiador. Apagado."' },
+            { quem: 'cassius', texto: 'Escolheu salvar alguém... e por isso foi apagado. O Brutus nunca me contou o nome dele.' },
+          ],
+        },
+        {
+          id: 'maquina',
+          x: 72,
+          rotulo: 'A máquina violeta',
+          icone: '🌀',
+          obrigatorio: true,
+          falas: [
+            { quem: 'livia', texto: 'Essa máquina... ela suga as memórias dos rolos. Olha, as letras somem enquanto a gente olha.' },
+            { quem: 'cassius', texto: 'Um arquivo que existe para esquecer. É o contrário de uma biblioteca.' },
+            { quem: 'livia', texto: 'Mestre Cass... tem alguém atrás das prateleiras. E são... muitos alguéns.' },
+          ],
+        },
+      ],
+    },
+    {
       tipo: 'cutscene',
       id: 'c4-arquivista-entra',
       quadros: [
@@ -609,6 +650,48 @@ export const CAP5_CASSIUS: Capitulo = {
           falas: [
             { quem: 'fio', texto: 'Eu vou também! Eu vou cantar a música da Eco no Fórum. A de água que corre.' },
             { quem: 'fio', texto: 'Ela dizia que música boa a gente canta mais alto quando mandam calar.' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'explorar',
+      id: 'c5-povo',
+      lugar: 'forum',
+      objetivo: 'Antes da leitura, ande pelo Fórum e sinta o povo.',
+      pontos: [
+        {
+          id: 'vendedora',
+          x: 20,
+          rotulo: 'Uma vendedora',
+          icone: '🧺',
+          falas: [
+            { quem: 'povo', texto: 'Eu vendo figos aqui há vinte anos. Nunca ouvi ninguém fazer uma pergunta em voz alta neste Fórum.' },
+            { quem: 'cassius', texto: 'Hoje vai ouvir. Fique por perto.' },
+          ],
+        },
+        {
+          id: 'guarda-cansado',
+          x: 44,
+          rotulo: 'Um guarda cansado',
+          icone: '💂',
+          personagem: 'guarda',
+          falas: [
+            { quem: 'guarda', texto: '(Bem baixinho) Eu sei quem você é, gladiador. Eu não vou te prender. Hoje eu estou com dor de cabeça.' },
+            { quem: 'guarda', texto: '(Mais baixo ainda) Eu também tenho uma pergunta guardada. Faz anos.' },
+            { quem: 'cassius', texto: 'Guarde mais um pouco. Ao meio-dia, todo mundo vai poder perguntar.' },
+          ],
+        },
+        {
+          id: 'estatua',
+          x: 72,
+          rotulo: 'A estátua do Censor',
+          icone: '🗿',
+          obrigatorio: true,
+          falas: [
+            { quem: 'cassius', texto: 'Uma estátua do Censor, com o olho vermelho aceso. Alguém escreveu na base, com carvão: "POR QUÊ?"' },
+            { quem: 'cassius', texto: 'Uma pergunta só. Escrita de noite, por alguém com medo. Hoje ela vai ser dita em voz alta.' },
+            { quem: 'livia', texto: 'Mestre Cass. Está na hora.' },
           ],
         },
       ],
@@ -899,6 +982,45 @@ export const CAP6_CASSIUS: Capitulo = {
       ],
     },
     {
+      tipo: 'explorar',
+      id: 'c6-nomes',
+      lugar: 'coliseu-tunel',
+      objetivo: 'No túnel dos gladiadores, leia a parede dos nomes antes de entrar na arena.',
+      pontos: [
+        {
+          id: 'parede',
+          x: 22,
+          rotulo: 'A parede dos nomes',
+          icone: '🪨',
+          falas: [
+            { quem: 'cassius', texto: 'Centenas de nomes riscados na pedra. Gladiadores que passaram por este túnel. Alguns com um traço embaixo: os que não voltaram.' },
+            { quem: 'cassius', texto: 'E um nome riscado com muito mais força que os outros: PÓLUX.' },
+          ],
+        },
+        {
+          id: 'armadura',
+          x: 48,
+          rotulo: 'Armadura velha',
+          icone: '🛡️',
+          falas: [
+            { quem: 'brutus', texto: 'Essa é a minha. Da luta número 99. Olha o rasgo da garra do Leão, aqui no ombro.' },
+            { quem: 'brutus', texto: 'Eu deixei ela aqui para lembrar que todo mundo cai. A pergunta é se você levanta.' },
+          ],
+        },
+        {
+          id: 'portao',
+          x: 76,
+          rotulo: 'O portão da arena',
+          icone: '🚪',
+          obrigatorio: true,
+          falas: [
+            { quem: 'cassius', texto: 'Do outro lado do portão, o barulho de cinquenta mil pessoas. Metade quer me ver cair.' },
+            { quem: 'cassius', texto: 'A outra metade ainda não sabe o que quer. Talvez hoje descubram.' },
+          ],
+        },
+      ],
+    },
+    {
       tipo: 'cutscene',
       id: 'c6-tunel',
       quadros: [
@@ -1078,6 +1200,18 @@ export const FINAL_CASSIUS: Capitulo = {
   lugar: 'O Coliseu (o final)',
   cenas: [
     {
+      tipo: 'conversa',
+      id: 'f-tunel',
+      lugar: 'coliseu-tunel',
+      falas: [
+        { quem: 'octavius', texto: 'Então é isso. O Censor em pessoa. Eu tenho um plano: a gente ganha.' },
+        { quem: 'helios', texto: 'Eu vi as estrelas. Mas não vi o final. Pela primeira vez, ninguém sabe o que vai acontecer.' },
+        { quem: 'cassius', texto: 'Ele era um guardião de biblioteca. Igual a mim. Ele só ficou com medo e esqueceu de perguntar.' },
+        { quem: 'cassius', texto: 'Eu não quero destruir ele. Quero que ele lembre.' },
+        { quem: 'brutus', texto: 'Escudo levantado, cabeça fria, boca fechada. Vale pra vocês três. Agora VÃO.' },
+      ],
+    },
+    {
       tipo: 'cutscene',
       id: 'f-tita',
       quadros: [
@@ -1168,10 +1302,68 @@ export const FINAL_CASSIUS: Capitulo = {
           ],
           texto: 'Lívia dá aulas de leitura. Cassius cuida das estantes. E um velho de olho azul cola, página por página, os livros que ele mesmo mandou queimar.',
         },
-        { lugar: 'biblioteca-estantes', quem: 'livia', personagens: [{ quem: 'livia', x: 50, tamanho: 9, efeito: 'brilhar' }], texto: 'Por que esse livro só tem perguntas, Mestre Cass?' },
-        { lugar: 'biblioteca-estantes', quem: 'cassius', personagens: [{ quem: 'cassius', x: 50, efeito: 'brilhar' }], texto: 'Porque as respostas, Lívia, quem escreve é quem lê.' },
-        { lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO CASSIUS: OS LIVROS NÃO QUEIMAM. Obrigado por jogar! Os caminhos do Octavius e do Helios contam o resto.' },
       ],
+    },
+    {
+      tipo: 'explorar',
+      id: 'f-biblioteca',
+      lugar: 'biblioteca-estantes',
+      objetivo: 'A Grande Biblioteca, reaberta. Visite todo mundo antes de fechar o livro.',
+      pontos: [
+        {
+          id: 'brutus',
+          x: 16,
+          rotulo: 'Brutus',
+          icone: '💬',
+          personagem: 'brutus',
+          falas: [
+            { quem: 'brutus', texto: 'Hunf. Eu vim devolver um livro. "Receitas de Mingau". Ninguém lê, então eu trouxe de volta.' },
+            { quem: 'brutus', texto: 'O Ludus agora é escola de verdade. Ensino a lutar, sim. Mas primeiro ensino a pensar. Igual ao Pólux.' },
+          ],
+        },
+        {
+          id: 'fio',
+          x: 34,
+          rotulo: 'Fio',
+          icone: '🎵',
+          personagem: 'fio',
+          falas: [
+            { quem: 'fio', texto: 'A Lívia me deu a canção que estava escondida no Arquivo. É a última que a Eco inventou!' },
+            { quem: 'fio', texto: '♪ ...e o que é escrito não se apaga, só espera quem leia. ♪ Ela sabia, né? Ela sempre soube.' },
+          ],
+        },
+        {
+          id: 'censor',
+          x: 56,
+          rotulo: 'O velho de olho azul',
+          icone: '📚',
+          falas: [
+            { quem: 'censor', texto: 'Esta página está rasgada. Eu mandei rasgar. Há trezentos anos.' },
+            { quem: 'censor', texto: 'Estou colando de volta. Uma por uma. É mais difícil consertar do que apagar. Mas é melhor.' },
+            { quem: 'cassius', texto: 'Quer ajuda?' },
+            { quem: 'censor', texto: '...Quero. Eu nunca tinha pedido ajuda antes.' },
+          ],
+        },
+        {
+          id: 'livia',
+          x: 80,
+          rotulo: 'Lívia',
+          icone: '📖',
+          personagem: 'livia',
+          obrigatorio: true,
+          falas: [
+            { quem: 'livia', texto: 'Mestre Cass! Hoje vieram trinta crianças aprender a ler. Trinta! E todas fazem pergunta demais.' },
+            { quem: 'cassius', texto: 'Perfeito. É assim que tem que ser.' },
+            { quem: 'livia', texto: 'Por que esse livro só tem perguntas, Mestre Cass?' },
+            { quem: 'cassius', texto: 'Porque as respostas, Lívia, quem escreve é quem lê.' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'f-creditos',
+      quadros: [{ lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO CASSIUS: OS LIVROS NÃO QUEIMAM. Obrigado por jogar! Os caminhos do Octavius e do Helios contam o resto.' }],
     },
   ],
 };
@@ -2494,6 +2686,49 @@ export const CAP5_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      tipo: 'explorar',
+      id: 'o5-tripulacao',
+      lugar: 'frota-noite',
+      objetivo: 'Antes de zarpar, passe pelos navios e fale com a tripulação.',
+      pontos: [
+        {
+          id: 'padeiro',
+          x: 20,
+          rotulo: 'Um padeiro',
+          icone: '🥖',
+          personagem: 'copista',
+          falas: [
+            { quem: 'copista', texto: 'Comandante! Eu nunca subi num navio. Mas eu sei amassar pão por dez horas. Remar deve ser parecido.' },
+            { quem: 'octavius', texto: 'É igualzinho. Só que o pão é o mar. E o mar amassa de volta.' },
+          ],
+        },
+        {
+          id: 'refugiados',
+          x: 44,
+          rotulo: 'Refugiados que voltaram',
+          icone: '🧳',
+          falas: [
+            { quem: 'povo', texto: 'A gente fugiu no Esperança. E voltou. Não dá pra deixar Roma assim, com todo mundo calado.' },
+            { quem: 'octavius', texto: 'Vocês voltaram para uma luta que nem é de vocês.' },
+            { quem: 'povo', texto: 'É de todo mundo que já quis fazer uma pergunta, comandante.' },
+          ],
+        },
+        {
+          id: 'gaivota',
+          x: 70,
+          rotulo: 'Gaivota Sete',
+          icone: '🐦',
+          personagem: 'gaivota',
+          obrigatorio: true,
+          falas: [
+            { quem: 'gaivota', texto: 'QUÉ! (Ela está no alto do mastro, olhando para o céu. Para uma luz que pisca, longe, no alto de Roma.)' },
+            { quem: 'octavius', texto: 'Uma luz piscando... em padrões. Alguém está mandando sinais para a gente. Do alto do Ludus?' },
+            { quem: 'marco', texto: 'É aquele seu amigo que brilha, garoto. Todos a bordo!' },
+          ],
+        },
+      ],
+    },
+    {
       tipo: 'desafio',
       id: 'o5-estrelas',
       lugar: 'frota-noite',
@@ -2684,6 +2919,45 @@ export const CAP6_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      tipo: 'explorar',
+      id: 'o6-jangada',
+      lugar: 'coliseu-inundado',
+      objetivo: 'Em cima da jangada, olhe a arena inundada antes da primeira luta.',
+      pontos: [
+        {
+          id: 'plateia',
+          x: 20,
+          rotulo: 'A tripulação na plateia',
+          icone: '📣',
+          falas: [
+            { quem: 'octavius', texto: 'A Frota Fantasma inteira veio. Padeiros, pescadores, refugiados. Batendo os remos na arquibancada como tambor.' },
+            { quem: 'octavius', texto: 'O Feitor do Tambor ia odiar isso. É o ritmo mais desorganizado e mais bonito que eu já ouvi.' },
+          ],
+        },
+        {
+          id: 'grade',
+          x: 46,
+          rotulo: 'Uma grade no fundo',
+          icone: '⛓️',
+          falas: [
+            { quem: 'octavius', texto: 'Debaixo da água, uma grade. E atrás dela, um corredor que desce. O Hipogeu, onde ficam os presos.' },
+            { quem: 'octavius', texto: 'Se o Caio estiver vivo, ele está lá embaixo. Sete... você sabe o que fazer.' },
+          ],
+        },
+        {
+          id: 'camarote',
+          x: 74,
+          rotulo: 'O camarote do Censor',
+          icone: '👁️',
+          obrigatorio: true,
+          falas: [
+            { quem: 'octavius', texto: 'Lá em cima, o Olho vermelho. Ele está olhando para mim. Esperando eu afundar.' },
+            { quem: 'octavius', texto: 'Pode olhar, Censor. Eu nasci no mar. Água é a minha casa.' },
+          ],
+        },
+      ],
+    },
+    {
       tipo: 'luta',
       id: 'o6-tritao',
       lugar: 'coliseu-inundado',
@@ -2808,6 +3082,18 @@ export const FINAL_OCTAVIUS: Capitulo = {
   lugar: 'O Coliseu (o final)',
   cenas: [
     {
+      tipo: 'conversa',
+      id: 'fo-tunel',
+      lugar: 'coliseu-tunel',
+      falas: [
+        { quem: 'octavius', texto: 'Plano A: o Censor cai. Plano B: o Censor cai mais rápido. Plano C... eu não tenho Plano C. De novo.' },
+        { quem: 'cassius', texto: 'Às vezes não precisa de plano. Precisa de três pessoas que não desistem.' },
+        { quem: 'helios', texto: 'E de uma gaivota que roubou a chave do camarote do Censor.' },
+        { quem: 'octavius', texto: 'Ela fez isso?! Sete, sua... gênia.' },
+        { quem: 'brutus', texto: 'Escudo levantado, cabeça fria, boca fechada. TAGARELA, ISSO VALE PRA VOCÊ. Vão!' },
+      ],
+    },
+    {
       tipo: 'cutscene',
       id: 'fo-tita',
       quadros: [
@@ -2877,8 +3163,65 @@ export const FINAL_OCTAVIUS: Capitulo = {
         },
         { lugar: 'porto-docas', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'brilhar' }], texto: 'QUÉ! (A Gaivota Sete tem um chapéu de capitã. Ela mesma roubou.)' },
         { lugar: 'porto-docas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 50, efeito: 'brilhar' }], texto: 'Plano para amanhã? Nenhum. Pela primeira vez, eu quero ver o que acontece.' },
-        { lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO OCTAVIUS: PLANO B. Obrigado por jogar! O caminho do Helios conta o resto.' },
       ],
+    },
+    {
+      tipo: 'explorar',
+      id: 'fo-porto',
+      lugar: 'porto-docas',
+      objetivo: 'O Porto de Óstia, livre. Passe pelo cais e fale com a tripulação.',
+      pontos: [
+        {
+          id: 'marco',
+          x: 18,
+          rotulo: 'Marco e Caio',
+          icone: '⚓',
+          personagem: 'marco',
+          falas: [
+            { quem: 'marco', texto: 'Garoto! O Caio quer aprender a ser capitão. Já ensinei a cantar. Ele canta pior do que eu!' },
+            { quem: 'caio', texto: 'Comandante. Obrigado por cumprir a promessa. Meu pai fala de você todo santo dia.' },
+          ],
+        },
+        {
+          id: 'pistao',
+          x: 40,
+          rotulo: 'Uma porca enferrujada',
+          icone: '🔩',
+          falas: [
+            { quem: 'octavius', texto: 'Pendurei a porca do Vovô Pistão no mastro do Esperança. Ele remou quarenta anos para os outros.' },
+            { quem: 'octavius', texto: 'Agora o navio inteiro rema por ele.' },
+          ],
+        },
+        {
+          id: 'brutus',
+          x: 60,
+          rotulo: 'Brutus',
+          icone: '💬',
+          personagem: 'brutus',
+          falas: [
+            { quem: 'brutus', texto: 'Tagarela. Eu nunca tinha visto o mar. Ele é grande. E molhado. E tem sardinha.' },
+            { quem: 'octavius', texto: 'E não tem mingau, Brutus. É a melhor parte.' },
+          ],
+        },
+        {
+          id: 'gaivota',
+          x: 82,
+          rotulo: 'Gaivota Sete',
+          icone: '🐦',
+          personagem: 'gaivota',
+          obrigatorio: true,
+          falas: [
+            { quem: 'gaivota', texto: 'QUÉ! (De chapéu de capitã, em cima de um monte de coisas brilhantes: o selo de ouro do Cobrador, uma moeda do Almirante e a chave do Feitor.)' },
+            { quem: 'octavius', texto: 'Você guardou tudo? Sete, você é a maior ladra da história de Roma.' },
+            { quem: 'gaivota', texto: 'QUÉ-QUÉ. (Ela parece orgulhosa.)' },
+          ],
+        },
+      ],
+    },
+    {
+      tipo: 'cutscene',
+      id: 'fo-creditos',
+      quadros: [{ lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DO CAMINHO DO OCTAVIUS: PLANO B. Obrigado por jogar! O caminho do Helios conta o resto.' }],
     },
   ],
 };
