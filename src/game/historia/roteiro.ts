@@ -229,6 +229,7 @@ export type Cena = (
       presente?: Equipamento;
     }
   | { tipo: 'fase'; id: string; lugar: Lugar; /** A fase aberta (fases.ts). */ fase: string }
+  | { tipo: 'mundo'; id: string; lugar: Lugar; /** O mundo visto de cima (mundos.ts). */ mundo: string }
   | { tipo: 'escolha'; id: string; lugar: Lugar; pergunta: string; opcoes: OpcaoEscolha[] }
 ) & { so?: CondicaoEscolha };
 
@@ -465,47 +466,11 @@ const CAP1_CASSIUS: Capitulo = {
       ],
     },
     {
-      tipo: 'explorar',
+      // O MUNDO VISTO DE CIMA (22/11/2026): a Grande Biblioteca para andar livre.
+      tipo: 'mundo',
       id: 'c1-estantes',
       lugar: 'biblioteca-estantes',
-      objetivo: 'Arrume a Biblioteca e encontre a Lívia.',
-      pontos: [
-        {
-          id: 'estante',
-          x: 22,
-          rotulo: 'Estante de história',
-          icone: '📚',
-          falas: [
-            { quem: 'cassius', texto: 'Livros sobre a Guerra das Ideias. Metade deles o Censor mandou "corrigir".' },
-            { quem: 'cassius', texto: 'Corrigir. Que palavra bonita para apagar.', emocao: 'triste' },
-          ],
-        },
-        {
-          id: 'mesa',
-          x: 48,
-          rotulo: 'Mesa de leitura',
-          icone: '📖',
-          falas: [
-            { quem: 'cassius', texto: 'O Livro das Mil Perguntas. O mais proibido de todos.' },
-            { quem: 'cassius', texto: 'Cada página termina com uma pergunta, e nenhuma tem resposta pronta. Foi nele que a Lívia aprendeu a ler.' },
-          ],
-        },
-        {
-          id: 'livia',
-          x: 78,
-          rotulo: 'Lívia',
-          icone: '💬',
-          personagem: 'livia',
-          obrigatorio: true,
-          falas: [
-            { quem: 'livia', texto: 'Mestre Cass! Mestre Cass!', emocao: 'surpreso', jeito: 'grito' },
-            { quem: 'livia', texto: 'Eles estão vindo! Os Incineradores do Censor! Vi da janela da torre!', emocao: 'medo', jeito: 'grito' },
-            { quem: 'cassius', texto: 'Calma, Lívia. Respire. Quantos?', emocao: 'pensando' },
-            { quem: 'livia', texto: 'Muitos. E uma coisa enorme atrás deles, toda vermelha, soltando fumaça pela cabeça...', emocao: 'medo', jeito: 'devagar' },
-            { quem: 'cassius', texto: 'A Fornalha. Então o Censor não quer só os livros. Quer a Biblioteca inteira.', emocao: 'determinado', zoom: 'perto' },
-          ],
-        },
-      ],
+      mundo: 'biblioteca-noite',
     },
     {
       tipo: 'conversa',

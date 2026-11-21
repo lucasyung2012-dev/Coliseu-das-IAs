@@ -1592,3 +1592,15 @@
   .retrato-grande, .emo-feliz, .emo-bravo, .emo-medo, .emo-triste, .emo-surpreso, .emo-determinado, .emote-pula, .letra-treme { animation: none; }
 }
 .menos-movimento .letra-treme, .menos-movimento .emo-medo, .menos-movimento .emo-bravo { animation: none; }
+
+/* ---------- O mundo visto de cima (22/11/2026) ---------- */
+.mundo-aberto { aspect-ratio: 16 / 10; }
+@media (orientation: portrait) and (max-width: 700px) { .mundo-aberto { aspect-ratio: 1 / 1; } }
+.chama-vela { animation: chama-vela 0.3s steps(2) infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes chama-vela { from { transform: scaleY(1); } to { transform: scale(0.8, 1.3); } }
+.luz-vela { animation: luz-vela 1.6s ease-in-out infinite alternate; }
+@keyframes luz-vela { from { opacity: 0.09; } to { opacity: 0.18; } }
+.luz-lua { animation: luz-lua 5s ease-in-out infinite alternate; }
+@keyframes luz-lua { from { opacity: 0.08; } to { opacity: 0.15; } }
+.saida-brilha { box-shadow: 0 0 12px 4px rgba(242, 193, 78, 0.6); animation: luz-vela 0.8s ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) { .chama-vela, .luz-vela, .luz-lua, .saida-brilha { animation: none; } }

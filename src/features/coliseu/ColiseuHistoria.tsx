@@ -17,6 +17,8 @@ import { MenuPausa, PausaContexto } from './Pausa';
 import { abafarMusica, temaDoLugar, useMusica, type TemaMusica } from '@/ui/musica';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { FASES } from '@/game/historia/fases';
+import { MUNDOS } from '@/game/historia/mundos';
+import { MundoAberto } from './MundoAberto';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
@@ -426,6 +428,10 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         onFim={() => proxima()}
       />
     );
+  if (cena.tipo === 'mundo') {
+    const mundo = MUNDOS[cena.mundo];
+    return mundo ? <MundoAberto key={cena.id} mundo={mundo} heroi={heroi} onSegredo={ganharSegredoHistoria} onFim={() => proxima()} /> : null;
+  }
   if (cena.tipo === 'fase') {
     const fase = FASES[cena.fase];
     return fase ? <FaseAberta key={cena.id} fase={fase} heroi={heroi} onFim={() => proxima()} /> : null;
