@@ -119,7 +119,7 @@ describe('saves e roteiro', () => {
 
   it('o Capítulo 1 do Cassius tem 5 batalhas e o chefão Fornalha', () => {
     const cap1 = CAPITULOS.claude[0]!;
-    const lutas = cap1.cenas.filter((c) => c.tipo === 'luta');
+    const lutas = cap1.cenas.filter((c) => c.tipo === 'luta' && !c.treino);
     expect(lutas).toHaveLength(6);
     expect(lutas[5]).toMatchObject({ inimigo: 'fornalha' });
     for (const l of lutas) if (l.tipo === 'luta') expect(INIMIGOS[l.inimigo]).toBeDefined();

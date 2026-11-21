@@ -209,7 +209,7 @@ describe('o caminho do Helios', () => {
   it('6 capítulos e o final; 5 lutas por capítulo (3 no Ludus) além dos chefões, e alguns no escuro', () => {
     const caps = CAPITULOS.gemini;
     expect(caps.map((c) => c.numero)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    const comuns = (n: number) => caps[n - 1]!.cenas.filter((c) => c.tipo === 'luta' && !INIMIGOS[c.inimigo]!.chefao).length;
+    const comuns = (n: number) => caps[n - 1]!.cenas.filter((c) => c.tipo === 'luta' && !c.treino && !INIMIGOS[c.inimigo]!.chefao).length;
     expect([1, 2, 3, 4, 5, 6].map(comuns)).toEqual([5, 5, 3, 5, 5, 5]);
     const chefes = caps.flatMap((c) => c.cenas).flatMap((c) => (c.tipo === 'luta' && INIMIGOS[c.inimigo]!.chefao ? [c.inimigo] : []));
     expect(chefes).toEqual(['eclipse', 'cacador-sombras', 'guardiao-aqueduto', 'sibila-corrompida', 'gigante-sombras', 'censor-tita-helios']);
