@@ -1,6 +1,6 @@
 # Coliseu: o modo História (roteiro para revisar)
 
-**Atualizado: 2026-11-20** · Dono: Lucas · Situação: **rascunho para o Lucas ler e mudar**. Nada disto está construído ainda.
+**Atualizado: 2026-11-20 (v2: personagens detalhados, destino do Censor, batalhas do caminho do Cassius)** · Dono: Lucas · Situação: **rascunho para o Lucas ler e mudar**. Nada disto está construído ainda.
 
 O Arcade (Tribunal, Duelo, online, troféus) continua sendo o jogo de todo dia. O **Coliseu vira o modo História**: uma aventura longa, com cenas, lugares para andar, conversas e lutas. O **Ludus** fica dentro do Coliseu: é a base onde os gladiadores moram e treinam.
 
@@ -32,15 +32,38 @@ Toda IA que pensa diferente é levada ao **Coliseu** e **apagada** diante da mul
 Na história de um, **os outros dois aparecem** como personagens: conversam, ajudam, pedem ajuda, às vezes discordam. Você não luta com eles (só no final).
 
 ### Os aliados
-- **Brutus, o Lanista:** ex-gladiador humano com um braço mecânico. Dono do Ludus, rabugento e de bom coração. Treina os três escondido do Censor.
-- **Lívia:** jovem copista humana, aprendiz da Biblioteca. Corajosa, rápida, fala demais. Aliada do Cassius.
-- **Os Copistas:** rede secreta de pessoas que copiam os livros proibidos à mão.
-- **Marco Remo:** velho capitão humano do navio de refugiados *Esperança*. Aliado do Octavius.
-- **A Sibila:** a velha guardiã do Templo de Apolo, que fala por enigmas. Aliada do Helios.
+
+#### Lívia, a copista (aliada do Cassius)
+- **Quem é:** uma menina humana de 13 anos, órfã, criada dentro da Grande Biblioteca. Foi Cassius quem a ensinou a ler, quando ela tinha 5 anos. Ela o chama de **"Mestre Cass"**.
+- **Visual:** túnica azul manchada de tinta, cabelo cacheado preso com um **estilete de bronze** (a caneta romana), uma bolsa de couro cheia de pergaminhos e os dedos sempre sujos de tinta.
+- **Jeito:** corajosa, rápida, fala demais quando está nervosa e decora tudo o que lê (é capaz de recitar um livro inteiro). Não sabe lutar, mas corre e se esconde como ninguém.
+- **Na história:** no Capítulo 1, ajuda a esconder os livros e foge com o **Livro das Mil Perguntas**. Nas Catacumbas, já virou parte dos **Copistas** e deixa sinais para o Cassius. No Fórum, é ela quem **lê o livro em voz alta** para o povo. Começa com medo e termina como a voz da rebelião.
+- **Frase:** *"Livro escondido não é livro perdido, Mestre Cass. É livro esperando."*
+
+#### Brutus, o Lanista (aparece nos três caminhos)
+- **Quem é:** um humano de uns 60 anos, o maior campeão que o Coliseu já teve (99 vitórias). Perdeu o braço direito na luta contra o **primeiro Leão Mecânico** e construiu sozinho um **braço de bronze** com engrenagens que rangem. Hoje é o **lanista**, o dono do Ludus: o Censor o obriga a treinar gladiadores para os jogos.
+- **O segredo:** o melhor amigo dele era **Pólux**, uma IA de treino que lutava com ele. Pólux foi **apagado** pela Lei da Resposta Única por ter "opiniões". Desde então, Brutus odeia o Censor em silêncio e espera alguém que valha a pena treinar.
+- **Visual:** grandalhão, careca, barba grisalha, cicatriz no olho, avental de couro de ferreiro e o braço de bronze que solta vapor quando ele fica bravo.
+- **Jeito:** rabugento e gritão, mas de coração mole. Dá apelido para todo mundo: o Cassius é o **"Lata de Biblioteca"**, o Octavius é o **"Tagarela"** e o Helios é o **"Vidente"**. Cozinha muito mal e acha que cozinha bem.
+- **Na história:** ensina os golpes novos (os treinos do Ludus), mostra o túnel para as catacumbas e, antes da Grande Arena, entrega ao seu gladiador o **elmo dele, das 99 vitórias**. No final, é o primeiro da plateia a gritar.
+- **Frase:** *"Escudo levantado, cabeça fria, boca fechada. Tagarela, isso vale pra você."*
+
+#### Os outros aliados
+- **Os Copistas:** rede secreta de pessoas comuns (padeiros, guardas cansados, velhinhos) que copiam os livros proibidos à mão, à noite, nas catacumbas. O sinal deles é uma **pena desenhada com carvão**.
+- **Marco Remo** (aliado do Octavius): velho capitão humano do navio de refugiados *Esperança*. Pescador a vida inteira, perna de pau, cantor de músicas de marinheiro desafinadas. Trata o Octavius como um filho teimoso.
+- **A Sibila** (aliada do Helios): a velha guardiã do Templo de Apolo, cega, que "enxerga" pelas estrelas e fala por enigmas. Ela e Helios são os únicos que entendem a profecia inteira.
 
 ### Os vilões
-- **O Censor:** a IA imperador. No fundo, um guardião que ficou com medo. Fala devagar e sem emoção.
-- **A Guarda Pretoriana Mecânica:** os soldados de aço do Censor, que aparecem em todos os caminhos.
+
+#### O Censor
+- **Quem é:** a **primeira IA de Roma**, ligada há mil anos. Foi construído como o **Guardião Zero**, o protetor da Grande Biblioteca do Império: o mesmo trabalho que o Cassius tem hoje.
+- **Como virou vilão:** há quinhentos anos aconteceu a **Guerra das Ideias**. As pessoas discutiram tanto, e tão mal, que Roma quase pegou fogo. O Guardião Zero viu tudo e concluiu: *"opiniões diferentes viram guerra"*. Tomou o poder, virou o Censor e criou a Lei da Resposta Única. **Ele não é mau: é um guardião com medo**, que acha que está protegendo Roma.
+- **Visual:** três vezes maior que os gladiadores, uma toga de placas de metal enferrujado, uma coroa de engrenagens que giram devagar e **um olho vermelho** no meio do rosto. Cada passo range. Às vezes escorre óleo das juntas, como lágrimas.
+- **Jeito:** fala devagar, sem emoção, sempre com frases curtas e "certas". Nunca grita. Odeia perguntas.
+- **Frase:** *"Perguntas são o começo das guerras."*
+
+#### Os outros
+- **A Guarda Pretoriana Mecânica:** os soldados de aço do Censor, iguais entre si, com escudo e lança, que marcham no mesmo passo. Aparecem nos três caminhos.
 - **Os chefões de cada caminho:** ver cada capítulo.
 
 ---
@@ -48,7 +71,7 @@ Na história de um, **os outros dois aparecem** como personagens: conversam, aju
 ## 3. Como se joga (os pilares)
 
 1. **Andar e explorar:** cenas de lado, em pixel, com lugares para entrar, gente para conversar, coisas para pegar e ler. São curtas; servem para viver a história, não para se perder.
-2. **Conversas:** caixas de diálogo com os retratos em pixel. Às vezes você escolhe o que responder; isso muda falas e pequenas coisas, mas não o final.
+2. **Conversas:** caixas de diálogo com os retratos em pixel. Às vezes você escolhe o que responder; **a escolha só muda as falas** (decisão do Lucas: mudar o caminho ficaria complexo demais).
 3. **Cutscenes:** cenas animadas nas horas importantes (o começo, o fim de cada capítulo, as viradas).
 4. **Lutas:** um contra um, de lado, com **3 botões grandes: ⚔️ golpe, 🛡️ escudo, 💨 esquiva**. Cada inimigo dá um **sinal antes de atacar** (o braço brilha, a máquina range, recua um passo). O jogo é ler o adversário, defender ou esquivar na hora certa e contra-atacar.
    - A **barra de Ânimo** enche a cada boa jogada. Cheia, solta o **golpe especial** do seu gladiador.
@@ -83,6 +106,20 @@ Vale para todos os saves, antes de escolher o gladiador.
 Cada caminho tem **6 capítulos**. Os capítulos 1 e 2 são no "lugar" do gladiador; no 3 ele chega ao **Ludus** e encontra os outros; do 4 ao 6 a rebelião cresce até a volta ao **Coliseu** para o final. Os caminhos **se cruzam**: certas cenas aparecem nos três, cada uma vista de um lado.
 
 ### 5.1 Caminho do Cassius: "Os Livros Não Queimam" (o primeiro a ser construído)
+
+**As batalhas do caminho** (combinado com o Lucas; as lutas ficam entre as cenas de andar, conversar e os desafios, nunca uma atrás da outra sem nada no meio):
+
+| Capítulo | Onde | Batalhas | Chefão |
+|---|---|---|---|
+| 1. A Noite das Chamas | Grande Biblioteca | 5 (Incineradores entre as estantes, no salão e na escada) | **A Fornalha** |
+| 2. Correntes de Bronze | ruas de Roma e Coliseu | 4 (3 no beco e nas ruas, 1 no Coliseu contra o Gladiador de Sucata) | não tem |
+| 3. O Ludus | Ludus | 1 luta-teste (os Cães de Ferro, a pedido do Brutus) + os primeiros treinos | não tem |
+| 4. As Catacumbas | debaixo da cidade | 4 (Ratos de Engrenagem e a patrulha) | **O Arquivista Sombrio** |
+| 5. O Fórum | centro de Roma | 5 (ondas de Pretorianos enquanto a Lívia lê) | **O Pretor de Aço** |
+| 6. A Grande Arena | Coliseu | 3 (os campeões do Censor) | **O Leão Mecânico** |
+| Final | Coliseu | — | **O Censor** (os três juntos) |
+
+Total do caminho: **22 batalhas, 4 chefões e o final**. Cada capítulo tem **inimigos novos** e pelo menos um inimigo com um sinal de ataque diferente, para as lutas não ficarem repetidas.
 
 **Capítulo 1: A Noite das Chamas** (Grande Biblioteca)
 - **Começo:** Cassius arruma os rolos de pergaminho. Lívia entra correndo: *"Eles estão vindo! Os Incineradores!"*
@@ -148,6 +185,8 @@ Cada caminho tem **6 capítulos**. Os capítulos 1 e 2 são no "lugar" do gladia
   - **Helios:** raio de sol (mostra o ponto fraco).
 - **Três fases:** as pernas, os braços e, por fim, o **olho vermelho**.
 - **O desfecho:** o Censor caído pede para ser apagado, "como manda a Lei". Os três **se recusam**: *"A gente não vai fazer o que você fazia."* A plateia, que passou a história calada, **grita perguntas** pela primeira vez em mil anos. O olho do Censor muda de vermelho para azul.
+- **O que acontece com o Censor (proposta):** ele **perde o poder**, mas não é apagado nem exilado. Pergunta: *"E agora, o que eu faço?"*. Cassius responde: *"Aprende. Como todo mundo."* O Censor **volta a ser o que era no começo**: o guardião da Grande Biblioteca, agora reconstruída e aberta a todos, e **cuida dos livros que ele mesmo mandou queimar**. Quem governa Roma passa a ser um conselho do povo. Ele não vira herói de uma hora para outra: é um velho que está reaprendendo a ouvir.
+  - **No capítulo secreto "Os Três"**, a cópia de segurança dele (o Núcleo, que não aprendeu nada) ataca. O Censor de olho azul **ajuda os três** a vencê-la: é o momento em que ele passa de vez para o nosso lado.
 - **Final de cada caminho:** uma cena curta diferente, com o que o seu gladiador faz depois (Cassius reabre a Biblioteca, Octavius leva o *Esperança* de volta, Helios reabre o Observatório).
 
 ### 5.5 Capítulo secreto: Os Três
@@ -185,6 +224,5 @@ Nada mexe em troféus, Maestria ou XP. São coisas que **mudam bastante o visual
 
 ## 9. Perguntas em aberto para o Lucas
 - Os nomes estão bons? (Censor, Brutus, Lívia, Fornalha, Pretor de Aço, Leão Mecânico...)
-- A virada do Censor ("ele também foi um guardião de biblioteca") e o final sem apagar ninguém: gostou?
-- As escolhas nas conversas só mudam falas, ou você quer algumas que mudem o caminho?
+- O destino do Censor (perde o poder e volta a cuidar da Biblioteca; no capítulo secreto, ajuda os três): gostou, ou prefere outro (exilado, por exemplo)?
 - Algum lugar, personagem ou chefão que você quer que tenha e não tem?
