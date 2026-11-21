@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, ANIMO_MAX, ataqueAtual, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type EstadoLuta } from '@/game/historia/luta';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
@@ -77,6 +77,28 @@ const TEXTO: Record<string, string> = {
   cansado: 'SEM FÔLEGO',
 };
 
+/** Faíscas voando para todos os lados, um corte e um anel: o impacto de um golpe. */
+function Impacto({ x, cor, corte = false, grande = false }: { x: string; cor: string; corte?: boolean; grande?: boolean }) {
+  const n = grande ? 14 : 9;
+  return (
+    <span className="pointer-events-none absolute bottom-[34%] z-20 h-0 w-0" style={{ left: x }} aria-hidden>
+      <span className="anel-impacto absolute h-16 w-16 rounded-full border-4 sm:h-24 sm:w-24" style={{ borderColor: cor, left: '-2rem', top: '-2rem' }} />
+      {corte && <span className="corte-golpe absolute -left-10 -top-1 h-1.5 w-20 bg-white shadow-[0_0_8px_#fff] sm:-left-14 sm:w-28" />}
+      {Array.from({ length: n }, (_, k) => {
+        const ang = (k / n) * Math.PI * 2 + (k % 2) * 0.3;
+        const dist = (grande ? 70 : 42) + (k % 3) * 12;
+        return (
+          <span
+            key={k}
+            className="faisca-voa absolute h-1.5 w-1.5 sm:h-2 sm:w-2"
+            style={{ background: k % 3 ? cor : '#ffffff', '--dx': `${Math.cos(ang) * dist}px`, '--dy': `${Math.sin(ang) * dist}px` } as CSSProperties}
+          />
+        );
+      })}
+    </span>
+  );
+}
+
 /**
  * A luta do modo História: falas antes, a luta, falas depois. Perdeu? Tenta de novo.
  * Controles: ⚔️ golpe, 🛡️ escudo, 💨 esquiva e ⭐ especial (Ânimo cheio).
@@ -104,6 +126,8 @@ export function LutaHistoria({
   const [e, setE] = useState<EstadoLuta>(() => novaLuta(def));
   const [tentativas, setTentativas] = useState(1);
   const visto = useRef(0);
+  // Golpes seguidos sem apanhar (o COMBO na tela).
+  const [combo, setCombo] = useState(0);
 
   useEffect(() => {
     if (fase !== 'luta') return;
@@ -117,6 +141,8 @@ export function LutaHistoria({
       if (ev.id <= visto.current) continue;
       const som = SOM[ev.tipo];
       if (som) tocar(som);
+      if (ev.tipo === 'acerto' || ev.tipo === 'especial') setCombo((c) => c + 1);
+      if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
     }
     visto.current = Math.max(visto.current, ...e.eventos.map((x) => x.id), 0);
     if (fase === 'luta' && e.fim === 'vitoria') {
@@ -163,10 +189,13 @@ export function LutaHistoria({
   const largura = def.id === 'fornalha' ? 30 : (VISUAL[def.id]?.largura ?? 13);
   const apanhou = e.eventos.some((ev) => ev.tipo === 'acerto' && ev.ate - e.tempo > 550);
   const plateiaLado = e.animo >= 50;
+  // O inimigo avança quando o golpe dele chega; cai quando perde.
+  const atacou = e.eventos.some((ev) => (ev.tipo === 'dano' || ev.tipo === 'bloqueio' || ev.tipo === 'esquiva') && ev.ate - e.tempo > 450);
+  const vencido = e.fim === 'vitoria';
 
   return (
     <div className="flex flex-col gap-2">
-      <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer' : ''}>
+      <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer-forte' : ''}>
         {/* Placar: vida dos dois, o fôlego e o Ânimo (ou a plateia, no Coliseu) */}
         <div className="absolute inset-x-2 top-2 z-10 grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
@@ -188,11 +217,22 @@ export function LutaHistoria({
           </div>
         </div>
 
+        {/* Sombras no chão */}
+        <span className="pointer-events-none absolute bottom-[12%] left-[22%] z-[9] h-[4%] w-[11%] -translate-x-1/2 rounded-[50%] bg-black/50" aria-hidden style={{ scale: acaoJ === 'esquiva' ? '0.6' : '1', transition: 'scale 120ms' }} />
+        {!vencido && <span className="pointer-events-none absolute bottom-[10%] left-[70%] z-[9] h-[4%] -translate-x-1/2 rounded-[50%] bg-black/50" style={{ width: `${largura * 0.85}%` }} aria-hidden />}
+
+        {/* A sombra que fica para trás na esquiva */}
+        {acaoJ === 'esquiva' && (
+          <div className="rastro-esquiva pointer-events-none absolute bottom-[14%] left-[22%] z-[9] w-[13%] -translate-x-1/2 opacity-40" aria-hidden>
+            <Retrato quem={heroi} />
+          </div>
+        )}
+
         {/* O herói */}
         <div
-          className={`absolute bottom-[14%] left-[22%] z-10 w-[13%] -translate-x-1/2 ${acaoJ === 'golpe' || acaoJ === 'especial' ? 'estocada-dir' : acaoJ === 'parado' ? 'respirar' : ''}`}
+          className={`absolute bottom-[14%] left-[22%] z-10 w-[13%] -translate-x-1/2 ${acaoJ === 'golpe' || acaoJ === 'especial' ? 'investida-dir' : acaoJ === 'parado' ? 'respirar-t' : ''}`}
           style={{
-            translate: acaoJ === 'esquiva' ? '-60% -22%' : undefined,
+            translate: acaoJ === 'esquiva' ? '-60% -22%' : acaoJ === 'ferido' ? '-18% 0' : undefined,
             transition: 'translate 120ms ease-out',
             filter: acaoJ === 'ferido' ? 'brightness(2.4) saturate(0)' : acaoJ === 'especial' ? 'drop-shadow(0 0 12px #f2c14e)' : undefined,
           }}
@@ -207,9 +247,11 @@ export function LutaHistoria({
 
         {/* O inimigo, com o sinal antes do ataque */}
         <div
-          className={`absolute bottom-[12%] left-[70%] z-10 -translate-x-1/2 ${sinal ? 'tremer' : def.chefao || def.id.startsWith('pretoriano') || def.id === 'gladiador-de-sucata' ? 'respirar' : 'flutuar'}`}
+          className={`absolute bottom-[12%] left-[70%] z-10 -translate-x-1/2 ${vencido ? 'inimigo-vencido' : atacou ? 'investida-esq' : sinal ? 'tremer-t' : def.chefao || def.id.startsWith('pretoriano') || def.id === 'gladiador-de-sucata' ? 'respirar-t' : 'flutuar'}`}
           style={{
             width: `${largura}%`,
+            translate: apanhou && !vencido ? '8% 0' : undefined,
+            transition: 'translate 90ms ease-out',
             filter: apanhou ? 'brightness(2.6)' : sinal ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
           }}
         >
@@ -240,11 +282,35 @@ export function LutaHistoria({
           )}
         </div>
 
+        {/* Impactos: faíscas, cortes, anéis, clarões */}
+        {e.eventos.map((ev) => {
+          const x = ev.lado === 'jogador' ? '22%' : '70%';
+          if (ev.tipo === 'acerto') return <Impacto key={`fx${ev.id}`} x={x} cor="#ffd04a" corte />;
+          if (ev.tipo === 'dano') return <Impacto key={`fx${ev.id}`} x={x} cor="#ff4a3a" />;
+          if (ev.tipo === 'bloqueio') return <Impacto key={`fx${ev.id}`} x="30%" cor="#9fe8ff" />;
+          if (ev.tipo === 'especial') return <Impacto key={`fx${ev.id}`} x="70%" cor="#f2c14e" corte grande />;
+          return null;
+        })}
+        {e.eventos.some((ev) => ev.tipo === 'dano' || ev.tipo === 'contra') && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
+        {e.eventos.some((ev) => ev.tipo === 'especial' || ev.tipo === 'fase') && <div className="clarao pointer-events-none absolute inset-0 z-[19] bg-white" aria-hidden />}
+        {/* pouca vida: as bordas pulsam vermelho */}
+        {fase === 'luta' && j.vida / j.vidaMax < 0.3 && <div className="perigo-bordas pointer-events-none absolute inset-0 z-[18]" aria-hidden />}
+        {/* LUTE! no começo */}
+        {fase === 'luta' && e.tempo < 1100 && (
+          <span className="lute-entra pointer-events-none absolute left-1/2 top-[38%] z-30 -translate-x-1/2 font-pixel text-3xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-5xl">LUTE!</span>
+        )}
+        {/* COMBO */}
+        {combo >= 3 && fase === 'luta' && (
+          <span key={combo} className="combo-pop pointer-events-none absolute left-[46%] top-[24%] z-20 -translate-x-1/2 whitespace-nowrap font-pixel text-[10px] text-[#ffd04a] [text-shadow:2px_2px_0_#000] sm:text-base">
+            COMBO ×{combo}
+          </span>
+        )}
+
         {/* Números e avisos que sobem */}
         {e.eventos.map((ev) => (
           <span
             key={ev.id}
-            className="subir-sumir pointer-events-none absolute z-20 -translate-x-1/2 whitespace-nowrap font-pixel text-[9px] [text-shadow:2px_2px_0_#000] sm:text-sm"
+            className={`subir-sumir pointer-events-none absolute z-20 -translate-x-1/2 whitespace-nowrap font-pixel [text-shadow:2px_2px_0_#000] ${ev.tipo === 'acerto' || ev.tipo === 'dano' ? 'text-sm sm:text-xl' : 'text-[9px] sm:text-sm'}`}
             style={{
               left: ev.lado === 'jogador' ? '22%' : '70%',
               bottom: '58%',
@@ -272,6 +338,7 @@ export function LutaHistoria({
                 tocar('start');
                 setTentativas((t) => t + 1);
                 setE(novaLuta(def));
+                setCombo(0);
                 setFase('luta');
               }}
               className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent"

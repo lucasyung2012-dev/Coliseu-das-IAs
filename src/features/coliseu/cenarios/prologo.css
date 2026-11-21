@@ -1,0 +1,78 @@
+/* Animações ambiente dos cenários do prólogo (prefixo pro-). Nos elementos de SVG,
+   px nas transformações vale como unidade do desenho (320 × 180). */
+.pro-cintila { animation: pro-cintila 2.4s steps(2) infinite; }
+@keyframes pro-cintila { 50% { opacity: 0.2; } }
+
+.pro-dirigivel { animation: pro-dirigivel 48s linear infinite; }
+@keyframes pro-dirigivel { from { transform: translateX(-60px); } to { transform: translateX(380px); } }
+
+.pro-nuvem { animation: pro-nuvem 26s ease-in-out infinite alternate; }
+@keyframes pro-nuvem { to { transform: translateX(-28px); } }
+
+.pro-vapor, .pro-vapor-lento { transform-box: fill-box; transform-origin: center; opacity: 0; }
+.pro-vapor { animation: pro-vapor 3.2s ease-out infinite; }
+.pro-vapor-lento { animation: pro-vapor 4.4s ease-out infinite; }
+@keyframes pro-vapor {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 0.75; }
+  100% { transform: translate(-10px, -38px) scale(2.4); opacity: 0; }
+}
+
+.pro-gira { animation: pro-gira 40s linear infinite; }
+.pro-gira-volta { animation: pro-gira 30s linear infinite reverse; }
+@keyframes pro-gira { to { transform: rotate(360deg); } }
+
+.pro-pulsa { animation: pro-pulsa 1.8s ease-in-out infinite; }
+@keyframes pro-pulsa { 50% { opacity: 0.45; } }
+
+.pro-varre { animation: pro-varre 9s ease-in-out infinite alternate; }
+@keyframes pro-varre { from { transform: rotate(-28deg); } to { transform: rotate(28deg); } }
+
+.pro-farol { animation: pro-farol 7s ease-in-out infinite alternate; }
+@keyframes pro-farol { from { transform: rotate(-200deg); } to { transform: rotate(-150deg); } }
+
+.pro-passante, .pro-passante-volta { animation-timing-function: linear; animation-iteration-count: infinite; }
+.pro-passante { animation-name: pro-passante; }
+.pro-passante-volta { animation-name: pro-passante-volta; }
+@keyframes pro-passante { from { transform: translateX(-20px); } to { transform: translateX(340px); } }
+@keyframes pro-passante-volta { from { transform: translateX(340px); } to { transform: translateX(-20px); } }
+.pro-passo { animation: pro-passo 0.5s steps(2) infinite; }
+@keyframes pro-passo { 50% { transform: translateY(-1px); } }
+
+.pro-onda { animation: pro-onda 2.6s steps(4) infinite alternate; }
+@keyframes pro-onda { to { transform: translateX(-8px); } }
+
+.pro-boia { animation: pro-boia 3s steps(3) infinite alternate; }
+@keyframes pro-boia { to { transform: translateY(2px); } }
+
+.pro-chama { transform-box: fill-box; transform-origin: bottom; animation: pro-chama 0.5s steps(3) infinite alternate; }
+@keyframes pro-chama { to { transform: scaleY(1.3) scaleX(0.9); } }
+
+.pro-balanca { animation: pro-balanca 3.4s ease-in-out infinite alternate; }
+@keyframes pro-balanca { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+
+.pro-agua { animation: pro-agua 0.4s steps(2) infinite; }
+@keyframes pro-agua { 50% { opacity: 0.25; } }
+
+.pro-cadente { opacity: 0; animation: pro-cadente 6s linear infinite; }
+@keyframes pro-cadente {
+  0%, 80% { opacity: 0; transform: translate(0, 0); }
+  82% { opacity: 1; }
+  92% { opacity: 0; transform: translate(-70px, 34px); }
+  100% { opacity: 0; }
+}
+
+.pro-varredura { animation: pro-varredura 2.8s linear infinite; }
+@keyframes pro-varredura { from { transform: translateY(0); } to { transform: translateY(180px); } }
+
+.pro-pulso-cabo { animation: pro-pulso-cabo 1.8s linear infinite; }
+@keyframes pro-pulso-cabo { from { transform: translateY(0); opacity: 1; } to { transform: translateY(80px); opacity: 0; } }
+
+.pro-poeira { animation: pro-poeira 5s ease-in-out infinite alternate; }
+@keyframes pro-poeira { to { transform: translate(6px, -10px); opacity: 0.1; } }
+
+.menos-movimento .pro-cintila, .menos-movimento .pro-dirigivel, .menos-movimento .pro-nuvem, .menos-movimento .pro-vapor,
+.menos-movimento .pro-vapor-lento, .menos-movimento .pro-gira, .menos-movimento .pro-gira-volta, .menos-movimento .pro-pulsa,
+.menos-movimento .pro-varre, .menos-movimento .pro-farol, .menos-movimento .pro-passante, .menos-movimento .pro-passante-volta,
+.menos-movimento .pro-passo, .menos-movimento .pro-onda, .menos-movimento .pro-boia, .menos-movimento .pro-chama,
+.menos-movimento .pro-balanca, .menos-movimento .pro-agua, .menos-movimento .pro-cadente, .menos-movimento .pro-varredura,
+.menos-movimento .pro-pulso-cabo, .menos-movimento .pro-poeira { animation: none; }

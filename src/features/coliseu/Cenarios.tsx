@@ -1,5 +1,7 @@
 import type { Falante, Lugar } from '@/game/historia/roteiro';
 import { CenaColiseu } from '../arcade/cenas/Cenarios';
+import { desenhoCapitulo } from './cenarios/capitulos';
+import { desenhoPrologo } from './cenarios/prologo';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
 import {
@@ -32,6 +34,14 @@ export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
   if (lugar === 'coliseu-calado') return <CenaColiseu corA="#8a5a3a" corB="#8a5a3a" arena="estatuas" />;
   // A arena de verdade: dia, plateia cheia e viva (no Capítulo 2 ela vaia e depois aplaude).
   if (lugar === 'coliseu-arena') return <CenaColiseu corA="#f08c50" corB="#8a8a98" arena="pedra" viva />;
+  // Os cenários novos, em 320 × 180 (o dobro de detalhe).
+  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar);
+  if (hd)
+    return (
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
+        {hd}
+      </svg>
+    );
   return (
     <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
       {desenho(lugar)}

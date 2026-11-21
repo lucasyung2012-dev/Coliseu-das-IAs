@@ -36,6 +36,7 @@ export interface Fala {
 export type Lugar =
   | 'titulo'
   | 'roma-noite'
+  | 'roma-praca'
   | 'roma-chamas'
   | 'camarote'
   | 'coliseu-calado'
@@ -63,6 +64,8 @@ export interface EmCena {
   /** Como ele aparece: entrando pela esquerda, pela direita, de cima ou surgindo. */
   entrada?: 'esq' | 'dir' | 'cima' | 'surgir';
   efeito?: 'tremer' | 'brilhar' | 'apagar' | 'caido' | 'pequeno';
+  /** Anda de `de` até `x` (posição inicial, de 0 a 100), virado para onde vai. */
+  de?: number;
   /** Tamanho em % da largura (padrão 14). */
   tamanho?: number;
   /** O olho do Censor azul (o final). */
@@ -77,7 +80,7 @@ export interface Quadro {
   /** Quem aparece na cena; sem isto, aparece só quem fala. */
   personagens?: EmCena[];
   /** Efeito da cena: clarão, tremor, fogo subindo, faíscas, aproximar ou escurecer. */
-  efeito?: 'clarao' | 'tremor' | 'fogo' | 'faiscas' | 'zoom' | 'escuro' | 'festa';
+  efeito?: 'clarao' | 'tremor' | 'fogo' | 'faiscas' | 'zoom' | 'escuro' | 'festa' | 'panoramica';
   som?: NomeSom;
 }
 
@@ -131,9 +134,9 @@ export const NOMES: Record<Falante, string> = {
 // ---------- Prólogo (vale para todos os saves) ----------
 
 export const PROLOGO: Quadro[] = [
-  { lugar: 'roma-noite', efeito: 'zoom', som: 'portao', texto: 'Esta é Roma Eterna.' },
+  { lugar: 'roma-noite', efeito: 'panoramica', som: 'portao', texto: 'Esta é Roma Eterna.' },
   { lugar: 'roma-noite', efeito: 'zoom', texto: 'Mil anos atrás, Roma não caiu. Ela construiu máquinas para nunca mais cair.' },
-  { lugar: 'roma-noite', efeito: 'faiscas', texto: 'Engrenagens no lugar de muralhas. Vapor no lugar do vento. E, para pensar por todos... uma IA.' },
+  { lugar: 'roma-noite', efeito: 'faiscas', texto: 'Engrenagens no lugar de muralhas. Vapor no lugar do vento. Dirigíveis no lugar das águias. E, para pensar por todos... uma IA.' },
   {
     lugar: 'camarote',
     efeito: 'escuro',
@@ -153,13 +156,61 @@ export const PROLOGO: Quadro[] = [
   },
   { lugar: 'coliseu-calado', efeito: 'escuro', texto: 'A LEI DA RESPOSTA ÚNICA. Toda IA que pensa diferente é levada ao Coliseu.' },
   {
-    lugar: 'coliseu-calado',
+    lugar: 'roma-praca',
+    som: 'passos',
     personagens: [
-      { quem: 'guarda', x: 32 },
-      { quem: 'eco', x: 50, efeito: 'tremer', tamanho: 8 },
-      { quem: 'guarda', x: 68, espelhar: true },
+      { quem: 'guarda', de: -12, x: 28 },
+      { quem: 'guarda', de: -26, x: 14 },
     ],
-    texto: 'Esta é Eco, uma pequena IA que limpava as fontes da cidade. O crime dela: inventar canções que não estavam na lista.',
+    texto: 'Desde então, nas praças, ninguém discute. Ninguém pergunta. Os Pretorianos passam, e a cidade inteira abaixa a cabeça.',
+  },
+  {
+    lugar: 'roma-praca',
+    personagens: [
+      { quem: 'eco', de: 74, x: 46, tamanho: 8 },
+      { quem: 'fio', de: 88, x: 60, tamanho: 8, espelhar: true },
+    ],
+    texto: 'Quase ninguém. Perto da fonte, uma pequena IA de limpeza cantarolava baixinho. Ao lado dela, o irmão caçula, Fio, batia o ritmo no balde.',
+  },
+  {
+    lugar: 'roma-praca',
+    quem: 'eco',
+    personagens: [
+      { quem: 'eco', x: 46, tamanho: 8, efeito: 'brilhar' },
+      { quem: 'fio', x: 60, tamanho: 8, espelhar: true },
+    ],
+    texto: '♪ Água que corre não pede licença... ♪ Gostou, Fio? Essa eu inventei hoje.',
+  },
+  {
+    lugar: 'roma-praca',
+    efeito: 'tremor',
+    som: 'pesada',
+    personagens: [
+      { quem: 'guarda', de: -12, x: 30 },
+      { quem: 'eco', x: 46, tamanho: 8, efeito: 'tremer', espelhar: true },
+      { quem: 'fio', x: 60, tamanho: 8, espelhar: true },
+    ],
+    texto: 'Mas canção nova é ideia nova. E ideia nova, para o Censor, é perigo.',
+  },
+  {
+    lugar: 'roma-praca',
+    quem: 'guarda',
+    personagens: [
+      { quem: 'guarda', x: 30 },
+      { quem: 'eco', x: 46, tamanho: 8, efeito: 'tremer', espelhar: true },
+      { quem: 'fio', x: 60, tamanho: 8, espelhar: true },
+    ],
+    texto: 'Essa música não está na Lista. Você vem com a gente.',
+  },
+  {
+    lugar: 'coliseu-calado',
+    som: 'passos',
+    personagens: [
+      { quem: 'guarda', de: -14, x: 32 },
+      { quem: 'eco', de: 4, x: 50, tamanho: 8 },
+      { quem: 'guarda', de: 22, x: 68, espelhar: true },
+    ],
+    texto: 'Naquela mesma noite, Eco foi levada ao Coliseu. O crime dela: inventar canções que não estavam na Lista.',
   },
   {
     lugar: 'coliseu-calado',
@@ -176,7 +227,8 @@ export const PROLOGO: Quadro[] = [
   {
     lugar: 'biblioteca-porta',
     efeito: 'zoom',
-    personagens: [{ quem: 'cassius', x: 50, entrada: 'dir' }],
+    som: 'passos',
+    personagens: [{ quem: 'cassius', de: 112, x: 50 }],
     texto: 'Mas, nesta noite, três IAs vão desobedecer ao mesmo tempo.',
   },
   {
@@ -188,14 +240,14 @@ export const PROLOGO: Quadro[] = [
   {
     lugar: 'porto',
     som: 'trombeta',
-    personagens: [{ quem: 'octavius', x: 40, entrada: 'esq' }],
+    personagens: [{ quem: 'octavius', de: -12, x: 40 }],
     texto: 'No Porto de Óstia, Octavius, o comandante da frota, lê a ordem de afundar o Esperança: um navio cheio de refugiados.',
   },
   { lugar: 'porto', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40 }], texto: 'Plano A: obedecer. Plano B... é bem melhor.' },
   {
     lugar: 'observatorio',
     efeito: 'faiscas',
-    personagens: [{ quem: 'helios', x: 30, entrada: 'surgir' }],
+    personagens: [{ quem: 'helios', de: 4, x: 30 }],
     texto: 'No Observatório, Helios, o vigia do céu, vê três estrelas se alinharem bem em cima do Coliseu.',
   },
   { lugar: 'observatorio', quem: 'helios', personagens: [{ quem: 'helios', x: 30, efeito: 'brilhar' }], texto: 'Três vozes. Uma noite. E o fim da Lei.' },
@@ -235,7 +287,7 @@ const CAP1_CASSIUS: Capitulo = {
           texto: 'Porque as respostas, Lívia, quem escreve é quem lê.',
         },
         { lugar: 'biblioteca-estantes', efeito: 'escuro', texto: 'Hoje. A mesma Biblioteca. Uma noite sem chuva... e sem lua.' },
-        { lugar: 'biblioteca-estantes', quem: 'cassius', personagens: [{ quem: 'cassius', x: 30, entrada: 'esq' }], texto: 'Mais uma noite tranquila. Ou quase.' },
+        { lugar: 'biblioteca-estantes', quem: 'cassius', personagens: [{ quem: 'cassius', x: 30, de: -12 }], texto: 'Mais uma noite tranquila. Ou quase.' },
       ],
     },
     {
@@ -444,9 +496,9 @@ const CAP1_CASSIUS: Capitulo = {
           som: 'trombeta',
           personagens: [
             { quem: 'cassius', x: 30, efeito: 'caido' },
-            { quem: 'guarda', x: 60, entrada: 'dir', espelhar: true },
-            { quem: 'decuriao', x: 76, entrada: 'dir', espelhar: true },
-            { quem: 'guarda', x: 90, entrada: 'dir', espelhar: true },
+            { quem: 'guarda', x: 60, de: 112, espelhar: true },
+            { quem: 'decuriao', x: 76, de: 112, espelhar: true },
+            { quem: 'guarda', x: 90, de: 112, espelhar: true },
           ],
           texto: 'A Guarda Pretoriana entra em fila, no mesmo passo. Dezenas de lanças apontadas para Cassius.',
         },
@@ -598,8 +650,8 @@ const CAP2_CASSIUS: Capitulo = {
         {
           lugar: 'beco',
           personagens: [
-            { quem: 'cassius', x: 30, entrada: 'esq' },
-            { quem: 'fio', x: 44, tamanho: 8, entrada: 'esq' },
+            { quem: 'cassius', x: 30, de: -12 },
+            { quem: 'fio', x: 44, tamanho: 8, de: -12 },
           ],
           texto: 'Os dois pulam para um beco escuro. Atrás deles, os apitos da Guarda.',
         },
@@ -716,7 +768,7 @@ const CAP2_CASSIUS: Capitulo = {
           quem: 'brutus',
           personagens: [
             { quem: 'cassius', x: 34 },
-            { quem: 'brutus', x: 66, espelhar: true, entrada: 'dir', tamanho: 17 },
+            { quem: 'brutus', x: 66, espelhar: true, de: 112, tamanho: 17 },
           ],
           texto: 'Então você é o Lata de Biblioteca de quem estão falando. Hum. Ombros tortos. Guarda baixa. Vai apanhar.',
         },
@@ -735,7 +787,7 @@ const CAP2_CASSIUS: Capitulo = {
       tipo: 'cutscene',
       id: 'c2-arena',
       quadros: [
-        { lugar: 'coliseu-arena', efeito: 'clarao', som: 'trombeta', personagens: [{ quem: 'cassius', x: 30, entrada: 'esq' }], texto: 'Os portões se abrem. A luz do sol. A areia. Cinquenta mil pessoas.' },
+        { lugar: 'coliseu-arena', efeito: 'clarao', som: 'trombeta', personagens: [{ quem: 'cassius', x: 30, de: -12 }], texto: 'Os portões se abrem. A luz do sol. A areia. Cinquenta mil pessoas.' },
         { lugar: 'coliseu-arena', quem: 'arauto', efeito: 'festa', som: 'plateia', texto: 'POVO DE ROMA ETERNA! Hoje, o traidor da Biblioteca, o ladrão de livros...' },
         {
           lugar: 'coliseu-arena',
@@ -744,7 +796,7 @@ const CAP2_CASSIUS: Capitulo = {
           som: 'pesada',
           personagens: [
             { quem: 'cassius', x: 30 },
-            { quem: 'sucata', x: 70, espelhar: true, entrada: 'dir', tamanho: 18 },
+            { quem: 'sucata', x: 70, espelhar: true, de: 112, tamanho: 18 },
           ],
           texto: '...contra o GLADIADOR DE SUCATA! Montado com as peças de cem IAs apagadas!',
         },

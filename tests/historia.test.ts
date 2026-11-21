@@ -139,4 +139,17 @@ describe('saves e roteiro', () => {
     expect(PROLOGO.length).toBeGreaterThanOrEqual(15);
     expect(PROLOGO[PROLOGO.length - 1]!.lugar).toBe('titulo');
   });
+
+  it("o prólogo mostra Roma, a praça com a Eco e o Fio, e quem anda vai para um lugar dentro da cena", () => {
+    expect(PROLOGO[0]!.efeito).toBe("panoramica");
+    const praca = PROLOGO.filter((q) => q.lugar === "roma-praca");
+    expect(praca.some((q) => q.personagens?.some((p) => p.quem === "eco") && q.personagens?.some((p) => p.quem === "fio"))).toBe(true);
+    const quadros = [...PROLOGO, ...Object.values(CAPITULOS).flat().flatMap((c) => c.cenas).flatMap((c) => (c.tipo === "cutscene" ? c.quadros : []))];
+    for (const q of quadros) {
+      for (const p of q.personagens ?? []) {
+        expect(p.x).toBeGreaterThanOrEqual(0);
+        expect(p.x).toBeLessThanOrEqual(100);
+      }
+    }
+  });
 });

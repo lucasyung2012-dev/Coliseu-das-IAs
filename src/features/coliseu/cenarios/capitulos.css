@@ -1,0 +1,443 @@
+/*
+ * Animações de ambiente dos cenários dos capítulos (320 × 180).
+ * Toda classe e todo keyframe começam com "cap-" para não colidir com o resto do jogo.
+ * Atenção: animar opacity num elemento sobrescreve o atributo opacity dele;
+ * por isso as classes que mexem em opacity vão em grupos (<g>) ou em retângulos sem opacity própria.
+ */
+
+/* Chama: estica para cima a partir da base, em dois passos (retrô) */
+.cap-chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cap-chama 0.5s steps(2) infinite alternate;
+}
+@keyframes cap-chama {
+  from {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.92, 1.2);
+    opacity: 0.85;
+  }
+}
+
+/* Halo de luz respirando devagar */
+.cap-pulsar {
+  animation: cap-pulsar 2.6s ease-in-out infinite alternate;
+}
+@keyframes cap-pulsar {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Luz tremida de incêndio (janelas com a cidade em chamas) */
+.cap-tremular {
+  animation: cap-tremular 0.9s steps(3) infinite alternate;
+}
+@keyframes cap-tremular {
+  from {
+    opacity: 0.72;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Véu vermelho sobre a cena em chamas */
+.cap-luz-fogo {
+  opacity: 0.08;
+  animation: cap-luz-fogo 1.4s steps(4) infinite alternate;
+}
+@keyframes cap-luz-fogo {
+  from {
+    opacity: 0.05;
+  }
+  to {
+    opacity: 0.16;
+  }
+}
+
+/* Poeira flutuando na luz */
+.cap-poeira {
+  opacity: 0;
+  animation: cap-poeira 7s steps(28) infinite;
+}
+@keyframes cap-poeira {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(6px, -18px);
+    opacity: 0;
+  }
+}
+
+/* Brasas subindo do fogo */
+.cap-brasa {
+  opacity: 0;
+  animation: cap-brasa 3.2s steps(24) infinite;
+}
+@keyframes cap-brasa {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(5px, -40px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-2px, -70px);
+    opacity: 0;
+  }
+}
+
+/* Fumaça subindo e se espalhando */
+.cap-fumaca {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: cap-fumaca 10s linear infinite;
+}
+@keyframes cap-fumaca {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(14px, -46px) scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Vapor escapando dos canos */
+.cap-vapor {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: cap-vapor 2.7s steps(9) infinite;
+}
+@keyframes cap-vapor {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(3px, -18px) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Lampião pendurado balançando (gira pelo topo da corrente) */
+.cap-balancar {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: cap-balancar 4.5s ease-in-out infinite alternate;
+}
+@keyframes cap-balancar {
+  from {
+    transform: rotate(-2.5deg);
+  }
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+
+/* Estandartes e toldos ondulando no vento */
+.cap-bandeira {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: cap-bandeira 3.2s steps(4) infinite alternate;
+}
+@keyframes cap-bandeira {
+  from {
+    transform: skewX(-3deg);
+  }
+  to {
+    transform: skewX(3deg);
+  }
+}
+
+/* Roupa no varal balançando */
+.cap-roupa {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: cap-roupa 2.4s steps(4) infinite alternate;
+}
+@keyframes cap-roupa {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+/* Gota caindo do cano até a poça */
+.cap-gota {
+  animation: cap-gota 2s steps(14) infinite;
+}
+@keyframes cap-gota {
+  0%,
+  20% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  90% {
+    transform: translate(0, 32px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 34px);
+    opacity: 0;
+  }
+}
+
+/* Paisagem passando atrás da jaula (faixa de 640 px que anda 320 px e recomeça) */
+.cap-rolar {
+  animation: cap-rolar 18s steps(320) infinite;
+}
+.cap-rolar-lento {
+  animation: cap-rolar 48s steps(320) infinite;
+}
+@keyframes cap-rolar {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-320px);
+  }
+}
+
+/* Solavanco da carroça nas pedras */
+.cap-sacudir {
+  animation: cap-sacudir 0.6s steps(1) infinite;
+}
+@keyframes cap-sacudir {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(1px);
+  }
+}
+
+/* Multidão se mexendo */
+.cap-multidao {
+  animation: cap-multidao 0.8s steps(1) infinite;
+}
+@keyframes cap-multidao {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Nuvens andando devagar */
+.cap-nuvem {
+  animation: cap-nuvem 40s steps(30) infinite alternate;
+}
+@keyframes cap-nuvem {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-30px);
+  }
+}
+
+/* Pombas atravessando o céu, batendo as asas */
+.cap-pomba {
+  animation: cap-pomba 16s linear infinite;
+}
+@keyframes cap-pomba {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(360px, -24px);
+  }
+}
+.cap-asa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cap-asa 0.3s steps(1) infinite;
+}
+@keyframes cap-asa {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(-1);
+  }
+}
+
+/* Pomba bicando o chão */
+.cap-bicar {
+  animation: cap-bicar 1.6s steps(1) infinite;
+}
+@keyframes cap-bicar {
+  0%,
+  60% {
+    transform: translate(0, 0);
+  }
+  70% {
+    transform: translate(1px, 3px);
+  }
+  80% {
+    transform: translate(0, 0);
+  }
+  90% {
+    transform: translate(1px, 3px);
+  }
+}
+
+/* Estrelas e brilhos piscando */
+.cap-estrela {
+  animation: cap-estrela 3s steps(3) infinite alternate;
+}
+@keyframes cap-estrela {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* Janela acesa que falha de vez em quando (e olhos do gato piscando) */
+.cap-piscar {
+  animation: cap-piscar 6s steps(1) infinite;
+}
+@keyframes cap-piscar {
+  0%,
+  88% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  92% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0.5;
+  }
+}
+
+/* Olho do Censor nos cartazes, brilhando */
+.cap-olho {
+  animation: cap-olho 2.4s steps(3) infinite alternate;
+}
+@keyframes cap-olho {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Feixes de luz da arena */
+.cap-feixe {
+  animation: cap-feixe 5s ease-in-out infinite alternate;
+}
+@keyframes cap-feixe {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Alguém passando lá no fim do beco */
+.cap-passante {
+  animation: cap-passante 14s steps(48) infinite;
+}
+@keyframes cap-passante {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(96px);
+  }
+}
+
+/* Rabo do gato abanando */
+.cap-rabo {
+  transform-box: fill-box;
+  transform-origin: 100% 100%;
+  animation: cap-rabo 1.8s steps(3) infinite alternate;
+}
+@keyframes cap-rabo {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+/* Menos movimento: tudo parado (partículas ficam visíveis, paradas) */
+.menos-movimento .cap-chama,
+.menos-movimento .cap-pulsar,
+.menos-movimento .cap-tremular,
+.menos-movimento .cap-luz-fogo,
+.menos-movimento .cap-poeira,
+.menos-movimento .cap-brasa,
+.menos-movimento .cap-fumaca,
+.menos-movimento .cap-vapor,
+.menos-movimento .cap-balancar,
+.menos-movimento .cap-bandeira,
+.menos-movimento .cap-roupa,
+.menos-movimento .cap-gota,
+.menos-movimento .cap-rolar,
+.menos-movimento .cap-rolar-lento,
+.menos-movimento .cap-sacudir,
+.menos-movimento .cap-multidao,
+.menos-movimento .cap-nuvem,
+.menos-movimento .cap-pomba,
+.menos-movimento .cap-asa,
+.menos-movimento .cap-bicar,
+.menos-movimento .cap-estrela,
+.menos-movimento .cap-piscar,
+.menos-movimento .cap-olho,
+.menos-movimento .cap-feixe,
+.menos-movimento .cap-passante,
+.menos-movimento .cap-rabo {
+  animation: none;
+}
+.menos-movimento .cap-poeira,
+.menos-movimento .cap-brasa {
+  opacity: 0.7;
+}
+.menos-movimento .cap-fumaca {
+  opacity: 0.3;
+}
+.menos-movimento .cap-vapor {
+  opacity: 0.4;
+}
