@@ -68,8 +68,12 @@ export interface EstadoFase {
   tempo: number;
   x: number;
   y: number;
+  /** Velocidade de lado: acelera e freia (o andar não fica duro). */
+  vx: number;
   vy: number;
   noChao: boolean;
+  /** Quando pisou no chão pela última vez (dá para pular logo depois de sair da beirada). */
+  chaoEm: number;
   /** Para onde está virado. */
   dir: 1 | -1;
   andando: boolean;
@@ -93,7 +97,11 @@ export interface Entrada {
   pular: boolean;
 }
 
-export const VELOCIDADE = 34;
+export const VELOCIDADE = 42;
+const ACELERA = 260;
+const FREIA = 340;
+/** Folga para pular depois de sair da beirada (ms). */
+const FOLGA_PULO = 110;
 export const PULO = 64;
 export const GRAVIDADE = 175;
 const LARGURA_HEROI = 6;
@@ -103,7 +111,7 @@ const FERIDO_MS = 1200;
 export const larguraDa = (f: Fase) => f.telas.length * 100;
 
 export function novaFase(): EstadoFase {
-  return { tempo: 0, x: 8, y: 0, vy: 0, noChao: true, dir: 1, andando: false, coletados: [], volta: 8, voltaY: 0, feridoAte: 0, queimadas: 0, ditos: [], falando: null, fim: false };
+  return { tempo: 0, x: 8, y: 0, vx: 0, vy: 0, noChao: true, chaoEm: 0, dir: 1, andando: false, coletados: [], volta: 8, voltaY: 0, feridoAte: 0, queimadas: 0, ditos: [], falando: null, fim: false };
 }
 
 /** O fogo está aceso agora? */
@@ -121,13 +129,17 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   if (s0.fim) return s0;
   const seg = dt / 1000;
   const tempo = s0.tempo + dt;
-  let { x, y, vy, noChao, dir } = s0;
-  // Andar
+  let { x, y, vx, vy, noChao, dir } = s0;
+  // Andar: acelera até a velocidade máxima e freia quando solta (no ar, controla um pouco menos).
   const mov = (e.dir ? 1 : 0) - (e.esq ? 1 : 0);
   if (mov !== 0) dir = mov as 1 | -1;
-  x = Math.max(3, Math.min(larguraDa(f) - 3, x + mov * VELOCIDADE * seg));
-  // Pular (só do chão ou de cima de uma plataforma)
-  if (e.pular && noChao) {
+  const controle = noChao ? 1 : 0.7;
+  if (mov !== 0) vx = Math.max(-VELOCIDADE, Math.min(VELOCIDADE, vx + mov * ACELERA * controle * seg));
+  else vx = Math.sign(vx) * Math.max(0, Math.abs(vx) - FREIA * controle * seg);
+  x = Math.max(3, Math.min(larguraDa(f) - 3, x + vx * seg));
+  if (x <= 3 || x >= larguraDa(f) - 3) vx = 0;
+  // Pular: do chão, de cima de uma plataforma, ou logo depois de sair da beirada.
+  if (e.pular && vy <= 0 && (noChao || tempo - s0.chaoEm <= FOLGA_PULO)) {
     vy = PULO;
     noChao = false;
   }
@@ -152,14 +164,14 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
       }
     }
   }
-  let s: EstadoFase = { ...s0, tempo, x, y, vy, noChao, dir, andando: mov !== 0 && noChao };
+  let s: EstadoFase = { ...s0, tempo, x, y, vx, vy, noChao, dir, andando: Math.abs(vx) > 4 && noChao, chaoEm: noChao ? tempo : s0.chaoEm };
   // O ponto de volta: o último lugar seguro em que pisou (em cima de algo, ou no chão longe do fogo).
   if (noChao && (y > 0 || !f.perigos.some((p) => x > p.x - 4 && x < p.x + p.w + 4))) s = { ...s, volta: x, voltaY: y };
   // Fogo: encostou com os pés baixos, volta para o ponto seguro.
   if (tempo >= s.feridoAte) {
     for (const p of f.perigos) {
       if (y < 5 && x > p.x && x < p.x + p.w && fogoAceso(p, tempo)) {
-        s = { ...s, x: s.volta, y: s.voltaY, vy: 0, noChao: true, feridoAte: tempo + FERIDO_MS, queimadas: s.queimadas + 1 };
+        s = { ...s, x: s.volta, y: s.voltaY, vx: 0, vy: 0, noChao: true, feridoAte: tempo + FERIDO_MS, queimadas: s.queimadas + 1 };
         break;
       }
     }

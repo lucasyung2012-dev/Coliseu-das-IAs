@@ -1549,3 +1549,9 @@
 }
 @media (prefers-reduced-motion: reduce) { .balanca-frente, .particula-frente { animation: none; } }
 .menos-movimento .balanca-frente, .menos-movimento .particula-frente { animation: none; }
+
+/* A fase aberta: o próprio tamanho (no celular em pé, 4:3, para os bonecos não ficarem minúsculos). */
+.fase-aberta { aspect-ratio: 16 / 9; }
+@media (orientation: portrait) and (max-width: 700px) {
+  .fase-aberta { aspect-ratio: 4 / 3; }
+}

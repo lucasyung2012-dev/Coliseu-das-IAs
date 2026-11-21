@@ -122,6 +122,7 @@ import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { usePausado } from './Pausa';
+import Icone from '@/ui/pixel/Icones';
 import { Retrato } from './Cenarios';
 
 /** O desenho e o tamanho de cada inimigo (em % da largura da cena). */
@@ -274,12 +275,13 @@ const SOM: Partial<Record<string, SomHistoria>> = {
  * Os botões e o jeito de cada gladiador (pedido do Lucas: cada um luta diferente).
  * A ordem é sempre golpe, defesa, esquiva e especial; muda o nome, o ícone e a dica.
  */
-const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [string, string]; esquiva: [string, string]; especial: [string, string]; dica: string; cor: string }> = {
+const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [string, string]; esquiva: [string, string]; especial: [string, string]; icones: Record<'golpe' | 'escudo' | 'esquiva' | 'especial', string>; dica: string; cor: string }> = {
   guardiao: {
     golpe: ['⚔️', 'GLÁDIO'],
     escudo: ['🛡️', 'ESCUDO'],
     esquiva: ['💨', 'ESQUIVA'],
     especial: ['📚', 'MURALHA'],
+    icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'esquiva', especial: 'muralha' },
     dica: 'GUARDIÃO: bloqueie NA ÚLTIMA HORA para guardar 📜 páginas; o próximo golpe no ABERTO cita todas e bate muito. Esquiva pesada. MURALHA: tudo bloqueado e metade volta.',
     cor: '#e0782c',
   },
@@ -288,6 +290,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
     escudo: ['🪵', 'APARAR'],
     esquiva: ['🌀', 'ROLAR'],
     especial: ['🕸️', 'REDE'],
+    icones: { golpe: 'tridente', escudo: 'aparar', esquiva: 'rolar', especial: 'rede' },
     dica: 'ESTRATEGISTA: role NA ÚLTIMA HORA e ele TROPEÇA (fica aberto muito tempo). Aparar deixa passar um pouco. Use os PLANOS do cenário. REDE: preso e sem atacar.',
     cor: '#2aa08a',
   },
@@ -296,6 +299,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
     escudo: ['🪞', 'ESPELHO'],
     esquiva: ['✨', 'LAMPEJO'],
     especial: ['🌑', 'ECLIPSE'],
+    icones: { golpe: 'lanca', escudo: 'espelho', esquiva: 'lampejo', especial: 'eclipse' },
     dica: 'VIDENTE: você vê o PRÓXIMO golpe (até as fintas). Lampejo NA ÚLTIMA HORA junta ☀️ luz. Menos vida. ECLIPSE: os 3 próximos golpes erram, e a luz vira raio.',
     cor: '#f2c14e',
   },
@@ -304,6 +308,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
     escudo: ['🛡️', 'ESCUDO'],
     esquiva: ['💨', 'ESQUIVA'],
     especial: ['⭐', 'ESPECIAL'],
+    icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'esquiva', especial: 'especial' },
     dica: '',
     cor: '#f2c14e',
   },
@@ -511,7 +516,7 @@ export function LutaHistoria({
   const cheio = e.animo >= ANIMO_MAX;
   const acaoJ = e.tempo < j.acaoAte ? j.acao : 'parado';
   // Os inimigos também ficaram maiores (pedido do Lucas: "os bonecos estão muito pequenininhos").
-  const largura = Math.min(48, (LARGURA_ESPECIAL[def.id] ?? VISUAL[def.id]?.largura ?? 13) * 1.15);
+  const largura = Math.min(52, (LARGURA_ESPECIAL[def.id] ?? VISUAL[def.id]?.largura ?? 13) * 1.32);
   const apanhou = e.eventos.some((ev) => ev.tipo === 'acerto' && ev.ate - e.tempo > 550);
   const plateiaLado = e.animo >= 50;
   // O inimigo avança quando o golpe dele chega; cai quando perde.
@@ -597,19 +602,19 @@ export function LutaHistoria({
         </div>
 
         {/* Sombras no chão */}
-        <span className="pointer-events-none absolute bottom-[12%] left-[22%] z-[9] h-[4%] w-[14%] -translate-x-1/2 rounded-[50%] bg-black/50" aria-hidden style={{ scale: acaoJ === 'esquiva' ? '0.6' : '1', transition: 'scale 120ms' }} />
+        <span className="pointer-events-none absolute bottom-[12%] left-[22%] z-[9] h-[4%] w-[17%] -translate-x-1/2 rounded-[50%] bg-black/50" aria-hidden style={{ scale: acaoJ === 'esquiva' ? '0.6' : '1', transition: 'scale 120ms' }} />
         {!vencido && <span className="pointer-events-none absolute bottom-[10%] left-[70%] z-[9] h-[4%] -translate-x-1/2 rounded-[50%] bg-black/50" style={{ width: `${largura * 0.85}%` }} aria-hidden />}
 
         {/* A sombra que fica para trás na esquiva */}
         {acaoJ === 'esquiva' && (
-          <div className="rastro-esquiva pointer-events-none absolute bottom-[14%] left-[22%] z-[9] w-[16%] -translate-x-1/2 opacity-40" aria-hidden>
+          <div className="rastro-esquiva pointer-events-none absolute bottom-[14%] left-[22%] z-[9] w-[19%] -translate-x-1/2 opacity-40" aria-hidden>
             <Retrato quem={heroi} />
           </div>
         )}
 
         {/* O herói */}
         <div
-          className={`absolute bottom-[14%] left-[22%] z-10 w-[16%] -translate-x-1/2 ${acaoJ === 'golpe' || acaoJ === 'especial' ? 'investida-dir' : acaoJ === 'parado' ? 'respirar-t' : ''}`}
+          className={`absolute bottom-[14%] left-[22%] z-10 w-[19%] -translate-x-1/2 ${acaoJ === 'golpe' || acaoJ === 'especial' ? 'investida-dir' : acaoJ === 'parado' ? 'respirar-t' : ''}`}
           style={{
             // Cada um esquiva do seu jeito: o Cassius pula pesado, o Octavius rola no chão, o Helios some num lampejo.
             translate:
@@ -631,7 +636,7 @@ export function LutaHistoria({
           </div>
           {acaoJ === 'escudo' && (
             <span className={`absolute -right-[40%] top-[15%] text-3xl sm:text-5xl ${estilo === 'vidente' ? 'drop-shadow-[0_0_10px_#ffe08a]' : 'drop-shadow-[0_0_8px_#9fe8ff]'}`} aria-hidden>
-              {bot.escudo[0]}
+              <Icone nome={bot.icones.escudo} className="w-8 sm:w-14" />
             </span>
           )}
           {/* Páginas guardadas voando em volta do Cassius; luz em volta do Helios */}
@@ -737,7 +742,7 @@ export function LutaHistoria({
         {/* Na luta final, o especial chama um aliado que entra correndo */}
         {quemAjuda && aliado && (
           <div key={aliado.id} className="pointer-events-none absolute inset-0 z-20" aria-hidden>
-            <div className="entra-esq absolute bottom-[14%] left-[44%] w-[16%] -translate-x-1/2">
+            <div className="entra-esq absolute bottom-[14%] left-[44%] w-[19%] -translate-x-1/2">
               <Retrato quem={quemAjuda} azul={quemAjuda === 'censor'} />
             </div>
             <span className="lute-entra absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap font-pixel text-xs text-[#f2c14e] [text-shadow:2px_2px_0_#000] sm:text-xl">
@@ -888,10 +893,10 @@ export function LutaHistoria({
       <div className="botoes-luta grid grid-cols-4 gap-2">
         {(
           [
-            ['golpe', bot.golpe[0], bot.golpe[1], '#e04a3a'],
-            ['escudo', bot.escudo[0], bot.escudo[1], '#ffd04a'],
-            ['esquiva', bot.esquiva[0], bot.esquiva[1], '#ff3a3a'],
-            ['especial', bot.especial[0], bot.especial[1], bot.cor],
+            ['golpe', bot.icones.golpe, bot.golpe[1], '#e04a3a'],
+            ['escudo', bot.icones.escudo, bot.escudo[1], '#ffd04a'],
+            ['esquiva', bot.icones.esquiva, bot.esquiva[1], '#7ad0ff'],
+            ['especial', bot.icones.especial, bot.especial[1], bot.cor],
           ] as const
         ).map(([acao, icone, nome, cor]) => (
           <button
@@ -906,8 +911,8 @@ export function LutaHistoria({
             style={{ '--cor': cor } as CSSProperties}
             aria-label={nome}
           >
-            <span className="medalhao text-xl sm:text-3xl" aria-hidden>
-              {icone}
+            <span className="medalhao" aria-hidden>
+              <Icone nome={icone} className="w-[62%]" />
             </span>
             <span className="font-pixel text-[7px] text-[#f4e2b4] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{nome}</span>
           </button>

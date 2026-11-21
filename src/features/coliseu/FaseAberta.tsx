@@ -5,36 +5,70 @@ import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
 import { CenarioHistoria, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
-import { PrimeiroPlano } from './PrimeiroPlano';
+import Icone from '@/ui/pixel/Icones';
 
 /**
  * A FASE ABERTA (teste, 22/11/2026): o lugar é maior que a tela e a câmera segue o
  * gladiador. Anda (◀ ▶ ou A/D), pula (⤒, W ou espaço), sobe em mesas e estantes,
  * desvia do fogo, pega os livros e chega na saída. Quem está perto fala sozinho.
  */
-const ALTURA_TELA = 56.25;
+// A altura da tela em unidades (100 = a largura): medida de verdade, para nada esticar no celular em pé.
+const ALTURA_PADRAO = 62.5;
 const CHAO = 13; // % da altura da tela onde fica o chão
-const LARGURA_HEROI = 10; // o gladiador maior (pedido do Lucas: "os bonecos estão muito pequenininhos")
+const LARGURA_HEROI = 14; // bem maior (pedido do Lucas: "os bonecos ainda estão muito pequenininhos")
 
 export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante; onFim: () => void }) {
   const [s, setS] = useState(novaFase);
   const entrada = useRef<Entrada>({ esq: false, dir: false, pular: false });
   const [acabou, setAcabou] = useState(false);
   const largura = larguraDa(fase);
+  // A altura do palco em unidades (100 = a largura), medida de verdade.
+  const palcoRef = useRef<HTMLDivElement>(null);
+  const [altura, setAltura] = useState(ALTURA_PADRAO);
+  useEffect(() => {
+    const el = palcoRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const medir = () => {
+      if (el.clientWidth > 0) setAltura((el.clientHeight / el.clientWidth) * 100);
+    };
+    medir();
+    const ro = new ResizeObserver(medir);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   // O menu de pausa para a fase (o relógio não anda).
   const pausado = usePausado();
   const pausadoRef = useRef(pausado);
   pausadoRef.current = pausado;
 
-  // O relógio da fase (um passo por quadro, no máximo 50 ms de uma vez).
+  // O relógio da fase (um passo por quadro, no máximo 50 ms de uma vez). O estado mora num
+  // ref e a tela só copia: antes, o "pular" era apagado antes do passo ler (o pulo falhava).
+  const estado = useRef(s);
+  // Pulo "perdoado": apertou até 150 ms antes de tocar o chão, ele pula quando tocar.
+  const pularAte = useRef(0);
+  // A câmera segue com suavidade (não dá tranco).
+  const [camera, setCamera] = useState(0);
+  const cameraRef = useRef(0);
   useEffect(() => {
     let ultimo = performance.now();
     let id = 0;
     const quadro = (agora: number) => {
       const dt = Math.min(50, agora - ultimo);
       ultimo = agora;
-      if (!pausadoRef.current) setS((x) => passoFase(fase, x, entrada.current, dt));
-      entrada.current = { ...entrada.current, pular: false };
+      if (!pausadoRef.current) {
+        if (entrada.current.pular) {
+          pularAte.current = agora + 150;
+          entrada.current = { ...entrada.current, pular: false };
+        }
+        const antes = estado.current;
+        const novo = passoFase(fase, antes, { ...entrada.current, pular: agora < pularAte.current }, dt);
+        if (novo.vy > antes.vy + 1) pularAte.current = 0;
+        estado.current = novo;
+        setS(novo);
+        const alvo = Math.max(0, Math.min(larguraDa(fase) - 100, novo.x - 45));
+        cameraRef.current += (alvo - cameraRef.current) * Math.min(1, dt / 120);
+        setCamera(cameraRef.current);
+      }
       id = requestAnimationFrame(quadro);
     };
     id = requestAnimationFrame(quadro);
@@ -81,10 +115,8 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
     antes.current = s;
   }, [s]);
 
-  // A câmera segue o gladiador (sem sair do cenário).
-  const camera = Math.max(0, Math.min(largura - 100, s.x - 45));
   const emX = (x: number) => `${(x / largura) * 100}%`;
-  const emY = (y: number) => `${CHAO + (y / ALTURA_TELA) * 100}%`;
+  const emY = (y: number) => `${CHAO + (y / altura) * 100}%`;
   const falando = s.falando ? fase.comentarios.find((c) => c.id === s.falando!.id) : undefined;
   const aberta = saidaAberta(fase, s);
 
@@ -116,7 +148,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           ))}
         </p>
       </div>
-      <div className="pixel-box palco-historia fase-aberta relative w-full select-none overflow-hidden" style={{ touchAction: 'none' }}>
+      <div ref={palcoRef} className="pixel-box fase-aberta relative w-full select-none overflow-hidden" style={{ touchAction: 'none' }}>
         {/* O mundo inteiro, que anda com a câmera */}
         <div
           className="absolute inset-y-0 left-0"
@@ -130,7 +162,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
 
           {/* Mesas, estantes, sacadas e vigas */}
           {fase.plataformas.map((p, k) => (
-            <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO}%`, height: `${(p.y / ALTURA_TELA) * 100}%` }} aria-hidden>
+            <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO}%`, height: `${(p.y / altura) * 100}%` }} aria-hidden>
               <div className={`plataforma plataforma-${p.tipo} absolute inset-x-0 top-0`} />
               {(p.tipo === 'mesa' || p.tipo === 'estante') && (
                 <>
@@ -220,9 +252,6 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           </div>
         </div>
 
-        {/* A camada da frente: anda mais rápido que o fundo (dá profundidade) */}
-        <PrimeiroPlano lugar={fase.telas[Math.min(fase.telas.length - 1, Math.floor(s.x / 100))] ?? fase.telas[0]!} camera={camera} />
-
         {/* O balão de quem está falando (fica na tela, não no mundo) */}
         {falando && (
           <div key={falando.id} className="balao-fase absolute inset-x-[4%] top-[6%] z-20 flex items-center gap-2 border-2 border-[#c8962a] bg-black/85 p-2">
@@ -254,13 +283,13 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
       {/* Os controles na tela (bons para o celular): segure ◀ ▶ e toque ⤒ para pular */}
       <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2">
         <button type="button" {...botao('esq')} className="pixel-box botao-luta flex items-center justify-center py-3" style={{ '--cor': '#c8962a' } as CSSProperties} aria-label="Andar para a esquerda">
-          <span className="medalhao text-xl sm:text-2xl">◀</span>
+          <span className="medalhao"><Icone nome="esq" className="w-[62%]" /></span>
         </button>
         <button type="button" {...botao('dir')} className="pixel-box botao-luta flex items-center justify-center py-3" style={{ '--cor': '#c8962a' } as CSSProperties} aria-label="Andar para a direita">
-          <span className="medalhao text-xl sm:text-2xl">▶</span>
+          <span className="medalhao"><Icone nome="dir" className="w-[62%]" /></span>
         </button>
         <button type="button" {...botao('pular')} className="pixel-box botao-luta flex items-center justify-center gap-2 py-3" style={{ '--cor': '#4ad46a' } as CSSProperties} aria-label="Pular">
-          <span className="medalhao text-xl sm:text-2xl">⤒</span>
+          <span className="medalhao"><Icone nome="pular" className="w-[62%]" /></span>
           <span className="font-pixel text-[8px] text-[#f4e2b4] sm:text-[10px]">PULAR</span>
         </button>
       </div>
