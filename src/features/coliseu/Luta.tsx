@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, modoDaLuta, usarPlano, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type Estilo, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
-import { NOMES, type Fala, type Falante, type Lugar } from '@/game/historia/roteiro';
+import { NOMES, type EntradaInimigo, type Fala, type Falante, type Lugar } from '@/game/historia/roteiro';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import {
   CAPITAO_INCINERADOR,
@@ -376,6 +376,65 @@ function Impacto({ x, cor, corte = false, grande = false }: { x: string; cor: st
   );
 }
 
+/** O jeito de chegar de cada bicho (quando a cena não pede um jeito especial). */
+function entradaDe(id: string, chefao: boolean): EntradaInimigo {
+  if (/morcego|veloz|gaivota|vigia-telhado/.test(id)) return 'voando';
+  if (/jacare|mergulhador|tritao|leviata|limpador-esgoto/.test(id)) return 'agua';
+  if (/rato|caes|gato|cacador/.test(id)) return 'rapido';
+  if (chefao || /fornalha|tita|colosso|gigante|touro|leao|centuriao|pretor-de-aco/.test(id)) return 'pesado';
+  return 'andando';
+}
+const DURACAO_ENTRADA: Record<EntradaInimigo, number> = { janela: 1900, voando: 1700, pesado: 2100, rapido: 900, agua: 1500, andando: 1400 };
+const SONS_ENTRADA: Record<EntradaInimigo, [SomHistoria, number][]> = {
+  janela: [['catapulta', 350], ['pesada', 1250]],
+  voando: [['galope', 200], ['escudoMetal', 1350]],
+  pesado: [['pesada', 150], ['pesada', 650], ['pesada', 1150], ['pesada', 1650]],
+  rapido: [['galope', 0]],
+  agua: [['onda', 100]],
+  andando: [['passos', 0], ['passos', 700]],
+};
+
+/** O que acontece em volta da chegada: o vidro estourando, a poeira no chão, a água espirrando. */
+function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
+  const cacos = [
+    [-60, -40], [-30, -70], [10, -80], [50, -50], [70, 10], [-70, 20], [30, 60], [-20, 70], [60, 70], [-50, -10],
+  ];
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      {entrada === 'janela' && (
+        <>
+          {/* a janela alta da biblioteca, de noite, que ele estoura para entrar */}
+          <div className="janela-entrada absolute z-[9] left-[60%] top-[4%] h-[42%] w-[22%] rounded-t-[45%] border-[5px] border-[#3a2414] bg-[#0c1030]">
+            <span className="vidro-entrada absolute inset-0 rounded-t-[45%] bg-[linear-gradient(135deg,#6a8ad8aa,#a8c8ff66_40%,#3a4a9a88)]" />
+            <span className="absolute inset-y-0 left-1/2 w-[6%] -translate-x-1/2 bg-[#3a2414]" />
+            <span className="absolute inset-x-0 top-[48%] h-[6%] bg-[#3a2414]" />
+          </div>
+          {cacos.map(([dx, dy], k) => (
+            <span
+              key={k}
+              className="caco-vidro absolute z-[12] left-[71%] top-[24%] block h-[3%] w-[2%] bg-[#c8dcff]"
+              style={{ '--dx': `${dx * 3}%`, '--dy': `${dy * 3}%`, animationDelay: `${330 + (k % 3) * 40}ms`, rotate: `${k * 37}deg` } as CSSProperties}
+            />
+          ))}
+          <span className="clarao-entrada absolute z-[12] left-[71%] top-[24%] block h-[30%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+        </>
+      )}
+      {entrada === 'agua' &&
+        [-12, -6, 0, 6, 12].map((dx, k) => (
+          <span key={k} className="respingo-entrada absolute z-[12] bottom-[12%] block h-[5%] w-[3%] rounded-full bg-[#8ad0ff]" style={{ left: `${70 + dx}%`, animationDelay: `${200 + k * 50}ms`, '--dx': `${dx * 4}%` } as CSSProperties} />
+        ))}
+      {entrada !== 'voando' && entrada !== 'agua' &&
+        [-10, -5, 0, 5, 10].map((dx, k) => (
+          <span
+            key={k}
+            className="poeira-entrada absolute z-[12] bottom-[11%] block h-[6%] w-[6%] rounded-full bg-[#c8b89a]"
+            style={{ left: `${70 + dx}%`, '--dx': `${dx * 5}%`, animationDelay: `${(entrada === 'janela' ? 1250 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : 1100) + k * 30}ms` } as CSSProperties}
+          />
+        ))}
+    </div>
+  );
+}
+
 /**
  * A luta do modo História: falas antes, a luta, falas depois. Perdeu? Tenta de novo.
  * Controles: golpe, escudo, esquiva e especial (Ânimo cheio).
@@ -393,6 +452,7 @@ export function LutaHistoria({
   treino,
   onVitoria,
   equipe,
+  entrada: entradaPedida,
 }: {
   lugar: Lugar;
   inimigo: string;
@@ -408,6 +468,8 @@ export function LutaHistoria({
   onVitoria?: (pecas: number) => void;
   /** Capítulo secreto: os três lutam juntos e dá para TROCAR de gladiador no meio da luta. */
   equipe?: Partial<Record<Falante, AtributosLuta>>;
+  /** Como o inimigo chega (a janela quebrando no capítulo 1, por exemplo). */
+  entrada?: EntradaInimigo;
 }) {
   const def = INIMIGOS[inimigo]!;
   const [heroi, setHeroi] = useState<Falante>(heroiInicial);
@@ -433,7 +495,16 @@ export function LutaHistoria({
     setLuzAte(0);
   };
   const [feitos, setFeitos] = useState(0);
-  const [fase, setFase] = useState<'antes' | 'luta' | 'depois' | 'derrota'>(antes?.length ? 'antes' : 'luta');
+  // Antes de tudo, o inimigo CHEGA (inteiro, com animação): ninguém aparece do nada.
+  const entrada = treino ? null : entradaPedida ?? entradaDe(inimigo, !!def.chefao);
+  const [fase, setFase] = useState<'chegada' | 'antes' | 'luta' | 'depois' | 'derrota'>(entrada ? 'chegada' : antes?.length ? 'antes' : 'luta');
+  useEffect(() => {
+    if (!entrada) return;
+    const sons = SONS_ENTRADA[entrada];
+    const ids = sons.map(([som, ms]) => window.setTimeout(() => tocar(som), ms));
+    ids.push(window.setTimeout(() => setFase(antes?.length ? 'antes' : 'luta'), DURACAO_ENTRADA[entrada]));
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, []);
   const [e, setE] = useState<EstadoLuta>(() => novaLuta(def, atributos));
   const [tentativas, setTentativas] = useState(1);
   const modo = modoDaLuta(e);
@@ -555,7 +626,8 @@ export function LutaHistoria({
 
   return (
     <div className="flex flex-col gap-2">
-      <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer-forte' : ''}>
+      <Palco lugar={lugar} className={acaoJ === 'ferido' || (fase === 'chegada' && entrada === 'pesado') ? 'tremer-forte' : ''}>
+        {fase === 'chegada' && entrada && <EfeitoEntrada entrada={entrada} />}
         {/* Placar: vida dos dois, o fôlego e o Ânimo (ou a plateia, no Coliseu) */}
         <div className="absolute inset-x-2 top-2 z-20 grid grid-cols-2 gap-3">
           <div className="flex flex-col gap-1">
@@ -661,7 +733,8 @@ export function LutaHistoria({
           </div>
         )}
 
-        {/* O inimigo, com o sinal antes do ataque */}
+        {/* O inimigo, com o sinal antes do ataque (e a chegada dele, no começo) */}
+        <div className={`pointer-events-none absolute inset-0 z-10 [&>*]:pointer-events-auto ${fase === 'chegada' && entrada ? `entrada-${entrada}` : ''}`}>
         <div
           className={`absolute bottom-[12%] left-[70%] z-10 -translate-x-1/2 ${vencido ? 'inimigo-vencido' : atacou ? 'investida-esq' : sinal && !ilusao ? 'tremer-t' : ilusao ? 'respirar-t' : def.chefao || def.id.startsWith('pretoriano') || def.id === 'gladiador-de-sucata' ? 'respirar-t' : 'flutuar'}`}
           style={{
@@ -714,6 +787,7 @@ export function LutaHistoria({
               ))}
             </svg>
           )}
+        </div>
         </div>
 
         {/* ECLIPSE: a lua cobre o sol, o céu escurece e o inimigo erra os próximos golpes */}

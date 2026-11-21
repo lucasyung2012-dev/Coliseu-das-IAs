@@ -74,6 +74,9 @@ export interface Fala {
 }
 
 /** Os desenhos de fundo das cenas. */
+/** A chegada do inimigo antes da luta: quebrando a janela, voando, pesado, rápido, saindo da água ou andando. */
+export type EntradaInimigo = 'janela' | 'voando' | 'pesado' | 'rapido' | 'agua' | 'andando';
+
 export type Lugar =
   | 'titulo'
   | 'roma-noite'
@@ -208,6 +211,8 @@ export type Cena = (
       depois?: Fala[];
       /** Luta de treino: não dá para perder; acaba quando faz `quantos` vezes o `evento`. */
       treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
+      /** Como o inimigo chega (sem isso, o jeito vem do tipo de bicho). */
+      entrada?: EntradaInimigo;
     }
   | {
       tipo: 'desafio';
@@ -500,6 +505,7 @@ const CAP1_CASSIUS: Capitulo = {
       id: 'c1-luta1',
       lugar: 'biblioteca-estantes',
       inimigo: 'incinerador',
+      entrada: 'janela',
       antes: [
         { quem: 'livia', texto: 'Um deles entrou pela janela!', emocao: 'surpreso', jeito: 'grito', zoom: 'susto' },
         { quem: 'cassius', texto: 'Quando ele piscar em AMARELO, eu levanto o escudo. Depois, ataco enquanto ele estiver ABERTO.' },

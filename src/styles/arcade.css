@@ -1622,7 +1622,10 @@
 @keyframes seta-borda { from { opacity: 0.6; } to { opacity: 1; } }
 .estrela-objetivo { animation: estrela-objetivo 1s ease-in-out infinite alternate; filter: drop-shadow(0 0 4px #ffd04a); }
 @keyframes estrela-objetivo { from { translate: 0 0; scale: 0.9; } to { translate: 0 -20%; scale: 1.1; } }
-@media (prefers-reduced-motion: reduce) { .seta-pula, .seta-borda, .estrela-objetivo { animation: none; } }
+.guia-saida { filter: drop-shadow(0 0 3px #ffd04a) drop-shadow(0 0 2px #000); animation: seta-borda 0.6s ease-in-out infinite alternate; }
+.aviso-saida { animation: aviso-saida 3.5s ease-out forwards; }
+@keyframes aviso-saida { 0% { opacity: 0; scale: 0.6; } 10% { opacity: 1; scale: 1.15; } 18% { scale: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .seta-pula, .seta-borda, .estrela-objetivo, .guia-saida, .aviso-saida { animation: none; } }
 /* As chamas subindo no minigame dos livros. */
 .chama-livros {
   background: radial-gradient(ellipse at 50% 90%, #fff0a0 0 15%, #ffb03a 30%, #ff5a1a 55%, transparent 72%);
@@ -1630,3 +1633,50 @@
   animation: chama-fase 0.32s steps(2) infinite alternate;
 }
 @media (prefers-reduced-motion: reduce) { .chama-livros { animation: none; } }
+
+/* A CHEGADA DO INIMIGO (antes de toda luta do modo História): ninguém aparece do nada. */
+.entrada-andando { animation: entrada-andando 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@keyframes entrada-andando {
+  0% { translate: 42% 0; } 20% { translate: 33% -1.5%; } 40% { translate: 22% 0; } 60% { translate: 12% -1.5%; } 80% { translate: 4% 0; } 100% { translate: 0 0; }
+}
+.entrada-rapido { animation: entrada-rapido 0.9s cubic-bezier(0.1, 0.9, 0.2, 1) both; }
+@keyframes entrada-rapido { 0% { translate: 50% 0; } 70% { translate: -3% 0; } 100% { translate: 0 0; } }
+.entrada-voando { animation: entrada-voando 1.7s ease-in-out both; }
+@keyframes entrada-voando {
+  0% { translate: 40% -90%; } 35% { translate: -30% -45%; } 60% { translate: 12% -25%; } 80% { translate: -4% -8%; } 100% { translate: 0 0; }
+}
+.entrada-pesado { animation: entrada-pesado 2.1s linear both; }
+@keyframes entrada-pesado {
+  0% { translate: 45% 0; } 10% { translate: 36% 0; } 24% { translate: 36% 0; } 34% { translate: 24% 0; } 48% { translate: 24% 0; } 58% { translate: 12% 0; } 72% { translate: 12% 0; } 82% { translate: 0 0; } 100% { translate: 0 0; }
+}
+.entrada-agua { animation: entrada-agua 1.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
+@keyframes entrada-agua { 0% { translate: 0 45%; opacity: 0; } 20% { opacity: 1; } 100% { translate: 0 0; } }
+/* Pela janela: some, estoura o vidro lá em cima, pula em arco e cai no chão. */
+.entrada-janela { animation: entrada-janela 1.9s both; }
+@keyframes entrada-janela {
+  0% { translate: 2% -62%; opacity: 0; scale: 0.7; }
+  17% { translate: 2% -62%; opacity: 0; scale: 0.7; }
+  20% { translate: 2% -62%; opacity: 1; scale: 0.75; }
+  45% { translate: -10% -70%; scale: 0.95; animation-timing-function: ease-in; }
+  66% { translate: -2% 0; scale: 1; }
+  72% { translate: -1% -5%; }
+  78% { translate: 0 0; }
+  100% { translate: 0 0; opacity: 1; scale: 1; }
+}
+.entrada-janela, .entrada-voando, .entrada-agua { transform-origin: 70% 85%; }
+.janela-entrada { animation: janela-entrada 1.9s both; }
+@keyframes janela-entrada { 0% { opacity: 0; } 8% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+.vidro-entrada { animation: vidro-entrada 1.9s steps(1) both; }
+@keyframes vidro-entrada { 0% { opacity: 1; } 18% { opacity: 0.4; } 19% { opacity: 1; } 20% { opacity: 0; } 100% { opacity: 0; } }
+.caco-vidro { opacity: 0; animation: caco-vidro 0.9s ease-out both; box-shadow: 0 0 3px #fff; }
+@keyframes caco-vidro { 0% { opacity: 1; translate: 0 0; } 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 200%); } }
+.clarao-entrada { opacity: 0; animation: clarao-entrada 0.5s ease-out 0.33s both; }
+@keyframes clarao-entrada { 0% { opacity: 0.85; scale: 0.3; } 100% { opacity: 0; scale: 1.4; } }
+.poeira-entrada { opacity: 0; animation: poeira-entrada 0.7s ease-out both; }
+@keyframes poeira-entrada { 0% { opacity: 0.8; translate: 0 0; scale: 0.5; } 100% { opacity: 0; translate: var(--dx) -60%; scale: 1.6; } }
+.respingo-entrada { opacity: 0; animation: respingo-entrada 0.8s ease-out both; }
+@keyframes respingo-entrada { 0% { opacity: 1; translate: 0 0; } 50% { translate: calc(var(--dx) / 2) -300%; } 100% { opacity: 0; translate: var(--dx) 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .entrada-andando, .entrada-rapido, .entrada-voando, .entrada-pesado, .entrada-agua, .entrada-janela { animation-duration: 0.01s; }
+  .caco-vidro, .poeira-entrada, .respingo-entrada, .clarao-entrada { display: none; }
+}

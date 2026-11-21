@@ -23,8 +23,8 @@ export const MUNDOS: Record<string, Mundo> = {
       '#.p..cccccccccccccc..p.#',
       '#....c..TT....TT..c....#',
       '#EE..c............c..EE#',
-      '#EE..c.....SS.....c..EE#',
-      '#EE..c.....SS.....c..EE#',
+      '#EE..c.....TT.....c..EE#',
+      '#EE..c............c..EE#',
       '#....c..TT....TT..c....#',
       '#.p..cccccccccccccc..p.#',
       '#......................#',
@@ -50,15 +50,6 @@ export const MUNDOS: Record<string, Mundo> = {
         falas: [
           { quem: 'cassius', texto: 'O Livro das Mil Perguntas. O mais proibido de todos.' },
           { quem: 'cassius', texto: 'Cada página termina com uma pergunta, e nenhuma tem resposta pronta. Foi nele que a Lívia aprendeu a ler.', emocao: 'feliz' },
-        ],
-      },
-      {
-        id: 'estatua',
-        x: 11,
-        y: 6,
-        falas: [
-          { quem: 'narrador', texto: 'Uma estátua de bronze, coberta de poeira. Na base: "GUARDIÃO ZERO".' },
-          { quem: 'cassius', texto: 'O primeiro guardião. Ninguém sabe o que aconteceu com ele.', emocao: 'pensando' },
         ],
       },
       {
@@ -224,8 +215,8 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
       '#.p..cccccccccccccc..p.#',
       '#....c..TT....TT..c....#',
       '#EE..c............c..EE#',
-      '#EE..c.....SS.....c..EE#',
-      '#EE..c.....SS.....c..EE#',
+      '#EE..c.....TT.....c..EE#',
+      '#EE..c............c..EE#',
       '#....c..TT....TT..c....#',
       '#.p..cccccccccccccc..p.#',
       '#......................#',

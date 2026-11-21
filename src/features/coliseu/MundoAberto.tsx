@@ -160,6 +160,23 @@ export function MundoAberto({
     const k = Math.min((0.43 * VISIVEL) / Math.max(0.001, Math.abs(dx)), (0.4 * alturaVisivel) / Math.max(0.001, Math.abs(dy)));
     return { x: ((VISIVEL / 2 + dx * k) / VISIVEL) * 100, y: ((alturaVisivel / 2 + dy * k) / alturaVisivel) * 100, angulo: (Math.atan2(dy, dx) * 180) / Math.PI };
   })();
+  // Depois de falar com quem precisava: uma seta grande em volta do gladiador aponta a saída.
+  const guia = (() => {
+    const saida = saidas[0];
+    if (!aberta || !saida) return null;
+    const dx = saida[0] + 0.5 - s.x;
+    const dy = saida[1] + 0.5 - (s.y - 0.6);
+    const d = Math.hypot(dx, dy);
+    if (d < 1.8) return null;
+    return { x: s.x + (dx / d) * 1.25, y: s.y - 0.6 + (dy / d) * 1.25, angulo: (Math.atan2(dy, dx) * 180) / Math.PI };
+  })();
+  const [avisoSaida, setAvisoSaida] = useState(false);
+  useEffect(() => {
+    if (!aberta || saidas.length === 0) return;
+    setAvisoSaida(true);
+    const id = window.setTimeout(() => setAvisoSaida(false), 3500);
+    return () => window.clearTimeout(id);
+  }, [aberta]);
   const emMundo = (x: number, y: number): CSSProperties => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
 
   const botao = (tecla: keyof EntradaMundo) => ({
@@ -233,6 +250,11 @@ export function MundoAberto({
               )}
             </div>
           ))}
+          {guia && (
+            <span className="guia-saida pointer-events-none absolute block" style={{ ...emMundo(guia.x, guia.y), width: `${(0.8 / W) * 100}%`, transform: `translate(-50%, -50%) rotate(${guia.angulo}deg)`, zIndex: 290 }} aria-hidden>
+              <Icone nome="dir" className="w-full" />
+            </span>
+          )}
           {/* Quem (ou o que) você PRECISA encontrar: uma estrelinha dourada até ver */}
           {obrigatorios.map((o) => (
             <span key={`ob-${o.id}`} className="estrela-objetivo absolute block" style={{ ...emMundo(o.x, o.y), width: `${(0.5 / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 260 }}>
@@ -248,6 +270,11 @@ export function MundoAberto({
           </span>
         )}
 
+        {avisoSaida && (
+          <span className="aviso-saida placa-ponto pointer-events-none absolute left-1/2 top-[8%] z-[460] -translate-x-1/2 whitespace-nowrap px-2 py-1 font-pixel text-[9px] sm:text-xs" aria-live="polite">
+            SIGA A SETA ATÉ A SAÍDA
+          </span>
+        )}
         {/* A luz: escuro em volta, como uma noite de verdade */}
         <div
           className="pointer-events-none absolute inset-0 z-[400]"
@@ -325,6 +352,8 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
   const W = mundo.mapa[0]!.length;
   const H = mundo.mapa.length;
   const t = (x: number, y: number) => mundo.mapa[y]?.[x] ?? '#';
+  // O chão vai numa camada de baixo: assim uma peça grande (estátua, forja, fonte) nunca é cortada pelo chão do ladrilho vizinho.
+  const fundo: ReactNode[] = [];
   const pecas: ReactNode[] = [];
   const luzes: ReactNode[] = [];
   const cor = CORES[mundo.tema];
@@ -340,7 +369,7 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
           <rect x={X} y={Y + PX - 1} width={PX} height="1" fill="#3a2e26" opacity="0.5" />
         </g>
       );
-      if ('.PTSpvftgxMDF'.includes(c)) pecas.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDF'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Areia (o pátio do Ludus): grãos e marcas de pé.
       if (c === 'a')
         pecas.push(
@@ -636,6 +665,14 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
             <rect x={X + 23} y={Y - 22} width="3.5" height="5" fill="#c8c8d0" />
             {/* o brilho do bronze */}
             <rect x={X + 12} y={Y - 10} width="1" height="4" fill="#f0d090" opacity="0.7" />
+            {/* no FÃ³rum, a estÃ¡tua Ã© a do Censor: capuz vermelho por cima do elmo */}
+            {mundo.tema === 'forum' && (
+              <>
+                <rect x={X + 11} y={Y - 17} width="10" height="9" fill="#8a1a1a" />
+                <rect x={X + 10} y={Y - 9} width="12" height="5" fill="#a82020" />
+                <rect x={X + 14} y={Y - 12} width="4" height="2" fill="#1a0a0a" />
+              </>
+            )}
           </g>,
         );
       }
@@ -655,6 +692,7 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
   );
   return (
     <svg viewBox={`0 0 ${W * PX} ${H * PX}`} className="absolute inset-0 h-full w-full" shapeRendering="crispEdges" aria-hidden>
+      {fundo}
       {pecas}
       <g style={{ mixBlendMode: 'screen' }}>{luzes}</g>
     </svg>

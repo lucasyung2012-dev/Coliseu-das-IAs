@@ -160,16 +160,21 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
             <span key={k} className="chama-livros block h-full w-[9%]" style={{ animationDelay: `${(k * 113) % 400}ms` }} />
           ))}
         </div>
-        {/* O alçapão de madeira com a argola, e a Lívia esperando os livros */}
-        <div className="absolute bottom-[3%] left-[3%] z-[6] h-[16%] w-[18%] border-[3px] border-[#2a160a] bg-[repeating-linear-gradient(90deg,#6a4220_0_10px,#5a3418_10px_12px)]" aria-hidden>
-          <span className="absolute left-1/2 top-1/2 block h-[38%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#8a8a98]" />
+        {/* O alçapão aberto: a tampa de madeira em pé, o buraco escuro e a Lívia saindo dele
+            (do tamanho certo, de lá de baixo das catacumbas) para pegar os livros. */}
+        <div className="pointer-events-none absolute bottom-[12%] left-[2%] z-[4] h-[16%] w-[20%] border-[3px] border-[#2a160a] bg-[repeating-linear-gradient(90deg,#6a4220_0_10px,#5a3418_10px_12px)]" aria-hidden>
+          <span className="absolute left-1/2 top-[30%] block h-[34%] w-[18%] -translate-x-1/2 rounded-full border-[3px] border-[#8a8a98]" />
         </div>
-        <span className="placa-ponto absolute bottom-[21%] left-[12%] z-[6] -translate-x-1/2 whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px]">ALÇAPÃO</span>
-        <div className="pointer-events-none absolute bottom-[19%] left-[19%] z-[5] w-[8%] -translate-x-1/2" aria-hidden>
-          <div className={salvos.length > 0 ? 'emo-feliz' : 'respirar'} key={salvos.length}>
-            <Retrato quem="livia" />
+        <div className="pointer-events-none absolute bottom-[3%] left-[2%] z-[4] h-[10%] w-[20%] border-[3px] border-[#2a160a] bg-[#080402] shadow-[inset_0_4px_8px_#000]" aria-hidden />
+        <div className="pointer-events-none absolute bottom-[8%] left-[2%] z-[5] h-[60%] w-[20%] overflow-hidden" aria-hidden>
+          <div className="absolute bottom-[-22%] left-1/2 w-[92%] -translate-x-1/2">
+            <div className={salvos.length > 0 ? 'emo-feliz' : 'respirar'} key={salvos.length}>
+              <Retrato quem="livia" />
+            </div>
           </div>
         </div>
+        <div className="pointer-events-none absolute bottom-[3%] left-[2%] z-[6] h-[5%] w-[20%] border-x-[3px] border-b-[3px] border-[#2a160a] bg-[#6a4220]" aria-hidden />
+        <span className="placa-ponto absolute bottom-[29%] left-[12%] z-[6] -translate-x-1/2 whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px]">ALÇAPÃO</span>
         {livros.map((l, k) => {
           const salvo = salvos.includes(k);
           const queimado = queimados.includes(k);
