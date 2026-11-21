@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
@@ -36,6 +36,10 @@ export default function ColiseuHistoria() {
   const fimDoPrologo = () => setTela({ tipo: 'escolher' });
 
   const save = tela.tipo === 'jogo' ? saves.find((s) => s.id === tela.id) : undefined;
+  // O save aberto sumiu (apagado em outro aparelho, por exemplo): volta para a lista em vez de ficar em branco.
+  useEffect(() => {
+    if (tela.tipo === 'jogo' && !save) setTela({ tipo: 'saves' });
+  }, [tela, save]);
 
   return (
     <main data-area="coliseu" className="relative min-h-screen bg-[#0c0a10] text-fg">
