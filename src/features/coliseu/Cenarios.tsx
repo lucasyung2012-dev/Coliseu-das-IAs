@@ -1,6 +1,7 @@
 import type { Falante, Lugar } from '@/game/historia/roteiro';
 import { CenaColiseu } from '../arcade/cenas/Cenarios';
 import { desenhoCapitulo } from './cenarios/capitulos';
+import { desenhoCapitulo2 } from './cenarios/capitulos2';
 import { desenhoPrologo } from './cenarios/prologo';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
@@ -25,6 +26,22 @@ import {
   paletaCensor,
   PRETORIANO,
 } from '@/ui/pixel/historia';
+import {
+  ALMIRANTE_FERRUGEM,
+  ARQUIVISTA,
+  COPISTA,
+  LEAO_MECANICO,
+  MARCO_REMO,
+  MARINHEIRO_FERRO,
+  PALETA_ALMIRANTE,
+  PALETA_COPISTA,
+  PALETA_MARCO_REMO,
+  PALETA_MARINHEIRO,
+  PALETA_PRETOR,
+  paletaArquivista,
+  paletaLeao,
+  PRETOR_DE_ACO,
+} from '@/ui/pixel/historia2';
 
 /**
  * Os cenários do modo História, em pixel (160 × 90, ampliados sem suavizar).
@@ -34,8 +51,10 @@ export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
   if (lugar === 'coliseu-calado') return <CenaColiseu corA="#8a5a3a" corB="#8a5a3a" arena="estatuas" />;
   // A arena de verdade: dia, plateia cheia e viva (no Capítulo 2 ela vaia e depois aplaude).
   if (lugar === 'coliseu-arena') return <CenaColiseu corA="#f08c50" corB="#8a8a98" arena="pedra" viva />;
+  // A Grande Arena dos Jogos da Resposta Única: a arena imperial, lotada e em festa.
+  if (lugar === 'coliseu-noite') return <CenaColiseu corA="#f08c50" corB="#c0283c" arena="imperial" viva festa />;
   // Os cenários novos, em 320 × 180 (o dobro de detalhe).
-  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar);
+  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar);
   if (hd)
     return (
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
@@ -416,6 +435,20 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
       return <Sprite grade={BRUTUS} paleta={PALETA_BRUTUS} espelhar={espelhar} />;
     case 'sucata':
       return <Sprite grade={GLADIADOR_SUCATA} paleta={PALETA_SUCATA} espelhar={espelhar} />;
+    case 'copista':
+      return <Sprite grade={COPISTA} paleta={PALETA_COPISTA} espelhar={espelhar} />;
+    case 'arquivista':
+      return <Sprite grade={ARQUIVISTA} paleta={paletaArquivista(false)} espelhar={espelhar} />;
+    case 'pretor':
+      return <Sprite grade={PRETOR_DE_ACO} paleta={PALETA_PRETOR} espelhar={espelhar} />;
+    case 'marco':
+      return <Sprite grade={MARCO_REMO} paleta={PALETA_MARCO_REMO} espelhar={espelhar} />;
+    case 'almirante':
+      return <Sprite grade={ALMIRANTE_FERRUGEM} paleta={PALETA_ALMIRANTE} espelhar={espelhar} />;
+    case 'marinheiro':
+      return <Sprite grade={MARINHEIRO_FERRO} paleta={PALETA_MARINHEIRO} espelhar={espelhar} />;
+    case 'leao':
+      return <Sprite grade={LEAO_MECANICO} paleta={paletaLeao(false)} espelhar={espelhar} />;
     default:
       return null;
   }

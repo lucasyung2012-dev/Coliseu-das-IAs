@@ -217,6 +217,8 @@ Nada mexe em troféus, Maestria ou XP. São coisas que **mudam bastante o visual
 ---
 
 ## 8. Como construir (por partes)
+> **Situação em 21/11/2026:** fatias 1 e 2 prontas (Cassius inteiro, com o Ludus, e o final). O caminho do Octavius começou (Capítulo 1). Falta: Octavius 2 a 6, Helios, o capítulo secreto e os prêmios no Arcade.
+
 
 1. **Fatia 1 (para testar se é divertido):** o prólogo, os saves, a **luta** (os 3 botões e o Ânimo), andar e conversar, e o **Capítulo 1 do Cassius** inteiro, até a Fornalha.
 2. Depois: os capítulos 2 a 6 do Cassius, com o Ludus entrando no 3.

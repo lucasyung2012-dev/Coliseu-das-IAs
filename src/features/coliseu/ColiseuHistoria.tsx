@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { avancarSave, CAMINHOS_ABERTOS, criarSave, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { CAPITULOS, PROLOGO, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { desbloquear, tocar } from '@/ui/som';
 import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
+import { DesafioMarcas, DesafioPlanos } from './Desafios2';
+import { Ludus } from './Ludus';
 
 /**
  * O Coliseu: o modo História (docs/HISTORIA.md). Prólogo, saves (quantos quiser,
@@ -71,8 +73,8 @@ export default function ColiseuHistoria() {
                         {PERSONAGENS[s.gladiador].gladiador.toUpperCase()} · {NOME_DO_CAMINHO[s.gladiador].toUpperCase()}
                       </span>
                       <span className="block text-xs text-muted">
-                        Capítulo {s.capitulo}
-                        {CAPITULOS[s.gladiador][s.capitulo - 1] ? `: ${CAPITULOS[s.gladiador][s.capitulo - 1]!.titulo}` : ' (em breve)'} · salvo em {new Date(s.atualizadoEm).toLocaleDateString('pt-BR')}
+                        {s.capitulo > 7 ? '🏆 Caminho completo' : `Capítulo ${s.capitulo}`}
+                        {s.capitulo > 7 ? '' : CAPITULOS[s.gladiador][s.capitulo - 1] ? `: ${CAPITULOS[s.gladiador][s.capitulo - 1]!.titulo}` : ' (em breve)'} · salvo em {new Date(s.atualizadoEm).toLocaleDateString('pt-BR')}
                       </span>
                     </span>
                     {apagando === s.id ? (
@@ -194,8 +196,12 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
     return (
       <Palco lugar="rua-noite">
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 p-4 text-center">
-          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">CONTINUA EM BREVE</p>
-          <p className="max-w-md text-sm text-white/80">O Capítulo {save.capitulo} ainda está sendo construído. O seu save está guardado: quando ele chegar, é só continuar daqui.</p>
+          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{save.capitulo > 7 ? '🏆 CAMINHO COMPLETO!' : 'CONTINUA EM BREVE'}</p>
+          <p className="max-w-md text-sm text-white/80">
+            {save.capitulo > 7
+              ? 'Você terminou este caminho. Roma voltou a perguntar. Experimente os outros condenados para ver a história pelos olhos deles.'
+              : `O Capítulo ${save.capitulo} ainda está sendo construído. O seu save está guardado: quando ele chegar, é só continuar daqui.`}
+          </p>
           <button type="button" onClick={onSair} className="pixel-box pixel-hover px-4 py-2 font-pixel text-[10px] text-accent">
             ◀ VOLTAR AOS SAVES
           </button>
@@ -242,7 +248,35 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
       </Palco>
     );
   if (cena.tipo === 'explorar') return <Explorar lugar={cena.lugar} objetivo={cena.objetivo} pontos={cena.pontos} heroi={heroi} onFim={proxima} />;
-  if (cena.tipo === 'luta') return <LutaHistoria lugar={cena.lugar} inimigo={cena.inimigo} heroi={heroi} antes={cena.antes} depois={cena.depois} onFim={proxima} />;
+  if (cena.tipo === 'luta')
+    return (
+      <LutaHistoria
+        lugar={cena.lugar}
+        inimigo={cena.inimigo}
+        heroi={heroi}
+        antes={cena.antes}
+        depois={cena.depois}
+        atributos={atributosDoSave(save)}
+        onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
+        onFim={proxima}
+      />
+    );
+  if (cena.tipo === 'ludus')
+    return (
+      <Ludus
+        save={save}
+        heroi={heroi}
+        lugar={cena.lugar}
+        objetivo={cena.objetivo}
+        conversas={cena.conversas}
+        obrigatorio={cena.obrigatorio}
+        presente={cena.presente}
+        onGravar={(s) => gravarSaveHistoria({ ...s, atualizadoEm: new Date().toISOString() })}
+        onFim={proxima}
+      />
+    );
+  if (cena.desafio === 'ler-marcas') return <DesafioMarcas lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
+  if (cena.desafio === 'escolher-plano') return <DesafioPlanos lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   return <DesafioLivros lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
 }

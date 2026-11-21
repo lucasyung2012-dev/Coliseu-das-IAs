@@ -1,5 +1,8 @@
 import type { IaId } from '../personagens';
 import type { NomeSom } from '@/ui/som';
+import type { Tecnica } from './luta';
+import type { Equipamento } from './saves';
+import { CAP1_OCTAVIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS } from './roteiro2';
 
 /**
  * O roteiro do modo História em forma de dados (docs/HISTORIA.md): cada capítulo é
@@ -25,7 +28,14 @@ export type Falante =
   | 'eco'
   | 'arauto'
   | 'povo'
-  | 'sucata';
+  | 'sucata'
+  | 'copista'
+  | 'arquivista'
+  | 'pretor'
+  | 'marco'
+  | 'almirante'
+  | 'marinheiro'
+  | 'leao';
 
 export interface Fala {
   quem: Falante;
@@ -53,7 +63,16 @@ export type Lugar =
   | 'beco'
   | 'rua-mercado'
   | 'coliseu-tunel'
-  | 'coliseu-arena';
+  | 'coliseu-arena'
+  | 'ludus-patio'
+  | 'ludus-forja'
+  | 'ludus-celas'
+  | 'catacumbas'
+  | 'catacumbas-arquivo'
+  | 'forum'
+  | 'coliseu-noite'
+  | 'porto-docas'
+  | 'navio-conves';
 
 /** Um personagem em cena numa cutscene. */
 export interface EmCena {
@@ -102,7 +121,25 @@ export type Cena =
   | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[] }
   | { tipo: 'explorar'; id: string; lugar: Lugar; objetivo: string; pontos: PontoExplorar[] }
   | { tipo: 'luta'; id: string; lugar: Lugar; inimigo: string; antes?: Fala[]; depois?: Fala[] }
-  | { tipo: 'desafio'; id: string; lugar: Lugar; desafio: 'esconder-livros' | 'segurar-carroca'; antes?: Fala[] };
+  | { tipo: 'desafio'; id: string; lugar: Lugar; desafio: 'esconder-livros' | 'segurar-carroca' | 'ler-marcas' | 'escolher-plano'; antes?: Fala[] }
+  | {
+      tipo: 'ludus';
+      id: string;
+      lugar: Lugar;
+      objetivo: string;
+      conversas: ConversaLudus[];
+      /** Treino de golpe que precisa fazer antes de seguir. */
+      obrigatorio?: Tecnica;
+      /** Presente que ganha ao entrar (o elmo do Brutus, no Capítulo 6). */
+      presente?: Equipamento;
+    };
+
+/** Uma conversa no Ludus: alguém de pé no pátio, com o que tem a dizer. */
+export interface ConversaLudus {
+  quem: Falante;
+  rotulo: string;
+  falas: Fala[];
+}
 
 export interface Capitulo {
   numero: number;
@@ -129,6 +166,13 @@ export const NOMES: Record<Falante, string> = {
   arauto: 'Arauto do Coliseu',
   povo: 'Alguém na multidão',
   sucata: 'Gladiador de Sucata',
+  copista: 'Velho Copista',
+  arquivista: 'O Arquivista Sombrio',
+  pretor: 'O Pretor de Aço',
+  marco: 'Marco Remo',
+  almirante: 'Almirante Ferrugem',
+  marinheiro: 'Marinheiro de Ferro',
+  leao: 'O Leão Mecânico',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------
@@ -854,7 +898,7 @@ const CAP2_CASSIUS: Capitulo = {
 };
 
 export const CAPITULOS: Record<IaId, Capitulo[]> = {
-  claude: [CAP1_CASSIUS, CAP2_CASSIUS],
-  chatgpt: [],
+  claude: [CAP1_CASSIUS, CAP2_CASSIUS, CAP3_CASSIUS, CAP4_CASSIUS, CAP5_CASSIUS, CAP6_CASSIUS, FINAL_CASSIUS],
+  chatgpt: [CAP1_OCTAVIUS],
   gemini: [],
 };

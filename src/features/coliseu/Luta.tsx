@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
-import { agir, ANIMO_MAX, ataqueAtual, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type EstadoLuta } from '@/game/historia/luta';
+import { agir, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import {
@@ -22,6 +22,31 @@ import {
   PRETORIANO_BATEDOR,
   PRETORIANO_LANCEIRO,
 } from '@/ui/pixel/historia';
+import {
+  CAO_DE_FERRO,
+  CENSOR_TITA,
+  DIMAQUERO,
+  MARINHEIRO_FERRO,
+  MIRMILAO_BRONZE,
+  PALETA_ALMIRANTE,
+  PALETA_CAO_DE_FERRO,
+  PALETA_DIMAQUERO,
+  PALETA_MARINHEIRO,
+  PALETA_MIRMILAO,
+  PALETA_PRETOR,
+  PALETA_RATO,
+  PALETA_RETIARIO,
+  ALMIRANTE_FERRUGEM,
+  ARQUIVISTA,
+  LEAO_MECANICO,
+  paletaArquivista,
+  paletaLeao,
+  paletaTita,
+  PRETOR_DE_ACO,
+  RATO_ENGRENAGEM,
+  RETIARIO_MECANICO,
+} from '@/ui/pixel/historia2';
+import { BRUTUS, PALETA_BRUTUS } from '@/ui/pixel/historia';
 import { desbloquear, tocar, type NomeSom } from '@/ui/som';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
@@ -37,11 +62,36 @@ const VISUAL: Record<string, { grade: string[]; paleta: Paleta; largura: number 
   'pretoriano-lanceiro': { grade: PRETORIANO_LANCEIRO, paleta: PALETA_PRETORIANO, largura: 13 },
   'pretoriano-veterano': { grade: DECURIAO, paleta: { ...PALETA_PRETORIANO, S: '#d8c070', s: '#8a7030' }, largura: 14 },
   'gladiador-de-sucata': { grade: GLADIADOR_SUCATA, paleta: PALETA_SUCATA, largura: 19 },
+  'boneco-de-treino': { grade: BRUTUS, paleta: PALETA_BRUTUS, largura: 17 },
+  'caes-de-ferro': { grade: CAO_DE_FERRO, paleta: PALETA_CAO_DE_FERRO, largura: 20 },
+  'rato-engrenagem': { grade: RATO_ENGRENAGEM, paleta: PALETA_RATO, largura: 13 },
+  'rato-rei': { grade: RATO_ENGRENAGEM, paleta: { ...PALETA_RATO, E: '#ffd04a' }, largura: 19 },
+  'patrulha-catacumba': { grade: PRETORIANO_LANCEIRO, paleta: { ...PALETA_PRETORIANO, R: '#5a3a6a', C: '#3a2a4a' }, largura: 13 },
+  'patrulha-sargento': { grade: PRETORIANO_BATEDOR, paleta: { ...PALETA_PRETORIANO, R: '#5a3a6a', C: '#3a2a4a', S: '#c8b070' }, largura: 14 },
+  'pretoriano-escudeiro': { grade: DECURIAO, paleta: PALETA_PRETORIANO, largura: 14 },
+  'pretoriano-lanceiro-elite': { grade: PRETORIANO_LANCEIRO, paleta: { ...PALETA_PRETORIANO, S: '#e0e4f0', R: '#e04a3a' }, largura: 14 },
+  'pretoriano-incendiario': { grade: PRETORIANO_BATEDOR, paleta: { ...PALETA_PRETORIANO, R: '#ff6a2a', C: '#a83a10', E: '#ffd04a' }, largura: 14 },
+  'centuriao-de-aco': { grade: DECURIAO, paleta: { ...PALETA_PRETORIANO, S: '#f2c14e', s: '#8a6a1a', R: '#8a1a1a' }, largura: 15 },
+  'pretor-de-aco': { grade: PRETOR_DE_ACO, paleta: PALETA_PRETOR, largura: 22 },
+  'retiario-mecanico': { grade: RETIARIO_MECANICO, paleta: PALETA_RETIARIO, largura: 19 },
+  'mirmilao-bronze': { grade: MIRMILAO_BRONZE, paleta: PALETA_MIRMILAO, largura: 19 },
+  dimaquero: { grade: DIMAQUERO, paleta: PALETA_DIMAQUERO, largura: 18 },
+  'marinheiro-ferro': { grade: MARINHEIRO_FERRO, paleta: PALETA_MARINHEIRO, largura: 15 },
+  'marinheiro-arpao': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO }, largura: 15 },
+  'marinheiro-canhao': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO }, largura: 16 },
+  'contramestre-ferro': { grade: MARINHEIRO_FERRO, paleta: { ...PALETA_MARINHEIRO }, largura: 18 },
+  'almirante-ferrugem': { grade: ALMIRANTE_FERRUGEM, paleta: PALETA_ALMIRANTE, largura: 22 },
 };
+
+/** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */
+const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38 };
 
 function SpriteInimigo({ e }: { e: EstadoLuta }) {
   const sinalFogo = e.inimigo.estado === 'sinal' && ataqueAtual(e).tipo === 'fogo';
   if (e.def.id === 'fornalha') return <Sprite grade={FORNALHA} paleta={paletaFornalha(sinalFogo, e.inimigo.fase)} espelhar />;
+  if (e.def.id === 'arquivista') return <Sprite grade={ARQUIVISTA} paleta={paletaArquivista(false)} espelhar />;
+  if (e.def.id === 'leao-mecanico') return <Sprite grade={LEAO_MECANICO} paleta={paletaLeao(e.inimigo.fase > 0 || sinalFogo)} espelhar />;
+  if (e.def.id === 'censor-tita') return <Sprite grade={CENSOR_TITA} paleta={paletaTita(e.inimigo.fase)} espelhar />;
   const v = VISUAL[e.def.id] ?? VISUAL.incinerador!;
   return <Sprite grade={v.grade} paleta={v.paleta} espelhar />;
 }
@@ -65,6 +115,9 @@ const SOM: Partial<Record<string, NomeSom>> = {
   finta: 'pergunta',
   contra: 'pesada',
   cansado: 'falha',
+  riposta: 'pesada',
+  quebra: 'refuta',
+  aliado: 'fanfarra',
 };
 const TEXTO: Record<string, string> = {
   bloqueio: 'BLOQUEOU!',
@@ -75,6 +128,9 @@ const TEXTO: Record<string, string> = {
   finta: 'FINTA!',
   contra: '⚠ CONTRA-ATAQUE!',
   cansado: 'SEM FÔLEGO',
+  riposta: '⚡ CONTRA-ATAQUE!',
+  quebra: '💥 GUARDA QUEBRADA!',
+  aliado: '',
 };
 
 /** Faíscas voando para todos os lados, um corte e um anel: o impacto de um golpe. */
@@ -112,6 +168,9 @@ export function LutaHistoria({
   antes,
   depois,
   onFim,
+  atributos = ATRIBUTOS_INICIAIS,
+  treino,
+  onVitoria,
 }: {
   lugar: Lugar;
   inimigo: string;
@@ -119,11 +178,18 @@ export function LutaHistoria({
   antes?: Fala[];
   depois?: Fala[];
   onFim: () => void;
+  /** Força, defesa, vida, carisma e os golpes aprendidos (vêm do save). */
+  atributos?: AtributosLuta;
+  /** Treino do Ludus: o objetivo é fazer `quantos` vezes o evento; não dá para perder. */
+  treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
+  /** Venceu: recebe as peças de máquina que o inimigo deixou. */
+  onVitoria?: (pecas: number) => void;
 }) {
   const def = INIMIGOS[inimigo]!;
-  const noColiseu = lugar === 'coliseu-arena';
+  const noColiseu = lugar === 'coliseu-arena' || lugar === 'coliseu-noite';
+  const [feitos, setFeitos] = useState(0);
   const [fase, setFase] = useState<'antes' | 'luta' | 'depois' | 'derrota'>(antes?.length ? 'antes' : 'luta');
-  const [e, setE] = useState<EstadoLuta>(() => novaLuta(def));
+  const [e, setE] = useState<EstadoLuta>(() => novaLuta(def, atributos));
   const [tentativas, setTentativas] = useState(1);
   const visto = useRef(0);
   // Golpes seguidos sem apanhar (o COMBO na tela).
@@ -131,7 +197,7 @@ export function LutaHistoria({
 
   useEffect(() => {
     if (fase !== 'luta') return;
-    const id = window.setInterval(() => setE((s) => passoLuta(s)), TICK_LUTA);
+    const id = window.setInterval(() => setE((s) => passoLuta(s, atributos)), TICK_LUTA);
     return () => window.clearInterval(id);
   }, [fase]);
 
@@ -143,14 +209,21 @@ export function LutaHistoria({
       if (som) tocar(som);
       if (ev.tipo === 'acerto' || ev.tipo === 'especial') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
+      if (treino && ev.tipo === treino.evento) setFeitos((n) => n + 1);
     }
     visto.current = Math.max(visto.current, ...e.eventos.map((x) => x.id), 0);
     if (fase === 'luta' && e.fim === 'vitoria') {
       tocar('vitoria');
+      onVitoria?.(def.pecas ?? (def.chefao ? 6 : 2));
       if (noColiseu) tocar('plateia');
       setFase('depois');
     }
     if (fase === 'luta' && e.fim === 'derrota') {
+      // No treino não tem derrota: o Brutus te levanta e segue.
+      if (treino) {
+        setE(novaLuta(def, atributos));
+        return;
+      }
       tocar('derrota');
       setFase('derrota');
     }
@@ -159,7 +232,7 @@ export function LutaHistoria({
   const apertar = (acao: 'golpe' | 'escudo' | 'esquiva' | 'especial') => {
     if (fase !== 'luta') return;
     desbloquear();
-    setE((s) => agir(s, acao));
+    setE((s) => agir(s, acao, atributos));
   };
 
   useEffect(() => {
@@ -186,12 +259,24 @@ export function LutaHistoria({
   const corSinal = at.tipo === 'corpo' ? '#ffd04a' : at.tipo === 'finta' ? '#ffd04a' : '#ff3a3a';
   const cheio = e.animo >= ANIMO_MAX;
   const acaoJ = e.tempo < j.acaoAte ? j.acao : 'parado';
-  const largura = def.id === 'fornalha' ? 30 : (VISUAL[def.id]?.largura ?? 13);
+  const largura = LARGURA_ESPECIAL[def.id] ?? VISUAL[def.id]?.largura ?? 13;
   const apanhou = e.eventos.some((ev) => ev.tipo === 'acerto' && ev.ate - e.tempo > 550);
   const plateiaLado = e.animo >= 50;
   // O inimigo avança quando o golpe dele chega; cai quando perde.
   const atacou = e.eventos.some((ev) => (ev.tipo === 'dano' || ev.tipo === 'bloqueio' || ev.tipo === 'esquiva') && ev.ate - e.tempo > 450);
   const vencido = e.fim === 'vitoria';
+  // O Arquivista: nas fintas, quem treme são as cópias falsas; a verdadeira fica parada.
+  const ilusao = !!def.ilusoes && sinal && at.tipo === 'finta';
+  const aliado = e.eventos.find((ev) => ev.tipo === 'aliado');
+  const quemAjuda = aliado && def.aliados ? (def.aliados[aliado.valor ?? 0] as Falante | undefined) : undefined;
+
+  // Treino: chegou no objetivo, acabou (as falas de "depois" aparecem).
+  useEffect(() => {
+    if (treino && fase === 'luta' && feitos >= treino.quantos) {
+      tocar('vitoria');
+      setFase('depois');
+    }
+  }, [feitos]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -247,12 +332,12 @@ export function LutaHistoria({
 
         {/* O inimigo, com o sinal antes do ataque */}
         <div
-          className={`absolute bottom-[12%] left-[70%] z-10 -translate-x-1/2 ${vencido ? 'inimigo-vencido' : atacou ? 'investida-esq' : sinal ? 'tremer-t' : def.chefao || def.id.startsWith('pretoriano') || def.id === 'gladiador-de-sucata' ? 'respirar-t' : 'flutuar'}`}
+          className={`absolute bottom-[12%] left-[70%] z-10 -translate-x-1/2 ${vencido ? 'inimigo-vencido' : atacou ? 'investida-esq' : sinal && !ilusao ? 'tremer-t' : ilusao ? 'respirar-t' : def.chefao || def.id.startsWith('pretoriano') || def.id === 'gladiador-de-sucata' ? 'respirar-t' : 'flutuar'}`}
           style={{
             width: `${largura}%`,
             translate: apanhou && !vencido ? '8% 0' : undefined,
             transition: 'translate 90ms ease-out',
-            filter: apanhou ? 'brightness(2.6)' : sinal ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
+            filter: apanhou ? 'brightness(2.6)' : sinal && !ilusao ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
           }}
         >
           <SpriteInimigo e={e} />
@@ -266,7 +351,7 @@ export function LutaHistoria({
                 aria-hidden
               />
             ))}
-          {sinal && (
+          {sinal && !ilusao && (
             <span
               className="absolute -top-[22%] left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-black px-1 font-pixel text-[7px] text-black sm:text-[10px]"
               style={{ background: corSinal }}
@@ -282,13 +367,47 @@ export function LutaHistoria({
           )}
         </div>
 
+        {/* As cópias falsas do Arquivista: nas fintas, são elas que tremem e brilham */}
+        {def.ilusoes && !vencido &&
+          [52, 88].map((x) => (
+            <div
+              key={x}
+              className={`pointer-events-none absolute bottom-[12%] z-[9] -translate-x-1/2 opacity-60 ${ilusao ? 'tremer-t' : 'flutuar'}`}
+              style={{ left: `${x}%`, width: `${largura * 0.85}%`, filter: ilusao ? 'drop-shadow(0 0 10px #ffd04a)' : undefined }}
+              aria-hidden
+            >
+              <Sprite grade={ARQUIVISTA} paleta={paletaArquivista(true)} espelhar />
+            </div>
+          ))}
+
+        {/* Na luta final, o especial chama um aliado que entra correndo */}
+        {quemAjuda && aliado && (
+          <div key={aliado.id} className="pointer-events-none absolute inset-0 z-20" aria-hidden>
+            <div className="entra-esq absolute bottom-[14%] left-[44%] w-[13%] -translate-x-1/2">
+              <Retrato quem={quemAjuda} />
+            </div>
+            <span className="lute-entra absolute left-1/2 top-[30%] -translate-x-1/2 whitespace-nowrap font-pixel text-xs text-[#f2c14e] [text-shadow:2px_2px_0_#000] sm:text-xl">
+              {quemAjuda === 'octavius' ? '⚓ OCTAVIUS: CARGA EM EQUIPE!' : quemAjuda === 'helios' ? '☀️ HELIOS: RAIO DE SOL!' : '📚 CASSIUS: ESCUDO DE LIVROS!'}
+            </span>
+          </div>
+        )}
+
+        {/* Treino do Ludus: o objetivo e quanto falta */}
+        {treino && fase === 'luta' && (
+          <span className="absolute left-1/2 top-[30%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-[#c8962a] bg-black/80 px-2 py-1 font-pixel text-[8px] text-[#f2c14e] sm:text-[11px]">
+            🏋️ {treino.rotulo}: {Math.min(feitos, treino.quantos)}/{treino.quantos}
+          </span>
+        )}
+
         {/* Impactos: faíscas, cortes, anéis, clarões */}
         {e.eventos.map((ev) => {
           const x = ev.lado === 'jogador' ? '22%' : '70%';
           if (ev.tipo === 'acerto') return <Impacto key={`fx${ev.id}`} x={x} cor="#ffd04a" corte />;
           if (ev.tipo === 'dano') return <Impacto key={`fx${ev.id}`} x={x} cor="#ff4a3a" />;
           if (ev.tipo === 'bloqueio') return <Impacto key={`fx${ev.id}`} x="30%" cor="#9fe8ff" />;
-          if (ev.tipo === 'especial') return <Impacto key={`fx${ev.id}`} x="70%" cor="#f2c14e" corte grande />;
+          if (ev.tipo === 'especial' || ev.tipo === 'aliado') return <Impacto key={`fx${ev.id}`} x="70%" cor="#f2c14e" corte grande />;
+          if (ev.tipo === 'riposta') return <Impacto key={`fx${ev.id}`} x="66%" cor="#9fe8ff" corte grande />;
+          if (ev.tipo === 'quebra') return <Impacto key={`fx${ev.id}`} x="68%" cor="#ff8a3a" grande />;
           return null;
         })}
         {e.eventos.some((ev) => ev.tipo === 'dano' || ev.tipo === 'contra') && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
@@ -317,7 +436,7 @@ export function LutaHistoria({
               color: ev.tipo === 'dano' || ev.tipo === 'contra' ? '#ff5a5a' : ev.tipo === 'guarda' || ev.tipo === 'cansado' ? '#bbb' : '#f2c14e',
             }}
           >
-            {ev.tipo === 'acerto' || ev.tipo === 'dano' ? `-${ev.valor}` : TEXTO[ev.tipo]}
+            {ev.tipo === "acerto" || ev.tipo === "dano" ? (ev.valor ? `-${ev.valor}` : "🛡 NADA ENTRA!") : TEXTO[ev.tipo]}
           </span>
         ))}
 
@@ -337,7 +456,7 @@ export function LutaHistoria({
               onClick={() => {
                 tocar('start');
                 setTentativas((t) => t + 1);
-                setE(novaLuta(def));
+                setE(novaLuta(def, atributos));
                 setCombo(0);
                 setFase('luta');
               }}

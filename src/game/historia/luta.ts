@@ -58,14 +58,25 @@ export interface DefInimigo {
   chefao?: boolean;
   /** Dano do contra-ataque quando o jogador bate três vezes na guarda dele. */
   contra?: number;
+  /** Escudo gigante (o Pretor de Aço): golpe na guarda não entra nada; só a QUEBRA-GUARDA abre. */
+  escudoGigante?: boolean;
+  /** Faz cópias falsas (o Arquivista): só a tela muda, as fintas viram ilusões. */
+  ilusoes?: boolean;
+  /** Luta final: o especial chama os aliados (cada vez um). */
+  aliados?: string[];
+  /** Peças de máquina que ele deixa para o ferreiro (padrão: 2; chefão: 6). */
+  pecas?: number;
 }
+
+/** Golpes que o Brutus ensina no Ludus. */
+export type Tecnica = 'contra-ataque' | 'quebra-guarda';
 
 export type AcaoJogador = 'parado' | 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'ferido';
 export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado';
 
 export interface EventoLuta {
   id: number;
-  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado';
+  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado' | 'riposta' | 'quebra' | 'aliado';
   valor?: number;
   lado: 'jogador' | 'inimigo';
   ate: number;
@@ -82,6 +93,8 @@ export interface EstadoLuta {
     acaoDesde: number;
     acaoAte: number;
     golpePronto: number;
+    /** Até quando vale o CONTRA-ATAQUE (golpe logo depois de bloquear). */
+    ripostaAte: number;
     esquivaPronta: number;
   };
   inimigo: {
@@ -110,6 +123,8 @@ export interface AtributosLuta {
   forca: number;
   defesa: number;
   carisma: number;
+  /** Golpes aprendidos no Ludus. */
+  tecnicas?: Tecnica[];
 }
 export const ATRIBUTOS_INICIAIS: AtributosLuta = { vida: 100, forca: 1, defesa: 1, carisma: 1 };
 
@@ -119,7 +134,7 @@ export function novaLuta(def: DefInimigo, atributos: AtributosLuta = ATRIBUTOS_I
   return {
     tempo: 0,
     def,
-    jogador: { vida: atributos.vida, vidaMax: atributos.vida, folego: FOLEGO_MAX, acao: 'parado', acaoDesde: 0, acaoAte: 0, golpePronto: 0, esquivaPronta: 0 },
+    jogador: { vida: atributos.vida, vidaMax: atributos.vida, folego: FOLEGO_MAX, acao: 'parado', acaoDesde: 0, acaoAte: 0, golpePronto: 0, esquivaPronta: 0, ripostaAte: 0 },
     inimigo: { vida: def.vida, estado: 'espera', estadoAte: 0, fase: 0, ataque: 0, proximoEm: 1500, combo: 0, guardas: 0, contra: false },
     animo: 0,
     fim: null,
@@ -155,8 +170,11 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     if (s.animo < ANIMO_MAX) return s;
     let r: EstadoLuta = { ...s, animo: 0, jogador: { ...j, acao: 'especial', acaoDesde: s.tempo, acaoAte: s.tempo + 700 } };
     r = bater(r, 28 * (1 + (a.forca - 1) * 0.2), true);
-    if (r.fim) return evento(r, 'especial', 'jogador');
-    return evento({ ...r, inimigo: { ...r.inimigo, estado: 'atordoado', estadoAte: s.tempo + ATORDOADO_MS, combo: 0, guardas: 0, contra: false } }, 'especial', 'jogador');
+    // Na luta final, o especial chama um aliado de cada vez (o valor do evento diz qual).
+    const tipo = s.def.aliados?.length ? 'aliado' : 'especial';
+    const qual = s.def.aliados?.length ? r.seq % s.def.aliados.length : undefined;
+    if (r.fim) return evento(r, tipo, 'jogador', qual);
+    return evento({ ...r, inimigo: { ...r.inimigo, estado: 'atordoado', estadoAte: s.tempo + ATORDOADO_MS, combo: 0, guardas: 0, contra: false } }, tipo, 'jogador', qual);
   }
   if (acao !== 'golpe' && ocupado) return s;
   if (acao === 'golpe' && (ocupado || s.tempo < j.golpePronto)) return s;
@@ -167,15 +185,29 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     const r: EstadoLuta = { ...s, jogador: { ...j, folego, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, golpePronto: s.tempo + RECARGA_GOLPE_MS } };
     const i = r.inimigo;
     const base = 7 * (1 + (a.forca - 1) * 0.2);
+    const sabe = (t: Tecnica) => a.tecnicas?.includes(t) ?? false;
+    // CONTRA-ATAQUE (aprendido no Ludus): golpe logo depois de bloquear entra dobrado e deixa ele tonto.
+    if (sabe('contra-ataque') && s.tempo < j.ripostaAte) {
+      const rr: EstadoLuta = { ...r, jogador: { ...r.jogador, ripostaAte: 0 } };
+      const g = bater({ ...rr, inimigo: { ...i, guardas: 0 } }, base * 2.2);
+      const tonto = g.fim ? g : { ...g, inimigo: { ...g.inimigo, estado: 'atordoado' as const, estadoAte: s.tempo + 700, combo: 0, contra: false } };
+      return ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a);
+    }
+    // Escudo gigante: só entra golpe cheio com a guarda quebrada (tonto).
+    const muralha = s.def.escudoGigante ? (i.estado === 'atordoado' ? 1 : 0.3) : 1;
     // Aberto ou atordoado: golpe cheio (e mais Ânimo). Em guarda: ele defende quase tudo.
     if (i.estado === 'aberto' || i.estado === 'atordoado') {
-      return ganharAnimo(bater({ ...r, inimigo: { ...i, guardas: 0 } }, i.estado === 'atordoado' ? base * 1.5 : base), 5, a);
+      return ganharAnimo(bater({ ...r, inimigo: { ...i, guardas: 0 } }, (i.estado === 'atordoado' ? base * 1.5 : base) * muralha), 5, a);
     }
-    if (i.estado === 'sinal') return ganharAnimo(bater(r, base * 0.5), 2, a);
+    if (i.estado === 'sinal') return ganharAnimo(bater(r, base * 0.5 * muralha), 2, a);
     // Na guarda: quase nada entra, e na terceira vez seguida ele contra-ataca.
     const guardas = i.guardas + 1;
-    let g = evento(bater(r, 1), 'guarda', 'inimigo');
+    let g = evento(bater(r, s.def.escudoGigante ? 0 : 1), 'guarda', 'inimigo');
     if (g.fim) return g;
+    // QUEBRA-GUARDA (aprendido no Ludus): a terceira pancada seguida arrebenta a guarda.
+    if (guardas >= GUARDAS_ATE_CONTRA && sabe('quebra-guarda')) {
+      return ganharAnimo(evento({ ...g, inimigo: { ...g.inimigo, guardas: 0, estado: 'atordoado', estadoAte: g.tempo + 1000, combo: 0, contra: false } }, 'quebra', 'inimigo'), 10, a);
+    }
     if (guardas >= GUARDAS_ATE_CONTRA) {
       g = evento({ ...g, inimigo: { ...g.inimigo, guardas: 0, contra: true, estado: 'sinal', estadoAte: g.tempo + CONTRA_ATAQUE(0).sinalMs } }, 'contra', 'inimigo');
       return g;
@@ -224,7 +256,8 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
     return depoisDoGolpe(ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a), at, at.abertoMs + 250);
   }
   if (fazendo === 'escudo' && at.tipo === 'corpo') {
-    return depoisDoGolpe(ganharAnimo(evento(s, 'bloqueio', 'jogador'), 8, a), at, at.abertoMs);
+    const bloqueou = ganharAnimo(evento(s, 'bloqueio', 'jogador'), 8, a);
+    return depoisDoGolpe({ ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } }, at, at.abertoMs);
   }
   // Escudo contra fogo ou investida segura só metade.
   const fator = fazendo === 'escudo' ? 0.5 : 1;

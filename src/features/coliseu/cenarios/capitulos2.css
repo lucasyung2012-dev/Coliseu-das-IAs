@@ -1,0 +1,598 @@
+/*
+ * Animações de ambiente dos cenários do segundo bloco de capítulos (320 × 180).
+ * Toda classe e todo keyframe começam com "c2-" para não colidir com o resto do jogo.
+ * Atenção: animar opacity num elemento sobrescreve o atributo opacity dele;
+ * por isso as classes que mexem em opacity vão em grupos (<g>) ou em retângulos sem opacity própria.
+ * Nos elementos de SVG, px nas transformações vale como unidade do desenho.
+ */
+
+/* Chama: estica para cima a partir da base, em dois passos (retrô) */
+.c2-chama {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c2-chama 0.5s steps(2) infinite alternate;
+}
+@keyframes c2-chama {
+  from {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.92, 1.2);
+    opacity: 0.85;
+  }
+}
+
+/* Halo de luz respirando devagar */
+.c2-pulsar {
+  animation: c2-pulsar 2.6s ease-in-out infinite alternate;
+}
+@keyframes c2-pulsar {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Poeira flutuando na luz */
+.c2-poeira {
+  opacity: 0;
+  animation: c2-poeira 7s steps(28) infinite;
+}
+@keyframes c2-poeira {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(6px, -18px);
+    opacity: 0;
+  }
+}
+
+/* Brasas subindo da fornalha */
+.c2-brasa {
+  opacity: 0;
+  animation: c2-brasa 3.2s steps(24) infinite;
+}
+@keyframes c2-brasa {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(5px, -40px);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-2px, -70px);
+    opacity: 0;
+  }
+}
+
+/* Faíscas pulando da bigorna (três trajetórias) */
+.c2-faisca-1,
+.c2-faisca-2,
+.c2-faisca-3 {
+  opacity: 0;
+  animation: c2-faisca-1 0.9s steps(6) infinite;
+}
+.c2-faisca-2 {
+  animation-name: c2-faisca-2;
+  animation-duration: 1.1s;
+}
+.c2-faisca-3 {
+  animation-name: c2-faisca-3;
+  animation-duration: 0.8s;
+}
+@keyframes c2-faisca-1 {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-14px, -12px);
+    opacity: 0;
+  }
+}
+@keyframes c2-faisca-2 {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(12px, -16px);
+    opacity: 0;
+  }
+}
+@keyframes c2-faisca-3 {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(3px, -14px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(6px, -6px);
+    opacity: 0;
+  }
+}
+
+/* Vapor subindo da tina de têmpera */
+.c2-vapor {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: c2-vapor 2.7s steps(9) infinite;
+}
+@keyframes c2-vapor {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(3px, -18px) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Fole da forja enchendo e esvaziando (achata para baixo) */
+.c2-fole {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c2-fole 1.6s steps(4) infinite alternate;
+}
+@keyframes c2-fole {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(0.6);
+  }
+}
+
+/* Lampião ou carga pendurada balançando (gira pelo topo) */
+.c2-balancar {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c2-balancar 4.5s ease-in-out infinite alternate;
+}
+@keyframes c2-balancar {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+/* Estandartes, flâmulas e bandeirinhas ondulando no vento */
+.c2-bandeira {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c2-bandeira 3.2s steps(4) infinite alternate;
+}
+@keyframes c2-bandeira {
+  from {
+    transform: skewX(-3deg);
+  }
+  to {
+    transform: skewX(3deg);
+  }
+}
+
+/* Velas do navio enfunando com o vento da tempestade */
+.c2-vela {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: c2-vela 1.8s steps(3) infinite alternate;
+}
+@keyframes c2-vela {
+  from {
+    transform: skewX(-2deg) scaleY(1);
+  }
+  to {
+    transform: skewX(3deg) scaleY(1.04);
+  }
+}
+
+/* Nuvens andando devagar */
+.c2-nuvem {
+  animation: c2-nuvem 40s steps(30) infinite alternate;
+}
+@keyframes c2-nuvem {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-30px);
+  }
+}
+
+/* Pombas atravessando o céu */
+.c2-pomba {
+  animation: c2-pomba 16s linear infinite;
+}
+@keyframes c2-pomba {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(360px, -24px);
+  }
+}
+
+/* Gaivotas planando de um lado ao outro, subindo e descendo */
+.c2-gaivota {
+  animation: c2-gaivota 18s linear infinite;
+}
+@keyframes c2-gaivota {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(90px, -6px);
+  }
+  50% {
+    transform: translate(180px, 4px);
+  }
+  75% {
+    transform: translate(270px, -4px);
+  }
+  100% {
+    transform: translate(370px, 2px);
+  }
+}
+
+/* Asas batendo (vira de cabeça para baixo pela base) */
+.c2-asa {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: c2-asa 0.3s steps(1) infinite;
+}
+@keyframes c2-asa {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(-1);
+  }
+}
+
+/* Passarinho bicando o chão */
+.c2-bicar {
+  animation: c2-bicar 1.6s steps(1) infinite;
+}
+@keyframes c2-bicar {
+  0%,
+  60% {
+    transform: translate(0, 0);
+  }
+  70% {
+    transform: translate(1px, 3px);
+  }
+  80% {
+    transform: translate(0, 0);
+  }
+  90% {
+    transform: translate(1px, 3px);
+  }
+}
+
+/* Gota caindo do teto da catacumba até a poça */
+.c2-gota {
+  animation: c2-gota 2.4s steps(20) infinite;
+}
+@keyframes c2-gota {
+  0%,
+  30% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  88% {
+    transform: translate(0, 129px);
+    opacity: 1;
+  }
+  90%,
+  100% {
+    transform: translate(0, 131px);
+    opacity: 0;
+  }
+}
+
+/* Ondinha na poça quando a gota cai (mesmo ritmo da gota) */
+.c2-ondinha {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: c2-ondinha 2.4s steps(6) infinite;
+}
+@keyframes c2-ondinha {
+  0%,
+  88% {
+    transform: scaleX(0.3);
+    opacity: 0;
+  }
+  90% {
+    transform: scaleX(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1.6);
+    opacity: 0;
+  }
+}
+
+/* Estrelas piscando */
+.c2-estrela {
+  animation: c2-estrela 3s steps(3) infinite alternate;
+}
+@keyframes c2-estrela {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+/* Luzinhas e olhos no escuro que piscam de vez em quando */
+.c2-piscar {
+  animation: c2-piscar 5s steps(1) infinite;
+}
+@keyframes c2-piscar {
+  0%,
+  86% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  91% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0;
+  }
+}
+
+/* Olho do Censor brilhando */
+.c2-olho {
+  animation: c2-olho 2.4s steps(3) infinite alternate;
+}
+@keyframes c2-olho {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Feixe de luar entrando pela janela */
+.c2-feixe {
+  animation: c2-feixe 5s ease-in-out infinite alternate;
+}
+@keyframes c2-feixe {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Multidão se mexendo */
+.c2-multidao {
+  animation: c2-multidao 0.8s steps(1) infinite;
+}
+@keyframes c2-multidao {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+/* Núcleo violeta da máquina de apagar memórias */
+.c2-maquina {
+  animation: c2-maquina 1.6s steps(4) infinite alternate;
+}
+@keyframes c2-maquina {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Engrenagens girando (a origem vem no estilo, em unidades do desenho) */
+.c2-gira {
+  animation: c2-gira 12s steps(48) infinite;
+}
+@keyframes c2-gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Brilho na água (reflexo do sol, chão molhado) */
+.c2-agua {
+  animation: c2-agua 1.8s steps(3) infinite alternate;
+}
+@keyframes c2-agua {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Barcos boiando */
+.c2-navio {
+  animation: c2-navio 3s steps(2) infinite alternate;
+}
+@keyframes c2-navio {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(1px);
+  }
+}
+
+/* Ondas do mar revolto (indo e voltando) */
+.c2-onda {
+  animation: c2-onda 2.2s steps(6) infinite alternate;
+}
+.c2-onda-volta {
+  animation: c2-onda-volta 2.8s steps(6) infinite alternate;
+}
+@keyframes c2-onda {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-10px, 2px);
+  }
+}
+@keyframes c2-onda-volta {
+  from {
+    transform: translate(0, 1px);
+  }
+  to {
+    transform: translate(9px, -1px);
+  }
+}
+
+/* Onda estourando por cima da amurada */
+.c2-espuma {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: c2-espuma 4s steps(8) infinite;
+}
+@keyframes c2-espuma {
+  0%,
+  55% {
+    transform: scale(0.3, 0.2);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(0.8, 1);
+    opacity: 1;
+  }
+  85% {
+    transform: scale(1.2, 1.3);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.4, 1);
+    opacity: 0;
+  }
+}
+
+/* Chuva caindo em diagonal (anda um "andar" de 60 px e recomeça) */
+.c2-chuva {
+  animation: c2-chuva 0.45s linear infinite;
+}
+@keyframes c2-chuva {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-10px, 60px);
+  }
+}
+
+/* Relâmpago: clarão rápido de vez em quando */
+.c2-relampago {
+  opacity: 0;
+  animation: c2-relampago 7s steps(1) infinite;
+}
+@keyframes c2-relampago {
+  0%,
+  89% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 0.35;
+  }
+  91% {
+    opacity: 0;
+  }
+  92% {
+    opacity: 0.25;
+  }
+  94% {
+    opacity: 0;
+  }
+}
+
+/* Menos movimento: tudo parado (partículas ficam visíveis, paradas; o relâmpago some) */
+.menos-movimento .c2-chama,
+.menos-movimento .c2-pulsar,
+.menos-movimento .c2-poeira,
+.menos-movimento .c2-brasa,
+.menos-movimento .c2-faisca-1,
+.menos-movimento .c2-faisca-2,
+.menos-movimento .c2-faisca-3,
+.menos-movimento .c2-vapor,
+.menos-movimento .c2-fole,
+.menos-movimento .c2-balancar,
+.menos-movimento .c2-bandeira,
+.menos-movimento .c2-vela,
+.menos-movimento .c2-nuvem,
+.menos-movimento .c2-pomba,
+.menos-movimento .c2-gaivota,
+.menos-movimento .c2-asa,
+.menos-movimento .c2-bicar,
+.menos-movimento .c2-gota,
+.menos-movimento .c2-ondinha,
+.menos-movimento .c2-estrela,
+.menos-movimento .c2-piscar,
+.menos-movimento .c2-olho,
+.menos-movimento .c2-feixe,
+.menos-movimento .c2-multidao,
+.menos-movimento .c2-maquina,
+.menos-movimento .c2-gira,
+.menos-movimento .c2-agua,
+.menos-movimento .c2-navio,
+.menos-movimento .c2-onda,
+.menos-movimento .c2-onda-volta,
+.menos-movimento .c2-espuma,
+.menos-movimento .c2-chuva,
+.menos-movimento .c2-relampago {
+  animation: none;
+}
+.menos-movimento .c2-poeira,
+.menos-movimento .c2-brasa {
+  opacity: 0.7;
+}
+.menos-movimento .c2-vapor {
+  opacity: 0.4;
+}
+.menos-movimento .c2-faisca-1,
+.menos-movimento .c2-faisca-2,
+.menos-movimento .c2-faisca-3 {
+  opacity: 0;
+}
