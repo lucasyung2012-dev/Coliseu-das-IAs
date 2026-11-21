@@ -23,15 +23,37 @@ export function emocaoDa(f: { quem?: Falante; texto: string; emocao?: Emocao; je
 }
 
 /** O texto com emoção: no grito, cada letra treme. */
-function TextoComEmocao({ texto, jeito }: { texto: string; jeito?: JeitoFala }) {
-  if (jeito !== 'grito') return <>{texto}</>;
+function TextoComEmocao({ texto, n, jeito }: { texto: string; n: number; jeito?: JeitoFala }) {
+  // O texto inteiro já ocupa o lugar (o que falta digitar fica invisível), então a caixa não muda de tamanho.
+  if (jeito !== 'grito')
+    return (
+      <>
+        {texto.slice(0, n)}
+        <span className="invisible">{texto.slice(n)}</span>
+      </>
+    );
+  // No grito cada letra treme, mas a palavra fica inteira na mesma linha (nunca "estante s").
+  let k = 0;
   return (
     <>
-      {texto.split('').map((c, k) => (
-        <span key={k} className="letra-treme inline-block whitespace-pre" style={{ animationDelay: `${(k * 53) % 300}ms` }}>
-          {c}
-        </span>
-      ))}
+      {texto.split(/(\s+)/).map((parte, p) => {
+        if (/^\s+$/.test(parte)) {
+          k += parte.length;
+          return parte;
+        }
+        return (
+          <span key={p} className="inline-block whitespace-nowrap">
+            {parte.split('').map((c) => {
+              const i = k++;
+              return (
+                <span key={i} className={`letra-treme inline-block ${i >= n ? 'invisible' : ''}`} style={{ animationDelay: `${(i * 53) % 300}ms` }}>
+                  {c}
+                </span>
+              );
+            })}
+          </span>
+        );
+      })}
     </>
   );
 }
@@ -85,9 +107,7 @@ export function CaixaFala({ fala, onSeguir }: { fala: Fala; onSeguir: () => void
         <span
           className={`mt-1 block leading-snug ${fala.quem === 'narrador' ? 'italic text-white/70' : 'text-white'} ${jeito === 'sussurro' ? 'text-xs italic text-white/70 sm:text-sm' : jeito === 'grito' ? 'text-base font-bold sm:text-lg' : 'text-sm sm:text-base'}`}
         >
-          <TextoComEmocao texto={mostrado} jeito={jeito} />
-          {/* o resto do texto, invisível, para a caixa não mudar de tamanho enquanto digita */}
-          <span className="invisible">{fala.texto.slice(mostrado.length)}</span>
+          <TextoComEmocao texto={fala.texto} n={mostrado.length} jeito={jeito} />
         </span>
         <span className={`mt-1 block text-right font-pixel text-[9px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>▼</span>
       </button>
@@ -339,7 +359,7 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
           <span
             className={`block min-h-[3.9em] leading-snug sm:min-h-[2.6em] ${q.quem ? 'text-white' : 'italic text-white/90'} ${emocaoQ.jeito === 'sussurro' ? 'text-xs italic text-white/70 sm:text-base' : emocaoQ.jeito === 'grito' ? 'text-base font-bold sm:text-xl' : 'text-sm sm:text-lg'}`}
           >
-            <TextoComEmocao texto={mostrado} jeito={emocaoQ.jeito} />
+            <TextoComEmocao texto={q.texto} n={mostrado.length} jeito={emocaoQ.jeito} />
           </span>
           <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>{auto ? 'AUTO' : 'TOQUE PARA SEGUIR ▼'}</span>
         </span>
