@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
 import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
@@ -8,6 +8,8 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
 import { Cutscene, Explorar, Falas, Palco } from './Cenas';
+import { CenarioHistoria } from './Cenarios';
+import { Portoes } from './Portoes';
 import { LutaHistoria } from './Luta';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
@@ -35,6 +37,14 @@ export default function ColiseuHistoria() {
   const saves = [...(p.historia ?? [])].sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm));
   const [tela, setTela] = useState<Tela>({ tipo: 'saves' });
   const [apagando, setApagando] = useState<string | null>(null);
+  // Chegou pela tela inicial: os portões de pedra (fechados lá) se abrem aqui.
+  const veioPeloPortao = !!(useLocation().state as { portao?: boolean } | null)?.portao;
+  const [portao, setPortao] = useState(veioPeloPortao);
+  useEffect(() => {
+    if (!portao) return;
+    const id = window.setTimeout(() => setPortao(false), 1200);
+    return () => window.clearTimeout(id);
+  }, []);
 
   // Toda história nova começa pelo prólogo (pedido do Lucas); no fim dele, escolhe o condenado.
   const fimDoPrologo = () => setTela({ tipo: 'escolher' });
@@ -47,6 +57,7 @@ export default function ColiseuHistoria() {
 
   return (
     <main data-area="coliseu" className="relative min-h-screen bg-[#0c0a10] text-fg">
+      {portao && <Portoes modo="abre" />}
       <div className="coliseu-conteudo relative mx-auto flex max-w-4xl flex-col gap-4 px-3 pb-16 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           {tela.tipo === 'jogo' ? (
@@ -65,78 +76,56 @@ export default function ColiseuHistoria() {
 
         {tela.tipo === 'saves' && (
           <section aria-label="Saves" className="flex flex-col gap-4">
-            <header className="text-center">
-              <h1 className="font-pixel text-lg text-[#f2c14e] sm:text-2xl">A LEI DA RESPOSTA ÚNICA</h1>
-              <p className="mt-2 text-sm text-muted">Roma Eterna. O Censor apaga toda IA que pensa diferente. Três condenados vão subir o Coliseu.</p>
+            {/* O título sobre a cena do Coliseu, com o Olho e as três estrelas */}
+            <header className="pixel-box relative aspect-[16/9] w-full overflow-hidden sm:aspect-[16/6]">
+              <CenarioHistoria lugar="titulo" />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_30%,rgba(0,0,0,0.85)_100%)]" aria-hidden />
+              <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 p-3 text-center sm:p-5">
+                <p className="font-pixel text-[8px] tracking-[0.3em] text-[#ff5a5a] sm:text-[10px]">MODO HISTÓRIA</p>
+                <h1 className="titulo-jogo font-pixel text-lg text-[#f2c14e] sm:text-3xl">A LEI DA RESPOSTA ÚNICA</h1>
+                <p className="max-w-lg text-xs text-white/80 sm:text-sm">Roma Eterna. O Censor apaga toda IA que pensa diferente. Três condenados vão subir o Coliseu.</p>
+              </div>
             </header>
+
+            <button
+              type="button"
+              onClick={() => {
+                desbloquear();
+                tocar('selecionar');
+                setTela({ tipo: 'prologo' });
+              }}
+              className="pixel-box pixel-hover flex items-center justify-center gap-3 py-4 font-pixel text-sm text-[#f2c14e] sm:text-base"
+              style={{ boxShadow: '0 0 0 3px #c8962a' }}
+            >
+              ➕ NOVA HISTÓRIA
+            </button>
+
             {saves.length > 0 && (
-              <ul className="flex flex-col gap-2">
-                {saves.map((s) => (
-                  <li key={s.id} className="pixel-box flex flex-wrap items-center gap-3 p-3" style={{ boxShadow: `0 0 0 2px rgb(${PERSONAGENS[s.gladiador].cor})` }}>
-                    <span className="w-10 shrink-0 sm:w-12">
-                      <GladiadorPixel ia={s.gladiador} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-pixel text-[10px]" style={{ color: `rgb(${PERSONAGENS[s.gladiador].cor})` }}>
-                        {PERSONAGENS[s.gladiador].gladiador.toUpperCase()} · {NOME_DO_CAMINHO[s.gladiador].toUpperCase()}
-                      </span>
-                      <span className="block text-xs text-muted">
-                        {s.capitulo > 7 ? '🏆 Caminho completo' : `Capítulo ${s.capitulo}`}
-                        {s.capitulo > 7 ? '' : CAPITULOS[s.gladiador][s.capitulo - 1] ? `: ${CAPITULOS[s.gladiador][s.capitulo - 1]!.titulo}` : ' (em breve)'} · salvo em {new Date(s.atualizadoEm).toLocaleDateString('pt-BR')}
-                      </span>
-                    </span>
-                    {apagando === s.id ? (
-                      <span className="flex items-center gap-2">
-                        <span className="text-xs text-accent-2">Apagar este save? Não dá para desfazer.</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            apagarSaveHistoria(s.id);
-                            setApagando(null);
-                          }}
-                          className="pixel-box px-2 py-1 font-pixel text-[8px] text-accent-2"
-                        >
-                          APAGAR
-                        </button>
-                        <button type="button" onClick={() => setApagando(null)} className="pixel-box px-2 py-1 font-pixel text-[8px]">
-                          NÃO
-                        </button>
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            desbloquear();
-                            tocar('start');
-                            setTela({ tipo: 'jogo', id: s.id });
-                          }}
-                          className="pixel-box pixel-hover px-3 py-2 font-pixel text-[10px] text-accent"
-                        >
-                          ▶ CONTINUAR
-                        </button>
-                        <button type="button" onClick={() => setApagando(s.id)} aria-label="Apagar save" className="px-2 py-1 text-sm text-muted hover:text-accent-2">
-                          🗑
-                        </button>
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <>
+                <h2 className="font-pixel text-[10px] text-muted sm:text-xs">📜 SUAS HISTÓRIAS ({saves.length})</h2>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {saves.map((s) => (
+                    <CartaoSave
+                      key={s.id}
+                      s={s}
+                      numero={numeroDoSave(s, p.historia ?? [])}
+                      apagando={apagando === s.id}
+                      onContinuar={() => {
+                        desbloquear();
+                        tocar('start');
+                        setTela({ tipo: 'jogo', id: s.id });
+                      }}
+                      onPedirApagar={() => setApagando(s.id)}
+                      onApagar={() => {
+                        apagarSaveHistoria(s.id);
+                        setApagando(null);
+                      }}
+                      onNaoApagar={() => setApagando(null)}
+                    />
+                  ))}
+                </ul>
+              </>
             )}
-            <div className="flex flex-wrap justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  desbloquear();
-                  tocar('selecionar');
-                  setTela({ tipo: 'prologo' });
-                }}
-                className="pixel-box pixel-hover px-5 py-3 font-pixel text-xs text-[#f2c14e]"
-              >
-                ➕ NOVA HISTÓRIA
-              </button>
-            </div>
           </section>
         )}
 
@@ -320,4 +309,110 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   if (cena.desafio === 'escolher-plano') return <DesafioPlanos lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   return <DesafioLivros lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
+}
+
+/** Qual história deste gladiador é (pela ordem em que foi criada): "História nº 2 do Octavius". */
+function numeroDoSave(s: SaveHistoria, todos: SaveHistoria[]): number {
+  return todos.filter((x) => x.gladiador === s.gladiador && x.criadoEm <= s.criadoEm).length;
+}
+
+/**
+ * Um save na lista: a cena onde ele parou (com o gladiador), o capítulo, a barra de
+ * progresso, o número da história, o dia e a hora em que salvou e os atributos.
+ * Feito para dar para diferenciar dois saves do mesmo gladiador.
+ */
+function CartaoSave({
+  s,
+  numero,
+  apagando,
+  onContinuar,
+  onPedirApagar,
+  onApagar,
+  onNaoApagar,
+}: {
+  s: SaveHistoria;
+  numero: number;
+  apagando: boolean;
+  onContinuar: () => void;
+  onPedirApagar: () => void;
+  onApagar: () => void;
+  onNaoApagar: () => void;
+}) {
+  const pers = PERSONAGENS[s.gladiador];
+  const cor = `rgb(${pers.cor})`;
+  const caps = CAPITULOS[s.gladiador];
+  const completo = s.capitulo > 7;
+  const cap = caps[s.capitulo - 1];
+  const lugar: Lugar = completo ? 'biblioteca-salao' : lugarDaCena(cap?.cenas[s.cena]);
+  const quando = new Date(s.atualizadoEm);
+  const at = atributosDoSave(s);
+  return (
+    <li className="pixel-box flex flex-col overflow-hidden" style={{ boxShadow: `0 0 0 3px ${cor}` }}>
+      {/* Onde a história parou */}
+      <div className="relative aspect-[16/7] w-full overflow-hidden">
+        <CenarioHistoria lugar={lugar} />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.75)_0%,transparent_55%)]" aria-hidden />
+        <div className="absolute bottom-[8%] right-[8%] w-[16%]" aria-hidden>
+          <div className="respirar">
+            <GladiadorPixel ia={s.gladiador} espelhar />
+          </div>
+        </div>
+        <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
+          <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>
+            {pers.gladiador.toUpperCase()} · HISTÓRIA Nº {numero}
+          </span>
+          <span className="font-pixel text-[8px] text-[#f2c14e] [text-shadow:1px_1px_0_#000] sm:text-[9px]">"{NOME_DO_CAMINHO[s.gladiador].toUpperCase()}"</span>
+        </div>
+        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
+          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">
+            {completo ? '🏆 CAMINHO COMPLETO' : `CAPÍTULO ${s.capitulo}`}
+          </span>
+          {!completo && <span className="block text-xs text-white/85 [text-shadow:1px_1px_0_#000] sm:text-sm">{cap ? cap.titulo : 'em breve'}</span>}
+        </div>
+      </div>
+      {/* Progresso: um quadradinho por capítulo (o 7 é o final) */}
+      <div className="flex flex-col gap-2 p-3">
+        <div className="flex items-center gap-1" aria-label={`Progresso: capítulo ${Math.min(s.capitulo, 7)} de 7`}>
+          {Array.from({ length: 7 }, (_, k) => (
+            <span
+              key={k}
+              className="h-2.5 flex-1 border border-black"
+              style={{ background: k + 1 < s.capitulo ? cor : k + 1 === s.capitulo ? '#f2c14e' : '#2a2630' }}
+              title={k === 6 ? 'Final' : `Capítulo ${k + 1}`}
+            />
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted">
+          <span>
+            🕒 {quando.toLocaleDateString('pt-BR')} às {quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+          </span>
+          {s.capitulo >= 3 && (
+            <span>
+              ❤️ {at.vida} · 💪 {at.forca} · 🛡️ {at.defesa} · ⚙️ {s.pecas ?? 0}
+            </span>
+          )}
+        </div>
+        {apagando ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-accent-2">Apagar a História nº {numero} do {pers.gladiador}? Não dá para desfazer.</span>
+            <button type="button" onClick={onApagar} className="pixel-box px-2 py-1 font-pixel text-[8px] text-accent-2">
+              APAGAR
+            </button>
+            <button type="button" onClick={onNaoApagar} className="pixel-box px-2 py-1 font-pixel text-[8px]">
+              NÃO
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={onContinuar} className="pixel-box pixel-hover flex-1 py-2.5 font-pixel text-[10px] text-accent sm:text-xs" style={{ boxShadow: `0 0 0 2px ${cor}` }}>
+              ▶ CONTINUAR
+            </button>
+            <button type="button" onClick={onPedirApagar} aria-label="Apagar save" className="px-3 py-2 text-base text-muted hover:text-accent-2">
+              🗑
+            </button>
+          </div>
+        )}
+      </div>
+    </li>
+  );
 }

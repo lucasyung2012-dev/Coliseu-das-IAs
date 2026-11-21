@@ -1183,3 +1183,23 @@
   .dica-luta { display: none; }
   .botoes-luta button { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
 }
+
+/* ===== Tela inicial nova (21/11/2026) ===== */
+.titulo-jogo { text-shadow: 3px 3px 0 #5a2a12, 6px 6px 0 #1a0a06, 0 0 24px rgba(242, 193, 78, 0.45); letter-spacing: 0.04em; }
+.portal-coliseu { box-shadow: 0 0 0 2px #000, 0 0 28px -6px #c8962a; transition: box-shadow 200ms, translate 200ms; }
+.portal-coliseu:hover, .portal-coliseu:focus-visible { box-shadow: 0 0 0 2px #000, 0 0 40px 0 #f2c14e; translate: 0 -3px; }
+/* Os portões de pedra: fechados de cara, depois abrem para os lados. */
+.portao-esq { animation: portao-esq 0.6s cubic-bezier(0.6, 0, 0.3, 1) both; }
+.portao-dir { animation: portao-dir 0.6s cubic-bezier(0.6, 0, 0.3, 1) both; }
+@keyframes portao-esq { from { translate: -100% 0; } to { translate: 0 0; } }
+@keyframes portao-dir { from { translate: 100% 0; } to { translate: 0 0; } }
+.portao-titulo { animation: portao-titulo 0.75s ease both; }
+@keyframes portao-titulo { 0%, 50% { opacity: 0; scale: 1.4; } 100% { opacity: 1; scale: 1; } }
+/* Dentro do Coliseu: os portões (já fechados) se abrem. */
+.portao-esq.abre { animation: portao-abre-esq 0.9s cubic-bezier(0.6, 0, 0.3, 1) 0.15s both; }
+.portao-dir.abre { animation: portao-abre-dir 0.9s cubic-bezier(0.6, 0, 0.3, 1) 0.15s both; }
+@keyframes portao-abre-esq { from { translate: 0 0; } to { translate: -100% 0; } }
+@keyframes portao-abre-dir { from { translate: 0 0; } to { translate: 100% 0; } }
+.portao-titulo.abre { animation: portao-titulo-sai 0.5s ease both; }
+@keyframes portao-titulo-sai { from { opacity: 1; } to { opacity: 0; } }
+.menos-movimento .portao-esq, .menos-movimento .portao-dir, .menos-movimento .portao-titulo { animation: none; display: none; }

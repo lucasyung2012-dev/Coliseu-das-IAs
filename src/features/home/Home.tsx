@@ -1,44 +1,98 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { IAS } from '@/game/personagens';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear, tocar } from '@/ui/som';
+import { tocar as tocarHistoria } from '@/ui/somHistoria';
+import { CenarioHistoria } from '../coliseu/Cenarios';
+import { Portoes } from '../coliseu/Portoes';
 import { PORTAIS } from './areas';
 
+/**
+ * A tela inicial (refeita em 21/11/2026, o Lucas achou genérica): Roma Eterna à noite
+ * no alto, com o nome do jogo bem grande; depois o Coliseu (o modo História, primeiro)
+ * e o Imperium Arcade embaixo. Entrar no Coliseu abre os portões de pedra.
+ */
 export default function Home() {
-  const [arcade, ...outros] = PORTAIS;
+  const arcade = PORTAIS.find((p) => p.area === 'arcade');
+  const coliseu = PORTAIS.find((p) => p.area === 'coliseu');
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-8">
-      <header className="animate-fade-up text-center">
-        <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" width={96} height={96} className="mx-auto mb-4 h-20 w-20 [image-rendering:pixelated] sm:h-24 sm:w-24" style={{ boxShadow: "0 0 0 4px rgb(242 193 78), 0 0 30px -4px rgb(242 193 78)" }} />
-        <p className="text-xs uppercase tracking-[0.3em] text-muted">A arena das grandes ideias</p>
-        <h1 className="mt-3 font-display text-4xl text-accent sm:text-6xl">Coliseu das IAs</h1>
-        <p className="mt-4 text-muted">Claude, ChatGPT e Gemini entram na arena. Você decide quem convence.</p>
+    <main className="flex min-h-screen flex-col">
+      {/* O topo: Roma Eterna à noite e o nome do jogo */}
+      <header className="relative h-[46vh] min-h-[260px] w-full overflow-hidden sm:h-[52vh]">
+        <CenarioHistoria lugar="roma-noite" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(5,3,20,0.1)_0%,rgba(5,3,20,0.05)_50%,#0c0a10_100%)]" aria-hidden />
+        <div className="absolute inset-x-0 top-[10%] flex flex-col items-center px-3 text-center">
+          <p className="animate-fade-up font-pixel text-[9px] tracking-[0.35em] text-[#f2c14e] [text-shadow:2px_2px_0_#000] sm:text-xs">A ARENA DAS GRANDES IDEIAS</p>
+          <h1 className="titulo-jogo abertura-pedra mt-3 font-pixel text-[2.1rem] leading-[1.15] text-[#f2c14e] sm:text-7xl" aria-label="Coliseu das IAs">
+            COLISEU
+            <span className="block text-[1.35rem] text-white sm:text-5xl">DAS IAS</span>
+          </h1>
+          <p className="animate-fade-up mt-3 max-w-md text-sm text-white/85 [text-shadow:1px_1px_0_#000] sm:text-base" style={{ animationDelay: '300ms' }}>
+            Claude, ChatGPT e Gemini contra a Lei da Resposta Única.
+          </p>
+        </div>
       </header>
 
-      <nav aria-label="Áreas do jogo" className="grid gap-5 sm:grid-cols-2">
+      <nav aria-label="Áreas do jogo" className="mx-auto -mt-10 flex w-full max-w-4xl flex-col gap-6 px-4 pb-10 sm:px-8">
+        {coliseu && <PortalColiseu rota={coliseu.rota} frase={coliseu.frase} />}
         {arcade && <PortalArcade rota={arcade.rota} frase={arcade.frase} />}
-        {outros.map((p, i) => (
-          <Link
-            key={p.area}
-            to={p.rota}
-            data-area={p.area}
-            onMouseEnter={() => tocar('passarMouse')}
-            onClick={() => {
-              desbloquear();
-              tocar('clique');
-            }}
-            style={{ animationDelay: `${220 + i * 90}ms` }}
-            className="group animate-fade-up rounded-2xl border border-line bg-surface p-6 text-fg transition hover:-translate-y-1 hover:border-accent"
-          >
-            <h2 className="font-display text-xl text-accent">{p.titulo}</h2>
-            <p className="mt-2 text-sm text-muted">{p.frase}</p>
-            <span className="mt-4 inline-block text-sm text-accent transition group-hover:translate-x-1">Entrar →</span>
-          </Link>
-        ))}
       </nav>
 
-      <footer className="mt-auto text-center text-xs text-muted">Versão 0.1 · em construção</footer>
+      <footer className="mt-auto pb-6 text-center text-xs text-muted">Coliseu das IAs · feito pelo Lucas</footer>
     </main>
+  );
+}
+
+/**
+ * O portão do Coliseu (o modo História): o Coliseu sob as três estrelas, com o Olho do
+ * Censor no alto e os três condenados na frente. Ao tocar, os portões de pedra se abrem.
+ */
+function PortalColiseu({ rota, frase }: { rota: string; frase: string }) {
+  const navegar = useNavigate();
+  const [abrindo, setAbrindo] = useState(false);
+  return (
+    <>
+      <Link
+        to={rota}
+        data-area="coliseu"
+        aria-label={`Coliseu: modo História. ${frase}`}
+        onClick={(ev) => {
+          desbloquear();
+          tocarHistoria('portao');
+          if (prefereMenosMovimento()) return;
+          ev.preventDefault();
+          setAbrindo(true);
+          window.setTimeout(() => navegar(rota, { state: { portao: true } }), 750);
+        }}
+        className="portal-coliseu group animate-fade-up relative block overflow-hidden border-4 border-[#c8962a] bg-black text-fg"
+        style={{ animationDelay: '150ms' }}
+      >
+        <div className="relative aspect-[16/10] w-full sm:aspect-[16/7]">
+          <CenarioHistoria lugar="titulo" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_40%,rgba(0,0,0,0.85)_100%)]" aria-hidden />
+          {/* os três condenados, na frente do Coliseu */}
+          <div className="absolute bottom-[30%] left-1/2 flex -translate-x-1/2 items-end gap-3 sm:gap-8" aria-hidden>
+            {IAS.map((id, i) => (
+              <div key={id} className="w-10 transition-transform duration-300 group-hover:-translate-y-2 sm:w-16" style={{ transitionDelay: `${i * 70}ms` }}>
+                <div className="respirar" style={{ animationDelay: `${i * 250}ms` }}>
+                  <GladiadorPixel ia={id} espelhar={i === 2} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 p-3 text-center sm:p-5">
+            <p className="font-pixel text-[8px] tracking-[0.3em] text-[#ff5a5a] sm:text-[10px]">MODO HISTÓRIA</p>
+            <h2 className="font-pixel text-xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-4xl">O COLISEU</h2>
+            <p className="max-w-md text-xs text-white/80 sm:text-sm">{frase}</p>
+            <p className="piscar mt-1 border-2 border-[#f2c14e] bg-black/70 px-3 py-1 font-pixel text-[9px] text-[#f2c14e] sm:text-xs">▶ ENTRAR NO COLISEU</p>
+          </div>
+        </div>
+      </Link>
+      {/* Os portões de pedra fechando (dentro do Coliseu, eles abrem) */}
+      {abrindo && <Portoes modo="fecha" />}
+    </>
   );
 }
 
@@ -55,12 +109,12 @@ function PortalArcade({ rota, frase }: { rota: string; frase: string }) {
       }}
       data-area="arcade"
       aria-label={`Imperium Arcade. ${frase}`}
-      className="maquina-arcade group animate-fade-up relative block overflow-hidden bg-bg p-5 text-fg sm:col-span-2 sm:p-8"
-      style={{ animationDelay: '120ms' }}
+      className="maquina-arcade group animate-fade-up relative block overflow-hidden bg-bg p-5 text-fg sm:p-8"
+      style={{ animationDelay: '260ms' }}
     >
       <div className="tela-crt pointer-events-none absolute inset-0" aria-hidden />
       <div className="relative flex flex-col items-center gap-4 text-center">
-        <p className="font-pixel text-[9px] tracking-[0.3em] text-accent-2 sm:text-[10px]">★ 1 JOGADOR ★</p>
+        <p className="font-pixel text-[9px] tracking-[0.3em] text-accent-2 sm:text-[10px]">★ 1 OU 2 JOGADORES ★</p>
         <h2 className="neon letreiro font-pixel text-2xl leading-snug text-accent sm:text-4xl">Imperium Arcade</h2>
         <div className="flex items-end gap-4 sm:gap-10">
           {IAS.map((id, i) => (
