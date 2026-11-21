@@ -1,24 +1,33 @@
 /**
  * A luta do modo História (docs/HISTORIA.md, seção 3): um contra um, de lado,
- * com 3 botões (golpe, escudo, esquiva). Cada inimigo dá um SINAL antes de atacar;
- * o jogo é ler o sinal e reagir na hora certa:
+ * com 3 botões (golpe, escudo, esquiva). Cada inimigo dá um SINAL antes de atacar:
  * - sinal AMARELO (golpe de corpo): dá para defender com o ESCUDO (ou esquivar);
- * - sinal VERMELHO (fogo, investida): o escudo não segura direito, tem que ESQUIVAR.
+ * - sinal VERMELHO (fogo, investida): o escudo segura só metade, tem que ESQUIVAR;
+ * - FINTA: o sinal aparece e o golpe não vem (quem se defendeu à toa gastou fôlego);
+ * - COMBO: vários golpes seguidos, com sinal curto entre eles.
  * Depois de atacar, o inimigo fica ABERTO um tempo: é a hora de bater forte.
+ * Bater nele em guarda quase não entra; três vezes seguidas, ele CONTRA-ATACA.
+ * Golpe, escudo e esquiva gastam FÔLEGO, que volta sozinho quando você para.
  * Cada boa jogada enche o ÂNIMO; cheio, libera o golpe especial.
  * Funções puras: a tela chama `passoLuta` a cada tick e `agir` nos botões.
+ * (Dificuldade revista em 21/11/2026: o Lucas achou fácil demais.)
  */
 export const TICK_LUTA = 50;
 export const ANIMO_MAX = 100;
+export const FOLEGO_MAX = 100;
 const GOLPE_MS = 250;
-const RECARGA_GOLPE_MS = 320;
-const ESCUDO_MS = 550;
-const ESQUIVA_MS = 420;
-const RECARGA_ESQUIVA_MS = 800;
-const FERIDO_MS = 350;
-const ATORDOADO_MS = 1200;
+const RECARGA_GOLPE_MS = 380;
+const ESCUDO_MS = 450;
+const ESQUIVA_MS = 380;
+const RECARGA_ESQUIVA_MS = 850;
+const FERIDO_MS = 450;
+const ATORDOADO_MS = 1100;
+const CUSTO = { golpe: 10, escudo: 22, esquiva: 28 } as const;
+/** Fôlego que volta por segundo (só quando não está defendendo nem esquivando). */
+const FOLEGO_POR_SEGUNDO = 38;
+const GUARDAS_ATE_CONTRA = 3;
 
-export type TipoAtaque = 'corpo' | 'fogo' | 'investida';
+export type TipoAtaque = 'corpo' | 'fogo' | 'investida' | 'finta';
 
 export interface AtaqueInimigo {
   nome: string;
@@ -28,6 +37,9 @@ export interface AtaqueInimigo {
   dano: number;
   /** Quanto tempo o inimigo fica aberto (vulnerável) depois de atacar. */
   abertoMs: number;
+  /** Golpes seguidos (o primeiro com o sinal normal, os outros com `comboMs`). */
+  combo?: number;
+  comboMs?: number;
 }
 
 export interface FaseInimigo {
@@ -41,17 +53,19 @@ export interface DefInimigo {
   nome: string;
   vida: number;
   fases: FaseInimigo[];
-  /** A partir de que fração da vida entra a fase seguinte (ex.: [0.5] = metade). */
+  /** A partir de que fração da vida entra a fase seguinte (ex.: [0.66, 0.33]). */
   trocaDeFase?: number[];
   chefao?: boolean;
+  /** Dano do contra-ataque quando o jogador bate três vezes na guarda dele. */
+  contra?: number;
 }
 
 export type AcaoJogador = 'parado' | 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'ferido';
-export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado' | 'ferido';
+export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado';
 
 export interface EventoLuta {
   id: number;
-  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase';
+  tipo: 'acerto' | 'bloqueio' | 'esquiva' | 'dano' | 'especial' | 'guarda' | 'fase' | 'finta' | 'contra' | 'cansado';
   valor?: number;
   lado: 'jogador' | 'inimigo';
   ate: number;
@@ -60,8 +74,30 @@ export interface EventoLuta {
 export interface EstadoLuta {
   tempo: number;
   def: DefInimigo;
-  jogador: { vida: number; vidaMax: number; acao: AcaoJogador; acaoDesde: number; acaoAte: number; golpePronto: number; esquivaPronta: number };
-  inimigo: { vida: number; estado: EstadoInimigo; estadoAte: number; fase: number; ataque: number; proximoEm: number };
+  jogador: {
+    vida: number;
+    vidaMax: number;
+    folego: number;
+    acao: AcaoJogador;
+    acaoDesde: number;
+    acaoAte: number;
+    golpePronto: number;
+    esquivaPronta: number;
+  };
+  inimigo: {
+    vida: number;
+    estado: EstadoInimigo;
+    estadoAte: number;
+    fase: number;
+    ataque: number;
+    proximoEm: number;
+    /** Golpes que ainda faltam no combo atual. */
+    combo: number;
+    /** Quantas vezes seguidas o jogador bateu na guarda dele. */
+    guardas: number;
+    /** O próximo golpe é um contra-ataque (rápido, depois de apanhar na guarda). */
+    contra: boolean;
+  };
   animo: number;
   fim: null | 'vitoria' | 'derrota';
   eventos: EventoLuta[];
@@ -83,8 +119,8 @@ export function novaLuta(def: DefInimigo, atributos: AtributosLuta = ATRIBUTOS_I
   return {
     tempo: 0,
     def,
-    jogador: { vida: atributos.vida, vidaMax: atributos.vida, acao: 'parado', acaoDesde: 0, acaoAte: 0, golpePronto: 0, esquivaPronta: 0 },
-    inimigo: { vida: def.vida, estado: 'espera', estadoAte: 0, fase: 0, ataque: 0, proximoEm: 1500 },
+    jogador: { vida: atributos.vida, vidaMax: atributos.vida, folego: FOLEGO_MAX, acao: 'parado', acaoDesde: 0, acaoAte: 0, golpePronto: 0, esquivaPronta: 0 },
+    inimigo: { vida: def.vida, estado: 'espera', estadoAte: 0, fase: 0, ataque: 0, proximoEm: 1500, combo: 0, guardas: 0, contra: false },
     animo: 0,
     fim: null,
     eventos: [],
@@ -100,8 +136,11 @@ const evento = (s: EstadoLuta, tipo: EventoLuta['tipo'], lado: EventoLuta['lado'
 
 const ganharAnimo = (s: EstadoLuta, n: number, a: AtributosLuta): EstadoLuta => ({ ...s, animo: Math.min(ANIMO_MAX, s.animo + n * (1 + (a.carisma - 1) * 0.25)) });
 
+const CONTRA_ATAQUE = (dano: number): AtaqueInimigo => ({ nome: 'Contra-ataque', tipo: 'corpo', sinalMs: 420, dano, abertoMs: 700 });
+
 /** O ataque que o inimigo está preparando (ou o próximo). */
 export function ataqueAtual(s: EstadoLuta): AtaqueInimigo {
+  if (s.inimigo.contra) return CONTRA_ATAQUE(s.def.contra ?? 10);
   const fase = s.def.fases[s.inimigo.fase]!;
   return fase.ataques[s.inimigo.ataque % fase.ataques.length]!;
 }
@@ -110,31 +149,41 @@ export function ataqueAtual(s: EstadoLuta): AtaqueInimigo {
 export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'especial', a: AtributosLuta = ATRIBUTOS_INICIAIS): EstadoLuta {
   if (s.fim) return s;
   const j = s.jogador;
-  const ocupado = s.tempo < j.acaoAte && j.acao !== 'escudo';
   if (j.acao === 'ferido' && s.tempo < j.acaoAte) return s;
+  const ocupado = s.tempo < j.acaoAte && j.acao !== 'escudo';
   if (acao === 'especial') {
     if (s.animo < ANIMO_MAX) return s;
     let r: EstadoLuta = { ...s, animo: 0, jogador: { ...j, acao: 'especial', acaoDesde: s.tempo, acaoAte: s.tempo + 700 } };
-    r = bater(r, 30 * (1 + (a.forca - 1) * 0.2), true);
-    return evento({ ...r, inimigo: { ...r.inimigo, estado: 'atordoado', estadoAte: s.tempo + ATORDOADO_MS } }, 'especial', 'jogador');
+    r = bater(r, 28 * (1 + (a.forca - 1) * 0.2), true);
+    if (r.fim) return evento(r, 'especial', 'jogador');
+    return evento({ ...r, inimigo: { ...r.inimigo, estado: 'atordoado', estadoAte: s.tempo + ATORDOADO_MS, combo: 0, guardas: 0, contra: false } }, 'especial', 'jogador');
   }
+  if (acao !== 'golpe' && ocupado) return s;
+  if (acao === 'golpe' && (ocupado || s.tempo < j.golpePronto)) return s;
+  if (acao === 'esquiva' && s.tempo < j.esquivaPronta) return s;
+  if (j.folego < CUSTO[acao]) return evento(s, 'cansado', 'jogador');
+  const folego = j.folego - CUSTO[acao];
   if (acao === 'golpe') {
-    if (ocupado || s.tempo < j.golpePronto) return s;
-    const r: EstadoLuta = { ...s, jogador: { ...j, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, golpePronto: s.tempo + RECARGA_GOLPE_MS } };
+    const r: EstadoLuta = { ...s, jogador: { ...j, folego, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, golpePronto: s.tempo + RECARGA_GOLPE_MS } };
     const i = r.inimigo;
-    const base = 8 * (1 + (a.forca - 1) * 0.2);
+    const base = 7 * (1 + (a.forca - 1) * 0.2);
     // Aberto ou atordoado: golpe cheio (e mais Ânimo). Em guarda: ele defende quase tudo.
-    if (i.estado === 'aberto' || i.estado === 'atordoado') return ganharAnimo(bater(r, i.estado === 'atordoado' ? base * 1.5 : base), 6, a);
-    if (i.estado === 'sinal') return ganharAnimo(bater(r, base * 0.6), 3, a);
-    return evento(bater(r, 1), 'guarda', 'inimigo');
+    if (i.estado === 'aberto' || i.estado === 'atordoado') {
+      return ganharAnimo(bater({ ...r, inimigo: { ...i, guardas: 0 } }, i.estado === 'atordoado' ? base * 1.5 : base), 5, a);
+    }
+    if (i.estado === 'sinal') return ganharAnimo(bater(r, base * 0.5), 2, a);
+    // Na guarda: quase nada entra, e na terceira vez seguida ele contra-ataca.
+    const guardas = i.guardas + 1;
+    let g = evento(bater(r, 1), 'guarda', 'inimigo');
+    if (g.fim) return g;
+    if (guardas >= GUARDAS_ATE_CONTRA) {
+      g = evento({ ...g, inimigo: { ...g.inimigo, guardas: 0, contra: true, estado: 'sinal', estadoAte: g.tempo + CONTRA_ATAQUE(0).sinalMs } }, 'contra', 'inimigo');
+      return g;
+    }
+    return { ...g, inimigo: { ...g.inimigo, guardas } };
   }
-  if (acao === 'escudo') {
-    if (ocupado) return s;
-    return { ...s, jogador: { ...j, acao: 'escudo', acaoDesde: s.tempo, acaoAte: s.tempo + ESCUDO_MS } };
-  }
-  // esquiva
-  if (ocupado || s.tempo < j.esquivaPronta) return s;
-  return { ...s, jogador: { ...j, acao: 'esquiva', acaoDesde: s.tempo, acaoAte: s.tempo + ESQUIVA_MS, esquivaPronta: s.tempo + RECARGA_ESQUIVA_MS } };
+  if (acao === 'escudo') return { ...s, jogador: { ...j, folego, acao: 'escudo', acaoDesde: s.tempo, acaoAte: s.tempo + ESCUDO_MS } };
+  return { ...s, jogador: { ...j, folego, acao: 'esquiva', acaoDesde: s.tempo, acaoAte: s.tempo + ESQUIVA_MS, esquivaPronta: s.tempo + RECARGA_ESQUIVA_MS } };
 }
 
 function bater(s: EstadoLuta, dano: number, especial = false): EstadoLuta {
@@ -145,29 +194,44 @@ function bater(s: EstadoLuta, dano: number, especial = false): EstadoLuta {
   // Troca de fase do chefão (fica mais rápido e muda os golpes).
   const limite = s.def.trocaDeFase?.[r.inimigo.fase];
   if (limite !== undefined && vida / s.def.vida <= limite && r.inimigo.fase + 1 < s.def.fases.length) {
-    r = evento({ ...r, inimigo: { ...r.inimigo, fase: r.inimigo.fase + 1, ataque: 0 } }, 'fase', 'inimigo');
+    r = evento({ ...r, inimigo: { ...r.inimigo, fase: r.inimigo.fase + 1, ataque: 0, combo: 0 } }, 'fase', 'inimigo');
   }
   return r;
+}
+
+/** Terminou um golpe: se ainda tem combo, já prepara o próximo; senão, fica aberto. */
+function depoisDoGolpe(s: EstadoLuta, at: AtaqueInimigo, abertoMs: number): EstadoLuta {
+  const i = s.inimigo;
+  const restantes = i.combo > 0 ? i.combo - 1 : (at.combo ?? 1) - 1;
+  if (restantes > 0 && !i.contra) {
+    return { ...s, inimigo: { ...i, estado: 'sinal', estadoAte: s.tempo + (at.comboMs ?? 380), combo: restantes } };
+  }
+  return { ...s, inimigo: { ...i, estado: 'aberto', estadoAte: s.tempo + abertoMs, ataque: i.contra ? i.ataque : i.ataque + 1, combo: 0, contra: false } };
 }
 
 /** O golpe do inimigo chegou: o que o jogador estava fazendo decide o resultado. */
 function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta {
   const j = s.jogador;
+  // Finta: o golpe não vem. Ele volta para a guarda logo (quem se defendeu à toa gastou fôlego).
+  if (at.tipo === 'finta') {
+    const fase = s.def.fases[s.inimigo.fase]!;
+    const r = evento(s, 'finta', 'inimigo');
+    return { ...r, inimigo: { ...r.inimigo, estado: 'espera', ataque: r.inimigo.ataque + 1, proximoEm: s.tempo + fase.pausaMs[0] * 0.5 } };
+  }
   const fazendo = s.tempo < j.acaoAte ? j.acao : 'parado';
-  const aberto = (r: EstadoLuta, ms: number): EstadoLuta => ({ ...r, inimigo: { ...r.inimigo, estado: 'aberto', estadoAte: r.tempo + ms, ataque: r.inimigo.ataque + 1 } });
   if (fazendo === 'esquiva' || fazendo === 'especial') {
-    // Esquivou: escapa de tudo e o inimigo fica mais tempo aberto.
-    return aberto(ganharAnimo(evento(s, 'esquiva', 'jogador'), 15, a), at.abertoMs + 300);
+    // Esquivou: escapa de tudo; no último golpe do combo, ele fica mais tempo aberto.
+    return depoisDoGolpe(ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a), at, at.abertoMs + 250);
   }
   if (fazendo === 'escudo' && at.tipo === 'corpo') {
-    return aberto(ganharAnimo(evento(s, 'bloqueio', 'jogador'), 10, a), at.abertoMs);
+    return depoisDoGolpe(ganharAnimo(evento(s, 'bloqueio', 'jogador'), 8, a), at, at.abertoMs);
   }
   // Escudo contra fogo ou investida segura só metade.
   const fator = fazendo === 'escudo' ? 0.5 : 1;
   const dano = Math.round((at.dano * fator) / (1 + (a.defesa - 1) * 0.15));
   const vida = Math.max(0, j.vida - dano);
   let r: EstadoLuta = evento({ ...s, jogador: { ...j, vida, acao: 'ferido', acaoDesde: s.tempo, acaoAte: s.tempo + FERIDO_MS } }, 'dano', 'jogador', dano);
-  r = aberto(r, Math.round(at.abertoMs * 0.6));
+  r = depoisDoGolpe(r, at, Math.round(at.abertoMs * 0.5));
   return vida <= 0 ? { ...r, fim: 'derrota' } : r;
 }
 
@@ -175,13 +239,16 @@ export function passoLuta(s0: EstadoLuta, a: AtributosLuta = ATRIBUTOS_INICIAIS,
   if (s0.fim) return s0;
   const tempo = s0.tempo + TICK_LUTA;
   let s: EstadoLuta = { ...s0, tempo, eventos: s0.eventos.filter((e) => e.ate > tempo) };
-  if (s.jogador.acaoAte <= tempo && s.jogador.acao !== 'parado') s = { ...s, jogador: { ...s.jogador, acao: 'parado' } };
+  const j = s.jogador;
+  const defendendo = tempo < j.acaoAte && (j.acao === 'escudo' || j.acao === 'esquiva');
+  const folego = defendendo ? j.folego : Math.min(FOLEGO_MAX, j.folego + (FOLEGO_POR_SEGUNDO * TICK_LUTA) / 1000);
+  s = { ...s, jogador: { ...j, folego, acao: j.acaoAte <= tempo && j.acao !== 'parado' ? 'parado' : j.acao } };
   const i = s.inimigo;
   const fase = s.def.fases[i.fase]!;
   if (i.estado === 'sinal' && tempo >= i.estadoAte) return impacto(s, ataqueAtual(s), a);
-  if ((i.estado === 'aberto' || i.estado === 'atordoado' || i.estado === 'ferido') && tempo >= i.estadoAte) {
+  if ((i.estado === 'aberto' || i.estado === 'atordoado') && tempo >= i.estadoAte) {
     const [min, max] = fase.pausaMs;
-    return { ...s, inimigo: { ...i, estado: 'espera', proximoEm: tempo + min + aleatorio() * (max - min) } };
+    return { ...s, inimigo: { ...i, estado: 'espera', guardas: 0, proximoEm: tempo + min + aleatorio() * (max - min) } };
   }
   if (i.estado === 'espera' && tempo >= i.proximoEm) {
     return { ...s, inimigo: { ...i, estado: 'sinal', estadoAte: tempo + ataqueAtual(s).sinalMs } };

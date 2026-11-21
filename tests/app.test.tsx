@@ -46,7 +46,8 @@ describe('App', () => {
   it('Coliseu (modo História): prólogo, saves, escolher o Cassius e abrir o Capítulo 1', () => {
     localStorage.removeItem('coliseu.historia.prologo');
     abrir('/coliseu');
-    expect(screen.getByText(/Mil anos depois da fundação/)).toBeInTheDocument();
+    // O prólogo é uma cutscene (o texto aparece letra por letra); dá para pular.
+    expect(screen.getByRole('button', { name: /PULAR/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
     fireEvent.click(screen.getByRole('button', { name: /NOVA HISTÓRIA/ }));
     expect(screen.getByRole('button', { name: /OCTAVIUS/ })).toBeDisabled();

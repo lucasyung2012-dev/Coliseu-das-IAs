@@ -1098,3 +1098,29 @@
 .menos-movimento .flutuar, .menos-movimento .girar-devagar {
   animation: none;
 }
+
+/* ===== Modo História: cutscenes animadas, efeitos e lutas (21/11/2026) ===== */
+/* Usam a propriedade translate (e não transform) para somar com o -translate-x-1/2 do Tailwind. */
+.entra-esq { animation: entra-esq 900ms cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@keyframes entra-esq { from { translate: -260% 0; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+.entra-dir { animation: entra-dir 900ms cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+@keyframes entra-dir { from { translate: 260% 0; opacity: 0; } to { translate: 0 0; opacity: 1; } }
+.cair-de-cima { animation: cair-de-cima 700ms cubic-bezier(0.5, 0, 0.9, 0.6) both; }
+@keyframes cair-de-cima { from { translate: 0 -200%; } 80% { translate: 0 4%; } to { translate: 0 0; } }
+.brilho-heroi { animation: brilho-heroi 1.2s ease-in-out infinite alternate; }
+@keyframes brilho-heroi { from { filter: drop-shadow(0 0 2px #f2c14e); } to { filter: drop-shadow(0 0 12px #f2c14e) brightness(1.15); } }
+/* A IA sendo apagada: pisca, perde a cor e some de baixo para cima. */
+.apagar-ia { animation: apagar-ia 1.6s steps(8) both; }
+@keyframes apagar-ia { 0% { filter: none; clip-path: inset(0 0 0 0); } 30% { filter: brightness(3) saturate(0); } 60% { filter: brightness(2) saturate(0) blur(1px); clip-path: inset(0 0 40% 0); opacity: 0.7; } 100% { filter: brightness(4) saturate(0); clip-path: inset(0 0 100% 0); opacity: 0; } }
+.caido { rotate: 80deg; translate: 0 30%; filter: brightness(0.8); }
+.tremer-forte { animation: tremer-forte 0.45s steps(6) 2; }
+@keyframes tremer-forte { 0%, 100% { translate: 0 0; } 20% { translate: -2% 1%; } 40% { translate: 2% -1%; } 60% { translate: -1% -1%; } 80% { translate: 1% 1%; } }
+.cena-aproxima { animation: cena-aproxima 7s ease-out both; }
+@keyframes cena-aproxima { from { scale: 1; } to { scale: 1.12; } }
+.cena-respira { animation: cena-respira 9s ease-in-out infinite alternate; }
+@keyframes cena-respira { from { scale: 1; translate: 0 0; } to { scale: 1.04; translate: -1% 0; } }
+.brasa-subindo { animation: brasa-subindo 2.2s linear infinite both; }
+@keyframes brasa-subindo { from { translate: 0 0; opacity: 1; } to { translate: 12px -380px; opacity: 0; } }
+.fumaca-subindo { animation: fumaca-subindo 1.8s ease-out infinite both; }
+@keyframes fumaca-subindo { from { translate: 0 0; scale: 0.6; opacity: 0.8; } to { translate: -40% -260%; scale: 2.2; opacity: 0; } }
+.menos-movimento .entra-esq, .menos-movimento .entra-dir, .menos-movimento .cair-de-cima, .menos-movimento .brilho-heroi, .menos-movimento .apagar-ia, .menos-movimento .tremer-forte, .menos-movimento .cena-aproxima, .menos-movimento .cena-respira, .menos-movimento .brasa-subindo, .menos-movimento .fumaca-subindo { animation: none; }

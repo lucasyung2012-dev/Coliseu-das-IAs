@@ -8,7 +8,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import { desbloquear, tocar } from '@/ui/som';
 import { Cutscene, Explorar, Falas, Palco } from './Cenas';
 import { LutaHistoria } from './Luta';
-import { DesafioLivros } from './Desafio';
+import { DesafioCarroca, DesafioLivros } from './Desafio';
 
 /**
  * O Coliseu: o modo História (docs/HISTORIA.md). Prólogo, saves (quantos quiser,
@@ -262,5 +262,6 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
     );
   if (cena.tipo === 'explorar') return <Explorar lugar={cena.lugar} objetivo={cena.objetivo} pontos={cena.pontos} heroi={heroi} onFim={proxima} />;
   if (cena.tipo === 'luta') return <LutaHistoria lugar={cena.lugar} inimigo={cena.inimigo} heroi={heroi} antes={cena.antes} depois={cena.depois} onFim={proxima} />;
+  if (cena.desafio === 'segurar-carroca') return <DesafioCarroca lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
   return <DesafioLivros lugar={cena.lugar} antes={cena.antes} onFim={proxima} />;
 }

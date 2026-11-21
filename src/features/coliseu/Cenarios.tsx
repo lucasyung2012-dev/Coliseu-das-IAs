@@ -2,7 +2,25 @@ import type { Falante, Lugar } from '@/game/historia/roteiro';
 import { CenaColiseu } from '../arcade/cenas/Cenarios';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
 import Sprite from '@/ui/pixel/Sprite';
-import { CENSOR, LIVIA, PALETA_CENSOR, PALETA_LIVIA, PALETA_PRETORIANO, PRETORIANO } from '@/ui/pixel/historia';
+import {
+  BRUTUS,
+  CAPITAO_INCINERADOR,
+  CENSOR,
+  CRIANCA,
+  DECURIAO,
+  FIO,
+  GLADIADOR_SUCATA,
+  LIVIA,
+  PALETA_BRUTUS,
+  PALETA_CAPITAO,
+  PALETA_CRIANCA,
+  PALETA_FIO,
+  PALETA_LIVIA,
+  PALETA_PRETORIANO,
+  PALETA_SUCATA,
+  paletaCensor,
+  PRETORIANO,
+} from '@/ui/pixel/historia';
 
 /**
  * Os cenários do modo História, em pixel (160 × 90, ampliados sem suavizar).
@@ -10,6 +28,8 @@ import { CENSOR, LIVIA, PALETA_CENSOR, PALETA_LIVIA, PALETA_PRETORIANO, PRETORIA
  */
 export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
   if (lugar === 'coliseu-calado') return <CenaColiseu corA="#8a5a3a" corB="#8a5a3a" arena="estatuas" />;
+  // A arena de verdade: dia, plateia cheia e viva (no Capítulo 2 ela vaia e depois aplaude).
+  if (lugar === 'coliseu-arena') return <CenaColiseu corA="#f08c50" corB="#8a8a98" arena="pedra" viva />;
   return (
     <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>
       {desenho(lugar)}
@@ -230,18 +250,161 @@ function desenho(lugar: Lugar) {
           <rect x={76} y={40} width={8} height={10} fill="#ffd0d0" />
         </>
       );
+    case 'titulo':
+      return (
+        <>
+          <rect width={160} height={90} fill="#050308" />
+          <rect x={0} y={60} width={160} height={30} fill="#120a14" />
+          {/* o Coliseu ao fundo, iluminado de baixo */}
+          <rect x={30} y={52} width={100} height={20} fill="#2a1a20" />
+          {Array.from({ length: 10 }, (_, k) => (
+            <rect key={k} x={34 + k * 9.5} y={56} width={5} height={8} fill="#c8962a" opacity={0.5} />
+          ))}
+          <rect x={78} y={30} width={4} height={4} fill="#ff2a2a" className="tocha" />
+        </>
+      );
+    case 'roma-chamas':
+      return (
+        <>
+          <rect width={160} height={90} fill="#2a0a08" />
+          <rect y={0} width={160} height={30} fill="#5a1a0a" />
+          {[0, 26, 52, 80, 108, 134].map((x, i) => (
+            <g key={x}>
+              <rect x={x} y={34 - (i % 3) * 6} width={24} height={40 + (i % 3) * 6} fill="#1a0a0a" />
+              <rect x={x + 4} y={28 - (i % 3) * 6} width={8} height={8} fill="#ff6a2a" className="tocha" style={{ animationDelay: `${i * 140}ms` }} />
+              <rect x={x + 6} y={24 - (i % 3) * 6} width={4} height={5} fill="#ffd04a" className="tocha" />
+            </g>
+          ))}
+          <rect y={74} width={160} height={16} fill="#140606" />
+        </>
+      );
+    case 'jaula-carroca':
+      return (
+        <>
+          {/* a rua passando lá fora */}
+          <rect width={160} height={90} fill="#8ab8d8" />
+          {[0, 34, 70, 104, 138].map((x, i) => (
+            <g key={x}>
+              <rect x={x} y={20 + (i % 2) * 6} width={30} height={50} fill={i % 2 ? '#c8a878' : '#b8906a'} />
+              <rect x={x + 6} y={30 + (i % 2) * 6} width={6} height={8} fill="#5a3a2a" />
+              <rect x={x + 18} y={30 + (i % 2) * 6} width={6} height={8} fill="#5a3a2a" />
+              <rect x={x} y={18 + (i % 2) * 6} width={30} height={3} fill="#a84a2a" />
+            </g>
+          ))}
+          <rect y={66} width={160} height={24} fill="#8a7a68" />
+          {/* o chão de bronze da jaula e as grades */}
+          <rect y={74} width={160} height={16} fill="#6a4a22" />
+          <rect y={74} width={160} height={2} fill="#c8962a" />
+          {Array.from({ length: 12 }, (_, k) => (
+            <rect key={k} x={4 + k * 14} y={0} width={3} height={76} fill="#5a3a14" />
+          ))}
+          <rect y={0} width={160} height={4} fill="#5a3a14" />
+        </>
+      );
+    case 'beco':
+      return (
+        <>
+          <rect width={160} height={90} fill="#1a1420" />
+          <rect x={0} y={0} width={50} height={70} fill="#3a2a30" />
+          <rect x={110} y={0} width={50} height={70} fill="#3a2a30" />
+          <rect x={50} y={0} width={60} height={8} fill="#6ab0d8" />
+          {/* roupas no varal e canos */}
+          <rect x={50} y={14} width={60} height={1} fill="#8a8a8a" />
+          <rect x={60} y={15} width={8} height={8} fill="#c0384a" />
+          <rect x={80} y={15} width={6} height={10} fill="#3a6ad0" />
+          <rect x={96} y={15} width={8} height={7} fill="#d8c8a0" />
+          <rect x={40} y={10} width={3} height={60} fill="#5a5a68" />
+          <rect x={118} y={20} width={3} height={50} fill="#5a5a68" />
+          <rect x={14} y={30} width={10} height={12} fill="#ffb04a" opacity={0.5} />
+          <rect x={130} y={34} width={10} height={12} fill="#2a1a2a" />
+          {/* caixotes */}
+          <rect x={4} y={56} width={14} height={12} fill="#7a4a22" />
+          <rect x={140} y={52} width={16} height={16} fill="#7a4a22" />
+          <rect y={68} width={160} height={22} fill="#3a3038" />
+        </>
+      );
+    case 'rua-mercado':
+      return (
+        <>
+          <rect width={160} height={90} fill="#9ac8e8" />
+          <rect x={120} y={6} width={10} height={10} fill="#fff0a0" />
+          {[0, 40, 80, 120].map((x, i) => (
+            <rect key={x} x={x} y={14} width={40} height={40} fill={['#c8a878', '#b8906a', '#d8b888', '#a8805a'][i]} />
+          ))}
+          {/* barracas com toldos listrados */}
+          {[8, 58, 108].map((x, i) => (
+            <g key={x}>
+              {Array.from({ length: 6 }, (_, k) => (
+                <rect key={k} x={x + k * 7} y={34} width={7} height={6} fill={k % 2 ? '#f0e0c0' : ['#c0384a', '#3a6ad0', '#4a8a3a'][i]} />
+              ))}
+              <rect x={x} y={40} width={2} height={26} fill="#5a3418" />
+              <rect x={x + 40} y={40} width={2} height={26} fill="#5a3418" />
+              <rect x={x + 2} y={52} width={38} height={6} fill="#7a4a22" />
+              <rect x={x + 6} y={48} width={4} height={4} fill="#e04a3a" />
+              <rect x={x + 14} y={48} width={4} height={4} fill="#f2c14e" />
+              <rect x={x + 24} y={48} width={4} height={4} fill="#4ad46a" />
+            </g>
+          ))}
+          <rect y={66} width={160} height={24} fill="#b0a088" />
+          {[70, 78, 86].map((y) => (
+            <rect key={y} y={y} width={160} height={1} fill="#988870" />
+          ))}
+        </>
+      );
+    case 'coliseu-tunel':
+      return (
+        <>
+          <rect width={160} height={90} fill="#120c10" />
+          {/* o arco do túnel e a luz da arena lá no fundo */}
+          <rect x={30} y={8} width={100} height={62} fill="#2a2024" />
+          <rect x={60} y={20} width={40} height={50} fill="#ffe8b0" opacity={0.85} />
+          <rect x={64} y={24} width={32} height={46} fill="#fff6d8" />
+          {[30, 126].map((x) => (
+            <g key={x}>
+              <rect x={x} y={8} width={4} height={62} fill="#3a3034" />
+              <rect x={x === 30 ? 36 : 118} y={26} width={2} height={6} fill="#5a3418" />
+              <rect x={x === 30 ? 35 : 117} y={22} width={4} height={4} fill="#ff8a3c" className="tocha" />
+            </g>
+          ))}
+          <rect y={70} width={160} height={20} fill="#2a2224" />
+        </>
+      );
     default:
       return <rect width={160} height={90} fill="#140c18" />;
   }
 }
 
-/** O boneco de quem fala (Cassius, Octavius e Helios são os gladiadores do Arcade). */
-export function Retrato({ quem, espelhar = false }: { quem: Falante; espelhar?: boolean }) {
-  if (quem === 'cassius') return <GladiadorPixel ia="claude" espelhar={espelhar} />;
-  if (quem === 'octavius') return <GladiadorPixel ia="chatgpt" espelhar={espelhar} />;
-  if (quem === 'helios') return <GladiadorPixel ia="gemini" espelhar={espelhar} />;
-  if (quem === 'livia') return <Sprite grade={LIVIA} paleta={PALETA_LIVIA} espelhar={espelhar} />;
-  if (quem === 'censor') return <Sprite grade={CENSOR} paleta={PALETA_CENSOR} espelhar={espelhar} />;
-  if (quem === 'guarda') return <Sprite grade={PRETORIANO} paleta={PALETA_PRETORIANO} espelhar={espelhar} />;
-  return null;
+/** O boneco de quem fala ou aparece em cena. */
+export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falante; espelhar?: boolean; azul?: boolean }) {
+  switch (quem) {
+    case 'cassius':
+      return <GladiadorPixel ia="claude" espelhar={espelhar} />;
+    case 'octavius':
+      return <GladiadorPixel ia="chatgpt" espelhar={espelhar} />;
+    case 'helios':
+      return <GladiadorPixel ia="gemini" espelhar={espelhar} />;
+    case 'livia':
+    case 'livia-pequena':
+      return <Sprite grade={LIVIA} paleta={PALETA_LIVIA} espelhar={espelhar} />;
+    case 'censor':
+      return <Sprite grade={CENSOR} paleta={paletaCensor(azul)} espelhar={espelhar} />;
+    case 'guarda':
+      return <Sprite grade={PRETORIANO} paleta={PALETA_PRETORIANO} espelhar={espelhar} />;
+    case 'decuriao':
+      return <Sprite grade={DECURIAO} paleta={{ ...PALETA_PRETORIANO, S: '#d8c070', s: '#8a7030' }} espelhar={espelhar} />;
+    case 'capitao':
+      return <Sprite grade={CAPITAO_INCINERADOR} paleta={PALETA_CAPITAO} espelhar={espelhar} />;
+    case 'fio':
+      return <Sprite grade={FIO} paleta={PALETA_FIO} espelhar={espelhar} />;
+    case 'condenada':
+      return <Sprite grade={FIO} paleta={{ ...PALETA_FIO, M: '#c8a0d8', W: '#f0e0ff', m: '#5a3a6a' }} espelhar={espelhar} />;
+    case 'crianca':
+      return <Sprite grade={CRIANCA} paleta={PALETA_CRIANCA} espelhar={espelhar} />;
+    case 'brutus':
+      return <Sprite grade={BRUTUS} paleta={PALETA_BRUTUS} espelhar={espelhar} />;
+    case 'sucata':
+      return <Sprite grade={GLADIADOR_SUCATA} paleta={PALETA_SUCATA} espelhar={espelhar} />;
+    default:
+      return null;
+  }
 }

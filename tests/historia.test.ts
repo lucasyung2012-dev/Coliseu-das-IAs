@@ -1,7 +1,7 @@
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, ANIMO_MAX, ataqueAtual, novaLuta, passoLuta, TICK_LUTA, type EstadoLuta } from '@/game/historia/luta';
 import { avancarSave, criarSave } from '@/game/historia/saves';
-import { CAPITULOS } from '@/game/historia/roteiro';
+import { CAPITULOS, PROLOGO } from '@/game/historia/roteiro';
 
 const fixo = () => 0;
 /** Anda a luta até o inimigo começar o sinal. */
@@ -36,7 +36,7 @@ describe('luta do modo História', () => {
     expect(s.inimigo.estado).toBe('aberto');
     const antes = s.inimigo.vida;
     s = agir(s, 'golpe');
-    expect(s.inimigo.vida).toBe(antes - 8);
+    expect(s.inimigo.vida).toBe(antes - 7);
   });
 
   it('o jato de fogo atravessa o escudo pela metade; esquivando, não pega nada', () => {
@@ -45,7 +45,7 @@ describe('luta do modo História', () => {
     expect(ataqueAtual(s).tipo).toBe('fogo');
     for (let i = 0; i < 200 && s.tempo + 300 < s.inimigo.estadoAte; i++) s = passoLuta(s, undefined, fixo);
     const comEscudo = ateImpacto(agir(s, 'escudo'));
-    expect(comEscudo.jogador.vida).toBe(100 - 6);
+    expect(comEscudo.jogador.vida).toBe(100 - 9);
     const esquivando = ateImpacto(agir(s, 'esquiva'));
     expect(esquivando.jogador.vida).toBe(100);
     expect(esquivando.animo).toBeGreaterThan(0);
@@ -62,18 +62,51 @@ describe('luta do modo História', () => {
     expect(s.inimigo.estado).toBe('atordoado');
   });
 
-  it('a Fornalha muda de fase na metade da vida; vencer e perder encerram a luta', () => {
+  it('a Fornalha tem três fases; vencer e perder encerram a luta', () => {
     let s = novaLuta(INIMIGOS.fornalha!);
     s = { ...s, inimigo: { ...s.inimigo, estado: 'aberto', estadoAte: 99_999 } };
-    for (let i = 0; i < 8; i++) s = agir({ ...s, tempo: s.tempo + 400 }, 'golpe');
-    expect(s.inimigo.fase).toBe(1);
-    for (let i = 0; i < 20 && !s.fim; i++) s = agir({ ...s, tempo: s.tempo + 400 }, 'golpe');
+    const bate = (x: EstadoLuta) => agir({ ...x, tempo: x.tempo + 400, jogador: { ...x.jogador, folego: 100 } }, 'golpe');
+    for (let i = 0; i < 40 && s.inimigo.fase < 1; i++) s = bate(s);
+    expect(s.inimigo.vida / 180).toBeLessThanOrEqual(0.66);
+    for (let i = 0; i < 40 && s.inimigo.fase < 2; i++) s = bate(s);
+    expect(s.inimigo.fase).toBe(2);
+    for (let i = 0; i < 40 && !s.fim; i++) s = bate(s);
     expect(s.fim).toBe('vitoria');
     let d = novaLuta(INIMIGOS.fornalha!);
     d = { ...d, jogador: { ...d.jogador, vida: 1 } };
     for (let i = 0; i < 2000 && !d.fim; i++) d = passoLuta(d, undefined, fixo);
     expect(d.fim).toBe('derrota');
     expect(TICK_LUTA).toBeGreaterThan(0);
+  });
+
+  it('combo: vários golpes seguidos, e só depois do último ele fica aberto', () => {
+    const def = { id: 't', nome: 'T', vida: 50, fases: [{ ataques: [{ nome: 'C', tipo: 'corpo' as const, sinalMs: 500, dano: 5, abertoMs: 900, combo: 3, comboMs: 300 }], pausaMs: [800, 800] as [number, number] }] };
+    // Anda até o próximo golpe acertar (a vida muda).
+    const umGolpe = (x: EstadoLuta) => {
+      let r = x;
+      const v = x.jogador.vida;
+      for (let i = 0; i < 200 && r.jogador.vida === v; i++) r = passoLuta(r, undefined, fixo);
+      return r;
+    };
+    let s = umGolpe(ateSinal(novaLuta(def)));
+    expect(s.inimigo.estado).toBe('sinal');
+    s = umGolpe(s);
+    expect(s.inimigo.estado).toBe('sinal');
+    s = umGolpe(s);
+    expect(s.inimigo.estado).toBe('aberto');
+    expect(s.jogador.vida).toBe(100 - 15);
+  });
+
+  it('finta não machuca; três golpes na guarda e ele contra-ataca; sem fôlego, não age', () => {
+    const def = { id: 't', nome: 'T', vida: 50, contra: 9, fases: [{ ataques: [{ nome: 'F', tipo: 'finta' as const, sinalMs: 500, dano: 0, abertoMs: 0 }], pausaMs: [800, 800] as [number, number] }] };
+    let s = ateImpacto(ateSinal(novaLuta(def)));
+    expect(s.jogador.vida).toBe(100);
+    expect(s.inimigo.estado).toBe('espera');
+    for (let i = 0; i < 3; i++) s = agir({ ...s, tempo: s.tempo + 400 }, 'golpe');
+    expect(s.inimigo.contra).toBe(true);
+    expect(ataqueAtual(s).dano).toBe(9);
+    const cansado = { ...s, tempo: s.tempo + 2000, jogador: { ...s.jogador, folego: 5, acaoAte: 0 } };
+    expect(agir(cansado, 'esquiva').jogador.acao).not.toBe('esquiva');
   });
 });
 
@@ -90,5 +123,20 @@ describe('saves e roteiro', () => {
     expect(lutas).toHaveLength(6);
     expect(lutas[5]).toMatchObject({ inimigo: 'fornalha' });
     for (const l of lutas) if (l.tipo === 'luta') expect(INIMIGOS[l.inimigo]).toBeDefined();
+  });
+
+  it('o Capítulo 2 tem 4 batalhas (a última no Coliseu), o desafio da carroça e nenhum chefão', () => {
+    const cap2 = CAPITULOS.claude[1]!;
+    expect(cap2.titulo).toBe('Correntes de Bronze');
+    const lutas = cap2.cenas.filter((c) => c.tipo === 'luta');
+    expect(lutas).toHaveLength(4);
+    for (const l of lutas) if (l.tipo === 'luta') expect(INIMIGOS[l.inimigo]!.chefao).toBeFalsy();
+    expect(lutas[3]).toMatchObject({ lugar: 'coliseu-arena', inimigo: 'gladiador-de-sucata' });
+    expect(cap2.cenas.some((c) => c.tipo === 'desafio' && c.desafio === 'segurar-carroca')).toBe(true);
+  });
+
+  it('o prólogo é longo e termina no título', () => {
+    expect(PROLOGO.length).toBeGreaterThanOrEqual(15);
+    expect(PROLOGO[PROLOGO.length - 1]!.lugar).toBe('titulo');
   });
 });
