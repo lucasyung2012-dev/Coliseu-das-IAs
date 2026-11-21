@@ -4,7 +4,7 @@ import Emote from '@/ui/pixel/Emotes';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
-import { CenarioHistoria, Retrato } from './Cenarios';
+import { CenarioHistoria, escalaDe, Retrato } from './Cenarios';
 
 /**
  * A caixa de fala: retrato, nome e o texto aparecendo letra por letra, com a "voz"
@@ -200,7 +200,7 @@ function Ator({ p, falando, outrosFalam }: { p: EmCena; falando?: boolean; outro
       className="absolute bottom-[12%] z-10 -translate-x-1/2"
       style={{
         left: `${pos}%`,
-        width: `${(p.tamanho ?? 14) * 1.5}%`,
+        width: `${p.tamanho !== undefined ? p.tamanho * 1.5 : 21 * escalaDe(p.quem)}%`,
         transition: `left ${dur}ms linear, filter 300ms`,
         // Quem fala fica em destaque; os outros, um pouco no escuro.
         filter: outrosFalam ? 'brightness(0.62) saturate(0.8)' : falando ? 'drop-shadow(0 0 6px rgba(242,193,78,0.55))' : undefined,
@@ -405,7 +405,7 @@ export function Explorar({
             onClick={() => ir(p)}
             aria-label={p.rotulo}
             className="absolute z-10 flex -translate-x-1/2 flex-col items-center"
-            style={{ left: `${p.x}%`, bottom: p.personagem ? "22%" : k % 2 ? "40%" : "24%", width: p.personagem ? "15%" : "auto" }}
+            style={{ left: `${p.x}%`, bottom: p.personagem ? "22%" : k % 2 ? "40%" : "24%", width: p.personagem ? `${15 * escalaDe(p.personagem)}%` : "auto" }}
           >
             {p.personagem && (
               <span className="respirar block w-full" aria-hidden>

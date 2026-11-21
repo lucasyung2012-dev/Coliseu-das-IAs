@@ -1606,3 +1606,20 @@
 @media (prefers-reduced-motion: reduce) { .chama-vela, .luz-vela, .luz-lua, .saida-brilha { animation: none; } }
 /* A estrela já tocada no minigame das estrelas brilha. */
 .brilho-estrela { filter: drop-shadow(0 0 6px #ffe08a) brightness(1.2); }
+
+/* Celular (22/11/2026, o Lucas viu um azul ao tocar e o andar travando): sem o realce azul do
+   toque, sem selecionar texto, sem zoom de dois toques e sem menu de segurar nos controles. */
+[data-area='coliseu'] { -webkit-tap-highlight-color: transparent; }
+[data-area='coliseu'] button { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.mundo-aberto, .fase-aberta, .palco-historia, .botoes-luta, .controles-jogo { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.controles-jogo button, .botoes-luta button { touch-action: none; }
+[data-area='coliseu'] button:focus:not(:focus-visible) { outline: none; }
+
+/* Sinalização no mundo: a seta pulando em cima da saída, a seta da beirada e a estrelinha de quem falta ver. */
+.seta-pula { animation: seta-pula 0.7s ease-in-out infinite alternate; }
+@keyframes seta-pula { from { translate: -50% 0; } to { translate: -50% 25%; } }
+.seta-borda { animation: seta-borda 0.9s ease-in-out infinite alternate; filter: drop-shadow(0 0 4px #000); }
+@keyframes seta-borda { from { opacity: 0.6; } to { opacity: 1; } }
+.estrela-objetivo { animation: estrela-objetivo 1s ease-in-out infinite alternate; filter: drop-shadow(0 0 4px #ffd04a); }
+@keyframes estrela-objetivo { from { translate: 0 0; scale: 0.9; } to { translate: 0 -20%; scale: 1.1; } }
+@media (prefers-reduced-motion: reduce) { .seta-pula, .seta-borda, .estrela-objetivo { animation: none; } }

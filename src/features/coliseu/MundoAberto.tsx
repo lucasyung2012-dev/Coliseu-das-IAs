@@ -6,7 +6,7 @@ import Icone from '@/ui/pixel/Icones';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
 import { Falas } from './Cenas';
-import { Retrato } from './Cenarios';
+import { escalaDe, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
 
 /**
@@ -141,18 +141,39 @@ export function MundoAberto({
 
   const alvo = conversa ? null : pertoDe(mundo, s);
   const aberta = saidaAbertaMundo(mundo, s);
+  // Onde ficam as saídas, quem ainda precisa ser visto e a seta da beirada (saída fora da tela).
+  const saidas = mundo.mapa.flatMap((linha, y) => linha.split('').flatMap((t, x) => (t === 'P' ? [[x, y] as [number, number]] : [])));
+  const obrigatorios = [
+    ...mundo.coisas.filter((c) => c.obrigatorio && !s.vistos.includes(c.id)).map((c) => ({ id: c.id, x: c.x + 0.5, y: c.y - 0.1 })),
+    ...mundo.pessoas
+      .filter((p) => p.obrigatorio && !s.vistos.includes(p.id))
+      .map((p) => ({ id: p.id, x: s.pessoas[p.id]!.x, y: s.pessoas[p.id]!.y - 1.6 * escalaDe(p.quem) })),
+  ];
+  const setaSaida = (() => {
+    const saida = saidas[0];
+    if (!saida) return null;
+    const ex = saida[0] + 0.5 - camera[0];
+    const ey = saida[1] + 0.5 - camera[1];
+    if (ex >= 0 && ex <= VISIVEL && ey >= 0 && ey <= alturaVisivel) return null;
+    const dx = ex - VISIVEL / 2;
+    const dy = ey - alturaVisivel / 2;
+    const k = Math.min((0.43 * VISIVEL) / Math.max(0.001, Math.abs(dx)), (0.4 * alturaVisivel) / Math.max(0.001, Math.abs(dy)));
+    return { x: ((VISIVEL / 2 + dx * k) / VISIVEL) * 100, y: ((alturaVisivel / 2 + dy * k) / alturaVisivel) * 100, angulo: (Math.atan2(dy, dx) * 180) / Math.PI };
+  })();
   const emMundo = (x: number, y: number): CSSProperties => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
 
   const botao = (tecla: keyof EntradaMundo) => ({
     onPointerDown: (ev: PointerEvent) => {
       ev.preventDefault();
+      // Segura o dedo no botão: escorregar um pouco não solta (antes, andar travava no celular).
+      ev.currentTarget.setPointerCapture?.(ev.pointerId);
       desbloquear();
       entrada.current = { ...entrada.current, [tecla]: true };
     },
     onPointerUp: () => {
       entrada.current = { ...entrada.current, [tecla]: false };
     },
-    onPointerLeave: () => {
+    onPointerCancel: () => {
       entrada.current = { ...entrada.current, [tecla]: false };
     },
     onContextMenu: (ev: MouseEvent) => ev.preventDefault(),
@@ -182,7 +203,7 @@ export function MundoAberto({
           ]
             .sort((a, b) => a.y - b.y)
             .map((p) => (
-              <div key={p.id} className="absolute" style={{ ...emMundo(p.x, p.y), width: `${(1.35 / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 5 + Math.floor(p.y * 10) }}>
+              <div key={p.id} className="absolute" style={{ ...emMundo(p.x, p.y), width: `${((1.15 * escalaDe(p.quem)) / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 5 + Math.floor(p.y * 10) }}>
                 <span className="absolute bottom-[-4%] left-1/2 h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" />
                 <div className={p.andando ? 'andar' : 'respirar'}>
                   <Retrato quem={p.quem} espelhar={p.dir === 'esq'} />
@@ -200,15 +221,32 @@ export function MundoAberto({
               <Emote emocao="surpreso" />
             </span>
           )}
-          {/* A saída fechada mostra um cadeado desenhado; aberta, brilha */}
-          {mundo.mapa.flatMap((linha, y) =>
-            linha.split('').map((t, x) =>
-              t === 'P' ? (
-                <span key={`${x}-${y}`} className={`absolute block ${aberta ? 'saida-brilha' : ''}`} style={{ ...emMundo(x, y), width: `${(1 / W) * 100}%`, height: `${(1 / H) * 100}%` }} />
-              ) : null,
-            ),
-          )}
+          {/* A saída: placa "SAÍDA" em cima; aberta, brilha e uma seta fica pulando */}
+          {saidas.map(([x, y]) => (
+            <div key={`${x}-${y}`} className="absolute" style={{ ...emMundo(x, y), width: `${(1 / W) * 100}%`, height: `${(1 / H) * 100}%`, zIndex: 250 }}>
+              <span className={`absolute inset-0 block ${aberta ? 'saida-brilha' : ''}`} />
+              <span className={`placa-ponto absolute -top-[95%] left-1/2 -translate-x-1/2 whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px] ${aberta ? '' : 'vista'}`}>SAÍDA</span>
+              {aberta && (
+                <span className="seta-pula absolute -top-[190%] left-1/2 block w-[70%]">
+                  <Icone nome="baixo" className="w-full" />
+                </span>
+              )}
+            </div>
+          ))}
+          {/* Quem (ou o que) você PRECISA encontrar: uma estrelinha dourada até ver */}
+          {obrigatorios.map((o) => (
+            <span key={`ob-${o.id}`} className="estrela-objetivo absolute block" style={{ ...emMundo(o.x, o.y), width: `${(0.5 / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 260 }}>
+              <Icone nome="estrela" className="w-full" />
+            </span>
+          ))}
         </div>
+
+        {/* A saída aberta fora da tela: uma seta na beirada aponta o caminho */}
+        {aberta && setaSaida && (
+          <span className="seta-borda pointer-events-none absolute z-[450] block w-[7%]" style={{ left: `${setaSaida.x}%`, top: `${setaSaida.y}%`, transform: `translate(-50%, -50%) rotate(${setaSaida.angulo}deg)` }} aria-hidden>
+            <Icone nome="dir" className="w-full" />
+          </span>
+        )}
 
         {/* A luz: escuro em volta, como uma noite de verdade */}
         <div
@@ -225,7 +263,7 @@ export function MundoAberto({
       </div>
 
       {/* Os controles na tela: as setas à esquerda e a mão de interagir à direita */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="controles-jogo flex items-center justify-between gap-3">
         <div className="grid w-[46%] max-w-[13rem] grid-cols-3 grid-rows-3 gap-1">
           <span />
           <BotaoSeta nome="cima" props={botao('cima')} />
@@ -259,7 +297,7 @@ export function MundoAberto({
   );
 }
 
-type PropsSeta = { onPointerDown: (ev: PointerEvent) => void; onPointerUp: () => void; onPointerLeave: () => void; onContextMenu: (ev: MouseEvent) => void };
+type PropsSeta = { onPointerDown: (ev: PointerEvent) => void; onPointerUp: () => void; onPointerCancel: () => void; onContextMenu: (ev: MouseEvent) => void };
 
 function BotaoSeta({ nome, props }: { nome: string; props: PropsSeta }) {
   return (
@@ -446,13 +484,20 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
                   <rect x={X + cx - 1} y={Y + 8} width="5" height="1" fill="#c8bca0" />
                 </g>
               ))}
+            {/* A janela grande, com arco em cima, vidros em grade e o céu da noite com estrelas */}
             {c === 'J' && (
               <>
-                <rect x={X + 3} y={Y + 2} width="10" height="11" fill="#6a4c34" />
-                <rect x={X + 4} y={Y + 3} width="8" height="9" fill="#1c2c5c" />
-                <rect x={X + 7.5} y={Y + 3} width="1" height="9" fill="#6a4c34" />
-                <rect x={X + 4} y={Y + 7} width="8" height="1" fill="#6a4c34" />
-                <rect x={X + 5} y={Y + 4} width="2" height="2" fill="#f4ecd0" />
+                <rect x={X + 1} y={Y - 6} width="14" height="20" fill="#5a3c24" />
+                <rect x={X + 3} y={Y - 8} width="10" height="3" fill="#5a3c24" />
+                <rect x={X + 2} y={Y - 4} width="12" height="17" fill="#141c40" />
+                <rect x={X + 4} y={Y - 6} width="8" height="2" fill="#141c40" />
+                <rect x={X + 2} y={Y + 6} width="12" height="7" fill="#1c2a58" />
+                <rect x={X + 7.5} y={Y - 6} width="1" height="19" fill="#5a3c24" />
+                <rect x={X + 2} y={Y + 2} width="12" height="1" fill="#5a3c24" />
+                <rect x={X + 4} y={Y - 2} width="1" height="1" fill="#f4ecd0" />
+                <rect x={X + 10} y={Y + 4} width="1" height="1" fill="#f4ecd0" />
+                <rect x={X + 11} y={Y - 3} width="1" height="1" fill="#c8d8ff" />
+                <rect x={X} y={Y + 13} width="16" height="2" fill="#8a6a4a" />
               </>
             )}
           </g>,
@@ -463,39 +508,63 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
       }
       if (c === 'E') {
         const cores = ['#b83a2a', '#2a6aa0', '#d8a83a', '#3a8a4a', '#8a3aa0', '#e0782c'];
+        // A estante é ALTA (mais alta que o gladiador): sobe 12 pixels acima do ladrilho, com coroa e 5 prateleiras.
         pecas.push(
           <g key={`e${k}`}>
-            <rect x={X} y={Y} width={PX} height={PX} fill="#4a2a14" />
-            {[2, 7, 12].map((r, j) => (
+            <rect x={X} y={Y - 12} width={PX} height={PX + 12} fill="#4a2a14" />
+            <rect x={X} y={Y - 14} width={PX} height="3" fill="#6a4220" />
+            <rect x={X} y={Y - 14} width={PX} height="1" fill="#8a5a2a" />
+            {[-10, -4, 2, 8, 13].map((r, j) => (
               <g key={r}>
-                <rect x={X + 1} y={Y + r + 3} width="14" height="1" fill="#2a160a" />
-                {[0, 1, 2, 3, 4, 5].map((b) => (
-                  <rect key={b} x={X + 1.5 + b * 2.3} y={Y + r - 1 + ((b + x + j) % 2)} width="2" height={4 - ((b + x + j) % 2)} fill={cores[(b + x * 3 + y + j) % cores.length]} />
-                ))}
+                <rect x={X + 1} y={Y + r + 3} width="14" height="1.2" fill="#2a160a" />
+                {[0, 1, 2, 3, 4, 5].map((b) => {
+                  const alto = (b + x + j) % 3;
+                  return (
+                    <g key={b}>
+                      <rect x={X + 1.5 + b * 2.3} y={Y + r - 1 + alto} width="2" height={4 - alto} fill={cores[(b + x * 3 + y + j) % cores.length]} />
+                      <rect x={X + 1.5 + b * 2.3} y={Y + r + alto} width="2" height="0.6" fill="#f2c14e" opacity="0.6" />
+                    </g>
+                  );
+                })}
               </g>
             ))}
-            <rect x={X} y={Y} width="1" height={PX} fill="#6a4220" />
-            <rect x={X + PX - 1} y={Y} width="1" height={PX} fill="#2a160a" />
+            <rect x={X} y={Y - 12} width="1" height={PX + 12} fill="#6a4220" />
+            <rect x={X + PX - 1} y={Y - 12} width="1" height={PX + 12} fill="#2a160a" />
           </g>,
         );
       }
       if (c === 'T') {
         const esq = t(x - 1, y) !== 'T';
+        // A mesa de leitura (2 ladrilhos): tampo com borda, toalha vermelha no meio, um livro
+        // aberto, uma pilha de livros, um pergaminho, a vela acesa, as pernas e os banquinhos.
         pecas.push(
           <g key={`m${k}`}>
-            <rect x={X} y={Y + 3} width={PX} height="9" fill="#8a5a2a" />
-            <rect x={X} y={Y + 3} width={PX} height="2" fill="#a8743a" />
-            <rect x={X} y={Y + 12} width={PX} height="2" fill="#4a2a14" />
-            {esq ? <rect x={X + 1} y={Y + 12} width="2" height="4" fill="#4a2a14" /> : <rect x={X + 13} y={Y + 12} width="2" height="4" fill="#4a2a14" />}
+            {esq && <rect x={X + 4} y={Y - 2} width="5" height="4" fill="#6a4220" />}
+            {!esq && <rect x={X + 7} y={Y - 2} width="5" height="4" fill="#6a4220" />}
+            <rect x={X} y={Y + 2} width={PX} height="10" fill="#8a5a2a" />
+            <rect x={X} y={Y + 2} width={PX} height="1.5" fill="#b07c42" />
+            <rect x={X} y={Y + 11} width={PX} height="2" fill="#5a3418" />
+            <rect x={esq ? X + 6 : X} y={Y + 3} width="10" height="8" fill="#8a1c24" />
+            <rect x={esq ? X + 6 : X} y={Y + 3} width="10" height="1" fill="#d8a83a" />
+            <rect x={esq ? X + 6 : X} y={Y + 10} width="10" height="1" fill="#d8a83a" />
+            {esq ? <rect x={X + 1} y={Y + 13} width="2" height="4" fill="#4a2a14" /> : <rect x={X + 13} y={Y + 13} width="2" height="4" fill="#4a2a14" />}
             {esq ? (
               <>
-                <rect x={X + 5} y={Y + 5} width="7" height="5" fill="#f0e0b8" />
-                <rect x={X + 8} y={Y + 5} width="1" height="5" fill="#a08060" />
+                <rect x={X + 2} y={Y + 4} width="9" height="6" fill="#f0e0b8" />
+                <rect x={X + 6} y={Y + 4} width="1" height="6" fill="#a08060" />
+                <rect x={X + 3} y={Y + 5.5} width="2.5" height="0.6" fill="#6a5a4a" />
+                <rect x={X + 3} y={Y + 7} width="2.5" height="0.6" fill="#6a5a4a" />
+                <rect x={X + 7.5} y={Y + 5.5} width="2.5" height="0.6" fill="#6a5a4a" />
+                <rect x={X + 12} y={Y + 9} width="3" height="2" fill="#e8dcc0" />
               </>
             ) : (
               <>
-                <rect x={X + 4} y={Y + 4} width="2" height="4" fill="#f4ecd0" />
-                <rect x={X + 4.5} y={Y + 2} width="1" height="2" fill="#ffb03a" className="chama-vela" />
+                <rect x={X + 9} y={Y + 7} width="6" height="2" fill="#2a6aa0" />
+                <rect x={X + 9} y={Y + 5} width="6" height="2" fill="#3a8a4a" />
+                <rect x={X + 10} y={Y + 3} width="5" height="2" fill="#b83a2a" />
+                <rect x={X + 3} y={Y + 4} width="2" height="5" fill="#f4ecd0" />
+                <rect x={X + 2} y={Y + 9} width="4" height="1" fill="#c8a050" />
+                <rect x={X + 3.5} y={Y + 1.5} width="1" height="2.5" fill="#ffb03a" className="chama-vela" />
               </>
             )}
           </g>,
@@ -504,12 +573,20 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
       }
       if (c === 'p') {
         pecas.push(
+          // A coluna de mármore: sombra no chão, base em degraus, fuste com caneluras e capitel com volutas.
           <g key={`co${k}`}>
-            <rect x={X + 3} y={Y - 10} width="10" height="24" fill="#e8dcc0" />
-            <rect x={X + 3} y={Y - 10} width="3" height="24" fill="#f8f0dc" />
-            <rect x={X + 10} y={Y - 10} width="3" height="24" fill="#c8b890" />
-            <rect x={X + 1} y={Y - 12} width="14" height="3" fill="#d8c8a0" />
-            <rect x={X + 1} y={Y + 12} width="14" height="3" fill="#b8a880" />
+            <ellipse cx={X + 8} cy={Y + 15} rx="8" ry="2" fill="#000" opacity="0.3" />
+            <rect x={X} y={Y + 12} width="16" height="3" fill="#b8a880" />
+            <rect x={X + 1} y={Y + 10} width="14" height="2" fill="#d0c098" />
+            <rect x={X + 3} y={Y - 14} width="10" height="24" fill="#e8dcc0" />
+            <rect x={X + 3} y={Y - 14} width="2" height="24" fill="#f8f0dc" />
+            <rect x={X + 6} y={Y - 14} width="1" height="24" fill="#c8b890" />
+            <rect x={X + 9} y={Y - 14} width="1" height="24" fill="#c8b890" />
+            <rect x={X + 11} y={Y - 14} width="2" height="24" fill="#b8a880" />
+            <rect x={X + 1} y={Y - 16} width="14" height="2" fill="#d8c8a0" />
+            <rect x={X} y={Y - 19} width="16" height="3" fill="#e8dcc0" />
+            <rect x={X - 1} y={Y - 18} width="3" height="3" fill="#c8b890" />
+            <rect x={X + 14} y={Y - 18} width="3" height="3" fill="#c8b890" />
           </g>,
         );
       }
@@ -527,24 +604,50 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
       // A estátua do Guardião Zero ocupa 2 × 2: desenha uma vez, no canto de cima à esquerda.
       if (c === 'S' && t(x - 1, y) !== 'S' && t(x, y - 1) !== 'S') {
         pecas.push(
+          // A estátua de bronze (redesenhada: o Lucas achou a anterior feia). Pedestal de pedra em
+          // degraus com placa; o guardião em pé, de elmo com crista, escudo redondo e lança.
           <g key={`es${k}`}>
-            <rect x={X + 2} y={Y + 20} width="28" height="10" fill="#8a7a6a" />
-            <rect x={X + 2} y={Y + 20} width="28" height="2" fill="#a89a88" />
-            <rect x={X + 11} y={Y - 2} width="10" height="22" fill="#a8742a" />
-            <rect x={X + 12} y={Y - 8} width="8" height="7" fill="#b8843a" />
-            <rect x={X + 6} y={Y + 4} width="6" height="10" fill="#9a6a2a" />
-            <rect x={X + 20} y={Y + 2} width="7" height="12" fill="#8a5a22" />
-            <rect x={X + 14} y={Y - 5} width="1.5" height="1.5" fill="#3a2410" />
-            <rect x={X + 17} y={Y - 5} width="1.5" height="1.5" fill="#3a2410" />
+            <ellipse cx={X + 16} cy={Y + 31} rx="15" ry="3" fill="#000" opacity="0.3" />
+            <rect x={X + 1} y={Y + 24} width="30" height="7" fill="#7a6e60" />
+            <rect x={X + 1} y={Y + 24} width="30" height="1.5" fill="#a89a88" />
+            <rect x={X + 4} y={Y + 18} width="24" height="7" fill="#8a7e70" />
+            <rect x={X + 4} y={Y + 18} width="24" height="1.5" fill="#b8aa96" />
+            <rect x={X + 11} y={Y + 20} width="10" height="3" fill="#c8a050" />
+            {/* as pernas e a túnica */}
+            <rect x={X + 12} y={Y + 10} width="3" height="8" fill="#8a5a22" />
+            <rect x={X + 17} y={Y + 10} width="3" height="8" fill="#7a4a1a" />
+            <rect x={X + 11} y={Y + 4} width="10" height="7" fill="#a8742a" />
+            <rect x={X + 11} y={Y + 9} width="10" height="2" fill="#8a5a22" />
+            {/* o peito e os braços */}
+            <rect x={X + 11} y={Y - 4} width="10" height="9" fill="#b8843a" />
+            <rect x={X + 12} y={Y - 3} width="3" height="6" fill="#d8a85a" />
+            <rect x={X + 21} y={Y - 3} width="3" height="8" fill="#a8742a" />
+            {/* a cabeça com o elmo e a crista */}
+            <rect x={X + 12} y={Y - 11} width="8" height="7" fill="#b8843a" />
+            <rect x={X + 12} y={Y - 12} width="8" height="2" fill="#a8742a" />
+            <rect x={X + 13} y={Y - 16} width="6" height="4" fill="#c0283c" />
+            <rect x={X + 14} y={Y - 8} width="4" height="1" fill="#3a2410" />
+            {/* o escudo redondo, na mão esquerda */}
+            <circle cx={X + 9} cy={Y + 2} r="6" fill="#9a6a2a" />
+            <circle cx={X + 9} cy={Y + 2} r="4.5" fill="#b8843a" />
+            <circle cx={X + 9} cy={Y + 2} r="1.6" fill="#e0b870" />
+            {/* a lança, na mão direita */}
+            <rect x={X + 24} y={Y - 18} width="1.5" height="36" fill="#6a4220" />
+            <rect x={X + 23} y={Y - 22} width="3.5" height="5" fill="#c8c8d0" />
+            {/* o brilho do bronze */}
+            <rect x={X + 12} y={Y - 10} width="1" height="4" fill="#f0d090" opacity="0.7" />
           </g>,
         );
       }
       if (c === 'P') {
         pecas.push(
-          <g key={`es${k}`}>
+          // A escada que desce: degraus escurecendo e uma placa pendurada em cima.
+          <g key={`sa${k}`}>
             {[0, 1, 2, 3].map((d) => (
               <rect key={d} x={X + 1 + d} y={Y + 2 + d * 3.4} width={PX - 2 - d * 2} height="3" fill={['#3a2e26', '#2e241c', '#221a14', '#16100c'][d]} />
             ))}
+            <rect x={X} y={Y} width="1" height={PX} fill="#6a5a4a" />
+            <rect x={X + PX - 1} y={Y} width="1" height={PX} fill="#6a5a4a" />
           </g>,
         );
       }

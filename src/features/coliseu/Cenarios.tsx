@@ -414,6 +414,35 @@ function desenho(lugar: Lugar) {
   }
 }
 
+/**
+ * A PROPORÇÃO de cada personagem em relação ao gladiador (pedido do Lucas, 22/11/2026: "a
+ * Lívia está enorme"). Cada desenho tem uma largura em pixels; para todos terem o mesmo
+ * tamanho de pixel na tela, a largura de quem aparece é multiplicada por isto. Crianças e
+ * bichos ficam menores; o Brutus, o Censor e o Gladiador de Sucata, maiores.
+ */
+const ESCALA: Partial<Record<Falante, number>> = {
+  livia: 0.64,
+  'livia-pequena': 0.5,
+  crianca: 0.52,
+  nina: 0.52,
+  caio: 0.68,
+  fio: 0.6,
+  eco: 0.6,
+  gaivota: 0.45,
+  lumen: 0.5,
+  copista: 0.8,
+  feirante: 0.8,
+  zelador: 0.8,
+  sibila: 0.8,
+  marco: 0.95,
+  pistao: 0.95,
+  brutus: 1.15,
+  sucata: 1.3,
+  rufus: 1.3,
+  censor: 1.7,
+};
+export const escalaDe = (quem: Falante): number => ESCALA[quem] ?? 1;
+
 /** O boneco de quem fala ou aparece em cena. */
 export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falante; espelhar?: boolean; azul?: boolean }) {
   switch (quem) {

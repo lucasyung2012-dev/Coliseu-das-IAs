@@ -3,7 +3,7 @@ import { NOMES, type Falante } from '@/game/historia/roteiro';
 import { fogoAceso, larguraDa, novaFase, passoFase, saidaAberta, type Entrada, type Fase } from '@/game/historia/fase';
 import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
-import { CenarioHistoria, Retrato } from './Cenarios';
+import { CenarioHistoria, escalaDe, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
 import Icone from '@/ui/pixel/Icones';
 
@@ -123,6 +123,8 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
   const botao = (tecla: 'esq' | 'dir' | 'pular') => ({
     onPointerDown: (ev: PointerEvent) => {
       ev.preventDefault();
+      // Segura o dedo no botão: escorregar um pouco não solta (antes, andar travava no celular).
+      ev.currentTarget.setPointerCapture?.(ev.pointerId);
       desbloquear();
       if (tecla === 'pular') entrada.current.pular = true;
       else entrada.current[tecla] = true;
@@ -130,7 +132,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
     onPointerUp: () => {
       if (tecla !== 'pular') entrada.current[tecla] = false;
     },
-    onPointerLeave: () => {
+    onPointerCancel: () => {
       if (tecla !== 'pular') entrada.current[tecla] = false;
     },
     onContextMenu: (ev: MouseEvent) => ev.preventDefault(),
@@ -217,7 +219,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           {/* Coisas e pessoas que comentam */}
           {fase.comentarios.map((c) =>
             c.personagem ? (
-              <div key={c.id} className="absolute -translate-x-1/2" style={{ left: emX(c.x), bottom: `${CHAO}%`, width: emX(LARGURA_HEROI) }} aria-hidden>
+              <div key={c.id} className="absolute -translate-x-1/2" style={{ left: emX(c.x), bottom: `${CHAO}%`, width: emX(LARGURA_HEROI * escalaDe(c.personagem)) }} aria-hidden>
                 <div className="respirar">
                   <Retrato quem={c.personagem} espelhar={s.x < c.x} />
                 </div>
@@ -277,7 +279,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
       </div>
 
       {/* Os controles na tela (bons para o celular): segure ◀ ▶ e toque ⤒ para pular */}
-      <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-2">
+      <div className="controles-jogo grid grid-cols-[1fr_1fr_1.4fr] gap-2">
         <button type="button" {...botao('esq')} className="pixel-box botao-luta flex items-center justify-center py-3" style={{ '--cor': '#c8962a' } as CSSProperties} aria-label="Andar para a esquerda">
           <span className="medalhao"><Icone nome="esq" className="w-[62%]" /></span>
         </button>
