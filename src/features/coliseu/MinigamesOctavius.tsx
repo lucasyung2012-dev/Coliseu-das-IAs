@@ -314,7 +314,7 @@ export function MinigameCanhoes({ lugar, antes, depois, onFim }: Base) {
           FOGO!
         </Botao>
         <Botao disabled={fase !== 'jogo'} onApertar={abaixar} cor="#ff5a5a">
-          ⬇️ ABAIXAR
+          ABAIXAR
         </Botao>
       </div>
     </div>

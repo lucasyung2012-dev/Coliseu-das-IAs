@@ -401,7 +401,7 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
           PULAR
         </BotaoGrande>
         <BotaoGrande disabled={fase !== 'jogo'} onApertar={() => fazer('abaixa')} cor="#5ab0ff">
-          ⬇️ ABAIXAR
+          ABAIXAR
         </BotaoGrande>
       </div>
     </div>

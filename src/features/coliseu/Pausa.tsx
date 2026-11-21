@@ -36,7 +36,7 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
     <div className="menu-pausa fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-label="Menu de pausa">
       <div className="flex w-full max-w-sm flex-col gap-3 border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-4 shadow-[0_0_40px_rgba(242,193,78,0.25)]">
         <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">
-          {aba === 'menu' ? '⏸ PAUSA' : aba === 'controles' ? 'CONTROLES' : 'OPÇÕES'}
+          {aba === 'menu' ? 'PAUSA' : aba === 'controles' ? 'CONTROLES' : 'OPÇÕES'}
         </p>
 
         {aba === 'menu' && (
@@ -114,7 +114,7 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
                 }
               }}
             >
-              {auto ? '⏩ CENAS: AUTOMÁTICAS' : 'CENAS: TOCAR PARA SEGUIR'}
+              {auto ? 'CENAS: AUTOMÁTICAS' : 'CENAS: TOCAR PARA SEGUIR'}
             </button>
             <button type="button" className={`${item} text-center`} onClick={() => (clique(), setAba('menu'))}>
               ◀ VOLTAR

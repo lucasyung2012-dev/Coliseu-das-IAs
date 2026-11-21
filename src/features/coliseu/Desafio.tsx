@@ -28,10 +28,15 @@ interface Livro {
 
 const CORES = ['#a83a2a', '#3a6a9a', '#c8962a', '#4a8a3a', '#7a3a8a', '#d8c8a0'];
 
+/** As três prateleiras da estante (onde fica o pé dos livros, em % da altura da cena). */
+const PRATELEIRAS = [34, 56, 78];
+
 function novosLivros(): Livro[] {
+  // Os livros em pé nas prateleiras (refeito em 22/11/2026: antes eram retângulos soltos).
   const posicoes = [
-    [10, 22], [24, 34], [38, 20], [52, 36], [66, 22], [80, 34], [92, 20],
-    [16, 50], [30, 62], [44, 48], [58, 62], [72, 50], [86, 62], [50, 74],
+    [32, 34], [42, 34], [52, 34], [64, 34], [76, 34],
+    [34, 56], [46, 56], [58, 56], [70, 56], [84, 56],
+    [38, 78], [52, 78], [66, 78], [80, 78],
   ];
   return posicoes.map(([x, y], k) => ({
     x: x!,
@@ -136,18 +141,41 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
         <span className="text-[#f2c14e]">
           SALVOS {salvos.length}/{PRECISA} · QUEIMADOS {queimados.length}
         </span>
-        <span className={restante < 8000 ? 'piscar text-[#ff5a5a]' : 'text-white/80'}>⏱ {Math.max(0, Math.ceil(restante / 1000))} s</span>
+        <span className={restante < 8000 ? 'piscar text-[#ff5a5a]' : 'text-white/80'}>TEMPO {Math.max(0, Math.ceil(restante / 1000))} s</span>
       </div>
       <Palco lugar={lugar}>
-        {/* o fogo subindo de baixo */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-gradient-to-t from-[#ff6a2a] via-[#ff6a2a]/50 to-transparent opacity-80" style={{ height: `${10 + fogo * 75}%` }} />
-        {/* o alçapão */}
-        <div className="absolute bottom-[3%] left-[2%] z-10 border-2 border-[#c8962a] bg-black/80 px-1 font-pixel text-[7px] text-[#f2c14e] sm:text-[9px]">⬇ ALÇAPÃO</div>
+        {/* A estante grande: madeira escura, laterais e as três prateleiras */}
+        <div className="pointer-events-none absolute bottom-[14%] left-[26%] right-[3%] top-[6%] z-[1] border-x-[6px] border-t-[6px] border-[#3a2010] bg-[linear-gradient(90deg,#2a160a,#3a2214_20%,#2a160a)]" aria-hidden>
+          <div className="absolute inset-x-0 top-0 h-[4%] bg-[#6a4220]" />
+        </div>
+        {PRATELEIRAS.map((y) => (
+          <div key={y} className="pointer-events-none absolute left-[26%] right-[3%] z-[2] h-[3.5%] border-b-2 border-[#1a0a04] bg-[#8a5a2a]" style={{ top: `${y}%` }} aria-hidden>
+            <div className="h-[35%] bg-[#b07c42]" />
+          </div>
+        ))}
+        {/* O fogo subindo de baixo: o brilho e as chamas desenhadas */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-[#ff6a2a]/90 via-[#ff6a2a]/35 to-transparent" style={{ height: `${10 + fogo * 70}%` }} aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[4] flex items-end justify-around" style={{ height: `${8 + fogo * 22}%` }} aria-hidden>
+          {Array.from({ length: 12 }, (_, k) => (
+            <span key={k} className="chama-livros block h-full w-[9%]" style={{ animationDelay: `${(k * 113) % 400}ms` }} />
+          ))}
+        </div>
+        {/* O alçapão de madeira com a argola, e a Lívia esperando os livros */}
+        <div className="absolute bottom-[3%] left-[3%] z-[6] h-[16%] w-[18%] border-[3px] border-[#2a160a] bg-[repeating-linear-gradient(90deg,#6a4220_0_10px,#5a3418_10px_12px)]" aria-hidden>
+          <span className="absolute left-1/2 top-1/2 block h-[38%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-[#8a8a98]" />
+        </div>
+        <span className="placa-ponto absolute bottom-[21%] left-[12%] z-[6] -translate-x-1/2 whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px]">ALÇAPÃO</span>
+        <div className="pointer-events-none absolute bottom-[19%] left-[19%] z-[5] w-[8%] -translate-x-1/2" aria-hidden>
+          <div className={salvos.length > 0 ? 'emo-feliz' : 'respirar'} key={salvos.length}>
+            <Retrato quem="livia" />
+          </div>
+        </div>
         {livros.map((l, k) => {
           const salvo = salvos.includes(k);
           const queimado = queimados.includes(k);
           const comBrasa = brasas.includes(k);
           const quase = !salvo && !queimado && l.queimaEm - passou < 2500;
+          const meio = (toques[k] ?? 0) === 1;
           return (
             <button
               key={k}
@@ -157,20 +185,38 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
                 ev.preventDefault();
                 tocarLivro(k);
               }}
-              className={`absolute z-10 -translate-x-1/2 transition-all duration-500 ${l.pesado ? 'h-[17%] w-[8%]' : 'h-[13%] w-[5.5%]'} ${quase ? 'tremer' : ''}`}
-              style={salvo ? { left: '5%', top: '90%', opacity: 0, transform: 'scale(0.3)' } : { left: `${l.x}%`, top: `${l.y}%`, opacity: queimado ? 0.35 : 1 }}
+              className={`absolute z-[5] transition-all duration-500 ${l.pesado ? 'h-[19%] w-[7.5%]' : 'h-[16%] w-[5%]'}`}
+              style={
+                salvo
+                  ? { left: '12%', top: '84%', opacity: 0, transform: 'translate(-50%, -100%) scale(0.3) rotate(-30deg)' }
+                  : { left: `${l.x}%`, top: `${l.y}%`, transform: `translate(-50%, -100%)${meio ? ' rotate(-8deg)' : ''}` }
+              }
             >
+              {/* O livro desenhado: capa, lombada escura, faixas douradas e a etiqueta do título */}
               <span
-                className="block h-full w-full border-2 border-black"
+                className={`relative block h-full w-full border-2 border-black ${quase && !comBrasa ? 'tremer' : ''}`}
                 style={{
-                  background: queimado ? '#2a1a14' : l.cor,
+                  background: queimado ? 'linear-gradient(180deg,#2a1a14,#120a08)' : `linear-gradient(90deg, rgba(0,0,0,0.35) 0 18%, ${l.cor} 18% 100%)`,
                   boxShadow: comBrasa ? '0 0 12px 4px #ff6a2a' : quase ? '0 0 8px 2px #ffb04a' : undefined,
                 }}
-              />
-              {l.pesado && !queimado && <span className="absolute inset-x-0 top-1 text-center font-pixel text-[6px] text-black sm:text-[8px]">{(toques[k] ?? 0) === 1 ? '1/2' : '2×'}</span>}
-              {(comBrasa || queimado) && (
-                <span className="tocha absolute -top-3 left-1/2 -translate-x-1/2 text-base sm:text-xl" aria-hidden>
-                  <Icone nome="brasa" className="inline-block w-[1em] align-middle" />
+              >
+                {!queimado && (
+                  <>
+                    <span className="absolute inset-x-[18%] top-[10%] block h-[5%] bg-[#f2c14e]" />
+                    <span className="absolute inset-x-[18%] bottom-[10%] block h-[5%] bg-[#f2c14e]" />
+                    <span className="absolute left-[30%] right-[12%] top-[32%] block h-[22%] bg-[#f0e0b8]" />
+                    {l.pesado && <span className="absolute right-[-12%] top-[45%] block h-[14%] w-[30%] border border-black bg-[#c8c8d0]" />}
+                  </>
+                )}
+                {queimado && <span className="luz-vela absolute inset-x-[20%] top-[30%] block h-[20%] bg-[#ff6a1a]" />}
+              </span>
+              {l.pesado && !queimado && (
+                <span className="absolute -top-[22%] left-1/2 -translate-x-1/2 whitespace-nowrap border border-black bg-[#f2c14e] px-0.5 font-pixel text-[6px] text-black sm:text-[8px]">{meio ? '1/2' : '2X'}</span>
+              )}
+              {quase && !comBrasa && !queimado && <span className="fumaca-fase absolute -top-[35%] left-1/4 block h-1/2 w-1/2" />}
+              {comBrasa && (
+                <span className="absolute -top-[45%] left-1/2 block w-[90%] -translate-x-1/2" aria-hidden>
+                  <Icone nome="brasa" className="piscar w-full" />
                 </span>
               )}
             </button>
@@ -198,7 +244,7 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
           </div>
         )}
       </Palco>
-      <p className="text-center text-[10px] text-muted">Toque nos livros para levar ao alçapão. Tomos grandes: 2 toques. Livro tremendo vai queimar. Brasa : não toque (perde 3 s).</p>
+      <p className="text-center text-[10px] text-muted">Toque nos livros para levar ao alçapão. Tomos grandes: 2 toques. Livro tremendo vai queimar. Livro com brasa: não toque (perde 3 s).</p>
     </div>
   );
 }
