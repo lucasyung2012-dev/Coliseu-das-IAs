@@ -67,7 +67,7 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
   return (
     <Palco lugar={q.lugar}>
       {q.quem && q.quem !== 'narrador' && (
-        <div key={`${i}-${q.quem}`} className="surgir absolute bottom-[22%] left-1/2 w-[18%] -translate-x-1/2 sm:w-[14%]" aria-hidden>
+        <div key={`${i}-${q.quem}`} className="surgir absolute bottom-[40%] left-1/2 w-[16%] -translate-x-1/2 sm:bottom-[34%] sm:w-[13%]" aria-hidden>
           <Retrato quem={q.quem} />
         </div>
       )}
