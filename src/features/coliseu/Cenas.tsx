@@ -93,6 +93,7 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
   const elenco: EmCena[] = q.personagens ?? (q.quem && q.quem !== 'narrador' && q.quem !== 'arauto' && q.quem !== 'povo' ? [{ quem: q.quem, x: 50, entrada: 'surgir' }] : []);
   const titulo = q.lugar === 'titulo';
   return (
+    <div className="flex flex-col gap-2">
     <div className={`pixel-box relative aspect-[16/10] w-full overflow-hidden sm:aspect-[16/9] ${q.efeito === 'tremor' ? 'tremer-forte' : ''}`}>
       {/* o cenário, se aproximando devagar */}
       <div key={`bg-${i}`} className={`absolute inset-0 ${q.efeito === 'zoom' ? 'cena-aproxima' : 'cena-respira'}`}>
@@ -102,7 +103,7 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
       {elenco.map((p, k) => (
         <div
           key={`${i}-${k}-${p.quem}`}
-          className={`absolute bottom-[30%] z-10 -translate-x-1/2 sm:bottom-[26%] ${p.entrada ? ENTRADA[p.entrada] : ''}`}
+          className={`absolute bottom-[12%] z-10 -translate-x-1/2 ${p.entrada ? ENTRADA[p.entrada] : ''}`}
           style={{ left: `${p.x}%`, width: `${p.tamanho ?? 14}%` }}
           aria-hidden
         >
@@ -130,27 +131,25 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
       {/* faixas de cinema */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[15] h-[7%] bg-black" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[7%] bg-black" />
-      {titulo ? (
+      {titulo && (
         <button type="button" autoFocus onClick={seguir} className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 text-center">
           <span className="abertura-pedra font-pixel text-xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-4xl">COLISEU DAS IAS</span>
           <span className="surgir font-pixel text-[9px] text-white sm:text-sm">A LEI DA RESPOSTA ÚNICA</span>
           <span className="piscar mt-4 font-pixel text-[8px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
         </button>
-      ) : (
-        <button
-          type="button"
-          autoFocus
-          onClick={seguir}
-          className="absolute inset-x-2 bottom-[8%] z-20 border-2 border-[#c8962a] bg-black/85 p-2 text-center sm:inset-x-8 sm:p-3"
-        >
-          {q.quem && NOMES[q.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[q.quem].toUpperCase()}</span>}
-          <span className="block min-h-[2.6em] text-sm leading-snug text-white sm:text-lg">{mostrado}</span>
-          <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>TOQUE PARA SEGUIR ▶</span>
-        </button>
       )}
       <button type="button" onClick={onFim} className="absolute right-2 top-[8%] z-30 bg-black/60 px-2 py-1 font-pixel text-[8px] text-white/70 hover:text-white">
         PULAR ▶▶
       </button>
+    </div>
+    {/* O texto fica embaixo da cena, para não cobrir os personagens */}
+    {!titulo && (
+      <button type="button" autoFocus onClick={seguir} className="w-full border-2 border-[#c8962a] bg-black/85 p-3 text-center">
+        {q.quem && NOMES[q.quem] && <span className="block font-pixel text-[8px] text-[#f2c14e] sm:text-[10px]">{NOMES[q.quem].toUpperCase()}</span>}
+        <span className="block min-h-[3.9em] text-sm leading-snug text-white sm:min-h-[2.6em] sm:text-lg">{mostrado}</span>
+        <span className={`mt-1 block font-pixel text-[8px] text-[#f2c14e] ${completo ? 'piscar' : 'opacity-0'}`}>TOQUE PARA SEGUIR ▶</span>
+      </button>
+    )}
     </div>
   );
 }
