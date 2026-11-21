@@ -331,7 +331,7 @@ export function LutaHistoria({
   // O Octavius luta com PLANOS: coisas do cenário que aparecem e dá para usar.
   const comPlanos = heroi === 'octavius' && !treino;
   const [planosUsados, setPlanosUsados] = useState<number[]>([]);
-  // Luta no escuro (Helios): só se vê o sinal com a LUZ (dura 2,5 s e recarrega em 6 s).
+  // Luta no escuro (Helios): só se vê o sinal com a LUZ (dura 4 s e recarrega em 5,5 s).
   const escuro = !!def.escuro;
   const [luzAte, setLuzAte] = useState(0);
   const [luzPronta, setLuzPronta] = useState(0);
@@ -424,8 +424,8 @@ export function LutaHistoria({
     if (!podeLuz) return;
     desbloquear();
     tocar('reflexo');
-    setLuzAte(e.tempo + 2500);
-    setLuzPronta(e.tempo + 6000);
+    setLuzAte(e.tempo + 4000);
+    setLuzPronta(e.tempo + 5500);
   };
   const aliado = e.eventos.find((ev) => ev.tipo === 'aliado');
   const quemAjuda = aliado && def.aliados ? (def.aliados[aliado.valor ?? 0] as Falante | undefined) : undefined;
@@ -497,7 +497,7 @@ export function LutaHistoria({
             width: `${largura}%`,
             translate: apanhou && !vencido ? '8% 0' : undefined,
             transition: 'translate 90ms ease-out',
-            filter: apanhou ? 'brightness(2.6)' : !aceso ? 'brightness(0.35)' : sinal && !ilusao ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
+            filter: apanhou ? 'brightness(2.6)' : !aceso ? 'brightness(0.55) saturate(0.4)' : sinal && !ilusao ? `drop-shadow(0 0 10px ${corSinal})` : i.estado === 'atordoado' ? 'saturate(0.3)' : undefined,
           }}
         >
           <SpriteInimigo e={e} />
@@ -556,7 +556,7 @@ export function LutaHistoria({
         {escuro && fase === 'luta' && (
           <div
             className="pointer-events-none absolute inset-0 z-[15] transition-opacity duration-300"
-            style={{ background: 'radial-gradient(circle at 22% 70%, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.92) 32%)', opacity: aceso ? 0 : 1 }}
+            style={{ background: 'radial-gradient(circle at 22% 70%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.82) 30%), radial-gradient(ellipse at 70% 72%, rgba(40,30,60,0.35) 0%, transparent 22%)', opacity: aceso ? 0 : 1 }}
             aria-hidden
           />
         )}
@@ -713,7 +713,7 @@ export function LutaHistoria({
             ev.preventDefault();
             acenderRef.current();
           }}
-          className={`pixel-box select-none py-3 font-pixel text-[10px] text-[#ffe08a] disabled:opacity-40 sm:text-xs ${podeLuz && !aceso ? 'piscar' : ''}`}
+          className={`pixel-box select-none py-3 font-pixel text-[10px] text-[#ffe08a] disabled:opacity-40 sm:text-xs ${podeLuz && !aceso ? 'animate-pulse' : ''}`}
           style={{ boxShadow: '0 0 0 2px #ffe08a' }}
         >
           ☀️ LUZ {aceso ? '(ACESA)' : podeLuz ? '(PRONTA: toque para ver o sinal)' : '(recarregando...)'} · tecla U

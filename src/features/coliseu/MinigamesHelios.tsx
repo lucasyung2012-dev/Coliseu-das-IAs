@@ -477,7 +477,7 @@ export function MinigameMapaCeu({ lugar, antes, depois, onFim }: Base) {
         <div className="absolute inset-0 z-[5] bg-[#05061e]/80" aria-hidden />
         {fase === 'jogo' && (
           <>
-            <div className="pointer-events-none absolute z-10 opacity-30" style={{ left: `${caixa.x}%`, top: `${caixa.y}%`, width: `${caixa.w}%`, height: `${caixa.h}%` }}>
+            <div className="pointer-events-none absolute z-10 opacity-60" style={{ left: `${caixa.x}%`, top: `${caixa.y}%`, width: `${caixa.w}%`, height: `${caixa.h}%` }}>
               <Desenho pontos={pts} tam={0.01} cor="#9fe8ff" />
             </div>
             {falsas.map(([x, y], k) => (

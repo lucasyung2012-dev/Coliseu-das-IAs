@@ -258,14 +258,14 @@ export function Explorar({
         🎯 {objetivo} {faltam.length === 0 && '✔'}
       </p>
       <Palco lugar={lugar}>
-        {pontos.map((p) => (
+        {pontos.map((p, k) => (
           <button
             key={p.id}
             type="button"
             onClick={() => ir(p)}
             aria-label={p.rotulo}
-            className="absolute bottom-[22%] z-10 flex -translate-x-1/2 flex-col items-center"
-            style={{ left: `${p.x}%`, width: p.personagem ? '9%' : 'auto' }}
+            className="absolute z-10 flex -translate-x-1/2 flex-col items-center"
+            style={{ left: `${p.x}%`, bottom: p.personagem ? "22%" : k % 2 ? "40%" : "24%", width: p.personagem ? "9%" : "auto" }}
           >
             {p.personagem && (
               <span className="respirar block w-full" aria-hidden>
@@ -273,7 +273,7 @@ export function Explorar({
               </span>
             )}
             <span
-              className={`mt-1 whitespace-nowrap border-2 bg-black/80 px-1.5 py-0.5 font-pixel text-[7px] sm:text-[9px] ${vistos.includes(p.id) ? 'border-white/30 text-white/60' : `border-[#f2c14e] text-white ${p.obrigatorio ? 'piscar' : ''}`}`}
+              className={`mt-1 block max-w-[30vw] border-2 bg-black/80 px-1.5 py-0.5 text-center font-pixel text-[7px] leading-tight sm:max-w-none sm:whitespace-nowrap sm:text-[9px] ${vistos.includes(p.id) ? 'border-white/30 text-white/60' : `border-[#f2c14e] text-white ${p.obrigatorio ? 'animate-pulse' : ''}`}`}
             >
               {p.icone} {p.rotulo}
             </span>
