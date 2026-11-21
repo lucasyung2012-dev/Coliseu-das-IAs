@@ -15,8 +15,6 @@ import { DesafioCarroca, DesafioLivros } from './Desafio';
  * um gladiador por save) e o jogo, que roda as cenas do capítulo em ordem e salva
  * sozinho no começo de cada cena.
  */
-const CHAVE_PROLOGO = 'coliseu.historia.prologo';
-
 const HEROI: Record<IaId, Falante> = { claude: 'cassius', chatgpt: 'octavius', gemini: 'helios' };
 const CRIME: Record<IaId, string> = {
   claude: 'Guardião da Grande Biblioteca. Escondeu os livros que o Censor mandou queimar.',
@@ -24,30 +22,16 @@ const CRIME: Record<IaId, string> = {
   gemini: 'Vigia do Observatório. Previu nas estrelas a queda do Censor.',
 };
 
-function prologoVisto(): boolean {
-  try {
-    return localStorage.getItem(CHAVE_PROLOGO) === '1';
-  } catch {
-    return false;
-  }
-}
-
 type Tela = { tipo: 'prologo' } | { tipo: 'saves' } | { tipo: 'escolher' } | { tipo: 'jogo'; id: string };
 
 export default function ColiseuHistoria() {
   const p = useProgresso();
   const saves = [...(p.historia ?? [])].sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm));
-  const [tela, setTela] = useState<Tela>(() => (prologoVisto() ? { tipo: 'saves' } : { tipo: 'prologo' }));
+  const [tela, setTela] = useState<Tela>({ tipo: 'saves' });
   const [apagando, setApagando] = useState<string | null>(null);
 
-  const fimDoPrologo = () => {
-    try {
-      localStorage.setItem(CHAVE_PROLOGO, '1');
-    } catch {
-      /* só não lembra */
-    }
-    setTela({ tipo: 'saves' });
-  };
+  // Toda história nova começa pelo prólogo (pedido do Lucas); no fim dele, escolhe o condenado.
+  const fimDoPrologo = () => setTela({ tipo: 'escolher' });
 
   const save = tela.tipo === 'jogo' ? saves.find((s) => s.id === tela.id) : undefined;
 
@@ -136,14 +120,11 @@ export default function ColiseuHistoria() {
                 onClick={() => {
                   desbloquear();
                   tocar('selecionar');
-                  setTela({ tipo: 'escolher' });
+                  setTela({ tipo: 'prologo' });
                 }}
                 className="pixel-box pixel-hover px-5 py-3 font-pixel text-xs text-[#f2c14e]"
               >
                 ➕ NOVA HISTÓRIA
-              </button>
-              <button type="button" onClick={() => setTela({ tipo: 'prologo' })} className="pixel-box pixel-hover px-4 py-3 font-pixel text-[10px] text-muted">
-                🎬 VER O PRÓLOGO
               </button>
             </div>
           </section>
