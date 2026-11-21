@@ -76,7 +76,7 @@ export const INIMIGOS: Record<string, DefInimigo> = {
   fornalha: {
     id: 'fornalha',
     nome: 'A Fornalha',
-    vida: 180,
+    vida: 165,
     chefao: true,
     contra: 18,
     trocaDeFase: [0.66, 0.33],

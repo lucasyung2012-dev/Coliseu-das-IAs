@@ -241,6 +241,16 @@ function depoisDoGolpe(s: EstadoLuta, at: AtaqueInimigo, abertoMs: number): Esta
   return { ...s, inimigo: { ...i, estado: 'aberto', estadoAte: s.tempo + abertoMs, ataque: i.contra ? i.ataque : i.ataque + 1, combo: 0, contra: false } };
 }
 
+/**
+ * Esquivou ou bloqueou o primeiro golpe de um combo: continua protegido até o último,
+ * sem gastar fôlego de novo (antes, o segundo golpe de um combo de fogo vinha antes da
+ * esquiva recarregar e não dava para escapar: o Lucas não conseguia vencer a Fornalha).
+ */
+function protegerCombo(s: EstadoLuta, acao: 'esquiva' | 'escudo'): EstadoLuta {
+  if (s.inimigo.estado !== 'sinal' || s.inimigo.combo <= 0) return s;
+  return { ...s, jogador: { ...s.jogador, acao, acaoAte: s.inimigo.estadoAte + 80 } };
+}
+
 /** O golpe do inimigo chegou: o que o jogador estava fazendo decide o resultado. */
 function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta {
   const j = s.jogador;
@@ -253,11 +263,11 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
   const fazendo = s.tempo < j.acaoAte ? j.acao : 'parado';
   if (fazendo === 'esquiva' || fazendo === 'especial') {
     // Esquivou: escapa de tudo; no último golpe do combo, ele fica mais tempo aberto.
-    return depoisDoGolpe(ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a), at, at.abertoMs + 250);
+    return protegerCombo(depoisDoGolpe(ganharAnimo(evento(s, 'esquiva', 'jogador'), 12, a), at, at.abertoMs + 250), 'esquiva');
   }
   if (fazendo === 'escudo' && at.tipo === 'corpo') {
     const bloqueou = ganharAnimo(evento(s, 'bloqueio', 'jogador'), 8, a);
-    return depoisDoGolpe({ ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } }, at, at.abertoMs);
+    return protegerCombo(depoisDoGolpe({ ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } }, at, at.abertoMs), 'escudo');
   }
   // Escudo contra fogo ou investida segura só metade.
   const fator = fazendo === 'escudo' ? 0.5 : 1;
