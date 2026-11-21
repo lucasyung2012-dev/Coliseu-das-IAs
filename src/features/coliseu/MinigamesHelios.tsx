@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -16,12 +17,12 @@ import { Retrato } from './Cenarios';
 
 type Fase = 'antes' | 'jogo' | 'ok' | 'perdeu';
 
-function Vidas({ n, max, icone }: { n: number; max: number; icone: string }) {
+function Vidas({ n, max }: { n: number; max: number; icone?: string }) {
   return (
     <span className="font-pixel text-[10px] sm:text-xs" aria-label={`${n} chances`}>
       {Array.from({ length: max }, (_, k) => (
         <span key={k} className={k < n ? '' : 'opacity-25'}>
-          {icone}
+          <Icone nome="coracao" className="inline-block w-[1.1em] align-middle" />
         </span>
       ))}
     </span>
@@ -142,8 +143,8 @@ export function MinigameTelescopio({ lugar, antes, depois, onFim }: Base) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Cabecalho vidas={<Vidas n={lentes} max={3} icone="🔭" />}>
-        🔭 O TELESCÓPIO: ache no céu a constelação do mapa. {Math.min(rodada + 1, RODADAS_TELESCOPIO)}/{RODADAS_TELESCOPIO}
+      <Cabecalho vidas={<Vidas n={lentes} max={3} icone="" />}>
+        O TELESCÓPIO: ache no céu a constelação do mapa. {Math.min(rodada + 1, RODADAS_TELESCOPIO)}/{RODADAS_TELESCOPIO}
       </Cabecalho>
       <Palco lugar={lugar}>
         <div className="absolute inset-0 z-[5] bg-[#05061e]/80" aria-hidden />
@@ -244,8 +245,8 @@ export function MinigameSaltos({ lugar, antes, depois, onFim }: Base) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Cabecalho vidas={<Vidas n={vidas} max={3} icone="🌙" />}>
-        🏠 SALTOS: segure para carregar e solte com a força na faixa verde. Vão {Math.min(vao + 1, VAOS)}/{VAOS}
+      <Cabecalho vidas={<Vidas n={vidas} max={3} icone="" />}>
+        SALTOS: segure para carregar e solte com a força na faixa verde. Vão {Math.min(vao + 1, VAOS)}/{VAOS}
       </Cabecalho>
       <Palco lugar={lugar}>
         <div
@@ -294,7 +295,7 @@ export function MinigameSaltos({ lugar, antes, depois, onFim }: Base) {
         className="pixel-box select-none py-4 font-pixel text-xs text-[#ffe08a] disabled:opacity-40"
         style={{ boxShadow: '0 0 0 2px #ffe08a' }}
       >
-        🌙 SEGURE E SOLTE PARA PULAR
+        SEGURE E SOLTE PARA PULAR
       </button>
     </div>
   );
@@ -383,13 +384,13 @@ export function MinigameEspelhos({ lugar, antes, depois, onFim, nivel = 1, titul
   return (
     <div className="flex flex-col gap-2">
       <Cabecalho>
-        ☀️ {titulo}: toque nos espelhos para girar. Leve a luz até o alvo 🎯. Espelho {qual + 1}/{lista.length}
+        {titulo}: toque nos espelhos para girar. Leve a luz até o alvo. Espelho {qual + 1}/{lista.length}
       </Cabecalho>
       <Palco lugar={lugar}>
         {fase === 'jogo' && (
           <div className="absolute inset-[8%] z-10 flex items-center gap-1">
             <span className="text-2xl sm:text-4xl" style={{ marginTop: `${(n.entrada - (n.h - 1) / 2) * 22}%` }} aria-hidden>
-              ☀️
+              <Icone nome="sol" className="inline-block w-[1em] align-middle" />
             </span>
             <div className="grid flex-1 gap-1" style={{ gridTemplateColumns: `repeat(${n.w}, minmax(0, 1fr))` }}>
               {grade.flatMap((linha, y) =>
@@ -407,7 +408,7 @@ export function MinigameEspelhos({ lugar, antes, depois, onFim, nivel = 1, titul
                       style={{ background: acesa ? (c === 'A' ? '#ffe08a' : 'rgba(255,224,138,0.45)') : 'rgba(0,0,0,0.55)', color: '#c8962a' }}
                       aria-label={c === '/' || c === '\\' ? 'Espelho' : c === 'A' ? 'Alvo' : c === 'X' ? 'Pedra' : 'Vazio'}
                     >
-                      {c === '/' ? '╱' : c === '\\' ? '╲' : c === 'A' ? '🎯' : c === 'X' ? '🧱' : ''}
+                      {c === '/' ? '╱' : c === '\\' ? '╲' : c === 'A' ? <Icone nome="alvo" className="inline-block w-[80%] align-middle" /> : c === 'X' ? <Icone nome="muro" className="inline-block w-[90%] align-middle" /> : ''}
                     </button>
                   );
                 }),
@@ -418,7 +419,7 @@ export function MinigameEspelhos({ lugar, antes, depois, onFim, nivel = 1, titul
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
-      <p className="text-center text-xs text-muted">A luz anda reto até bater num espelho, e o espelho desvia para cima ou para baixo. Pedra 🧱 bloqueia.</p>
+      <p className="text-center text-xs text-muted">A luz anda reto até bater num espelho, e o espelho desvia para cima ou para baixo. Pedra bloqueia.</p>
     </div>
   );
 }
@@ -470,8 +471,8 @@ export function MinigameMapaCeu({ lugar, antes, depois, onFim }: Base) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Cabecalho vidas={<Vidas n={vidas} max={3} icone="⭐" />}>
-        🗺️ O MAPA DO CÉU: toque só nas estrelas que formam {CONSTELACOES[c]!.nome} (o desenho apagado). {Math.min(rodada + 1, RODADAS_MAPA)}/{RODADAS_MAPA}
+      <Cabecalho vidas={<Vidas n={vidas} max={3} icone="" />}>
+        O MAPA DO CÉU: toque só nas estrelas que formam {CONSTELACOES[c]!.nome} (o desenho apagado). {Math.min(rodada + 1, RODADAS_MAPA)}/{RODADAS_MAPA}
       </Cabecalho>
       <Palco lugar={lugar}>
         <div className="absolute inset-0 z-[5] bg-[#05061e]/80" aria-hidden />
@@ -597,8 +598,8 @@ export function MinigameEnigmas({ lugar, antes, depois, onFim }: Base) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Cabecalho vidas={<Vidas n={vidas} max={3} icone="🕯️" />}>
-        🏺 OS ENIGMAS DA SIBILA: responda antes da vela apagar. Enigma {Math.min(n + 1, ENIGMAS.length)}/{ENIGMAS.length}
+      <Cabecalho vidas={<Vidas n={vidas} max={3} icone="" />}>
+        OS ENIGMAS DA SIBILA: responda antes da vela apagar. Enigma {Math.min(n + 1, ENIGMAS.length)}/{ENIGMAS.length}
       </Cabecalho>
       <Palco lugar={lugar} className={erro ? 'tremer' : ''}>
         <div className="absolute bottom-[12%] left-[18%] z-10 w-[12%] -translate-x-1/2" aria-hidden>

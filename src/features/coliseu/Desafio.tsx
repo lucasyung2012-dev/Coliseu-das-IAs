@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -133,7 +134,7 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2 font-pixel text-[9px] sm:text-[10px]">
         <span className="text-[#f2c14e]">
-          📚 SALVOS {salvos.length}/{PRECISA} · 🔥 QUEIMADOS {queimados.length}
+          SALVOS {salvos.length}/{PRECISA} · QUEIMADOS {queimados.length}
         </span>
         <span className={restante < 8000 ? 'piscar text-[#ff5a5a]' : 'text-white/80'}>⏱ {Math.max(0, Math.ceil(restante / 1000))} s</span>
       </div>
@@ -169,7 +170,7 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
               {l.pesado && !queimado && <span className="absolute inset-x-0 top-1 text-center font-pixel text-[6px] text-black sm:text-[8px]">{(toques[k] ?? 0) === 1 ? '1/2' : '2×'}</span>}
               {(comBrasa || queimado) && (
                 <span className="tocha absolute -top-3 left-1/2 -translate-x-1/2 text-base sm:text-xl" aria-hidden>
-                  🔥
+                  <Icone nome="brasa" className="inline-block w-[1em] align-middle" />
                 </span>
               )}
             </button>
@@ -197,7 +198,7 @@ export function DesafioLivros({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
           </div>
         )}
       </Palco>
-      <p className="text-center text-[10px] text-muted">Toque nos livros para levar ao alçapão. Tomos grandes: 2 toques. Livro tremendo vai queimar. Brasa 🔥: não toque (perde 3 s).</p>
+      <p className="text-center text-[10px] text-muted">Toque nos livros para levar ao alçapão. Tomos grandes: 2 toques. Livro tremendo vai queimar. Brasa : não toque (perde 3 s).</p>
     </div>
   );
 }
@@ -262,8 +263,8 @@ export function DesafioCarroca({ lugar, antes, onFim }: { lugar: Lugar; antes?: 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between font-pixel text-[9px] sm:text-[10px]">
-        <span className="text-[#f2c14e]">💪 TRANCOS {acertos}/3</span>
-        <span className="text-[#ff5a5a]">{'❤'.repeat(3 - erros)}</span>
+        <span className="text-[#f2c14e]">TRANCOS {acertos}/3</span>
+        <span className="text-[#ff5a5a]">{Array.from({ length: 3 - erros }, (_, k) => <Icone key={k} nome="coracao" className="inline-block w-[1.1em]" />)}</span>
       </div>
       <Palco lugar={lugar}>
         {/* o menino parado no caminho */}

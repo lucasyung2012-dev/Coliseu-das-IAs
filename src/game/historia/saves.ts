@@ -39,10 +39,10 @@ export type Equipamento = 'bracelete' | 'escudo-reforcado' | 'capa-vermelha' | '
 
 /** O que o ferreiro faz com as peças de máquina (só vale na História). */
 export const FERREIRO: { id: Equipamento; nome: string; icone: string; custo: number; efeito: string }[] = [
-  { id: 'bracelete', nome: 'Bracelete de bronze', icone: '⛓️', custo: 6, efeito: '+1 Força' },
-  { id: 'escudo-reforcado', nome: 'Escudo reforçado', icone: '🛡️', custo: 8, efeito: '+1 Defesa' },
-  { id: 'capa-vermelha', nome: 'Capa vermelha', icone: '🧣', custo: 8, efeito: '+1 Carisma (a plateia te ama)' },
-  { id: 'peitoral', nome: 'Peitoral de engrenagens', icone: '⚙️', custo: 12, efeito: '+20 Vida' },
+  { id: 'bracelete', nome: 'Bracelete de bronze', icone: 'corrente', custo: 6, efeito: '+1 Força' },
+  { id: 'escudo-reforcado', nome: 'Escudo reforçado', icone: 'escudo', custo: 8, efeito: '+1 Defesa' },
+  { id: 'capa-vermelha', nome: 'Capa vermelha', icone: 'capa', custo: 8, efeito: '+1 Carisma (a plateia te ama)' },
+  { id: 'peitoral', nome: 'Peitoral de engrenagens', icone: 'engrenagem', custo: 12, efeito: '+20 Vida' },
 ];
 
 /** Caminhos que já dá para jogar. */

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -15,12 +16,12 @@ function embaralhar<T>(xs: T[]): T[] {
 }
 
 /** Corações (chances) no canto. */
-function Vidas({ n, max, icone }: { n: number; max: number; icone: string }) {
+function Vidas({ n, max }: { n: number; max: number; icone?: string }) {
   return (
     <span className="font-pixel text-[10px] sm:text-xs" aria-label={`${n} chances`}>
       {Array.from({ length: max }, (_, k) => (
         <span key={k} className={k < n ? '' : 'opacity-25'}>
-          {icone}
+          <Icone nome="coracao" className="inline-block w-[1.1em] align-middle" />
         </span>
       ))}
     </span>
@@ -120,8 +121,8 @@ export function DesafioMarcas({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🪶 Siga a pena verdadeira: 3 riscos, carvão preto, ponta para a direita.</p>
-        <Vidas n={vidas} max={3} icone="🪔" />
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">Siga a pena verdadeira: 3 riscos, carvão preto, ponta para a direita.</p>
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={erro ? 'tremer-forte' : ''}>
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
@@ -286,8 +287,8 @@ export function DesafioPlanos({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">📋 Plano A, B ou C? Escolha rápido o que funciona.</p>
-        <Vidas n={vidas} max={3} icone="⚓" />
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">Plano A, B ou C? Escolha rápido o que funciona.</p>
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}

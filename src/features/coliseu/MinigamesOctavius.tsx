@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -19,12 +20,12 @@ import { Retrato } from './Cenarios';
 
 type Fase = 'antes' | 'jogo' | 'ok' | 'perdeu';
 
-function Vidas({ n, max, icone }: { n: number; max: number; icone: string }) {
+function Vidas({ n, max }: { n: number; max: number; icone?: string }) {
   return (
     <span className="font-pixel text-[10px] sm:text-xs" aria-label={`${n} chances`}>
       {Array.from({ length: max }, (_, k) => (
         <span key={k} className={k < n ? '' : 'opacity-25'}>
-          {icone}
+          <Icone nome="coracao" className="inline-block w-[1.1em] align-middle" />
         </span>
       ))}
     </span>
@@ -80,9 +81,9 @@ interface Base {
 
 // ---------- PERSEGUIÇÃO ----------
 const OBSTACULOS = [
-  { id: 'muro', icone: '🧱', acao: 'PULAR' },
-  { id: 'carroca', icone: '🛒', acao: 'DESLIZAR' },
-  { id: 'toldo', icone: '⛺', acao: 'ESCALAR' },
+  { id: 'muro', icone: 'muro', acao: 'PULAR' },
+  { id: 'carroca', icone: 'carroca', acao: 'DESLIZAR' },
+  { id: 'toldo', icone: 'toldo', acao: 'ESCALAR' },
 ] as const;
 const TOTAL_PERSEGUICAO = 18;
 
@@ -146,9 +147,9 @@ export function MinigamePerseguicao({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🏃 FUJA PELA SUBURA: 🧱 PULAR · 🛒 DESLIZAR · ⛺ ESCALAR. {Math.min(passados, TOTAL_PERSEGUICAO)}/{TOTAL_PERSEGUICAO}
+          FUJA PELA SUBURA: PULAR · DESLIZAR · ESCALAR. {Math.min(passados, TOTAL_PERSEGUICAO)}/{TOTAL_PERSEGUICAO}
         </p>
-        <Vidas n={distancia} max={3} icone="💨" />
+        <Vidas n={distancia} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         <div className="absolute bottom-[12%] left-[30%] z-10 w-[14%] -translate-x-1/2 transition-[bottom] duration-100" style={{ bottom: pose === 'PULAR' || pose === 'ESCALAR' ? '30%' : '12%' }} aria-hidden>
@@ -164,7 +165,7 @@ export function MinigamePerseguicao({ lugar, antes, depois, onFim }: Base) {
         </div>
         {fase === 'jogo' && atual && (
           <span className="absolute bottom-[14%] z-20 -translate-x-1/2 text-4xl sm:text-6xl" style={{ left: `${92 - p * 58}%` }} aria-hidden>
-            {OBSTACULOS[atual.tipo]!.icone}
+            <Icone nome={OBSTACULOS[atual.tipo]!.icone} className="inline-block w-[1em]" />
           </span>
         )}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
@@ -173,13 +174,13 @@ export function MinigamePerseguicao({ lugar, antes, depois, onFim }: Base) {
       </Palco>
       <div className="grid grid-cols-3 gap-2">
         <Botao disabled={fase !== 'jogo'} onApertar={() => agir('PULAR')}>
-          🧱 PULAR
+          PULAR
         </Botao>
         <Botao disabled={fase !== 'jogo'} onApertar={() => agir('DESLIZAR')} cor="#4ef0dc">
-          🛒 DESLIZAR
+          DESLIZAR
         </Botao>
         <Botao disabled={fase !== 'jogo'} onApertar={() => agir('ESCALAR')} cor="#ff5ab8">
-          ⛺ ESCALAR
+          ESCALAR
         </Botao>
       </div>
     </div>
@@ -273,15 +274,15 @@ export function MinigameCanhoes({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          💣 CANHÕES: atire um pouco ANTES do navio chegar na mira (a bala demora). Acertos {acertos}/{ACERTOS_CANHAO}
+          CANHÕES: atire um pouco ANTES do navio chegar na mira (a bala demora). Acertos {acertos}/{ACERTOS_CANHAO}
         </p>
-        <Vidas n={casco} max={3} icone="🚢" />
+        <Vidas n={casco} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={ataque !== null ? 'tremer' : ''}>
         {fase === 'jogo' && (
           <>
             <span className="absolute top-[34%] z-10 -translate-x-1/2 text-3xl sm:text-5xl" style={{ left: `${navio}%` }} aria-hidden>
-              🚢
+              <Icone nome="navio" className="inline-block w-[100%] align-middle" />
             </span>
             <span className="absolute top-[30%] z-20 -translate-x-1/2 font-pixel text-3xl text-[#ff3a3a] [text-shadow:0_0_6px_#000] sm:text-5xl" style={{ left: `${mira}%` }} aria-hidden>
               ⌖
@@ -291,12 +292,12 @@ export function MinigameCanhoes({ lugar, antes, depois, onFim }: Base) {
             ))}
             {ex && (
               <span className="absolute top-[32%] z-20 -translate-x-1/2 text-3xl sm:text-5xl" style={{ left: `${ex.x}%` }} aria-hidden>
-                {ex.acertou ? '💥' : '💦'}
+                <Icone nome={ex.acertou ? 'explosao' : 'respingo'} className="inline-block w-[1em]" />
               </span>
             )}
             {ataque !== null && (
               <span className="piscar absolute left-1/2 top-[12%] z-30 -translate-x-1/2 whitespace-nowrap border-2 border-black bg-[#ff3a3a] px-2 py-1 font-pixel text-[9px] text-black sm:text-sm">
-                ⚠ ELES VÃO ATIRAR: ABAIXE!
+                ELES VÃO ATIRAR: ABAIXE!
               </span>
             )}
           </>
@@ -310,7 +311,7 @@ export function MinigameCanhoes({ lugar, antes, depois, onFim }: Base) {
       </Palco>
       <div className="grid grid-cols-2 gap-2">
         <Botao disabled={fase !== 'jogo'} onApertar={atirar}>
-          💣 FOGO!
+          FOGO!
         </Botao>
         <Botao disabled={fase !== 'jogo'} onApertar={abaixar} cor="#ff5a5a">
           ⬇️ ABAIXAR
@@ -395,9 +396,9 @@ export function MinigameEstrelas({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          ⭐ NAVEGUE PELAS ESTRELAS: veja a ordem que o Helios mostra e toque nas estrelas igual. Rota {Math.min(rodada + 1, RODADAS_ESTRELAS.length)}/{RODADAS_ESTRELAS.length}
+          NAVEGUE PELAS ESTRELAS: veja a ordem que o Helios mostra e toque nas estrelas igual. Rota {Math.min(rodada + 1, RODADAS_ESTRELAS.length)}/{RODADAS_ESTRELAS.length}
         </p>
-        <Vidas n={vidas} max={3} icone="🧭" />
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         <div className="absolute inset-0 z-[5] bg-[#04051a]/75" aria-hidden />
@@ -417,11 +418,11 @@ export function MinigameEstrelas({ lugar, antes, depois, onFim }: Base) {
                 style={{ left: `${e.x}%`, top: `${e.y}%`, filter: acesa ? 'drop-shadow(0 0 12px #ffd04a)' : feita ? 'drop-shadow(0 0 8px #4ef0dc)' : undefined, scale: acesa ? '1.6' : '1' }}
                 aria-label={`Estrela ${k + 1}`}
               >
-                {feita ? '🌟' : '⭐'}
+                <Icone nome="estrela" className={`inline-block w-[1em] ${feita ? 'brilho-estrela' : ''}`} />
               </button>
             );
           })}
-        {fase === 'jogo' && mostrando < 0 && <span className="pointer-events-none absolute top-[6%] z-20 text-5xl opacity-90 sm:text-7xl" style={{ left: `${nuvem}%` }} aria-hidden>☁️☁️</span>}
+        {fase === 'jogo' && mostrando < 0 && <span className="pointer-events-none absolute top-[6%] z-20 text-5xl opacity-90 sm:text-7xl" style={{ left: `${nuvem}%` }} aria-hidden><span className="inline-flex w-[2.2em] gap-1"><Icone nome="nuvem" className="w-full" /><Icone nome="nuvem" className="w-full" /></span></span>}
         <div className="absolute bottom-[12%] left-[16%] z-10 w-[10%] -translate-x-1/2" aria-hidden>
           <div className="brilho-heroi">
             <Retrato quem="helios" />
@@ -482,15 +483,15 @@ export function MinigameBarcos({ lugar, antes, depois, onFim }: Base) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">⛵ PULE DE BARCO EM BARCO até o barco do campeão! Fileira {fileira}/{FILEIRAS}</p>
-        <Vidas n={vidas} max={3} icone="🛟" />
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">PULE DE BARCO EM BARCO até o barco do campeão! Fileira {fileira}/{FILEIRAS}</p>
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={caiu ? 'tremer-forte' : ''}>
         <div className="absolute inset-0 z-[5] bg-[#1a4a7a]/35" aria-hidden />
         {fase === 'jogo' &&
           Array.from({ length: FILEIRAS }, (_, f) => (
             <span key={f} className="absolute z-10 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl" style={{ left: `${barco(f)}%`, top: `${yFileira(f + 1)}%`, opacity: f === fileira ? 1 : 0.65 }} aria-hidden>
-              {f === FILEIRAS - 1 ? '🚩' : '🛶'}
+              <Icone nome={f === FILEIRAS - 1 ? 'bandeira' : 'barco'} className="inline-block w-[1em]" />
             </span>
           ))}
         {fase === 'jogo' && (
@@ -505,7 +506,7 @@ export function MinigameBarcos({ lugar, antes, depois, onFim }: Base) {
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
       <Botao disabled={fase !== 'jogo'} onApertar={pular}>
-        ⬆️ PULAR PARA O PRÓXIMO BARCO
+        PULAR PARA O PRÓXIMO BARCO
       </Botao>
     </div>
   );

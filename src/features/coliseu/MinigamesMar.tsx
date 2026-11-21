@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -15,12 +16,12 @@ import { Retrato } from './Cenarios';
 
 type Fase = 'antes' | 'jogo' | 'ok' | 'perdeu';
 
-function Vidas({ n, max, icone }: { n: number; max: number; icone: string }) {
+function Vidas({ n, max }: { n: number; max: number; icone?: string }) {
   return (
     <span className="font-pixel text-[10px] sm:text-xs" aria-label={`${n} chances`}>
       {Array.from({ length: max }, (_, k) => (
         <span key={k} className={k < n ? '' : 'opacity-25'}>
-          {icone}
+          <Icone nome="coracao" className="inline-block w-[1.1em] align-middle" />
         </span>
       ))}
     </span>
@@ -145,9 +146,9 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🥁 REME NO TAMBOR: TUM = esquerda, TÁ = direita. Remadas certas {acertos}/{PRECISA_REMAR}
+          REME NO TAMBOR: TUM = esquerda, TÁ = direita. Remadas certas {acertos}/{PRECISA_REMAR}
         </p>
-        <Vidas n={4 - chicote} max={4} icone="⛓️" />
+        <Vidas n={4 - chicote} max={4} icone="" />
       </div>
       <Palco lugar={lugar} className={brilho === 'erro' ? 'tremer-forte' : ''}>
         {fase === 'jogo' && batida >= 0 && (
@@ -156,7 +157,7 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
             className="surgir absolute top-[16%] z-20 font-pixel text-2xl [text-shadow:3px_3px_0_#000] sm:text-5xl"
             style={{ left: lado === 0 ? '18%' : '62%', color: lado === 0 ? '#ffd04a' : '#4ef0dc' }}
           >
-            🥁 {lado === 0 ? 'TUM!' : 'TÁ!'}
+            {lado === 0 ? 'TUM!' : 'TÁ!'}
           </span>
         )}
         <div className="absolute bottom-[12%] left-[45%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
@@ -190,7 +191,7 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
 }
 
 // ---------- A TEMPESTADE ----------
-const CORDAS = ['🪢 PROA', '🪢 MASTRO', '🪢 VELA', '🪢 POPA'];
+const CORDAS = ['PROA', 'MASTRO', 'VELA', 'POPA'];
 const ONDAS = 9;
 
 export function DesafioTempestade({ lugar, antes, depois, onFim }: Base) {
@@ -253,9 +254,9 @@ export function DesafioTempestade({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🌊 TEMPESTADE: amarre as cordas que piscarem antes da onda! Onda {Math.min(onda + 1, ONDAS)}/{ONDAS}
+          TEMPESTADE: amarre as cordas que piscarem antes da onda! Onda {Math.min(onda + 1, ONDAS)}/{ONDAS}
         </p>
-        <Vidas n={casco} max={3} icone="🚢" />
+        <Vidas n={casco} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={batendo ? 'tremer-forte' : ''}>
         {fase === 'jogo' && (
@@ -264,7 +265,7 @@ export function DesafioTempestade({ lugar, antes, depois, onFim }: Base) {
               <div className="h-full bg-[#5ab0ff]" style={{ width: `${Math.min(100, 100 - falta / 30)}%` }} />
             </div>
             <span className="absolute left-1/2 top-[14%] z-20 -translate-x-1/2 whitespace-nowrap font-pixel text-[9px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">
-              {batendo ? '🌊 SPLAAASH!' : `A ONDA VEM AÍ: ${(falta / 1000).toFixed(1)} s`}
+              {batendo ? 'SPLAAASH!' : `A ONDA VEM AÍ: ${(falta / 1000).toFixed(1)} s`}
             </span>
           </>
         )}

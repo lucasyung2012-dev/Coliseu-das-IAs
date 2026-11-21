@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import { prefereMenosMovimento } from '@/ui/movimento';
 import { desbloquear } from '@/ui/som';
@@ -16,12 +17,12 @@ import { Retrato } from './Cenarios';
 
 type Fase = 'antes' | 'jogo' | 'ok' | 'perdeu';
 
-function Vidas({ n, max, icone }: { n: number; max: number; icone: string }) {
+function Vidas({ n, max }: { n: number; max: number; icone?: string }) {
   return (
     <span className="font-pixel text-[10px] sm:text-xs" aria-label={`${n} chances`}>
       {Array.from({ length: max }, (_, k) => (
         <span key={k} className={k < n ? '' : 'opacity-25'}>
-          {icone}
+          <Icone nome="coracao" className="inline-block w-[1.1em] align-middle" />
         </span>
       ))}
     </span>
@@ -138,8 +139,8 @@ export function DesafioFurtivo({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🤫 {objetivo}</p>
-        <Vidas n={vidas} max={3} icone="👁️" />
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">{objetivo}</p>
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={pego ? 'tremer-forte' : ''}>
         {/* a luz que vigia, varrendo a cena */}
@@ -153,7 +154,7 @@ export function DesafioFurtivo({
         {/* esconderijos */}
         {[25, 50, 75].map((x) => (
           <span key={x} className="absolute bottom-[12%] z-[6] -translate-x-1/2 text-xl sm:text-3xl" style={{ left: `${6 + x * 0.86}%`, opacity: salvo >= x ? 1 : 0.6 }} aria-hidden>
-            📦
+            <Icone nome="caixote" className="inline-block w-[100%] align-middle" />
           </span>
         ))}
         <span className="absolute bottom-[14%] right-[3%] z-[6] font-pixel text-[8px] text-[#4ad46a] sm:text-[10px]">CHEGADA ▶</span>
@@ -165,7 +166,7 @@ export function DesafioFurtivo({
         </div>
         {fase === 'jogo' && (
           <span className="absolute left-1/2 top-[12%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-black px-2 py-1 font-pixel text-[8px] text-black sm:text-xs" style={{ background: cor }}>
-            {luz === 'verde' ? `🟢 ${vigia.toUpperCase()} OLHANDO PRO OUTRO LADO: ANDE!` : luz === 'amarela' ? '🟡 CUIDADO...' : `🔴 ${vigia.toUpperCase()} OLHANDO: PARADO!`}
+            {luz === 'verde' ? `${vigia.toUpperCase()} OLHANDO PRO OUTRO LADO: ANDE!` : luz === 'amarela' ? 'CUIDADO...' : `${vigia.toUpperCase()} OLHANDO: PARADO!`}
           </span>
         )}
         {pego && <span className="absolute left-1/2 top-[40%] z-20 -translate-x-1/2 font-pixel text-sm text-[#ff5a5a] [text-shadow:2px_2px_0_#000] sm:text-xl">VISTO! DE VOLTA AO ESCONDERIJO</span>}
@@ -189,7 +190,7 @@ export function DesafioFurtivo({
         onKeyUp={() => setAndando(false)}
         className="pixel-box select-none py-4 font-pixel text-xs text-[#f2c14e] active:translate-y-0.5 disabled:opacity-40"
       >
-        👣 SEGURE PARA ANDAR (solte para parar)
+        SEGURE PARA ANDAR (solte para parar)
       </button>
     </div>
   );
@@ -251,8 +252,8 @@ export function DesafioRitmo({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🎯 {objetivo}</p>
-        <Vidas n={3 - erros} max={3} icone="⚙️" />
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">{objetivo}</p>
+        <Vidas n={3 - erros} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={flash === 'erro' ? 'tremer-forte' : ''}>
         {fase === 'jogo' && (
@@ -264,7 +265,7 @@ export function DesafioRitmo({
               <div className="absolute inset-y-0 bg-[#4ad46a]/70" style={{ left: `${zona[0]}%`, width: `${zona[1] - zona[0]}%` }} />
               <div className="absolute inset-y-[-4px] w-1.5 bg-white shadow-[0_0_6px_#fff]" style={{ left: `${ponteiro}%` }} />
             </div>
-            {flash === 'ok' && <span className="font-pixel text-xs text-[#4ad46a] [text-shadow:2px_2px_0_#000]">CREC! ⚙️</span>}
+            {flash === 'ok' && <span className="font-pixel text-xs text-[#4ad46a] [text-shadow:2px_2px_0_#000]">CREC! </span>}
           </div>
         )}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
@@ -290,7 +291,7 @@ export function DesafioRitmo({
         }}
         className="pixel-box select-none py-4 font-pixel text-xs text-[#f2c14e] active:translate-y-0.5 disabled:opacity-40"
       >
-        ⚙️ {acao}!
+        {acao}!
       </button>
     </div>
   );
@@ -307,10 +308,10 @@ interface Coisa {
   voo: number;
 }
 const COISAS = [
-  { icone: '🍅', voo: 3600 },
-  { icone: '🪨', voo: 3200 },
-  { icone: '🔥', voo: 2900 },
-  { icone: '🏹', voo: 2200 },
+  { icone: 'tomate', voo: 3600 },
+  { icone: 'pedra', voo: 3200 },
+  { icone: 'brasa', voo: 2900 },
+  { icone: 'flecha', voo: 2200 },
 ];
 const DURACAO_PROTEGER = 24_000;
 
@@ -365,8 +366,8 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🛡️ Toque no que voar na direção da Lívia! Ela precisa terminar a página.</p>
-        <Vidas n={Math.max(0, voz)} max={3} icone="📖" />
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">Toque no que voar na direção da Lívia! Ela precisa terminar a página.</p>
+        <Vidas n={Math.max(0, voz)} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         <div className="absolute bottom-[14%] left-[14%] z-10 w-[7%] -translate-x-1/2" aria-hidden>
@@ -392,9 +393,9 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
                 }}
                 className="absolute z-20 -translate-x-1/2 -translate-y-1/2 p-1 text-2xl sm:text-4xl"
                 style={{ left: `${96 - p * 80}%`, top: `${c.y + p * (62 - c.y)}%` }}
-                aria-label={`Derrubar ${c.icone}`}
+                aria-label={`Derrubar: ${c.icone}`}
               >
-                <span className={prefereMenosMovimento() ? '' : 'girar-estrelas'}>{c.icone}</span>
+                <span className={prefereMenosMovimento() ? '' : 'girar-estrelas'}><Icone nome={c.icone} className="inline-block w-[1em]" /></span>
               </button>
             );
           })}
@@ -404,7 +405,7 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
           </div>
         )}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
-        {fase === 'perdeu' && <Perdeu titulo="A LÍVIA PAROU DE LER" dica="As flechas (🏹) são as mais rápidas: derrube primeiro o que estiver mais perto dela." onDeNovo={comecar} />}
+        {fase === 'perdeu' && <Perdeu titulo="A LÍVIA PAROU DE LER" dica="As flechas são as mais rápidas: derrube primeiro o que estiver mais perto dela." onDeNovo={comecar} />}
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
     </div>
@@ -473,9 +474,9 @@ export function DesafioArmadilhas({ lugar, heroi, antes, depois, onFim }: { luga
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          ⚠️ Espetos! Fuja do chão que acender. Rodada {Math.min(rodada + 1, RODADAS_ARMADILHA)}/{RODADAS_ARMADILHA}
+          Espetos! Fuja do chão que acender. Rodada {Math.min(rodada + 1, RODADAS_ARMADILHA)}/{RODADAS_ARMADILHA}
         </p>
-        <Vidas n={vidas} max={3} icone="❤️" />
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         {fase === 'jogo' &&
@@ -490,7 +491,7 @@ export function DesafioArmadilhas({ lugar, heroi, antes, depois, onFim }: { luga
               }}
               aria-hidden
             >
-              {perigo.includes(k) && espetos && <span className="absolute inset-x-0 -top-[60%] text-center text-2xl sm:text-4xl">🗡️🗡️🗡️</span>}
+              {perigo.includes(k) && espetos && <span className="absolute inset-x-0 -top-[60%] flex justify-center text-2xl sm:text-4xl"><Icone nome="espeto" className="inline-block w-[1.6em]" /></span>}
             </div>
           ))}
         <div className="absolute bottom-[14%] z-10 w-[10%] -translate-x-1/2 transition-[left] duration-150" style={{ left: `${faixa(onde)}%` }} aria-hidden>

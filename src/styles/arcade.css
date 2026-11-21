@@ -1604,3 +1604,5 @@
 @keyframes luz-lua { from { opacity: 0.08; } to { opacity: 0.15; } }
 .saida-brilha { box-shadow: 0 0 12px 4px rgba(242, 193, 78, 0.6); animation: luz-vela 0.8s ease-in-out infinite alternate; }
 @media (prefers-reduced-motion: reduce) { .chama-vela, .luz-vela, .luz-lua, .saida-brilha { animation: none; } }
+/* A estrela já tocada no minigame das estrelas brilha. */
+.brilho-estrela { filter: drop-shadow(0 0 6px #ffe08a) brightness(1.2); }

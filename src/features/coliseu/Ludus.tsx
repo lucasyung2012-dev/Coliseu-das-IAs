@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { EventoLuta, Tecnica } from '@/game/historia/luta';
 import type { ConversaLudus, Falante, Lugar } from '@/game/historia/roteiro';
 import {
@@ -40,50 +41,50 @@ const TREINOS_GOLPE: Record<Tecnica, DefTreino> = {
   'contra-ataque': {
     id: 'contra-ataque',
     nome: 'CONTRA-ATAQUE',
-    icone: '⚡',
+    icone: 'raio',
     efeito: 'Golpe logo depois de bloquear: dano dobrado e ele fica tonto',
     evento: 'riposta',
     quantos: 3,
     rotulo: 'CONTRA-ATAQUES',
-    explica: 'Segura o 🛡️ quando a espada vier e, assim que bloquear, ⚔️ na hora! Três vezes.',
+    explica: 'Segura o ESCUDO quando a espada vier e, assim que bloquear, GOLPE na hora! Três vezes.',
   },
   'quebra-guarda': {
     id: 'quebra-guarda',
     nome: 'QUEBRA-GUARDA',
-    icone: '💥',
+    icone: 'explosao',
     efeito: 'Três golpes seguidos na guarda quebram a defesa dele',
     evento: 'quebra',
     quantos: 2,
     rotulo: 'GUARDAS QUEBRADAS',
-    explica: 'Enquanto eu estiver na guarda (sem sinal, sem ABERTO): ⚔️ ⚔️ ⚔️ rápido! Duas vezes.',
+    explica: 'Enquanto eu estiver na guarda (sem sinal, sem ABERTO): GOLPE, GOLPE, GOLPE, rápido! Duas vezes.',
   },
   'espelho-de-sol': {
     id: 'espelho-de-sol',
     nome: 'ESPELHO DE SOL',
-    icone: '☀️',
+    icone: 'sol',
     efeito: 'Escudo levantado bem na hora do golpe reflete o ataque de volta (até o fogo)',
     evento: 'reflexo',
     quantos: 3,
     rotulo: 'REFLEXOS',
-    explica: 'Vidente, você vê as coisas antes de acontecer, né? Então levanta o 🛡️ BEM na hora em que a minha espada chegar. Nem antes, nem depois. Três vezes.',
+    explica: 'Vidente, você vê as coisas antes de acontecer, né? Então levanta o ESCUDO BEM na hora em que a minha espada chegar. Nem antes, nem depois. Três vezes.',
   },
   'esquiva-dupla': {
     id: 'esquiva-dupla',
     nome: 'ESQUIVA DUPLA',
-    icone: '🌀',
+    icone: 'rolar',
     efeito: 'A esquiva recarrega na metade do tempo; golpe logo depois de esquivar entra dobrado',
     evento: 'riposta',
     quantos: 3,
     rotulo: 'ESQUIVA E GOLPE',
-    explica: 'Tagarela, você é rápido de boca. Agora seja rápido de perna: 💨 esquiva do meu golpe e, na hora, ⚔️! Três vezes.',
+    explica: 'Tagarela, você é rápido de boca. Agora seja rápido de perna: ESQUIVA do meu golpe e, na hora, GOLPE! Três vezes.',
   },
 };
 
 const TREINOS_ATRIBUTO: DefTreino[] = [
-  { id: 'forca', nome: 'FORÇA', icone: '💪', efeito: '+1 Força (mais dano)', evento: 'acerto', quantos: 10, rotulo: 'GOLPES', explica: 'Acerta dez golpes em mim. Bate no ABERTO, que entra mais!' },
-  { id: 'defesa', nome: 'DEFESA', icone: '🛡️', efeito: '+1 Defesa (apanha menos)', evento: 'bloqueio', quantos: 5, rotulo: 'BLOQUEIOS', explica: 'Bloqueia cinco golpes meus. Cuidado com as fintas!' },
-  { id: 'vida', nome: 'RESISTÊNCIA', icone: '❤️', efeito: '+10 Vida', evento: 'esquiva', quantos: 5, rotulo: 'ESQUIVAS', explica: 'Esquiva cinco golpes meus. Pernas leves!' },
-  { id: 'carisma', nome: 'CARISMA', icone: '📣', efeito: '+1 Carisma (Ânimo e plateia enchem mais rápido)', evento: 'especial', quantos: 1, rotulo: 'ESPECIAIS', explica: 'Enche o Ânimo com boas jogadas e solta o SEU especial em mim: a Muralha do Lata de Biblioteca, a Rede do Tagarela ou o Eclipse do Vidente.' },
+  { id: 'forca', nome: 'FORÇA', icone: 'gladio', efeito: '+1 Força (mais dano)', evento: 'acerto', quantos: 10, rotulo: 'GOLPES', explica: 'Acerta dez golpes em mim. Bate no ABERTO, que entra mais!' },
+  { id: 'defesa', nome: 'DEFESA', icone: 'escudo', efeito: '+1 Defesa (apanha menos)', evento: 'bloqueio', quantos: 5, rotulo: 'BLOQUEIOS', explica: 'Bloqueia cinco golpes meus. Cuidado com as fintas!' },
+  { id: 'vida', nome: 'RESISTÊNCIA', icone: 'coracao', efeito: '+10 Vida', evento: 'esquiva', quantos: 5, rotulo: 'ESQUIVAS', explica: 'Esquiva cinco golpes meus. Pernas leves!' },
+  { id: 'carisma', nome: 'CARISMA', icone: 'estrela', efeito: '+1 Carisma (Ânimo e plateia enchem mais rápido)', evento: 'especial', quantos: 1, rotulo: 'ESPECIAIS', explica: 'Enche o Ânimo com boas jogadas e solta o SEU especial em mim: a Muralha do Lata de Biblioteca, a Rede do Tagarela ou o Eclipse do Vidente.' },
 ];
 
 const NOME_HEROI: Partial<Record<Falante, string>> = { cassius: 'Lata', octavius: 'Tagarela', helios: 'Vidente' };
@@ -155,7 +156,7 @@ export function Ludus({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🏛️ LUDUS · {objetivo}</p>
+      <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">LUDUS · {objetivo}</p>
       <Palco lugar={lugar}>
         <div className="absolute bottom-[12%] left-[12%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
           <div className="respirar">
@@ -181,7 +182,7 @@ export function Ludus({
             <span
               className={`mt-1 whitespace-nowrap border-2 bg-black/80 px-1.5 py-0.5 font-pixel text-[7px] sm:text-[9px] ${vistos.includes(c.quem + k) ? 'border-white/30 text-white/60' : 'piscar border-[#f2c14e] text-white'}`}
             >
-              💬 {c.rotulo}
+              {c.rotulo}
             </span>
           </button>
         ))}
@@ -201,7 +202,7 @@ export function Ludus({
             onClick={() => setGanhou(null)}
             className="absolute inset-x-6 top-[30%] z-20 border-2 border-[#f2c14e] bg-black/90 p-3 text-center"
           >
-            <span className="block font-pixel text-[10px] text-[#f2c14e] sm:text-sm">🎁 VOCÊ GANHOU: {ganhou === 'elmo-brutus' ? 'O ELMO DAS 99 VITÓRIAS' : ganhou.toUpperCase()}</span>
+            <span className="block font-pixel text-[10px] text-[#f2c14e] sm:text-sm">VOCÊ GANHOU: {ganhou === 'elmo-brutus' ? 'O ELMO DAS 99 VITÓRIAS' : ganhou.toUpperCase()}</span>
             <span className="mt-1 block text-xs text-white/80">+20 Vida · +1 Defesa · toque para fechar</span>
           </button>
         )}
@@ -209,11 +210,11 @@ export function Ludus({
 
       {/* Os atributos do gladiador */}
       <div className="pixel-box flex flex-wrap items-center justify-center gap-x-4 gap-y-1 p-2 font-pixel text-[8px] sm:text-[10px]">
-        <span>❤️ VIDA {at.vida}</span>
-        <span>💪 FORÇA {at.forca}</span>
-        <span>🛡️ DEFESA {at.defesa}</span>
-        <span>📣 CARISMA {at.carisma}</span>
-        <span className="text-[#f2c14e]">⚙️ PEÇAS {save.pecas ?? 0}</span>
+        <span>VIDA {at.vida}</span>
+        <span>FORÇA {at.forca}</span>
+        <span>DEFESA {at.defesa}</span>
+        <span>CARISMA {at.carisma}</span>
+        <span className="text-[#f2c14e]">PEÇAS {save.pecas ?? 0}</span>
         {(save.tecnicas ?? []).length > 0 && <span className="text-accent">GOLPES: {(save.tecnicas ?? []).map((t) => TREINOS_GOLPE[t].nome).join(', ')}</span>}
       </div>
 
@@ -226,7 +227,7 @@ export function Ludus({
             className={`pixel-box flex-1 py-2 font-pixel text-[9px] sm:text-[10px] ${painel === p ? 'text-[#f2c14e]' : 'text-muted'}`}
             aria-pressed={painel === p}
           >
-            {p === 'treinos' ? '🏋️ TREINAR COM O BRUTUS' : '⚒️ FERREIRO'}
+            {p === 'treinos' ? 'TREINAR COM O BRUTUS' : 'FERREIRO'}
           </button>
         ))}
       </div>
@@ -250,7 +251,7 @@ export function Ludus({
                   style={ehGolpe && !feito ? { boxShadow: '0 0 0 2px #f2c14e' } : undefined}
                 >
                   <span className="text-2xl" aria-hidden>
-                    {t.icone}
+                    <Icone nome={t.icone} className="inline-block w-[1.4em]" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-pixel text-[9px] text-[#f2c14e]">
@@ -285,13 +286,13 @@ export function Ludus({
                   className="pixel-box pixel-hover flex w-full items-center gap-2 p-2 text-left disabled:opacity-50"
                 >
                   <span className="text-2xl" aria-hidden>
-                    {f.icone}
+                    <Icone nome={f.icone} className="inline-block w-[1.4em]" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-pixel text-[9px] text-[#f2c14e]">{f.nome}</span>
                     <span className="block text-xs text-muted">{f.efeito}</span>
                   </span>
-                  <span className="font-pixel text-[8px]">{tem ? '✔ SEU' : `⚙️ ${f.custo}`}</span>
+                  <span className="font-pixel text-[8px]">{tem ? '✔ SEU' : `${f.custo}`}</span>
                 </button>
               </li>
             );

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import Icone from '@/ui/pixel/Icones';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -15,12 +16,12 @@ import { Retrato } from './Cenarios';
 
 type Fase = 'antes' | 'jogo' | 'ok' | 'perdeu';
 
-function Vidas({ n, max, icone }: { n: number; max: number; icone: string }) {
+function Vidas({ n, max }: { n: number; max: number; icone?: string }) {
   return (
     <span className="font-pixel text-[10px] sm:text-xs" aria-label={`${n} chances`}>
       {Array.from({ length: max }, (_, k) => (
         <span key={k} className={k < n ? '' : 'opacity-25'}>
-          {icone}
+          <Icone nome="coracao" className="inline-block w-[1.1em] align-middle" />
         </span>
       ))}
     </span>
@@ -120,9 +121,9 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">🔨 A FORJA DO BRUTUS: martele quando a brasa chegar na bigorna.</p>
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">A FORJA DO BRUTUS: martele quando a brasa chegar na bigorna.</p>
         <span className="font-pixel text-[10px]">
-          🔥 {acertos}/{PRECISA_FORJA}
+          {acertos}/{PRECISA_FORJA}
         </span>
       </div>
       <Palco lugar={lugar} className={brilho === 'erro' ? 'tremer' : ''}>
@@ -134,7 +135,7 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
             {chegadas.current.map((_, k) =>
               resolvidas.includes(k) || pos(k) > 102 || pos(k) < 5 ? null : (
                 <span key={k} className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl" style={{ left: `${pos(k)}%` }} aria-hidden>
-                  🔥
+                  <Icone nome="brasa" className="inline-block w-[1em] align-middle" />
                 </span>
               ),
             )}
@@ -159,7 +160,7 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
       <BotaoGrande disabled={fase !== 'jogo'} onApertar={martelar}>
-        🔨 MARTELAR!
+        MARTELAR!
       </BotaoGrande>
     </div>
   );
@@ -167,9 +168,9 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
 
 // ---------- CASSIUS 2: MEMÓRIA DOS GOLPES ----------
 const GOLPES = [
-  { id: 'golpe', icone: '⚔️', nome: 'GOLPE', cor: '#e04a3a' },
-  { id: 'escudo', icone: '🛡️', nome: 'ESCUDO', cor: '#ffd04a' },
-  { id: 'esquiva', icone: '💨', nome: 'ESQUIVA', cor: '#5ab0ff' },
+  { id: 'golpe', icone: 'gladio', nome: 'GOLPE', cor: '#e04a3a' },
+  { id: 'escudo', icone: 'escudo', nome: 'ESCUDO', cor: '#ffd04a' },
+  { id: 'esquiva', icone: 'esquiva', nome: 'ESQUIVA', cor: '#5ab0ff' },
 ] as const;
 const RODADAS_MEMORIA = [3, 4, 5, 6, 7];
 
@@ -229,9 +230,9 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🧠 MEMÓRIA DOS GOLPES: repita o que o Brutus fizer. Rodada {Math.min(rodada + 1, RODADAS_MEMORIA.length)}/{RODADAS_MEMORIA.length}
+          MEMÓRIA DOS GOLPES: repita o que o Brutus fizer. Rodada {Math.min(rodada + 1, RODADAS_MEMORIA.length)}/{RODADAS_MEMORIA.length}
         </p>
-        <Vidas n={vidas} max={3} icone="❤️" />
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         <div className="absolute bottom-[12%] left-[40%] z-10 w-[15%] -translate-x-1/2" aria-hidden>
@@ -243,7 +244,7 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
           <div className="absolute right-[8%] top-[24%] z-20 flex flex-col items-center gap-2">
             {atual ? (
               <span key={mostrando} className="surgir text-5xl sm:text-7xl" style={{ filter: `drop-shadow(0 0 10px ${atual.cor})` }}>
-                {atual.icone}
+                <Icone nome={atual.icone} className="inline-block w-[1em]" />
               </span>
             ) : (
               <span className="font-pixel text-[10px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">
@@ -275,7 +276,7 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
       <div className="grid grid-cols-3 gap-2">
         {GOLPES.map((g, k) => (
           <BotaoGrande key={g.id} cor={g.cor} disabled={fase !== 'jogo' || mostrando >= 0} onApertar={() => apertar(k)}>
-            {g.icone} {g.nome}
+            <Icone nome={g.icone} className="inline-block w-[1.2em] align-middle" /> {g.nome}
           </BotaoGrande>
         ))}
       </div>
@@ -360,9 +361,9 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🏃 CORRIDA DO PÁTIO: barril, PULE! Saco voando, ABAIXE! {Math.min(passados, TOTAL_CORRIDA)}/{TOTAL_CORRIDA}
+          CORRIDA DO PÁTIO: barril, PULE! Saco voando, ABAIXE! {Math.min(passados, TOTAL_CORRIDA)}/{TOTAL_CORRIDA}
         </p>
-        <Vidas n={vidas} max={3} icone="❤️" />
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         <div
@@ -387,7 +388,7 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
                 style={{ left: `${88 - p * 80}%`, bottom: o.tipo === 'barril' ? '12%' : '40%', rotate: o.tipo === 'barril' ? `${-p * 900}deg` : undefined }}
                 aria-hidden
               >
-                {o.tipo === 'barril' ? '🛢️' : '💰'}
+                <Icone nome={o.tipo === 'barril' ? 'barril' : 'saco'} className="inline-block w-[1em]" />
               </span>
             );
           })}
@@ -397,7 +398,7 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
       </Palco>
       <div className="grid grid-cols-2 gap-2">
         <BotaoGrande disabled={fase !== 'jogo'} onApertar={() => fazer('pulo')}>
-          ⬆️ PULAR
+          PULAR
         </BotaoGrande>
         <BotaoGrande disabled={fase !== 'jogo'} onApertar={() => fazer('abaixa')} cor="#5ab0ff">
           ⬇️ ABAIXAR
@@ -448,14 +449,14 @@ export function MinigameTorre({ lugar, antes, depois, onFim }: Base) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">📦 TORRE DE CAIXOTES: solte o caixote em cima da torre até a janela.</p>
+        <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">TORRE DE CAIXOTES: solte o caixote em cima da torre até a janela.</p>
         <span className="font-pixel text-[10px]">
-          📦 {torre.length - 1}/{ALTURA_TORRE}
+          {torre.length - 1}/{ALTURA_TORRE}
         </span>
       </div>
       <Palco lugar={lugar}>
         {/* a janela da cela lá no alto */}
-        <span className="absolute left-1/2 top-[4%] z-10 -translate-x-1/2 font-pixel text-[8px] text-[#4ad46a] [text-shadow:1px_1px_0_#000] sm:text-[10px]">🪟 A JANELA</span>
+        <span className="absolute left-1/2 top-[4%] z-10 -translate-x-1/2 font-pixel text-[8px] text-[#4ad46a] [text-shadow:1px_1px_0_#000] sm:text-[10px]">A JANELA</span>
         {torre.map((c, k) => (
           <div
             key={k}
@@ -492,7 +493,7 @@ export function MinigameTorre({ lugar, antes, depois, onFim }: Base) {
         {fase === 'ok' && <Falas falas={depois} onFim={onFim} />}
       </Palco>
       <BotaoGrande disabled={fase !== 'jogo'} onApertar={soltar}>
-        📦 SOLTAR!
+        SOLTAR!
       </BotaoGrande>
     </div>
   );
@@ -501,9 +502,9 @@ export function MinigameTorre({ lugar, antes, depois, onFim }: Base) {
 // ---------- OS TRÊS CONTRA A MURALHA ----------
 // Três faixas de bonecos de treino. Cada IA cuida da sua; você joga a do seu gladiador.
 const PAPEL: Record<'cassius' | 'octavius' | 'helios', { acao: string; icone: string; cor: string }> = {
-  cassius: { acao: 'SEGURAR COM O ESCUDO', icone: '🛡️', cor: '#f08c50' },
-  octavius: { acao: 'PLANO: DERRUBAR', icone: '🛢️', cor: '#4ef0dc' },
-  helios: { acao: 'ILUMINAR', icone: '☀️', cor: '#5ab0ff' },
+  cassius: { acao: 'SEGURAR COM O ESCUDO', icone: 'escudo', cor: '#f08c50' },
+  octavius: { acao: 'PLANO: DERRUBAR', icone: 'barril', cor: '#4ef0dc' },
+  helios: { acao: 'ILUMINAR', icone: 'sol', cor: '#5ab0ff' },
 };
 const ORDEM: ('cassius' | 'octavius' | 'helios')[] = ['cassius', 'octavius', 'helios'];
 const BONECOS_TRIO = 18;
@@ -586,9 +587,9 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
-          🤝 OS TRÊS CONTRA A MURALHA: {todos ? 'você controla os TRÊS' : 'cuide da SUA faixa'}. {Math.min(derrubados, meta)}/{meta}
+          OS TRÊS CONTRA A MURALHA: {todos ? 'você controla os TRÊS' : 'cuide da SUA faixa'}. {Math.min(derrubados, meta)}/{meta}
         </p>
-        <Vidas n={vidas} max={3} icone="🧱" />
+        <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
         {ORDEM.map((q, k) => (
@@ -612,7 +613,7 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
                 style={{ left: `${92 - p * 78}%`, top: `${33 + b.faixa * 24}%`, opacity: escondido ? 0.25 : 1 }}
                 aria-hidden
               >
-                🪆
+                <Icone nome="boneco" className="inline-block w-[100%] align-middle" />
               </span>
             );
           })}
@@ -624,13 +625,13 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
         <div className="grid grid-cols-3 gap-2">
           {ORDEM.map((q, k) => (
             <BotaoGrande key={q} disabled={fase !== 'jogo'} onApertar={() => agir(k)} cor={PAPEL[q].cor}>
-              {PAPEL[q].icone} {PAPEL[q].acao}
+              <Icone nome={PAPEL[q].icone} className="inline-block w-[1.2em] align-middle" /> {PAPEL[q].acao}
             </BotaoGrande>
           ))}
         </div>
       ) : (
         <BotaoGrande disabled={fase !== 'jogo'} onApertar={() => agir()} cor={papel.cor}>
-          {papel.icone} {papel.acao}!
+          <Icone nome={papel.icone} className="inline-block w-[1.2em] align-middle" /> {papel.acao}!
         </BotaoGrande>
       )}
     </div>
