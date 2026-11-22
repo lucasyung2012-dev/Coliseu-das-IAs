@@ -170,10 +170,10 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
               ) : (
                 <div key="r" className="absolute" style={{ ...emMapa(c.x, c.y), width: `${(2.1 / W) * 100}%`, translate: '-50% -92%', zIndex: 10 + Math.floor(c.y * 10) }}>
                   <span className="absolute bottom-[2%] left-1/2 h-[10%] w-[80%] -translate-x-1/2 rounded-[50%] bg-black/50" />
-                  <div className={c.estado === 'mira' ? 'tremer-t' : c.estado === 'carga' ? '' : 'respirar-t'} style={{ transform: c.dir === 'esq' ? undefined : 'scaleX(-1)', filter: c.estado === 'tonto' ? 'saturate(0.4)' : furioso(st) ? 'drop-shadow(0 0 6px #ff3a3a)' : undefined }}>
+                  <div className={st.fim === 'vitoria' ? 'inimigo-vencido' : c.estado === 'mira' ? 'tremer-t' : c.estado === 'carga' ? '' : 'respirar-t'} style={{ transform: c.dir === 'esq' ? undefined : 'scaleX(-1)', filter: c.estado === 'tonto' ? 'saturate(0.4)' : furioso(st) ? 'drop-shadow(0 0 6px #ff3a3a)' : undefined }}>
                     <SpriteInimigo e={rei} />
                   </div>
-                  {c.estado === 'tonto' && (
+                  {c.estado === 'tonto' && !st.fim && (
                     <>
                       <span className="emote-pula absolute -top-[22%] left-1/2 block w-[34%] -translate-x-1/2">
                         <Emote emocao="surpreso" />

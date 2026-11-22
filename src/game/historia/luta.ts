@@ -110,7 +110,20 @@ export const RECURSO_ZERO: RecursoEstilo = { paginas: 0, muralhaAte: 0, redeAte:
 const NA_HORA_ESCUDO_MS = 300;
 const NA_HORA_ESQUIVA_MS = 250;
 const MURALHA_MS = 4500;
-const REDE_MS = 2600;
+/**
+ * AS LUTAS ÚNICAS (22/11/2026, pedido do Lucas: "cada um bem diferente, respeitando o jeito de cada um").
+ * Os quatro botões continuam sendo quatro, mas cada gladiador faz uma coisa diferente com eles:
+ * - Cassius (guardião): GLÁDIO · ESCUDO (segura enquanto o dedo está em cima) · DEVOLVER (só logo
+ *   depois de bloquear) · MURALHA. Não esquiva: o escudo dele, na hora certa, segura até o fogo.
+ * - Octavius (estrategista): TRIDENTE (fura a guarda de longe) · REDE (prende quem está atacando
+ *   ou aberto) · ROLAR (e o próximo golpe é pelas costas) · PLANO B. Não bloqueia.
+ * - Helios (vidente): LAMPEJO (com luz guardada, no aviso, cancela o ataque) · ESPELHO (devolve o
+ *   fogo) · PASSO DE SOMBRA (some e junta luz) · ECLIPSE.
+ */
+const ESCUDO_SEGURO_MS = 1500;
+const REDE_PRESO_MS = 1800;
+const REDE_RECARGA_MS = 5000;
+const PLANO_B_MS = 2600;
 
 export type AcaoJogador = 'parado' | 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'ferido';
 export type EstadoInimigo = 'espera' | 'sinal' | 'aberto' | 'atordoado';
@@ -141,7 +154,11 @@ export interface EventoLuta {
     | 'rede'
     | 'luz'
     | 'eclipse'
-    | 'erro';
+    | 'erro'
+    // as lutas únicas
+    | 'planob'
+    | 'lampejo'
+    | 'escapou';
   valor?: number;
   lado: 'jogador' | 'inimigo';
   ate: number;
@@ -161,6 +178,8 @@ export interface EstadoLuta {
     /** Até quando vale o CONTRA-ATAQUE (golpe logo depois de bloquear). */
     ripostaAte: number;
     esquivaPronta: number;
+    /** Octavius: quando a REDE pode ser jogada de novo. */
+    redePronta: number;
   };
   inimigo: {
     vida: number;
@@ -209,7 +228,7 @@ export function novaLuta(def: DefInimigo, atributos: AtributosLuta = ATRIBUTOS_I
     tempo: 0,
     def,
     estilo: RECURSO_ZERO,
-    jogador: { vida, vidaMax: vida, folego: FOLEGO_MAX, acao: 'parado', acaoDesde: 0, acaoAte: 0, golpePronto: 0, esquivaPronta: 0, ripostaAte: 0 },
+    jogador: { vida, vidaMax: vida, folego: FOLEGO_MAX, acao: 'parado', acaoDesde: 0, acaoAte: 0, golpePronto: 0, esquivaPronta: 0, ripostaAte: 0, redePronta: 0 },
     inimigo: { vida: def.vida, estado: 'espera', estadoAte: 0, fase: 0, ataque: 0, proximoEm: 1500, combo: 0, guardas: 0, contra: false },
     animo: 0,
     fim: null,
@@ -236,9 +255,11 @@ export function ataqueAtual(s: EstadoLuta): AtaqueInimigo {
 }
 
 /** O jogador apertou um botão. */
-export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'especial', a: AtributosLuta = ATRIBUTOS_INICIAIS): EstadoLuta {
+export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'soltar', a: AtributosLuta = ATRIBUTOS_INICIAIS): EstadoLuta {
   if (s.fim) return s;
   const j = s.jogador;
+  // Cassius tirou o dedo do ESCUDO: abaixa.
+  if (acao === 'soltar') return j.acao === 'escudo' && s.tempo < j.acaoAte ? { ...s, jogador: { ...j, acaoAte: s.tempo } } : s;
   if (j.acao === 'ferido' && s.tempo < j.acaoAte) return s;
   const ocupado = s.tempo < j.acaoAte && j.acao !== 'escudo';
   if (acao === 'especial') {
@@ -256,10 +277,9 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
       return comAliado(evento(tonto(r, 600), 'muralha', 'jogador'));
     }
     if (a.estilo === 'estrategista') {
-      // REDE E TRIDENTE: o inimigo fica preso na rede 3 s (não ataca) e as estocadas entram mais forte.
-      r = bater(r, 10 * forca, true);
-      r = { ...r, estilo: { ...r.estilo, redeAte: s.tempo + REDE_MS } };
-      return comAliado(evento(tonto(r, REDE_MS), 'rede', 'jogador'));
+      // PLANO B: o plano desenhado a giz acontece (barril, corda, guindaste): pancada e ele fica tonto um bom tempo.
+      r = bater(r, 16 * forca, true);
+      return comAliado(evento(tonto(r, PLANO_B_MS), 'planob', 'jogador'));
     }
     if (a.estilo === 'vidente') {
       // ECLIPSE: os próximos 3 ataques erram; a luz guardada vira um raio de sol.
@@ -273,11 +293,42 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     if (r.fim) return evento(r, tipo, 'jogador', qual);
     return evento(tonto(r, ATORDOADO_MS), tipo, 'jogador', qual);
   }
+  const forcaG = 1 + (a.forca - 1) * 0.2;
+  // CASSIUS, DEVOLVER: só logo depois de bloquear. O golpe volta dobrado e ele fica tonto.
+  if (a.estilo === 'guardiao' && acao === 'esquiva') {
+    if (ocupado || s.tempo >= j.ripostaAte) return s;
+    if (j.folego < 10) return evento(s, 'cansado', 'jogador');
+    const r: EstadoLuta = { ...s, jogador: { ...j, folego: j.folego - 10, ripostaAte: 0, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, golpePronto: s.tempo + RECARGA_GOLPE_MS } };
+    const g = bater({ ...r, inimigo: { ...r.inimigo, guardas: 0 } }, 7 * forcaG * 2.4);
+    const tonto = g.fim ? g : { ...g, inimigo: { ...g.inimigo, estado: 'atordoado' as const, estadoAte: s.tempo + 800, combo: 0, contra: false } };
+    return ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a);
+  }
+  // OCTAVIUS, REDE: presa quem está atacando (cancela o golpe) ou aberto; na guarda, ele escapa.
+  if (a.estilo === 'estrategista' && acao === 'escudo') {
+    if (ocupado || s.tempo < j.redePronta) return s;
+    if (j.folego < 20) return evento(s, 'cansado', 'jogador');
+    const r: EstadoLuta = { ...s, jogador: { ...j, folego: j.folego - 20, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, redePronta: s.tempo + REDE_RECARGA_MS } };
+    const i = r.inimigo;
+    if (i.estado === 'espera') return evento(r, 'escapou', 'inimigo');
+    const preso: EstadoLuta = { ...r, estilo: { ...r.estilo, redeAte: s.tempo + REDE_PRESO_MS }, inimigo: { ...i, estado: 'atordoado', estadoAte: s.tempo + REDE_PRESO_MS, combo: 0, contra: false, guardas: 0, ataque: i.estado === 'sinal' ? i.ataque + 1 : i.ataque } };
+    return ganharAnimo(evento(preso, 'rede', 'inimigo'), 8, a);
+  }
+  // HELIOS, LAMPEJO no aviso: com luz guardada, o raio cancela o ataque e ele fica aberto.
+  if (a.estilo === 'vidente' && acao === 'golpe' && s.inimigo.estado === 'sinal' && s.estilo.luz > 0 && ataqueAtual(s).tipo !== 'finta') {
+    if (ocupado || s.tempo < j.golpePronto) return s;
+    if (j.folego < CUSTO.golpe) return evento(s, 'cansado', 'jogador');
+    const at = ataqueAtual(s);
+    const r: EstadoLuta = { ...s, estilo: { ...s.estilo, luz: s.estilo.luz - 1 }, jogador: { ...j, folego: j.folego - CUSTO.golpe, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, golpePronto: s.tempo + RECARGA_GOLPE_MS } };
+    const g = bater(r, 7 * forcaG * 0.8);
+    if (g.fim) return evento(g, 'lampejo', 'jogador');
+    const aberto: EstadoLuta = { ...g, inimigo: { ...g.inimigo, estado: 'aberto', estadoAte: s.tempo + at.abertoMs + 300, combo: 0, contra: false, ataque: g.inimigo.ataque + 1 } };
+    return ganharAnimo(evento(aberto, 'lampejo', 'jogador'), 10, a);
+  }
   if (acao !== 'golpe' && ocupado) return s;
   if (acao === 'golpe' && (ocupado || s.tempo < j.golpePronto)) return s;
   if (acao === 'esquiva' && s.tempo < j.esquivaPronta) return s;
   // O custo de cada ação muda com o estilo: o Guardião esquiva pesado; o Estrategista apara leve.
-  const custo = CUSTO[acao] + (a.estilo === 'guardiao' && acao === 'esquiva' ? 8 : 0) - (a.estilo === 'estrategista' && acao === 'escudo' ? 4 : 0);
+  const custo = CUSTO[acao] - (a.estilo === 'guardiao' && acao === 'escudo' ? 4 : 0);
   if (j.folego < custo) return evento(s, 'cansado', 'jogador');
   const folego = j.folego - custo;
   if (acao === 'golpe') {
@@ -287,7 +338,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     const sabe = (t: Tecnica) => a.tecnicas?.includes(t) ?? false;
     // CONTRA-ATAQUE (aprendido no Ludus): golpe logo depois de bloquear entra dobrado e deixa ele tonto.
     // (A ESQUIVA DUPLA do Octavius faz o mesmo depois de esquivar.)
-    if (s.tempo < j.ripostaAte) {
+    if (s.tempo < j.ripostaAte && a.estilo !== 'guardiao') {
       const rr: EstadoLuta = { ...r, jogador: { ...r.jogador, ripostaAte: 0 } };
       const g = bater({ ...rr, inimigo: { ...i, guardas: 0 } }, base * 2.2);
       const tonto = g.fim ? g : { ...g, inimigo: { ...g.inimigo, estado: 'atordoado' as const, estadoAte: s.tempo + 700, combo: 0, contra: false } };
@@ -310,6 +361,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
       return ganharAnimo(bater({ ...r, inimigo: { ...i, guardas: 0 } }, cheio * naRede), 5, a);
     }
     if (i.estado === 'sinal') return ganharAnimo(bater(r, base * 0.5 * muralha), 2, a);
+    if (a.estilo === 'estrategista') return ganharAnimo(evento(bater(r, gigante ? 0 : base * 0.35), 'guarda', 'inimigo'), 1, a);
     // Na guarda: quase nada entra, e na terceira vez seguida ele contra-ataca.
     const guardas = i.guardas + 1;
     let g = evento(bater(r, gigante ? 0 : 1), 'guarda', 'inimigo');
@@ -324,9 +376,9 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     }
     return { ...g, inimigo: { ...g.inimigo, guardas } };
   }
-  if (acao === 'escudo') return { ...s, jogador: { ...j, folego, acao: 'escudo', acaoDesde: s.tempo, acaoAte: s.tempo + ESCUDO_MS } };
+  if (acao === 'escudo') return { ...s, jogador: { ...j, folego, acao: 'escudo', acaoDesde: s.tempo, acaoAte: s.tempo + (a.estilo === 'guardiao' ? ESCUDO_SEGURO_MS : ESCUDO_MS) } };
   // ESQUIVA DUPLA (Octavius): a esquiva recarrega na metade do tempo. O Guardião, de armadura, demora mais.
-  const recarga = (a.tecnicas?.includes('esquiva-dupla') ? RECARGA_ESQUIVA_MS / 2 : RECARGA_ESQUIVA_MS) * (a.estilo === 'guardiao' ? 1.3 : 1);
+  const recarga = a.tecnicas?.includes('esquiva-dupla') ? RECARGA_ESQUIVA_MS / 2 : RECARGA_ESQUIVA_MS;
   return { ...s, jogador: { ...j, folego, acao: 'esquiva', acaoDesde: s.tempo, acaoAte: s.tempo + ESQUIVA_MS, esquivaPronta: s.tempo + recarga } };
 }
 
@@ -389,6 +441,13 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
   const naHora = (janela: number) => s.tempo - j.acaoDesde <= janela;
   // ESPELHO DE SOL (Helios): escudo levantado bem na hora do golpe (até 260 ms antes) reflete o
   // ataque, até o fogo e a investida. O inimigo leva o golpe de volta e fica tonto.
+  // ESPELHO (Helios): o fogo volta inteiro para quem soprou, e ele fica tonto.
+  if (fazendo === 'escudo' && a.estilo === 'vidente' && at.tipo === 'fogo') {
+    let r = bater(s, at.dano * (1 + (a.forca - 1) * 0.2));
+    r = ganharAnimo(evento(r, 'reflexo', 'inimigo'), 12, a);
+    if (r.fim) return r;
+    return protegerCombo(depoisDoGolpe(r, at, at.abertoMs + 400), 'escudo');
+  }
   if (fazendo === 'escudo' && a.tecnicas?.includes('espelho-de-sol') && s.tempo - j.acaoDesde <= 260) {
     let r = bater(s, at.dano * 0.8 * (1 + (a.forca - 1) * 0.2));
     r = ganharAnimo(evento(r, 'reflexo', 'inimigo'), 12, a);
@@ -406,11 +465,13 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
         aberto += 800;
       }
       // Vidente: esquiva na última hora junta LUZ (até 3), que fortalece o Eclipse.
-      if (a.estilo === 'vidente' && esquivou.estilo.luz < 3) {
-        esquivou = evento({ ...esquivou, estilo: { ...esquivou.estilo, luz: esquivou.estilo.luz + 1 } }, 'luz', 'jogador', esquivou.estilo.luz + 1);
+      if (a.estilo === 'vidente') {
+        aberto += 600;
+        if (esquivou.estilo.luz < 3) esquivou = evento({ ...esquivou, estilo: { ...esquivou.estilo, luz: esquivou.estilo.luz + 1 } }, 'luz', 'jogador', esquivou.estilo.luz + 1);
       }
     }
-    const dupla = a.tecnicas?.includes('esquiva-dupla') ? { ...esquivou, jogador: { ...esquivou.jogador, ripostaAte: s.tempo + 550 } } : esquivou;
+    // Octavius rolou: está nas costas dele, o próximo golpe entra como contra-ataque.
+    const dupla = a.tecnicas?.includes('esquiva-dupla') || a.estilo === 'estrategista' ? { ...esquivou, jogador: { ...esquivou.jogador, ripostaAte: s.tempo + 650 } } : esquivou;
     return protegerCombo(depoisDoGolpe(dupla, at, aberto), 'esquiva');
   }
   if (fazendo === 'escudo' && at.tipo === 'corpo') {
@@ -419,18 +480,25 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
     if (a.estilo === 'guardiao' && naHora(NA_HORA_ESCUDO_MS) && bloqueou.estilo.paginas < 3) {
       bloqueou = evento({ ...bloqueou, estilo: { ...bloqueou.estilo, paginas: bloqueou.estilo.paginas + 1 } }, 'pagina', 'jogador', bloqueou.estilo.paginas + 1);
     }
-    // Estrategista: o escudo dele é fraco, passa um quarto do golpe (sem derrubar).
-    if (a.estilo === 'estrategista') {
-      const vaza = Math.round((at.dano * 0.25) / (1 + (a.defesa - 1) * 0.15));
+    // Helios: o espelho é frágil contra pancada, passa metade do golpe.
+    if (a.estilo === 'vidente') {
+      const vaza = Math.round((at.dano * 0.5) / (1 + (a.defesa - 1) * 0.15));
       const vida = Math.max(0, bloqueou.jogador.vida - vaza);
       bloqueou = evento({ ...bloqueou, jogador: { ...bloqueou.jogador, vida } }, 'dano', 'jogador', vaza);
       if (vida <= 0) return { ...bloqueou, fim: 'derrota' };
     }
-    const comContra = a.tecnicas?.includes('contra-ataque') ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } } : bloqueou;
+    // Cassius sempre pode DEVOLVER logo depois de bloquear (os outros, com o contra-ataque do Ludus).
+    const comContra =
+      a.estilo === 'guardiao' ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 900 } } : a.tecnicas?.includes('contra-ataque') ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } } : bloqueou;
     return protegerCombo(depoisDoGolpe(comContra, at, at.abertoMs), 'escudo');
   }
-  // Escudo contra fogo ou investida segura só metade (o do Guardião segura 70%).
-  const fator = fazendo === 'escudo' ? (a.estilo === 'guardiao' ? 0.3 : 0.5) : 1;
+  // Cassius: escudo levantado na hora certa segura até o fogo e a investida, inteiros.
+  if (fazendo === 'escudo' && a.estilo === 'guardiao' && naHora(NA_HORA_ESCUDO_MS)) {
+    const r = ganharAnimo(evento(s, 'bloqueio', 'jogador'), 8, a);
+    return protegerCombo(depoisDoGolpe(r, at, at.abertoMs), 'escudo');
+  }
+  // Escudo contra fogo ou investida segura só metade (o do Guardião segura 75%; o espelho não para investida).
+  const fator = fazendo === 'escudo' ? (a.estilo === 'guardiao' ? 0.25 : a.estilo === 'vidente' && at.tipo === 'investida' ? 1 : 0.5) : 1;
   const dano = Math.round((at.dano * fator) / (1 + (a.defesa - 1) * 0.15));
   const vida = Math.max(0, j.vida - dano);
   let r: EstadoLuta = evento({ ...s, jogador: { ...j, vida, acao: 'ferido', acaoDesde: s.tempo, acaoAte: s.tempo + FERIDO_MS } }, 'dano', 'jogador', dano);

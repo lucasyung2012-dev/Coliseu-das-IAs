@@ -272,6 +272,9 @@ const SOM: Partial<Record<string, SomHistoria>> = {
   luz: 'reflexo',
   eclipse: 'especial',
   erro: 'finta',
+  planob: 'especial',
+  lampejo: 'reflexo',
+  escapou: 'finta',
 };
 
 /**
@@ -281,29 +284,29 @@ const SOM: Partial<Record<string, SomHistoria>> = {
 const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [string, string]; esquiva: [string, string]; especial: [string, string]; icones: Record<'golpe' | 'escudo' | 'esquiva' | 'especial', string>; dica: string; cor: string }> = {
   guardiao: {
     golpe: ['', 'GLÁDIO'],
-    escudo: ['', 'ESCUDO'],
-    esquiva: ['', 'ESQUIVA'],
+    escudo: ['', 'SEGURE O ESCUDO'],
+    esquiva: ['', 'DEVOLVER'],
     especial: ['', 'MURALHA'],
-    icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'esquiva', especial: 'muralha' },
-    dica: 'GUARDIÃO: bloqueie NA ÚLTIMA HORA para guardar páginas; o próximo golpe no ABERTO cita todas e bate muito. Esquiva pesada. MURALHA: tudo bloqueado e metade volta.',
+    icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'aparar', especial: 'muralha' },
+    dica: 'GUARDIÃO: SEGURE o escudo (não tem esquiva). Levantado NA ÚLTIMA HORA, segura até o fogo e guarda uma página. Depois de bloquear, DEVOLVER bate dobrado. O golpe no ABERTO cita as páginas.',
     cor: '#e0782c',
   },
   estrategista: {
     golpe: ['', 'TRIDENTE'],
-    escudo: ['', 'APARAR'],
+    escudo: ['', 'REDE'],
     esquiva: ['', 'ROLAR'],
-    especial: ['', 'REDE'],
-    icones: { golpe: 'tridente', escudo: 'aparar', esquiva: 'rolar', especial: 'rede' },
-    dica: 'ESTRATEGISTA: role NA ÚLTIMA HORA e ele TROPEÇA (fica aberto muito tempo). Aparar deixa passar um pouco. Use os PLANOS do cenário. REDE: preso e sem atacar.',
+    especial: ['', 'PLANO B'],
+    icones: { golpe: 'tridente', escudo: 'rede', esquiva: 'rolar', especial: 'mapa' },
+    dica: 'ESTRATEGISTA: não bloqueia. ROLE (na última hora ele tropeça) e o próximo golpe é pelas costas. A REDE prende quem está atacando ou aberto. O TRIDENTE fura a guarda de longe. Use os PLANOS do cenário.',
     cor: '#2aa08a',
   },
   vidente: {
-    golpe: ['', 'LANÇA'],
+    golpe: ['', 'LAMPEJO'],
     escudo: ['', 'ESPELHO'],
-    esquiva: ['', 'LAMPEJO'],
+    esquiva: ['', 'PASSO DE SOMBRA'],
     especial: ['', 'ECLIPSE'],
-    icones: { golpe: 'lanca', escudo: 'espelho', esquiva: 'lampejo', especial: 'eclipse' },
-    dica: 'VIDENTE: você vê o PRÓXIMO golpe (até as fintas). Lampejo NA ÚLTIMA HORA junta luz. Menos vida. ECLIPSE: os 3 próximos golpes erram, e a luz vira raio.',
+    icones: { golpe: 'lampejo', escudo: 'espelho', esquiva: 'esquiva', especial: 'eclipse' },
+    dica: 'VIDENTE: você vê o PRÓXIMO golpe. PASSO DE SOMBRA na última hora junta LUZ. Com luz, o LAMPEJO no aviso cancela o ataque. O ESPELHO devolve o fogo (pancada passa metade). ECLIPSE: 3 golpes erram.',
     cor: '#f2c14e',
   },
   neutro: {
@@ -320,7 +323,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
 /** A cena de entrada do especial (como nos jogos de luta): faixa na diagonal com o gladiador e o nome. */
 const NOME_ESPECIAL: Partial<Record<EventoLuta['tipo'], string>> = {
   muralha: 'MURALHA DE LIVROS',
-  rede: 'REDE E TRIDENTE',
+  planob: 'PLANO B',
   eclipse: 'ECLIPSE',
   especial: 'GOLPE ESPECIAL',
 };
@@ -342,10 +345,13 @@ const TEXTO: Record<string, string> = {
   citacao: 'CITAÇÃO!',
   muralha: '',
   tropeco: 'TROPEÇOU!',
-  rede: '',
+  rede: 'PRESO NA REDE!',
   luz: '+LUZ!',
   eclipse: '',
   erro: 'X ERROU!',
+  planob: '',
+  lampejo: 'LAMPEJO! CANCELOU!',
+  escapou: 'ESCAPOU DA REDE',
 };
 
 /** O que pode aparecer no cenário para o Octavius usar (no porto, no navio...). */
@@ -442,6 +448,46 @@ function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
 }
 
 /**
+ * O ESPECIAL DE CINEMA (22/11/2026): a tela escurece, o gladiador entra grande, o nome em letras
+ * enormes e o efeito de cada um. Muralha: livros caindo do céu. Plano B: o plano desenhado a giz
+ * (setas e o X). Eclipse: a lua cobrindo o sol e as estrelas aparecendo.
+ */
+function CinemaEspecial({ tipo, heroi, cor }: { tipo: EventoLuta['tipo']; heroi: Falante; cor: string }) {
+  const livros = ['#c0283c', '#2a6aa0', '#e0782c', '#3a8a4a', '#8a3aa0', '#d0a040', '#c0283c', '#2a6aa0', '#3a8a4a', '#e0782c'];
+  return (
+    <div className="cinema-especial pointer-events-none absolute inset-0 z-[26] overflow-hidden" aria-hidden>
+      <div className="absolute inset-0 bg-black/80" />
+      {tipo === 'muralha' &&
+        livros.map((c, k) => (
+          <span key={k} className="livro-cai absolute top-0 block h-[16%] w-[5%] border-2 border-black" style={{ left: `${8 + k * 9}%`, background: c, animationDelay: `${(k * 97) % 500}ms` }} />
+        ))}
+      {tipo === 'planob' && (
+        <svg viewBox="0 0 100 56" className="absolute inset-0 h-full w-full">
+          <path className="giz" d="M10 44 Q 30 10 52 30 T 88 16" fill="none" stroke="#f4f0e0" strokeWidth="1.2" strokeDasharray="3 2" />
+          <path className="giz" style={{ animationDelay: '250ms' }} d="M84 12 L 89 16 L 83 19" fill="none" stroke="#f4f0e0" strokeWidth="1.2" />
+          <path className="giz" style={{ animationDelay: '450ms' }} d="M66 36 L 74 44 M 74 36 L 66 44" stroke="#ff6a5a" strokeWidth="1.6" />
+          <circle className="giz" style={{ animationDelay: '150ms' }} cx="20" cy="40" r="4" fill="none" stroke="#f4f0e0" strokeWidth="1" />
+        </svg>
+      )}
+      {tipo === 'eclipse' && (
+        <>
+          <span className="sol-eclipse absolute left-1/2 top-[22%] block aspect-square w-[22%] -translate-x-1/2 rounded-full bg-[#ffd04a] shadow-[0_0_40px_#ffb03a]" />
+          <span className="lua-eclipse absolute top-[22%] block aspect-square w-[22%] rounded-full bg-[#0a0814]" />
+          {Array.from({ length: 14 }, (_, k) => (
+            <span key={k} className="estrela-eclipse absolute block h-[3px] w-[3px] bg-white" style={{ left: `${(k * 37) % 96 + 2}%`, top: `${(k * 23) % 80 + 5}%`, animationDelay: `${600 + k * 40}ms` }} />
+          ))}
+        </>
+      )}
+      <div className="corte-faixa absolute inset-x-0 top-[62%] h-[26%]" style={{ background: `linear-gradient(100deg, transparent 0%, ${cor}dd 12%, #120806ee 45%, ${cor}dd 88%, transparent 100%)` }} />
+      <div className="cinema-heroi absolute bottom-[4%] left-[4%] w-[30%]">
+        <Retrato quem={heroi} />
+      </div>
+      <span className="cinema-nome absolute left-[38%] top-[66%] font-pixel text-base text-white [text-shadow:3px_3px_0_#000] sm:text-4xl">{NOME_ESPECIAL[tipo]}!</span>
+    </div>
+  );
+}
+
+/**
  * A luta do modo História: falas antes, a luta, falas depois. Perdeu? Tenta de novo.
  * Controles: golpe, escudo, esquiva e especial (Ânimo cheio).
  * Teclado: J golpe, K escudo, L esquiva, espaço especial.
@@ -504,6 +550,7 @@ export function LutaHistoria({
     setLuzAte(0);
   };
   const [feitos, setFeitos] = useState(0);
+  const [cinema, setCinema] = useState<{ tipo: EventoLuta['tipo']; id: number } | null>(null);
   // Antes de tudo, o inimigo CHEGA (inteiro, com animação): ninguém aparece do nada.
   const entrada = treino ? null : entradaPedida ?? entradaDe(inimigo, !!def.chefao);
   const [fase, setFase] = useState<'chegada' | 'antes' | 'luta' | 'depois' | 'derrota'>(entrada ? 'chegada' : antes?.length ? 'antes' : 'luta');
@@ -542,7 +589,18 @@ export function LutaHistoria({
       if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
       // No treino do ESPECIAL vale o especial de qualquer jeito de lutar (Muralha, Rede, Eclipse).
-      if (treino && (ev.tipo === treino.evento || (treino.evento === 'especial' && (ev.tipo === 'muralha' || ev.tipo === 'rede' || ev.tipo === 'eclipse')))) setFeitos((n) => n + 1);
+      // Cada um treina com a defesa dele: o Cassius não esquiva (bloqueia) e o Octavius não bloqueia (rola).
+      const vale =
+        ev.tipo === treino?.evento ||
+        (treino?.evento === 'especial' && (ev.tipo === 'muralha' || ev.tipo === 'planob' || ev.tipo === 'eclipse')) ||
+        (treino?.evento === 'esquiva' && estilo === 'guardiao' && ev.tipo === 'bloqueio') ||
+        (treino?.evento === 'bloqueio' && estilo === 'estrategista' && ev.tipo === 'esquiva');
+      if (treino && vale) setFeitos((n) => n + 1);
+      // O especial vira cena de cinema por um segundo e meio.
+      if (NOME_ESPECIAL[ev.tipo] && !treino) {
+        setCinema({ tipo: ev.tipo, id: ev.id });
+        window.setTimeout(() => setCinema((c) => (c?.id === ev.id ? null : c)), 1600);
+      }
     }
     visto.current = Math.max(visto.current, ...e.eventos.map((x) => x.id), 0);
     if (fase === 'luta' && e.fim === 'vitoria') {
@@ -587,8 +645,16 @@ export function LutaHistoria({
         apertar('especial');
       }
     };
+    const soltarTecla = (ev: KeyboardEvent) => {
+      const k = ev.key.toLowerCase();
+      if (k === 'k' || k === 'arrowdown') setE((s) => agir(s, 'soltar', atributosRef.current));
+    };
     window.addEventListener('keydown', tecla);
-    return () => window.removeEventListener('keydown', tecla);
+    window.addEventListener('keyup', soltarTecla);
+    return () => {
+      window.removeEventListener('keydown', tecla);
+      window.removeEventListener('keyup', soltarTecla);
+    };
   }, [fase, pausado]);
 
   const j = e.jogador;
@@ -625,8 +691,6 @@ export function LutaHistoria({
   const rec = e.estilo;
   const naMuralha = e.tempo < rec.muralhaAte;
   const naRede = e.tempo < rec.redeAte;
-  // A faixa do especial: aparece enquanto o evento do especial está na tela.
-  const especialAgora = e.eventos.find((ev) => NOME_ESPECIAL[ev.tipo] && ev.ate - e.tempo > 0);
 
   // Treino: chegou no objetivo, acabou (as falas de "depois" aparecem).
   useEffect(() => {
@@ -907,15 +971,7 @@ export function LutaHistoria({
         {/* pouca vida: as bordas pulsam vermelho */}
         {fase === 'luta' && j.vida / j.vidaMax < 0.3 && <div className="perigo-bordas pointer-events-none absolute inset-0 z-[18]" aria-hidden />}
         {/* A faixa do especial: o gladiador grande na diagonal e o nome do golpe */}
-        {especialAgora && !treino && (
-          <div key={especialAgora.id} className="corte-especial pointer-events-none absolute inset-x-0 top-[30%] z-[25] flex h-[34%] items-center overflow-hidden" aria-hidden>
-            <div className="corte-faixa absolute inset-0" style={{ background: `linear-gradient(100deg, transparent 0%, ${bot.cor}dd 12%, #120806ee 45%, ${bot.cor}dd 88%, transparent 100%)` }} />
-            <div className="corte-heroi relative ml-[8%] w-[18%]">
-              <Retrato quem={heroi} />
-            </div>
-            <span className="corte-nome relative ml-[4%] font-pixel text-sm text-white [text-shadow:3px_3px_0_#000] sm:text-3xl">{NOME_ESPECIAL[especialAgora.tipo]}!</span>
-          </div>
-        )}
+        {cinema && <CinemaEspecial key={cinema.id} tipo={cinema.tipo} heroi={heroi} cor={bot.cor} />}
         {/* LUTE! no começo */}
         {fase === 'luta' && e.tempo < 1100 && (
           <span className="lute-entra pointer-events-none absolute left-1/2 top-[38%] z-30 -translate-x-1/2 font-pixel text-3xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-5xl">LUTE!</span>
@@ -976,7 +1032,7 @@ export function LutaHistoria({
       </Palco>
 
       {/* Os botões grandes (bons para o iPad) */}
-      <div className="botoes-luta grid grid-cols-4 gap-2">
+      <div className={`botoes-luta botoes-${estilo ?? 'neutro'} grid grid-cols-4 gap-2`}>
         {(
           [
             ['golpe', bot.icones.golpe, bot.golpe[1], '#e04a3a'],
@@ -988,12 +1044,27 @@ export function LutaHistoria({
           <button
             key={acao}
             type="button"
-            disabled={fase !== 'luta' || (acao === 'especial' && !cheio)}
+            disabled={
+              fase !== 'luta' ||
+              (acao === 'especial' && !cheio) ||
+              (acao === 'esquiva' && estilo === 'guardiao' && e.tempo >= j.ripostaAte) ||
+              (acao === 'escudo' && estilo === 'estrategista' && e.tempo < j.redePronta)
+            }
             onPointerDown={(ev) => {
               ev.preventDefault();
+              if (acao === 'escudo' && estilo === 'guardiao') ev.currentTarget.setPointerCapture?.(ev.pointerId);
               apertar(acao);
             }}
-            className={`pixel-box botao-luta flex select-none flex-col items-center gap-1 pb-2 pt-3 disabled:opacity-40 sm:pb-3 sm:pt-4 ${acao === 'especial' && cheio ? 'pronto' : ''}`}
+            onPointerUp={() => acao === 'escudo' && estilo === 'guardiao' && setE((s) => agir(s, 'soltar', atributosRef.current))}
+            onPointerCancel={() => acao === 'escudo' && estilo === 'guardiao' && setE((s) => agir(s, 'soltar', atributosRef.current))}
+            onContextMenu={(ev) => ev.preventDefault()}
+            className={`pixel-box botao-luta botao-${acao} flex select-none flex-col items-center gap-1 pb-2 pt-3 disabled:opacity-40 sm:pb-3 sm:pt-4 ${
+              (acao === 'especial' && cheio) ||
+              (acao === 'esquiva' && estilo === 'guardiao' && e.tempo < j.ripostaAte) ||
+              (acao === 'golpe' && estilo === 'vidente' && e.inimigo.estado === 'sinal' && rec.luz > 0)
+                ? 'pronto'
+                : ''
+            }`}
             style={{ '--cor': cor } as CSSProperties}
             aria-label={nome}
           >

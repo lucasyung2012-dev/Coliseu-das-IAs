@@ -29,16 +29,22 @@ function bomJogador(def: DefInimigo, a: AtributosLuta, erraACada = 5): EstadoLut
         defesas++;
         if (defesas % erraACada === 0) continue;
         const at = ataqueAtual(s);
-        // Cada estilo defende do seu jeito: o Vidente vê a finta e não gasta fôlego com ela;
-        // o Estrategista prefere rolar (o escudo dele é fraco).
+        // Cada estilo defende do seu jeito (as lutas únicas, 22/11/2026): o Cassius só levanta o
+        // escudo; o Octavius rola (e joga a rede quando o rolamento não recarregou); o Helios vê a
+        // finta, devolve o fogo no espelho e some no resto.
         if (a.estilo === 'vidente' && at.tipo === 'finta') continue;
-        const rola = a.estilo === 'estrategista' && s.tempo >= s.jogador.esquivaPronta && s.jogador.folego >= 40;
-        s = agir(s, rola || !(at.tipo === 'corpo' || at.tipo === 'finta') ? 'esquiva' : 'escudo', a);
+        let acao: 'escudo' | 'esquiva';
+        if (a.estilo === 'guardiao') acao = 'escudo';
+        else if (a.estilo === 'estrategista') acao = s.tempo >= j.esquivaPronta || s.tempo < j.redePronta ? 'esquiva' : 'escudo';
+        else if (a.estilo === 'vidente') acao = at.tipo === 'fogo' ? 'escudo' : 'esquiva';
+        else acao = at.tipo === 'corpo' || at.tipo === 'finta' ? 'escudo' : 'esquiva';
+        s = agir(s, acao, a);
       }
       continue;
     }
     if (i.estado === 'aberto' || i.estado === 'atordoado') {
       if (s.animo >= ANIMO_MAX) s = agir(s, 'especial', a);
+      else if (a.estilo === 'guardiao' && s.tempo < j.ripostaAte) s = agir(s, 'esquiva', a);
       else if (j.folego >= 40) s = agir(s, 'golpe', a);
       continue;
     }

@@ -39,9 +39,24 @@ describe('Cassius, o Guardião', () => {
     expect(s.inimigo.vida - comPaginas.inimigo.vida).toBeGreaterThan(2.5 * (s.inimigo.vida - semPaginas.inimigo.vida));
     expect(comPaginas.eventos.some((e) => e.tipo === 'citacao')).toBe(true);
   });
-  it('o escudo segura 70% do fogo', () => {
-    const s = defender(novaLuta(boneco('fogo'), a), a, 'escudo');
-    expect(s.jogador.vidaMax - s.jogador.vida).toBe(6);
+  it('o escudo na hora certa segura até o fogo inteiro; cedo, segura 75%', () => {
+    expect(defender(novaLuta(boneco('fogo'), a), a, 'escudo', 150).jogador.vida).toBe(100);
+    const cedo = defender(novaLuta(boneco('fogo'), a), a, 'escudo', 600);
+    expect(cedo.jogador.vidaMax - cedo.jogador.vida).toBe(5);
+  });
+  it('o escudo fica levantado enquanto segura, e abaixa ao soltar', () => {
+    let s = agir(novaLuta(boneco(), a), 'escudo', a);
+    expect(s.jogador.acaoAte - s.tempo).toBeGreaterThan(1000);
+    s = agir(s, 'soltar', a);
+    expect(s.jogador.acaoAte).toBe(s.tempo);
+  });
+  it('DEVOLVER: só depois de bloquear, e bate dobrado', () => {
+    const parado = novaLuta(boneco(), a);
+    expect(agir(parado, 'esquiva', a)).toBe(parado);
+    const s = defender(novaLuta(boneco(), a), a, 'escudo');
+    const d = agir({ ...s, jogador: { ...s.jogador, acaoAte: 0 } }, 'esquiva', a);
+    expect(d.eventos.some((e) => e.tipo === 'riposta')).toBe(true);
+    expect(s.inimigo.vida - d.inimigo.vida).toBeGreaterThanOrEqual(16);
   });
   it('MURALHA DE LIVROS: bloqueia tudo e devolve metade', () => {
     let s = { ...novaLuta(boneco('fogo'), a), animo: ANIMO_MAX };
@@ -62,15 +77,31 @@ describe('Octavius, o Estrategista', () => {
     expect(naHora.eventos.some((e) => e.tipo === 'tropeco')).toBe(true);
     expect(naHora.inimigo.estadoAte - naHora.tempo).toBeGreaterThan(cedo.inimigo.estadoAte - cedo.tempo + 600);
   });
-  it('aparar deixa passar um pouco do golpe', () => {
-    const s = defender(novaLuta(boneco(), a), a, 'escudo');
-    expect(s.jogador.vidaMax - s.jogador.vida).toBe(5);
+  it('REDE no ataque: cancela o golpe e prende; na guarda, ele escapa; depois recarrega', () => {
+    let s = novaLuta(boneco(), a);
+    expect(agir(s, 'escudo', a).eventos.some((e) => e.tipo === 'escapou')).toBe(true);
+    for (let k = 0; k < 400 && s.inimigo.estado !== 'sinal'; k++) s = passoLuta(s, a, fixo);
+    const preso = agir(s, 'escudo', a);
+    expect(preso.inimigo.estado).toBe('atordoado');
+    expect(preso.eventos.some((e) => e.tipo === 'rede')).toBe(true);
+    expect(agir({ ...preso, jogador: { ...preso.jogador, acaoAte: 0 } }, 'escudo', a).jogador.redePronta).toBe(preso.jogador.redePronta);
   });
-  it('REDE: o inimigo fica preso quase 3 segundos', () => {
+  it('TRIDENTE: fura um pouco a guarda de longe, sem provocar contra-ataque', () => {
+    let s = novaLuta(boneco(), a);
+    for (let k = 0; k < 3; k++) s = agir({ ...s, jogador: { ...s.jogador, golpePronto: 0, acaoAte: 0 } }, 'golpe', a);
+    expect(500 - s.inimigo.vida).toBeGreaterThan(6);
+    expect(s.inimigo.contra).toBe(false);
+  });
+  it('ROLAR: o próximo golpe é pelas costas (contra-ataque)', () => {
+    const s = defender(novaLuta(boneco(), a), a, 'esquiva');
+    const g = agir({ ...s, jogador: { ...s.jogador, acaoAte: 0, golpePronto: 0 } }, 'golpe', a);
+    expect(g.eventos.some((e) => e.tipo === 'riposta')).toBe(true);
+  });
+  it('PLANO B: pancada e ele fica tonto um bom tempo', () => {
     const s = agir({ ...novaLuta(boneco(), a), animo: ANIMO_MAX }, 'especial', a);
     expect(s.inimigo.estado).toBe('atordoado');
     expect(s.inimigo.estadoAte - s.tempo).toBeGreaterThanOrEqual(2500);
-    expect(s.eventos.some((e) => e.tipo === 'rede')).toBe(true);
+    expect(s.eventos.some((e) => e.tipo === 'planob')).toBe(true);
   });
 });
 
@@ -84,6 +115,20 @@ describe('Helios, o Vidente', () => {
     let s = novaLuta(boneco(), a);
     s = { ...s, estilo: { ...s.estilo, luz: 3 } };
     expect(defender(s, a, 'esquiva', 150).estilo.luz).toBe(3);
+  });
+  it('ESPELHO: o fogo volta inteiro para quem soprou', () => {
+    const s = defender(novaLuta(boneco('fogo'), a), a, 'escudo');
+    expect(s.jogador.vida).toBe(s.jogador.vidaMax);
+    expect(500 - s.inimigo.vida).toBe(20);
+  });
+  it('LAMPEJO com luz, no aviso: cancela o ataque e gasta a luz', () => {
+    let s = novaLuta(boneco(), a);
+    s = { ...s, estilo: { ...s.estilo, luz: 1 } };
+    for (let k = 0; k < 400 && s.inimigo.estado !== 'sinal'; k++) s = passoLuta(s, a, fixo);
+    const l = agir(s, 'golpe', a);
+    expect(l.estilo.luz).toBe(0);
+    expect(l.inimigo.estado).toBe('aberto');
+    expect(l.eventos.some((e) => e.tipo === 'lampejo')).toBe(true);
   });
   it('ECLIPSE: os 3 próximos golpes erram, e a luz vira dano', () => {
     const base = { ...novaLuta(boneco(), a), animo: ANIMO_MAX };
