@@ -185,6 +185,13 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                   <div className="absolute bottom-0 right-[8%] top-0 w-[8%] bg-[#4a2a14]" />
                 </>
               )}
+              {/* Cordame: a corda de navio pendurada lá de cima, com o nó onde se pisa */}
+              {p.tipo === 'cordame' && (
+                <>
+                  <div className="absolute bottom-0 left-1/2 top-[-400%] w-[6%] -translate-x-1/2 bg-[repeating-linear-gradient(180deg,#c8b890_0_4px,#8a7a5a_4px_6px)]" />
+                  <div className="absolute inset-x-[10%] top-0 h-[14%] rounded-full border-2 border-[#5a3a1c] bg-[#a8844a]" />
+                </>
+              )}
               {/* Barco: casco de madeira balançando na água, com a borda e o banco */}
               {p.tipo === 'barco' && (
                 <div className="barco-balanca absolute inset-x-0 bottom-[-40%] top-0">
@@ -383,13 +390,19 @@ function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
   const fase = (tempo + (p.atrasoMs ?? 0)) % ciclo;
   const noChao = fase < p.acesoMs;
   const caindo = !noChao && fase > ciclo - 700 ? (fase - (ciclo - 700)) / 700 : -1;
-  const icone = p.figura === 'tomate' ? 'tomate' : 'viga';
+  const icone = p.figura === 'tomate' ? 'tomate' : p.figura === 'bala' ? 'bala' : 'viga';
   if (!noChao && caindo < 0) return null;
   return (
     <>
       <span className="absolute inset-x-[-20%] bottom-0 h-[20%] rounded-[50%] bg-black/50" style={{ opacity: noChao ? 0.7 : 0.2 + caindo * 0.6 }} />
       <span className="absolute bottom-0 left-1/2 block w-[200%]" style={{ transform: `translate(-50%, ${noChao ? 0 : -(1 - caindo) * 600}%) rotate(${noChao ? 80 : caindo * 80}deg)` }}>
-        {icone === 'viga' ? <span className="block h-[10px] w-full bg-[linear-gradient(90deg,#4a2a14,#8a5a2a)] shadow-[0_0_10px_#ff7a2a] sm:h-[16px]" /> : <Icone nome="tomate" className="w-full" />}
+        {icone === 'viga' ? (
+          <span className="block h-[10px] w-full bg-[linear-gradient(90deg,#4a2a14,#8a5a2a)] shadow-[0_0_10px_#ff7a2a] sm:h-[16px]" />
+        ) : icone === 'bala' ? (
+          <span className="mx-auto block aspect-square w-[60%] rounded-full bg-[radial-gradient(circle_at_35%_35%,#6a6a78,#14141a_70%)] shadow-[0_0_6px_#000]" />
+        ) : (
+          <Icone nome="tomate" className="w-full" />
+        )}
       </span>
       {noChao && icone === 'viga' && <span className="chama-fase absolute bottom-0 left-1/4" />}
     </>

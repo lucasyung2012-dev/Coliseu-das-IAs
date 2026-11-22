@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji12345678y'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji12345678y*&'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -936,6 +936,24 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
             )}
           </g>,
         );
+      }
+      // ---- A frota fantasma (22/11/2026): névoa no chão e lanternas verdes de navio ----
+      if (c === '&')
+        pecas.push(
+          <g key={`nv${k}`} className="nevoa-mapa" opacity="0.35">
+            <ellipse cx={X + 8} cy={Y + 10} rx="11" ry="4" fill="#d8e0e8" />
+            <ellipse cx={X + 3} cy={Y + 7} rx="6" ry="2.5" fill="#e8f0f8" />
+          </g>,
+        );
+      if (c === '*') {
+        pecas.push(
+          <g key={`lv2${k}`}>
+            <rect x={X + 7} y={Y - 12} width="2" height="26" fill="#2a2a34" />
+            <rect x={X + 2} y={Y - 12} width="7" height="1.5" fill="#2a2a34" />
+            <rect x={X + 1} y={Y - 10} width="4" height="6" fill="#6aff9a" stroke="#1a3a2a" strokeWidth="0.8" className="luz-vela" />
+          </g>,
+        );
+        luzes.push(<circle key={`lvl${k}`} cx={X + 3} cy={Y - 7} r="24" fill="#6aff9a" opacity="0.16" className="luz-vela" />);
       }
       // ---- O porão da galera (22/11/2026): portinholas, grilhões e redes de dormir ----
       // Portinhola do remo: um buraco na parede com o mar e a luz entrando.

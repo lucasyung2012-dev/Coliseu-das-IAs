@@ -284,9 +284,14 @@ export function MinigameCanhoes({ lugar, antes, depois, onFim }: Base) {
             <span className="absolute top-[34%] z-10 -translate-x-1/2 text-3xl sm:text-5xl" style={{ left: `${navio}%` }} aria-hidden>
               <Icone nome="navio" className="inline-block w-[100%] align-middle" />
             </span>
-            <span className="absolute top-[30%] z-20 -translate-x-1/2 font-pixel text-3xl text-[#ff3a3a] [text-shadow:0_0_6px_#000] sm:text-5xl" style={{ left: `${mira}%` }} aria-hidden>
-              ⌖
+            <span className="absolute top-[30%] z-20 block w-[8%] -translate-x-1/2" style={{ left: `${mira}%`, filter: 'drop-shadow(0 0 4px #ff3a3a)' }} aria-hidden>
+              <Icone nome="alvo" className="w-full" />
             </span>
+            {/* o mar batendo e o nosso canhão, que dá coice e solta fumaça a cada tiro */}
+            <div className="chuva-forte pointer-events-none absolute inset-x-0 bottom-[22%] z-[9] h-[10%] opacity-40" aria-hidden />
+            <div key={balas.length} className="coice-canhao pointer-events-none absolute bottom-[14%] left-[32%] z-[11] h-[6%] w-[12%] rounded-r-full border-2 border-black bg-[linear-gradient(180deg,#5a5a64,#2a2a34)]" aria-hidden>
+              {balas.length > 0 && <span className="fumaca-tiro absolute -right-[30%] top-1/2 block h-[160%] w-[50%] -translate-y-1/2 rounded-full bg-[#d8d8e0]/70" />}
+            </div>
             {balas.map((b) => (
               <span key={b.id} className="absolute z-20 h-2 w-2 -translate-x-1/2 rounded-full bg-black shadow-[0_0_4px_#fff]" style={{ left: `${b.x}%`, top: `${70 - (1 - Math.max(0, b.chega - Date.now()) / VOO_BALA) * 32}%` }} />
             ))}

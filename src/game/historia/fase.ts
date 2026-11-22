@@ -15,7 +15,7 @@ export interface Plataforma {
   w: number;
   y: number;
   /** Como desenhar: mesa, estante, sacada, viga, caixote (do mercado) ou toldo de barraca. */
-  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo' | 'pedra' | 'sarcofago' | 'barco';
+  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo' | 'pedra' | 'sarcofago' | 'barco' | 'cordame';
   /** Anda de lado e volta (o barco no porto): até `dx` para a direita, ida e volta em `ms`. Leva quem está em cima. */
   move?: { dx: number; ms: number };
   /** Afunda (ou desmorona) depois de `afunda` ms com alguém em cima; volta 2,5 s depois. */
@@ -30,7 +30,7 @@ export interface Perigo {
   /** Anda pelo chão: de `de` até `ate` em `ms` (vai e volta; com `ida`, só vai e recomeça). */
   move?: { de: number; ate: number; ms: number; ida?: boolean };
   /** O desenho: quem anda (guarda, rato, jacaré, gato, barril rolando) ou o que cai (viga, tomate). */
-  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate';
+  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate' | 'bala';
   /** O fogo acende e apaga: aceso por `acesoMs`, apagado por `apagadoMs` (0 = sempre aceso). */
   acesoMs: number;
   apagadoMs: number;

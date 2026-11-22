@@ -2879,6 +2879,13 @@ export const CAP5_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): a abordagem, andando de lado pelo convés do Almirante.
+      tipo: 'fase',
+      id: 'o5-abordagem-fase',
+      lugar: 'navio-conves',
+      fase: 'abordagem',
+    },
+    {
       tipo: 'luta',
       id: 'o5-imediato',
       lugar: 'navio-conves',

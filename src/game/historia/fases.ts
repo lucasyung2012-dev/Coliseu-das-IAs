@@ -376,4 +376,45 @@ export const FASES: Record<string, Fase> = {
     precisa: 3,
     fim: { coisa: 'MOEDAS DO POVO', todos: 'Todas as moedas voltam para o povo.', alguns: 'Algumas já voltam para o povo.' },
   },
+  // Capítulo 5 do Octavius (22/11/2026): a abordagem ao navio do Almirante. Balas de canhão
+  // caindo no convés (a sombra avisa), o cordame balançando (pendure e vá junto) e as bandeiras
+  // do Olho para arrancar lá no alto. Comentários em rascunho (o Lucas pode reescrever).
+  'abordagem': {
+    id: 'abordagem',
+    telas: ['navio-conves', 'navio-conves'],
+    objetivo: 'Atravesse o convés do Almirante. Arranque as bandeiras do Olho lá no alto.',
+    plataformas: [
+      { x: 14, w: 10, y: 7, tipo: 'caixote' },
+      { x: 30, w: 10, y: 13, tipo: 'cordame', move: { dx: 14, ms: 2600 } },
+      { x: 58, w: 14, y: 9, tipo: 'sacada' },
+      { x: 76, w: 10, y: 16, tipo: 'viga' },
+      { x: 94, w: 10, y: 11, tipo: 'cordame', move: { dx: 12, ms: 2400 } },
+      { x: 118, w: 8, y: 6, tipo: 'caixote' },
+      { x: 130, w: 14, y: 12, tipo: 'sacada' },
+      { x: 150, w: 10, y: 18, tipo: 'viga' },
+      { x: 164, w: 10, y: 10, tipo: 'cordame', move: { dx: 10, ms: 2200 } },
+      { x: 180, w: 10, y: 7, tipo: 'caixote' },
+    ],
+    perigos: [
+      { x: 44, w: 6, tipo: 'queda', figura: 'bala', acesoMs: 500, apagadoMs: 1900, atrasoMs: 300 },
+      { x: 88, w: 6, tipo: 'queda', figura: 'bala', acesoMs: 500, apagadoMs: 1700, atrasoMs: 1100 },
+      { x: 124, w: 6, tipo: 'queda', figura: 'bala', acesoMs: 500, apagadoMs: 1600, atrasoMs: 700 },
+      { x: 168, w: 6, tipo: 'queda', figura: 'bala', acesoMs: 500, apagadoMs: 1500, atrasoMs: 200 },
+      // um marujo de ferro fazendo ronda no convés
+      { x: 100, w: 5, tipo: 'inimigo', figura: 'guarda', acesoMs: 0, apagadoMs: 0, move: { de: 100, ate: 116, ms: 2600 } },
+    ],
+    coletaveis: [
+      { id: 'bandeira-1', x: 81, y: 29, icone: 'bandeira', nome: 'Bandeira do Olho' },
+      { id: 'bandeira-2', x: 137, y: 25, icone: 'bandeira', nome: 'Bandeira do Olho' },
+      { id: 'bandeira-3', x: 155, y: 31, icone: 'bandeira', nome: 'Bandeira do Olho' },
+    ],
+    comentarios: [
+      { id: 'canhao', x: 8, quem: 'octavius', texto: 'Balas de canhão! Olha a sombra no convés.' },
+      { id: 'cordame', x: 28, quem: 'octavius', texto: 'O cordame balança. Pula na hora certa e vai junto.' },
+      { id: 'popa', x: 176, quem: 'octavius', texto: 'A popa. O Almirante está ali.' },
+    ],
+    saida: { x: 194, rotulo: 'A POPA' },
+    precisa: 3,
+    fim: { coisa: 'BANDEIRAS ARRANCADAS', todos: 'Nenhum Olho no navio. Ele agora é nosso.', alguns: 'O bastante para a tripulação saber quem manda.' },
+  },
 };
