@@ -352,13 +352,13 @@ export function usarHabilidade(
       st: { ...st, etapa: 'cansado', ate: t + d.cansaMs * 0.9, copias: undefined, projeteis: [], onda: undefined, angulo: undefined, vx: 0, vy: 0, habPronta: t + RECARGA.rede, eventos: ev(st, 'rede') },
     };
   }
-  // O passo de sombra: vai até 2,5 na direção em que está olhando, parando antes da parede.
+  // O passo de sombra: vai até 2,5 na direção em que está olhando. A sombra passa por cima
+  // das coisas (cai no ponto livre mais longe), mas não sai da arena.
   const n = Math.hypot(dir.x, dir.y) || 1;
   let fim = { ...heroi };
   for (let k = 0.25; k <= 2.5; k += 0.25) {
     const p = { x: heroi.x + (dir.x / n) * k, y: heroi.y + (dir.y / n) * k };
-    if (!livre(d.arena, p.x, p.y)) break;
-    fim = p;
+    if (livre(d.arena, p.x, p.y)) fim = p;
   }
   return { st: { ...st, invulAte: t + 550, habPronta: t + RECARGA.passo, eventos: ev(st, 'passo') }, heroi: fim };
 }

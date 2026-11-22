@@ -24,6 +24,13 @@ import { LutaHistoria } from './Luta';
 import { ChefaoNoMapa } from './ChefaoNoMapa';
 import { ChefaoEmEtapas } from './ChefaoEmEtapas';
 import { CHEFES } from '@/game/historia/chefoesDefs';
+
+/** A habilidade de cada um na primeira etapa do chefão (rascunho: o Lucas pode reescrever). */
+const FALA_HABILIDADE: Partial<Record<Falante, string>> = {
+  cassius: 'E o botão ESCUDO segura quase tudo, mas eu ando devagar com ele.',
+  octavius: 'E a REDE: de perto, prende ele na hora e some com as cópias.',
+  helios: 'E o PASSO DE SOMBRA: sumo e apareço mais à frente, sem levar nada.',
+};
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
 import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
@@ -470,13 +477,13 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         key={cena.id}
         def={chefe}
         heroi={heroi}
-        antes={cena.antes}
+        antes={[{ quem: heroi, texto: `Primeiro, a armadura. ${chefe.dica} ${FALA_HABILIDADE[heroi] ?? ''}` }]}
         duelo={() => (
           <LutaHistoria
             lugar={cena.lugar}
             inimigo={cena.inimigo}
             heroi={heroi}
-            antes={[{ quem: heroi, texto: 'A armadura caiu. Agora é cara a cara!', jeito: 'grito' }]}
+            antes={[{ quem: heroi, texto: 'A armadura caiu. Agora é cara a cara!', jeito: 'grito' }, ...(cena.antes ?? [])]}
             depois={cena.depois}
             atributos={equipe?.cassius ?? atributosDoSave(save)}
             equipe={equipe}
