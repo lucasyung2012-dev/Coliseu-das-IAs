@@ -160,6 +160,18 @@ export function DesafioRemar({ lugar, antes, depois, onFim }: Base) {
             {lado === 0 ? 'TUM!' : 'TÁ!'}
           </span>
         )}
+        {/* REMAR (22/11/2026): o tambor do feitor batendo e a fileira de remos que puxa junto a cada remada certa */}
+        <div className="pointer-events-none absolute bottom-[14%] left-[14%] z-[9] w-[12%]" aria-hidden>
+          <div key={batida} className={batida >= 0 ? 'tambor-bate' : ''}>
+            <div className="mx-auto h-[10px] w-[90%] rounded-[50%] bg-[#e8d8b0] sm:h-[18px]" />
+            <div className="mx-auto h-[34px] w-[90%] border-x-4 border-[#6a1a12] bg-[#a83a2a] sm:h-[60px]" />
+          </div>
+        </div>
+        <div className="pointer-events-none absolute inset-x-[30%] bottom-[4%] z-[8] flex justify-between" aria-hidden>
+          {Array.from({ length: 6 }, (_, j) => (
+            <span key={`${j}-${acertos}`} className="remo-puxa block h-[60px] w-[6px] origin-top bg-[linear-gradient(180deg,#a8844a_70%,#c89a5a_70%)] sm:h-[110px] sm:w-[9px]" style={{ animationDelay: `${j * 30}ms` }} />
+          ))}
+        </div>
         <div className="absolute bottom-[12%] left-[45%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
           <div className={brilho === 'ok' ? 'investida-dir' : 'respirar'} key={acertos}>
             <Retrato quem="octavius" />
@@ -259,6 +271,10 @@ export function DesafioTempestade({ lugar, antes, depois, onFim }: Base) {
         <Vidas n={casco} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={batendo ? 'tremer-forte' : ''}>
+        {/* A TEMPESTADE (22/11/2026): chuva caindo de lado, relâmpagos e a onda atravessando a tela quando bate. */}
+        <div className="chuva-forte pointer-events-none absolute inset-0 z-[15]" aria-hidden />
+        <div className="relampago pointer-events-none absolute inset-0 z-[16] bg-white" aria-hidden />
+        {batendo && <div className="onda-varre pointer-events-none absolute inset-y-[20%] z-[17] w-[70%] rounded-[40%] bg-[linear-gradient(180deg,#e8f4ff,#4a7ab8_30%,#1a3a6a)]" aria-hidden />}
         {fase === 'jogo' && (
           <>
             <div className="absolute inset-x-[10%] top-[8%] z-20 h-2 border border-black bg-black/60">

@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji12345678'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji12345678y'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -750,8 +750,8 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
-      if ('#JNoCKWIG'.includes(c)) {
-        const frente = !'#JENoCKWIGVBX'.includes(t(x, y + 1));
+      if ('#JNoCKWIG9s'.includes(c)) {
+        const frente = !'#JENoCKWIG9sVBX'.includes(t(x, y + 1));
         pecas.push(
           <g key={`p${k}`}>
             <rect x={X} y={Y} width={PX} height={PX} fill={cor.parede1} />
@@ -937,6 +937,37 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
+      // ---- O porão da galera (22/11/2026): portinholas, grilhões e redes de dormir ----
+      // Portinhola do remo: um buraco na parede com o mar e a luz entrando.
+      if (c === 's') {
+        pecas.push(
+          <g key={`pt${k}`}>
+            <rect x={X + 4} y={Y + 3} width="8" height="6" fill="#4a7ab8" />
+            <rect x={X + 4} y={Y + 7} width="8" height="2" fill="#2a4a7a" />
+            <rect x={X + 3} y={Y + 2} width="10" height="1.5" fill="#3a2010" />
+            <rect x={X + 7.5} y={Y + 3} width="1" height="12" fill="#a8844a" transform={`rotate(15 ${X + 8} ${Y + 6})`} />
+          </g>,
+        );
+        luzes.push(<path key={`pl${k}`} d={`M${X + 4} ${Y + 9} L${X + 12} ${Y + 9} L${X + 16} ${Y + 30} L${X} ${Y + 30} Z`} fill="#bcd8ff" opacity="0.14" />);
+      }
+      // Grilhões presos na parede.
+      if (c === '9')
+        pecas.push(
+          <g key={`gr2${k}`} stroke="#8a8a98" strokeWidth="1" fill="none">
+            <path d={`M${X + 4} ${Y + 2} L${X + 4} ${Y + 7} M${X + 12} ${Y + 2} L${X + 12} ${Y + 7}`} />
+            <circle cx={X + 4} cy={Y + 8.5} r="1.6" />
+            <circle cx={X + 12} cy={Y + 8.5} r="1.6" />
+          </g>,
+        );
+      // Rede de dormir pendurada (de lona, entre dois ganchos).
+      if (c === 'y')
+        pecas.push(
+          <g key={`hm${k}`}>
+            <path d={`M${X} ${Y + 2} Q${X + 8} ${Y + 12} ${X + 16} ${Y + 2}`} fill="#c8b890" stroke="#8a7a5a" strokeWidth="1" />
+            {t(x - 1, y) !== 'y' && <rect x={X} y={Y - 2} width="1.5" height="16" fill="#5a3a1c" />}
+            {t(x + 1, y) !== 'y' && <rect x={X + 14.5} y={Y - 2} width="1.5" height="16" fill="#5a3a1c" />}
+          </g>,
+        );
       // ---- O porto de Óstia (22/11/2026): guindaste, rede de pesca, âncora e lampião ----
       // O guindaste de madeira: torre, braço e o gancho pendurado.
       if (c === '5')

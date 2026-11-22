@@ -210,4 +210,44 @@ export const FASES: Record<string, Fase> = {
     precisa: 3,
     fim: { coisa: 'PEDAÇOS DA ROTA', todos: 'A rota inteira. Plano completo.', alguns: 'O resto, dá para improvisar.' },
   },
+  // Capítulo 2 do Octavius (22/11/2026): o convés da galera na tempestade. As ondas varrem o
+  // convés e voltam (espere baixar); barris, o castelo da popa e as vergas do mastro para
+  // subir; as cordas soltas para recolher. Comentários em rascunho (o Lucas pode reescrever).
+  'conves-tempestade': {
+    id: 'conves-tempestade',
+    telas: ['galera-tempestade', 'galera-tempestade'],
+    objetivo: 'Atravesse o convés na tempestade. Espere as ondas baixarem e recolha as cordas soltas.',
+    plataformas: [
+      { x: 16, w: 8, y: 8, tipo: 'caixote' },
+      { x: 30, w: 16, y: 12, tipo: 'sacada' },
+      { x: 52, w: 12, y: 18, tipo: 'viga' },
+      { x: 70, w: 8, y: 8, tipo: 'caixote' },
+      { x: 84, w: 14, y: 11, tipo: 'sacada' },
+      { x: 104, w: 8, y: 8, tipo: 'caixote' },
+      { x: 116, w: 12, y: 17, tipo: 'viga' },
+      { x: 134, w: 16, y: 11, tipo: 'sacada' },
+      { x: 156, w: 8, y: 8, tipo: 'caixote' },
+      { x: 168, w: 12, y: 16, tipo: 'viga' },
+    ],
+    perigos: [
+      { x: 24, w: 6, tipo: 'onda', acesoMs: 1400, apagadoMs: 1600 },
+      { x: 46, w: 24, tipo: 'onda', acesoMs: 1800, apagadoMs: 1600, atrasoMs: 400 },
+      { x: 98, w: 6, tipo: 'onda', acesoMs: 1200, apagadoMs: 1400, atrasoMs: 700 },
+      { x: 150, w: 18, tipo: 'onda', acesoMs: 1800, apagadoMs: 1500, atrasoMs: 900 },
+    ],
+    coletaveis: [
+      { id: 'corda-1', x: 58, y: 23, icone: 'corda', nome: 'Corda solta' },
+      { id: 'corda-2', x: 91, y: 16, icone: 'corda', nome: 'Corda solta' },
+      { id: 'corda-3', x: 122, y: 22, icone: 'corda', nome: 'Corda solta' },
+      { id: 'corda-4', x: 174, y: 21, icone: 'corda', nome: 'Corda solta' },
+    ],
+    comentarios: [
+      { id: 'ondas', x: 8, quem: 'octavius', texto: 'As ondas lavam o convés. Espera a água baixar!' },
+      { id: 'cordas', x: 56, quem: 'octavius', texto: 'Cordas soltas! Sem elas, o mastro cai.' },
+      { id: 'proa', x: 172, quem: 'octavius', texto: 'Mais um pouco até a proa.' },
+    ],
+    saida: { x: 194, rotulo: 'A PROA' },
+    precisa: 3,
+    fim: { coisa: 'CORDAS RECOLHIDAS', todos: 'Todas as cordas. O mastro aguenta.', alguns: 'O mastro range... mas aguenta.' },
+  },
 };

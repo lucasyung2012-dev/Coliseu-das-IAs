@@ -278,15 +278,15 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
     tema: 'navio',
     inicio: [2, 2],
     mapa: [
-      '######################',
+      '##s####s####s####s####',
       '#v........A.........v#',
       '#....................#',
       '#.qqq..qqq..qqq..qqq.#',
       '#....................#',
       '#.qqq..qqq..qqq..qqq.#',
       '#....................#',
-      '#r..bb.........kk...P#',
-      '######################',
+      '#r..bb...yy....kk...P#',
+      '####9#####9#####9#####',
     ],
     pontos: { tambor: [10, 1], corrente: [1, 7], remadores: [8, 4], gaivota: [16, 6] },
     rotas: {

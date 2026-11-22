@@ -230,6 +230,8 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                 <div className="absolute inset-x-0 bottom-0 h-[18%] rounded-[50%] bg-[#2a0a04]/80" style={{ opacity: p.tipo === 'agua' ? 0 : 1 }} />
                 {p.tipo === 'agua' ? (
                   <div className="agua-fase absolute inset-x-0 bottom-[-40%] top-[55%]" />
+                ) : p.tipo === 'onda' ? (
+                  aceso ? <div className="onda-fase absolute inset-x-[-10%] bottom-[-20%] top-[-30%]" /> : <div className="absolute inset-x-[10%] bottom-0 h-[16%] rounded-[50%] bg-[#4a7ab8]/50" />
                 ) : aceso ? (
                   Array.from({ length: Math.max(2, Math.round(p.w / 3)) }, (_, j) => (
                     <span

@@ -22,7 +22,7 @@ export interface Perigo {
   x: number;
   w: number;
   /** Fogo (acende e apaga) ou água funda (sempre: cair nela te leva de volta). */
-  tipo: 'fogo' | 'agua';
+  tipo: 'fogo' | 'agua' | 'onda';
   /** O fogo acende e apaga: aceso por `acesoMs`, apagado por `apagadoMs` (0 = sempre aceso). */
   acesoMs: number;
   apagadoMs: number;

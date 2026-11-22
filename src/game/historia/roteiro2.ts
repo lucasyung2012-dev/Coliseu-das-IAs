@@ -2019,6 +2019,13 @@ export const CAP2_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): o convés na tempestade, andando de lado.
+      tipo: 'fase',
+      id: 'o2-conves-fase',
+      lugar: 'galera-tempestade',
+      fase: 'conves-tempestade',
+    },
+    {
       tipo: 'luta',
       id: 'o2-luta3',
       lugar: 'galera-tempestade',

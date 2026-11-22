@@ -1869,3 +1869,20 @@
 .sombra-salto-forte { background: radial-gradient(ellipse, rgba(120,0,0,0.6), rgba(255,60,40,0.3) 60%, transparent 72%); box-shadow: 0 0 0 3px #ff3a3a, 0 0 14px #ff3a3a; animation: sombra-salto 0.15s steps(2) infinite alternate; }
 @keyframes sombra-salto { from { opacity: 0.6; } to { opacity: 1; } }
 .menos-movimento .sombra-salto, .menos-movimento .sombra-salto-forte { animation: none; }
+
+/* O mar do Octavius (22/11/2026): a onda no convés, os remos, o tambor, a chuva e o relâmpago. */
+.onda-fase { background: linear-gradient(180deg, #e8f4ff 0, #6a9ac8 18%, #2a4a7a 60%, #14284a); border-radius: 50% 50% 0 0; animation: onda-fase 0.5s ease-in-out infinite alternate; box-shadow: 0 -4px 0 #f4fbff; }
+@keyframes onda-fase { from { translate: -4% 0; } to { translate: 4% -6%; } }
+.remo-puxa { animation: remo-puxa 0.5s ease-out; }
+@keyframes remo-puxa { 0% { rotate: 0deg; } 40% { rotate: 28deg; } 100% { rotate: 0deg; } }
+.tambor-bate { animation: tambor-bate 0.18s ease-out; }
+@keyframes tambor-bate { 50% { scale: 1.08 0.92; } }
+.chuva-forte { background: repeating-linear-gradient(105deg, transparent 0 14px, rgba(200,220,255,0.35) 14px 15px); animation: chuva-forte 0.35s linear infinite; }
+@keyframes chuva-forte { from { background-position: 0 0; } to { background-position: -40px 120px; } }
+.relampago { opacity: 0; animation: relampago 5.5s steps(1) infinite; }
+@keyframes relampago { 0%, 61%, 63%, 65%, 100% { opacity: 0; } 62%, 64% { opacity: 0.3; } }
+.onda-varre { animation: onda-varre 0.9s ease-in forwards; }
+@keyframes onda-varre { from { left: 100%; } to { left: -70%; } }
+.menos-movimento .onda-fase, .menos-movimento .remo-puxa, .menos-movimento .tambor-bate, .menos-movimento .chuva-forte, .menos-movimento .onda-varre { animation: none; }
+.menos-movimento .relampago { display: none; }
+@media (prefers-reduced-motion: reduce) { .relampago { display: none; } }
