@@ -174,4 +174,40 @@ export const FASES: Record<string, Fase> = {
     precisa: 3,
     fim: { coisa: 'PERGUNTAS DO POVO', todos: 'Todas. Hoje elas vão ser lidas.', alguns: 'As outras, o povo vai ter coragem de dizer em voz alta.' },
   },
+  // Capítulo 1 do Octavius (22/11/2026): o alarme tocou e a fuga é pelos barcos do porto, de
+  // barco em barco (eles balançam) e de caixote em caixote, até o Esperança. Os pedaços da rota
+  // de fuga caíram pelo caminho. Comentários em rascunho (o Lucas pode reescrever).
+  'fuga-pelos-barcos': {
+    id: 'fuga-pelos-barcos',
+    telas: ['porto-docas', 'porto-docas'],
+    objetivo: 'O alarme tocou! Fuja pelos barcos até o Esperança. Recolha os pedaços da rota.',
+    plataformas: [
+      { x: 14, w: 12, y: 5, tipo: 'barco' },
+      { x: 30, w: 8, y: 9, tipo: 'caixote' },
+      { x: 42, w: 14, y: 5, tipo: 'barco' },
+      { x: 60, w: 14, y: 13, tipo: 'toldo' },
+      { x: 80, w: 12, y: 6, tipo: 'barco' },
+      { x: 96, w: 8, y: 10, tipo: 'caixote' },
+      { x: 108, w: 14, y: 5, tipo: 'barco' },
+      { x: 126, w: 12, y: 14, tipo: 'toldo' },
+      { x: 142, w: 12, y: 6, tipo: 'barco' },
+      { x: 160, w: 8, y: 10, tipo: 'caixote' },
+      { x: 172, w: 14, y: 5, tipo: 'barco' },
+    ],
+    perigos: [{ x: 12, w: 174, tipo: 'agua', acesoMs: 0, apagadoMs: 0 }],
+    coletaveis: [
+      { id: 'rota-1', x: 34, y: 14, icone: 'mapa', nome: 'Pedaço da rota' },
+      { id: 'rota-2', x: 67, y: 18, icone: 'mapa', nome: 'Pedaço da rota' },
+      { id: 'rota-3', x: 132, y: 19, icone: 'mapa', nome: 'Pedaço da rota' },
+      { id: 'rota-4', x: 164, y: 15, icone: 'mapa', nome: 'Pedaço da rota' },
+    ],
+    comentarios: [
+      { id: 'alarme', x: 6, quem: 'octavius', texto: 'O alarme tocou. Pelos barcos até o Esperança!' },
+      { id: 'rota', x: 32, quem: 'octavius', texto: 'Um pedaço do mapa da rota. Caiu do meu bolso na correria.' },
+      { id: 'esperanca', x: 168, quem: 'octavius', texto: 'O Esperança está logo ali.' },
+    ],
+    saida: { x: 194, rotulo: 'O ESPERANÇA' },
+    precisa: 3,
+    fim: { coisa: 'PEDAÇOS DA ROTA', todos: 'A rota inteira. Plano completo.', alguns: 'O resto, dá para improvisar.' },
+  },
 };

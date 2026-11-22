@@ -176,6 +176,14 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                   <div className="absolute bottom-0 right-[8%] top-0 w-[8%] bg-[#4a2a14]" />
                 </>
               )}
+              {/* Barco: casco de madeira balançando na água, com a borda e o banco */}
+              {p.tipo === 'barco' && (
+                <div className="barco-balanca absolute inset-x-0 bottom-[-40%] top-0">
+                  <div className="absolute inset-x-0 bottom-0 top-[18%] rounded-b-[45%] border-2 border-[#2a1a0c] bg-[linear-gradient(180deg,#8a5a2a,#5a3418)]" />
+                  <div className="absolute inset-x-[-4%] top-[14%] h-[12%] bg-[#4a2a12]" />
+                  <div className="absolute left-[40%] top-[30%] h-[18%] w-[20%] bg-[#6a4220]" />
+                </div>
+              )}
               {/* Pedra no meio da água, e a tampa de um sarcófago boiando */}
               {p.tipo === 'pedra' && <div className="absolute inset-x-0 bottom-0 top-0 rounded-t-[40%] border-2 border-[#2a2622] bg-[linear-gradient(180deg,#8a8276,#4a443c)]" />}
               {p.tipo === 'sarcofago' && (

@@ -291,8 +291,27 @@ export function DesafioRitmo({
         <Vidas n={3 - erros} max={3} icone="" />
       </div>
       <Palco lugar={lugar} className={flash === 'erro' ? 'tremer-forte' : ''}>
+        {/* GIRAR (redesenhado, 22/11/2026): a roda de madeira do guincho gira um dente a cada acerto
+            e a corrente vai descendo; no erro, a roda trava e treme. */}
+        <div className="pointer-events-none absolute right-[10%] top-[8%] z-[8] aspect-square w-[26%]" aria-hidden>
+          <div className="absolute inset-0 rounded-full border-[6px] border-[#4a2a12] bg-[#7a5430] transition-transform duration-200" style={{ transform: `rotate(${feitos * 45}deg)` }}>
+            {[0, 45, 90, 135].map((g) => (
+              <span key={g} className="absolute left-1/2 top-1/2 block h-[6px] w-full -translate-x-1/2 -translate-y-1/2 bg-[#4a2a12]" style={{ rotate: `${g}deg` }} />
+            ))}
+            {[0, 90, 180, 270].map((g) => (
+              <span key={`m${g}`} className="absolute left-1/2 top-1/2 block h-[10%] w-[10%] rounded-full bg-[#c8962a]" style={{ transform: `rotate(${g}deg) translateX(240%) translate(-50%, -50%)` }} />
+            ))}
+            <span className="absolute left-1/2 top-1/2 block h-[22%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c8962a]" />
+          </div>
+          {/* a corrente descendo */}
+          <div className="absolute left-1/2 top-1/2 flex w-[8%] -translate-x-1/2 flex-col items-center">
+            {Array.from({ length: 3 + feitos * 2 }, (_, j) => (
+              <span key={j} className="block h-[10px] w-full border-2 border-[#8a8a98]" style={{ borderRadius: '40%' }} />
+            ))}
+          </div>
+        </div>
         {fase === 'jogo' && (
-          <div className="absolute inset-x-[8%] top-[38%] z-20 flex flex-col items-center gap-2">
+          <div className="absolute inset-x-[8%] top-[60%] z-20 flex flex-col items-center gap-2">
             <span className="font-pixel text-[10px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">
               {acao}: {feitos}/{quantos}
             </span>

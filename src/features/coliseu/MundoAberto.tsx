@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji1234'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji12345678'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -936,6 +936,57 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
             )}
           </g>,
         );
+      }
+      // ---- O porto de Óstia (22/11/2026): guindaste, rede de pesca, âncora e lampião ----
+      // O guindaste de madeira: torre, braço e o gancho pendurado.
+      if (c === '5')
+        pecas.push(
+          <g key={`gd${k}`}>
+            <rect x={X + 6} y={Y - 22} width="4" height="36" fill="#6a4220" />
+            <rect x={X + 4} y={Y + 10} width="8" height="4" fill="#4a2a14" />
+            <rect x={X - 8} y={Y - 22} width="26" height="3" fill="#7a5430" />
+            <rect x={X - 6} y={Y - 19} width="1" height="14" fill="#c8b890" />
+            <rect x={X - 8} y={Y - 6} width="5" height="2" fill="#8a8a98" />
+            <rect x={X - 7} y={Y - 4} width="1.5" height="3" fill="#8a8a98" />
+            <rect x={X + 8} y={Y - 19} width="10" height="1" fill="#c8b890" transform={`rotate(35 ${X + 8} ${Y - 19})`} />
+          </g>,
+        );
+      // A rede de pesca secando entre dois postes.
+      if (c === '6')
+        pecas.push(
+          <g key={`rd${k}`}>
+            {t(x - 1, y) !== '6' && <rect x={X + 1} y={Y - 6} width="2" height="20" fill="#5a3a1c" />}
+            {t(x + 1, y) !== '6' && <rect x={X + 13} y={Y - 6} width="2" height="20" fill="#5a3a1c" />}
+            <rect x={X} y={Y - 5} width={PX} height="1" fill="#8a6a3a" />
+            {[0, 1, 2, 3].map((r) => (
+              <rect key={`h${r}`} x={X} y={Y - 2 + r * 3} width={PX} height="0.6" fill="#c8b890" opacity="0.8" />
+            ))}
+            {[2, 6, 10, 14].map((c2) => (
+              <rect key={`v${c2}`} x={X + c2} y={Y - 4} width="0.6" height="13" fill="#c8b890" opacity="0.8" />
+            ))}
+          </g>,
+        );
+      // A âncora de ferro e o rolo de corda.
+      if (c === '7')
+        pecas.push(
+          <g key={`an${k}`}>
+            <circle cx={X + 11} cy={Y + 10} r="4" fill="none" stroke="#c8b890" strokeWidth="2" />
+            <rect x={X + 4} y={Y - 4} width="2" height="15" fill="#4a4a54" />
+            <rect x={X + 1} y={Y - 1} width="8" height="1.5" fill="#4a4a54" />
+            <circle cx={X + 5} cy={Y - 5} r="1.6" fill="none" stroke="#4a4a54" strokeWidth="1" />
+            <path d={`M${X} ${Y + 9} Q${X + 5} ${Y + 15} ${X + 10} ${Y + 9}`} fill="none" stroke="#4a4a54" strokeWidth="2" />
+          </g>,
+        );
+      // O lampião no poste, com a luz em volta.
+      if (c === '8') {
+        pecas.push(
+          <g key={`lp${k}`}>
+            <rect x={X + 7} y={Y - 10} width="2" height="24" fill="#3a3a44" />
+            <rect x={X + 5} y={Y - 14} width="6" height="5" fill="#ffd04a" stroke="#3a3a44" strokeWidth="1" className="luz-vela" />
+            <rect x={X + 4} y={Y - 15} width="8" height="1.5" fill="#3a3a44" />
+          </g>,
+        );
+        luzes.push(<circle key={`ll${k}`} cx={X + 8} cy={Y - 11} r="26" fill="#ffd04a" opacity="0.2" className="luz-vela" />);
       }
       // Vaso de flores (a Biblioteca reaberta).
       if (c === '4')

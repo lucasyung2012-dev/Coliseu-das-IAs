@@ -1732,6 +1732,13 @@ export const CAP1_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): a fuga pelos barcos, andando de lado, depois do alarme.
+      tipo: 'fase',
+      id: 'o1-barcos',
+      lugar: 'porto-docas',
+      fase: 'fuga-pelos-barcos',
+    },
+    {
       tipo: 'luta',
       id: 'o1-luta4',
       lugar: 'porto-docas',
