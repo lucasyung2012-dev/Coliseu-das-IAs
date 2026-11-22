@@ -324,9 +324,9 @@ export const INIMIGOS: Record<string, DefInimigo> = {
     pecas: 0,
     trocaDeFase: [0.66, 0.33],
     fases: [
-      { ataques: [investida('Pisão do titã', 900, 26, 1200), golpe('Pedras caindo', 700, 12, 1000, 3, 380), finta(650)], pausaMs: [800, 1200] },
-      { ataques: [golpe('Braço de engrenagem', 650, 16, 1000, 2, 400), fogo('Correntes da Lei', 750, 24, 1100), finta(550), investida('Varredura de braço', 650, 26, 1100)], pausaMs: [650, 1000] },
-      { ataques: [fogo('O OLHO: raio da Resposta Única', 800, 30, 1300), golpe('Desmoronar', 500, 10, 950, 4, 270), finta(450), fogo('Raio duplo', 650, 20, 1100, 2, 420)], pausaMs: [550, 850] },
+      { alvo: 'AS PERNAS', ataques: [investida('Pisão do titã', 900, 26, 1200), golpe('Pedras caindo', 700, 12, 1000, 3, 380), finta(650)], pausaMs: [800, 1200] },
+      { alvo: 'OS BRAÇOS', ataques: [golpe('Braço de engrenagem', 650, 16, 1000, 2, 400), fogo('Correntes da Lei', 750, 24, 1100), finta(550), investida('Varredura de braço', 650, 26, 1100)], pausaMs: [650, 1000] },
+      { alvo: 'O OLHO', ataques: [fogo('O OLHO: raio da Resposta Única', 800, 30, 1300), golpe('Desmoronar', 500, 10, 950, 4, 270), finta(450), fogo('Raio duplo', 650, 20, 1100, 2, 420)], pausaMs: [550, 850] },
     ],
   },
 

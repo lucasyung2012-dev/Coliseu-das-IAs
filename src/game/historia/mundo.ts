@@ -36,7 +36,7 @@ export type Ladrilho =
 // Novos (22/11/2026, mapas do Octavius e do Helios): água, barril, caixote, amarra, farol, casco de navio,
 // banco de remo, tambor, cartaz, telescópio, planetário, mapa do céu, janela acesa, chaminé, parapeito,
 // tripé do oráculo, espelho, arquibancada, camarote e mural.
-const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N', 'D', 'F', 'w', 'b', 'k', 'r', 'H', 'n', 'q', 'A', 'C', 'U', 'O', 'K', 'W', 'h', 'V', 'Q', 'Y', 'B', 'X', 'I', 'G', 'L', 'z', 'l', 'R', 'j', 'i', '1', '2', '3']);
+const SOLIDOS = new Set<string>(['#', 'J', 'E', 'T', 'S', 'p', 'v', 'o', 'f', 't', 'g', 'x', 'M', 'N', 'D', 'F', 'w', 'b', 'k', 'r', 'H', 'n', 'q', 'A', 'C', 'U', 'O', 'K', 'W', 'h', 'V', 'Q', 'Y', 'B', 'X', 'I', 'G', 'L', 'z', 'l', 'R', 'j', 'i', '1', '2', '3', '4']);
 
 export interface Coisa {
   id: string;
@@ -80,6 +80,8 @@ export interface Mundo {
    * Sem `estilo`, não há lugar de saída: depois de ver o que precisa, aparece um botão.
    */
   saida?: SaidaMundo;
+  /** De dia (a Biblioteca reaberta): pouco escuro em volta e o sol nas janelas. */
+  claro?: boolean;
 }
 
 export type EstiloSaida = 'escada' | 'arco' | 'portao' | 'prancha' | 'escadaMao' | 'grade' | 'porta';

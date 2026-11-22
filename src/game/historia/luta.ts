@@ -47,6 +47,8 @@ export interface FaseInimigo {
   escudoGigante?: boolean;
   escuro?: boolean;
   ilusoes?: boolean;
+  /** O ponto fraco desta fase (o Titã: AS PERNAS, OS BRAÇOS, O OLHO): aparece na luta. */
+  alvo?: string;
   ataques: AtaqueInimigo[];
   /** Espera entre um ataque e outro (o jogo sorteia dentro do intervalo). */
   pausaMs: [number, number];

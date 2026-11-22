@@ -98,6 +98,8 @@ export interface MapaDeExplorar {
   /** Onde fica cada ponto (pelo id do ponto) e, se for gente, por onde anda. */
   pontos: Record<string, [number, number]>;
   rotas?: Record<string, [number, number][]>;
+  /** De dia (sol nas janelas, quase sem escuro em volta). */
+  claro?: boolean;
 }
 
 export const MAPAS: Record<string, MapaDeExplorar> = {
@@ -208,11 +210,12 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
   // O final: a Grande Biblioteca reaberta, de dia, com todo mundo (e o pedaço da chave num canto).
   'biblioteca-reaberta': {
     tema: 'biblioteca',
+    claro: true,
     inicio: [3, 12],
     mapa: [
       '########################',
       '#EEEEE##JJJ##JJJ##EEEEE#',
-      '#......................#',
+      '#..j.....4....4..j.....#',
       '#.p..cccccccccccccc..p.#',
       '#....c..TT....TT..c....#',
       '#EE..c............c..EE#',
@@ -631,7 +634,7 @@ export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: Ma
   const saida = SAIDAS[cena.id];
   // Sem lugar de saída: o P vira chão.
   const mapa = saida && !saida.estilo ? m.mapa.map((l) => l.replace('P', '.')) : m.mapa;
-  return { id: cena.id, tema: m.tema, lugar: cena.lugar as Lugar, mapa, objetivo: cena.objetivo, inicio: m.inicio, coisas, pessoas, saida };
+  return { id: cena.id, tema: m.tema, lugar: cena.lugar as Lugar, mapa, objetivo: cena.objetivo, inicio: m.inicio, coisas, pessoas, saida, claro: m.claro };
 }
 
 /**

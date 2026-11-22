@@ -356,7 +356,7 @@ export function MundoAberto({
         {/* A luz: escuro em volta, como uma noite de verdade */}
         <div
           className="pointer-events-none absolute inset-0 z-[400]"
-          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${Math.min(0.9, CORES[mundo.tema].escuro + (mundo.lugar.includes('noite') || mundo.lugar.includes('eclipse') || mundo.lugar.includes('ataque') ? 0.35 : 0))}) 100%)` }}
+          style={{ background: `radial-gradient(ellipse at 50% 55%, transparent ${mundo.tema === 'catacumbas' ? 28 : 45}%, rgba(4,2,12,${mundo.claro ? 0.12 : Math.min(0.9, CORES[mundo.tema].escuro + (mundo.lugar.includes('noite') || mundo.lugar.includes('eclipse') || mundo.lugar.includes('ataque') ? 0.35 : 0))}) 100%)` }}
           aria-hidden
         />
 
@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji123'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji1234'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -778,9 +778,10 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
               <>
                 <rect x={X + 1} y={Y - 6} width="14" height="20" fill="#5a3c24" />
                 <rect x={X + 3} y={Y - 8} width="10" height="3" fill="#5a3c24" />
-                <rect x={X + 2} y={Y - 4} width="12" height="17" fill="#141c40" />
-                <rect x={X + 4} y={Y - 6} width="8" height="2" fill="#141c40" />
-                <rect x={X + 2} y={Y + 6} width="12" height="7" fill="#1c2a58" />
+                <rect x={X + 2} y={Y - 4} width="12" height="17" fill={mundo.claro ? '#8ac8f0' : '#141c40'} />
+                <rect x={X + 4} y={Y - 6} width="8" height="2" fill={mundo.claro ? '#8ac8f0' : '#141c40'} />
+                <rect x={X + 2} y={Y + 6} width="12" height="7" fill={mundo.claro ? '#b8e0f8' : '#1c2a58'} />
+                {mundo.claro && x % 3 === 1 && <circle cx={X + 10} cy={Y - 1} r="2.5" fill="#fff4a0" />}
                 <rect x={X + 7.5} y={Y - 6} width="1" height="19" fill="#5a3c24" />
                 <rect x={X + 2} y={Y + 2} width="12" height="1" fill="#5a3c24" />
                 <rect x={X + 4} y={Y - 2} width="1" height="1" fill="#f4ecd0" />
@@ -793,7 +794,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
         );
         // A luz da lua entrando pela janela, no chão.
         if (c === 'J' && t(x, y + 1) !== '#')
-          luzes.push(<path key={`l${k}`} d={`M${X + 4} ${Y + 13} L${X + 12} ${Y + 13} L${X + 22} ${Y + 52} L${X + 6} ${Y + 52} Z`} fill="#bcd4ff" opacity="0.13" className="luz-lua" />);
+          luzes.push(<path key={`l${k}`} d={`M${X + 4} ${Y + 13} L${X + 12} ${Y + 13} L${X + 22} ${Y + 52} L${X + 6} ${Y + 52} Z`} fill={mundo.claro ? '#fff0a0' : '#bcd4ff'} opacity={mundo.claro ? 0.28 : 0.13} className="luz-lua" />);
       }
       if (c === 'E') {
         const cores = ['#b83a2a', '#2a6aa0', '#d8a83a', '#3a8a4a', '#8a3aa0', '#e0782c'];
@@ -936,6 +937,20 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
+      // Vaso de flores (a Biblioteca reaberta).
+      if (c === '4')
+        pecas.push(
+          <g key={`vs${k}`}>
+            <rect x={X + 4} y={Y + 6} width="8" height="8" fill="#b8643a" />
+            <rect x={X + 3} y={Y + 5} width="10" height="2" fill="#d8844a" />
+            <rect x={X + 7.3} y={Y - 2} width="1.4" height="8" fill="#3a8a4a" />
+            <rect x={X + 4} y={Y} width="1.2" height="6" fill="#3a8a4a" transform={`rotate(-20 ${X + 5} ${Y + 6})`} />
+            <rect x={X + 11} y={Y} width="1.2" height="6" fill="#3a8a4a" transform={`rotate(20 ${X + 11} ${Y + 6})`} />
+            <circle cx={X + 8} cy={Y - 3} r="2.2" fill="#f0c040" />
+            <circle cx={X + 3.5} cy={Y} r="1.8" fill="#e05a8a" />
+            <circle cx={X + 12.5} cy={Y} r="1.8" fill="#8a6ad8" />
+          </g>,
+        );
       // ---- O túnel dos gladiadores (22/11/2026): armas, banco e o balde de água do Brutus ----
       // Suporte de armas: lanças em pé e um escudo redondo pendurado.
       if (c === '1')

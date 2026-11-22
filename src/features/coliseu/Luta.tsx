@@ -993,6 +993,17 @@ export function LutaHistoria({
         {fase === 'luta' && j.vida / j.vidaMax < 0.3 && <div className="perigo-bordas pointer-events-none absolute inset-0 z-[18]" aria-hidden />}
         {/* A faixa do especial: o gladiador grande na diagonal e o nome do golpe */}
         {cinema && <CinemaEspecial key={cinema.id} tipo={cinema.tipo} heroi={heroi} cor={bot.cor} />}
+        {/* O ponto fraco de cada fase (o Titã): a etiqueta em cima e, quando muda, o aviso grande */}
+        {def.fases[e.inimigo.fase]?.alvo && fase === 'luta' && (
+          <span className="pointer-events-none absolute right-2 top-[18%] z-20 border-2 border-black bg-[#f2c14e] px-1 font-pixel text-[7px] text-black sm:text-[10px]">
+            ALVO: {def.fases[e.inimigo.fase]!.alvo}
+          </span>
+        )}
+        {def.fases[e.inimigo.fase]?.alvo && e.inimigo.fase > 0 && e.eventos.some((ev) => ev.tipo === 'fase') && (
+          <span className="lute-entra pointer-events-none absolute left-1/2 top-[34%] z-30 -translate-x-1/2 whitespace-nowrap font-pixel text-xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-4xl">
+            AGORA: {def.fases[e.inimigo.fase]!.alvo}!
+          </span>
+        )}
         {/* LUTE! no começo */}
         {fase === 'luta' && e.tempo < 1100 && (
           <span className="lute-entra pointer-events-none absolute left-1/2 top-[38%] z-30 -translate-x-1/2 font-pixel text-3xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-5xl">LUTE!</span>
