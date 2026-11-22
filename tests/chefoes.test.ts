@@ -63,3 +63,35 @@ describe('os chefões em duas etapas', () => {
     });
   }
 });
+
+describe('a habilidade de cada gladiador na primeira etapa', () => {
+  const d = CHEFES['fornalha']!;
+  it('Cassius: o escudo segura quase todo o dano das zonas', () => {
+    const st0 = novoEstadoChefe(d, 100);
+    const heroi = { x: st0.zonas![0]!.x, y: st0.zonas![0]!.y };
+    const semEscudo = rodar(d, st0, heroi, 2500);
+    const comEscudo = rodar(d, { ...st0, escudoAte: 99_999 }, heroi, 2500);
+    expect(semEscudo.vida).toBe(100 - d.dano);
+    expect(comEscudo.vida).toBeGreaterThan(semEscudo.vida);
+  });
+  it('Octavius: a rede perto deixa o chefão cansado e some com as cópias; longe, erra', () => {
+    const arq = CHEFES['arquivista']!;
+    const st0 = { ...novoEstadoChefe(arq, 100), etapa: 'ataque' as const, copias: [{ x: 3, y: 3, viva: true }] };
+    const perto = usarHabilidade(arq, st0, { x: st0.x + 1, y: st0.y }, 'rede').st;
+    expect(perto.etapa).toBe('cansado');
+    expect(perto.copias).toBeUndefined();
+    const longe = usarHabilidade(arq, st0, { x: st0.x + 8, y: st0.y }, 'rede').st;
+    expect(longe.etapa).toBe('ataque');
+    expect(usarHabilidade(arq, perto, { x: st0.x + 1, y: st0.y }, 'rede').st).toBe(perto);
+  });
+  it('Helios: o passo de sombra anda para a frente, para na parede e não leva dano', () => {
+    const st0 = novoEstadoChefe(d, 100);
+    const h = { x: 2.5, y: 4.8 };
+    const r = usarHabilidade(d, st0, h, 'passo', { x: 1, y: 0 });
+    expect(r.heroi!.x).toBeCloseTo(5, 1);
+    const parede = usarHabilidade(d, st0, h, 'passo', { x: -1, y: 0 });
+    expect(parede.heroi!.x).toBeGreaterThan(1.3);
+    expect(livre(d.arena, parede.heroi!.x, parede.heroi!.y)).toBe(true);
+    expect(r.st.invulAte).toBeGreaterThan(r.st.tempo);
+  });
+});

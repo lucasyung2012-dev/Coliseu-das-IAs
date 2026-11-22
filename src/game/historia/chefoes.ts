@@ -80,8 +80,12 @@ export interface EstadoChefe {
   vidaMax: number;
   feridoAte: number;
   golpeAte: number;
+  /** A habilidade de cada gladiador no mapa: escudo levantado, invisível no passo de sombra, quando dá de novo. */
+  escudoAte: number;
+  invulAte: number;
+  habPronta: number;
   fim: null | 'quebrou' | 'derrota';
-  eventos: { tipo: 'placa' | 'dano' | 'falsa' | 'bloqueou' | 'explode' | 'parede' | 'furia'; em: number }[];
+  eventos: { tipo: 'placa' | 'dano' | 'falsa' | 'bloqueou' | 'explode' | 'parede' | 'furia' | 'defendeu' | 'rede' | 'errou' | 'passo'; em: number }[];
 }
 
 const RAIO_HEROI = 0.55;
@@ -102,6 +106,9 @@ export function novoEstadoChefe(d: DefChefe, vidaHeroi = 100): EstadoChefe {
     vidaMax: vidaHeroi,
     feridoAte: 0,
     golpeAte: 0,
+    escudoAte: 0,
+    invulAte: 0,
+    habPronta: 0,
     fim: null,
     eventos: [],
   };
@@ -113,7 +120,12 @@ export function novoEstadoChefe(d: DefChefe, vidaHeroi = 100): EstadoChefe {
 const ev = (st: EstadoChefe, tipo: EstadoChefe['eventos'][number]['tipo']) => [...st.eventos.filter((e) => st.tempo - e.em < 1500), { tipo, em: st.tempo }];
 
 function machucar(d: DefChefe, st: EstadoChefe, fator = 1): EstadoChefe {
-  if (st.tempo < st.feridoAte) return st;
+  if (st.tempo < st.feridoAte || st.tempo < st.invulAte) return st;
+  // O escudo do Cassius segura quase tudo.
+  if (st.tempo < st.escudoAte) {
+    const vida = Math.max(0, st.vida - Math.round(d.dano * fator * 0.15));
+    return { ...st, vida, feridoAte: st.tempo + 600, eventos: ev(st, 'defendeu'), fim: vida <= 0 ? 'derrota' : st.fim };
+  }
   const vida = Math.max(0, st.vida - Math.round(d.dano * fator));
   return { ...st, vida, feridoAte: st.tempo + 1000, eventos: ev(st, 'dano'), fim: vida <= 0 ? 'derrota' : st.fim };
 }
@@ -300,4 +312,44 @@ export function golpearChefe(d: DefChefe, st: EstadoChefe, heroi: { x: number; y
 /** Uma arena simples: borda de parede, chão e as peças que o tema pede (o mapa usa os ladrilhos do mundo). */
 export function arena(id: string, tema: TemaMundo, lugar: Lugar, mapa: string[], objetivo: string): Mundo {
   return { id, tema, lugar, mapa, objetivo, inicio: [2, 4], coisas: [], pessoas: [] };
+}
+
+/**
+ * A HABILIDADE DE CADA GLADIADOR NO MAPA (22/11/2026), para a primeira etapa não ser igual
+ * para os três:
+ * - Cassius, ESCUDO: levanta o escudo por 1,2 s (quase nada passa), mas anda devagar;
+ * - Octavius, REDE: joga a rede até 4,5 de distância: o chefão fica preso (CANSADO na hora)
+ *   e as cópias somem; errou, perdeu a rede por um tempinho;
+ * - Helios, PASSO DE SOMBRA: some e reaparece 2,5 à frente, sem levar dano no caminho.
+ */
+export type Habilidade = 'escudo' | 'rede' | 'passo';
+export const HABILIDADE: Record<string, Habilidade> = { cassius: 'escudo', octavius: 'rede', helios: 'passo' };
+export const RECARGA: Record<Habilidade, number> = { escudo: 2200, rede: 7000, passo: 2400 };
+
+export function usarHabilidade(
+  d: DefChefe,
+  st: EstadoChefe,
+  heroi: { x: number; y: number },
+  hab: Habilidade,
+  dir: { x: number; y: number } = { x: 1, y: 0 },
+): { st: EstadoChefe; heroi?: { x: number; y: number } } {
+  if (st.fim || st.tempo < st.habPronta) return { st };
+  const t = st.tempo;
+  if (hab === 'escudo') return { st: { ...st, escudoAte: t + 1200, habPronta: t + RECARGA.escudo } };
+  if (hab === 'rede') {
+    const longe = Math.hypot(heroi.x - st.x, heroi.y - st.y) > 4.5;
+    if (longe || st.etapa === 'cansado') return { st: { ...st, habPronta: t + 1500, eventos: ev(st, 'errou') } };
+    return {
+      st: { ...st, etapa: 'cansado', ate: t + d.cansaMs * 0.9, copias: undefined, projeteis: [], onda: undefined, angulo: undefined, vx: 0, vy: 0, habPronta: t + RECARGA.rede, eventos: ev(st, 'rede') },
+    };
+  }
+  // O passo de sombra: vai até 2,5 na direção em que está olhando, parando antes da parede.
+  const n = Math.hypot(dir.x, dir.y) || 1;
+  let fim = { ...heroi };
+  for (let k = 0.25; k <= 2.5; k += 0.25) {
+    const p = { x: heroi.x + (dir.x / n) * k, y: heroi.y + (dir.y / n) * k };
+    if (!livre(d.arena, p.x, p.y)) break;
+    fim = p;
+  }
+  return { st: { ...st, invulAte: t + 550, habPronta: t + RECARGA.passo, eventos: ev(st, 'passo') }, heroi: fim };
 }

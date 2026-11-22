@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { furiosoChefe, golpearChefe, novoEstadoChefe, passoChefe, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
+import { furiosoChefe, golpearChefe, HABILIDADE, novoEstadoChefe, passoChefe, RECARGA, usarHabilidade, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { novaLuta } from '@/game/historia/luta';
 import { novoMundo, passoMundo, type EntradaMundo, type EstadoMundo } from '@/game/historia/mundo';
@@ -16,6 +16,13 @@ import { usePausado } from './Pausa';
 
 /** Os chefões grandes ocupam mais espaço no mapa. */
 const GRANDES = new Set(['censor-tita', 'censor-tita-octavius', 'censor-tita-helios', 'leviata', 'gigante-sombras', 'nucleo', 'leao-mecanico']);
+
+/** O segundo botão de cada gladiador no mapa. */
+const BOTAO_HAB = {
+  escudo: { nome: 'ESCUDO', icone: 'escudo', cor: '#e0782c' },
+  rede: { nome: 'REDE', icone: 'rede', cor: '#2aa08a' },
+  passo: { nome: 'PASSO DE SOMBRA', icone: 'esquiva', cor: '#c8a0ff' },
+} as const;
 
 const AVISO: Record<string, string> = {
   investida: 'ELE VAI CORRER!',
@@ -48,6 +55,25 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const pausadoRef = useRef(pausado);
   pausadoRef.current = pausado;
 
+  const hab = HABILIDADE[heroi] ?? 'escudo';
+  const habilidade = () => {
+    if (faseRef.current !== 'mapa' || pausadoRef.current) return;
+    desbloquear();
+    const { s: s0, st: a } = ref.current;
+    const e = entrada.current;
+    const ix = (e.dir ? 1 : 0) - (e.esq ? 1 : 0);
+    const iy = (e.baixo ? 1 : 0) - (e.cima ? 1 : 0);
+    const dir = ix || iy ? { x: ix, y: iy } : { x: s0.dir === 'esq' ? -1 : s0.dir === 'dir' ? 1 : 0, y: s0.dir === 'cima' ? -1 : s0.dir === 'baixo' ? 1 : 0 };
+    const r = usarHabilidade(def, a, s0, hab, dir);
+    if (r.st === a) return;
+    const s1 = r.heroi ? { ...s0, x: r.heroi.x, y: r.heroi.y } : s0;
+    ref.current = { s: s1, st: r.st };
+    setS(s1);
+    setSt(r.st);
+    const ult = r.st.eventos[r.st.eventos.length - 1]?.tipo;
+    tocar(hab === 'escudo' ? 'guarda' : ult === 'rede' ? 'plano' : ult === 'errou' ? 'falha' : 'esquiva');
+  };
+
   const golpe = () => {
     if (faseRef.current !== 'mapa' || pausadoRef.current) return;
     desbloquear();
@@ -72,8 +98,11 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
       const dt = Math.min(50, agora - ultimo);
       ultimo = agora;
       if (faseRef.current === 'mapa' && !pausadoRef.current) {
-        const s2 = passoMundo(m, ref.current.s, entrada.current, dt);
         const a = ref.current.st;
+        const s1 = ref.current.s;
+        let s2 = passoMundo(m, s1, entrada.current, dt);
+        // Com o escudo levantado, o Cassius anda devagar.
+        if (a.tempo < a.escudoAte) s2 = { ...s2, x: s1.x + (s2.x - s1.x) * 0.4, y: s1.y + (s2.y - s1.y) * 0.4 };
         const st2 = passoChefe(def, a, s2, dt);
         if (st2.vida < a.vida) tocar('dano');
         const novos = st2.eventos.filter((e) => e.em > a.tempo);
@@ -108,6 +137,9 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
       if (t) {
         ev.preventDefault();
         entrada.current = { ...entrada.current, [t]: true };
+      } else if (['k', 'K', 'Shift'].includes(ev.key) && faseRef.current === 'mapa') {
+        ev.preventDefault();
+        habilidade();
       } else if (['j', 'J', ' ', 'e', 'E', 'Enter'].includes(ev.key) && faseRef.current === 'mapa') {
         ev.preventDefault();
         golpe();
@@ -155,6 +187,11 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const noAr = p.tipo === 'salto' && st.etapa === 'ataque' ? Math.sin((1 - Math.max(0, st.ate - st.tempo) / 850) * Math.PI) : 0;
   const mira = st.etapa === 'mira' && (p.tipo === 'investida' || p.tipo === 'tiros') ? { ang: (Math.atan2(s.y - 0.6 - (st.y - 0.6), s.x - st.x) * 180) / Math.PI, d: Math.hypot(s.x - st.x, s.y - st.y) } : null;
   const cansado = st.etapa === 'cansado' && !st.fim;
+  const escudo = st.tempo < st.escudoAte;
+  const sombra = st.tempo < st.invulAte;
+  const naRede = cansado && st.eventos.some((e) => e.tipo === 'rede' && st.tempo - e.em < def.cansaMs);
+  const recarga = Math.max(0, st.habPronta - st.tempo) / RECARGA[hab];
+  const bh = BOTAO_HAB[hab];
   const bossFiltro = cansado ? 'saturate(0.35) brightness(0.9)' : `drop-shadow(0 0 ${raiva ? 8 : def.escuro ? 6 : 0}px ${raiva ? '#ff3a3a' : def.cor})`;
 
   const desenhoChefe = (x: number, y: number, chave: string, copia = false) => (
@@ -237,20 +274,40 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           ))}
 
           {/* O gladiador */}
-          <div className={`absolute ${ferido ? 'piscar' : ''}`} style={{ ...emMapa(s.x, s.y), width: `${((1.15 * escalaDe(heroi)) / W) * 100}%`, translate: '-50% -100%', zIndex: 260 + Math.floor(s.y * 4) }}>
+          <div className={`absolute ${ferido && !escudo ? 'piscar' : ''} ${sombra ? 'passo-sombra' : ''}`} style={{ ...emMapa(s.x, s.y), width: `${((1.15 * escalaDe(heroi)) / W) * 100}%`, translate: '-50% -100%', zIndex: 260 + Math.floor(s.y * 4) }}>
             <span className="absolute bottom-[-4%] left-1/2 h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" />
             <div className={s.andando ? 'andar' : 'respirar'}>
               <Retrato quem={heroi} espelhar={s.dir === 'esq'} />
             </div>
+            {escudo && (
+              <span className={`escudo-ergue absolute top-[30%] block w-[70%] ${s.dir === 'esq' ? '-left-[25%]' : '-right-[25%]'}`} aria-hidden>
+                <Icone nome="escudo" className="w-full drop-shadow-[0_0_6px_#ffb060]" />
+              </span>
+            )}
           </div>
           {/* O chefão e as cópias (iguaizinhas: só batendo para saber) */}
           {desenhoChefe(st.x, st.y, 'chefe')}
           {(st.copias ?? []).filter((c) => c.viva).map((c, k) => desenhoChefe(c.x, c.y, `c${k}`, true))}
 
+          {naRede && (
+            <span className="rede-cai pointer-events-none absolute z-[305] block" style={{ ...emMapa(st.x, st.y - tam * 0.45), width: `${((tam * 0.9) / W) * 100}%`, aspectRatio: '1', translate: '-50% -50%' }} aria-hidden>
+              <Icone nome="rede" className="h-full w-full opacity-90" />
+            </span>
+          )}
+          {recente?.tipo === 'errou' && (
+            <span className="pointer-events-none absolute z-[310] -translate-x-1/2 whitespace-nowrap font-pixel text-[8px] text-[#ccc] [text-shadow:1px_1px_0_#000] sm:text-xs" style={emMapa(s.x, s.y - 1.8)}>
+              {st.etapa === 'cansado' ? 'ELE JÁ ESTÁ CANSADO: BATA!' : 'LONGE DEMAIS PARA A REDE!'}
+            </span>
+          )}
+          {recente?.tipo === 'defendeu' && (
+            <span className="pointer-events-none absolute z-[310] -translate-x-1/2 whitespace-nowrap font-pixel text-[8px] text-[#ffb060] [text-shadow:1px_1px_0_#000] sm:text-xs" style={emMapa(s.x, s.y - 1.8)}>
+              SEGUROU!
+            </span>
+          )}
           {cansado && (
             <span className="pointer-events-none absolute z-[310] flex -translate-x-1/2 flex-col items-center" style={emMapa(st.x, st.y - tam - 0.3)}>
               <span className="emote-pula block w-6 sm:w-8"><Emote emocao="surpreso" /></span>
-              <span className="whitespace-nowrap border-2 border-black bg-[#4ad46a] px-1 font-pixel text-[7px] text-black sm:text-[10px]">CANSADO! BATA!</span>
+              <span className="whitespace-nowrap border-2 border-black bg-[#4ad46a] px-1 font-pixel text-[7px] text-black sm:text-[10px]">{naRede ? 'PRESO NA REDE! BATA!' : 'CANSADO! BATA!'}</span>
             </span>
           )}
           {st.etapa === 'mira' && !st.fim && (
@@ -310,6 +367,23 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
             <BotaoSeta nome="baixo" props={botao('baixo')} />
             <span />
           </div>
+          <div className="flex items-end gap-2">
+          <button
+            type="button"
+            onPointerDown={(ev) => {
+              ev.preventDefault();
+              habilidade();
+            }}
+            className="pixel-box botao-luta relative flex flex-col items-center gap-1 overflow-hidden px-3 py-2"
+            style={{ '--cor': bh.cor } as CSSProperties}
+            aria-label={bh.nome}
+          >
+            <span className="medalhao">
+              <Icone nome={bh.icone} className="w-[62%]" />
+            </span>
+            <span className="font-pixel text-[7px] text-[#f4e2b4]">{bh.nome}</span>
+            {recarga > 0 && <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-black/60" style={{ height: `${recarga * 100}%` }} aria-hidden />}
+          </button>
           <button
             type="button"
             onPointerDown={(ev) => {
@@ -325,9 +399,10 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
             </span>
             <span className="font-pixel text-[8px] text-[#f4e2b4]">GOLPE</span>
           </button>
+          </div>
         </div>
       </div>
-      <p className="dica-teclado text-center text-[10px] text-muted">Teclado: setas ou WASD para andar · J, E ou espaço para o golpe · Primeira etapa: quebre a armadura</p>
+      <p className="dica-teclado text-center text-[10px] text-muted">Teclado: setas ou WASD para andar · J, E ou espaço para o golpe · K ou Shift: {bh.nome.toLowerCase()} · Primeira etapa: quebre a armadura</p>
     </div>
   );
 }

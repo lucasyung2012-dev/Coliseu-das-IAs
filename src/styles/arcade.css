@@ -1951,3 +1951,9 @@
 .armadura-caiu { animation: armadura-caiu 0.7s cubic-bezier(.2,1.6,.4,1) both; }
 @keyframes armadura-caiu { from { scale: 2.4; opacity: 0; } to { scale: 1; opacity: 1; } }
 .menos-movimento .zona-marca, .menos-movimento .zona-quase, .menos-movimento .copia-chefe, .menos-movimento .armadura-caiu { animation: none; }
+/* A habilidade de cada um no mapa do chefão: escudo, rede e passo de sombra. */
+.escudo-ergue { animation: escudo-ergue 0.15s ease-out both; }
+@keyframes escudo-ergue { from { scale: 0.4; opacity: 0; } to { scale: 1; opacity: 1; } }
+.rede-cai { animation: rede-cai 0.35s ease-out both; }
+@keyframes rede-cai { from { scale: 2.2; opacity: 0; rotate: -20deg; } to { scale: 1; opacity: 1; rotate: 0deg; } }
+.passo-sombra { opacity: 0.35; filter: drop-shadow(0 0 8px #c8a0ff) brightness(0.6); }
