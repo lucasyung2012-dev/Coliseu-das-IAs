@@ -257,9 +257,11 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
             (st.zonas ?? []).map((z, k) => (
               <span key={k} className={`pointer-events-none absolute z-[250] block rounded-full border-2 ${st.etapa === 'ataque' ? 'zona-quase' : 'zona-marca'}`} style={{ ...roda(z.x, z.y - 0.2, p.raio), borderColor: def.cor, background: `radial-gradient(circle, ${def.cor}55, ${def.cor}22 70%, transparent)` }} aria-hidden />
             ))}
-          {recente?.tipo === 'explode' && p.tipo !== 'onda' && (
-            <span className="explosao-chao pointer-events-none absolute z-[255] block rounded-full" style={{ ...roda(st.x, st.y - 0.3, 2), background: `radial-gradient(circle, #fff8, ${def.cor}88 40%, transparent 70%)` }} aria-hidden />
-          )}
+          {recente?.tipo === 'explode' &&
+            p.tipo !== 'onda' &&
+            (p.tipo === 'zonas' ? (st.zonas ?? []).map((z) => ({ x: z.x, y: z.y - 0.2, r: p.raio * 1.3 })) : [{ x: st.x, y: st.y - 0.3, r: 2 }]).map((z, k) => (
+              <span key={`ex${recente.em}-${k}`} className="explosao-chao pointer-events-none absolute z-[255] block rounded-full" style={{ ...roda(z.x, z.y, z.r), background: `radial-gradient(circle, #fff8, ${def.cor}aa 40%, transparent 70%)` }} aria-hidden />
+            ))}
           {/* A onda de choque */}
           {st.onda !== undefined && (
             <span className="pointer-events-none absolute z-[255] block rounded-full border-4" style={{ ...roda(st.x, st.y - 0.3, Math.max(0.2, st.onda)), borderColor: def.cor, boxShadow: `0 0 12px ${def.cor}, inset 0 0 12px ${def.cor}` }} aria-hidden />
@@ -305,7 +307,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
             </span>
           )}
           {cansado && (
-            <span className="pointer-events-none absolute z-[310] flex -translate-x-1/2 flex-col items-center" style={emMapa(st.x, st.y - tam - 0.3)}>
+            <span className="pointer-events-none absolute z-[310] flex -translate-x-1/2 flex-col items-center" style={emMapa(Math.min(W - 2.2, Math.max(2.2, st.x)), st.y - tam - 0.3)}>
               <span className="emote-pula block w-6 sm:w-8"><Emote emocao="surpreso" /></span>
               <span className="whitespace-nowrap border-2 border-black bg-[#4ad46a] px-1 font-pixel text-[7px] text-black sm:text-[10px]">{naRede ? 'PRESO NA REDE! BATA!' : 'CANSADO! BATA!'}</span>
             </span>

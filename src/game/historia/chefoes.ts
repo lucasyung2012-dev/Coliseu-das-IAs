@@ -1,4 +1,4 @@
-import { livre, type Mundo, type TemaMundo } from './mundo';
+import { livre, VELOCIDADE_MUNDO, type Mundo, type TemaMundo } from './mundo';
 import type { Lugar } from './roteiro';
 
 /**
@@ -281,6 +281,11 @@ export function passoChefe(d: DefChefe, st0: EstadoChefe, heroi: { x: number; y:
     }
   } else if (t >= st.ate) {
     st = comecarMira(d, { ...st, i: st.i + 1 }, heroi);
+  }
+  // Ficou cansado longe de você: o cansaço dura também o tempo de você chegar até ele.
+  if (st.etapa === 'cansado' && st0.etapa !== 'cansado') {
+    const longe = Math.max(0, Math.hypot(heroi.x - st.x, heroi.y - st.y) - ALCANCE);
+    st = { ...st, ate: st.ate + Math.min(3000, (longe / VELOCIDADE_MUNDO) * 1000) };
   }
   return st;
 }
