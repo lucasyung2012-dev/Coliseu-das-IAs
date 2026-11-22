@@ -506,6 +506,8 @@ export function LutaHistoria({
   equipe,
   entrada: entradaPedida,
   vantagem,
+  vidaInicial,
+  semEntrada,
 }: {
   lugar: Lugar;
   inimigo: string;
@@ -525,6 +527,10 @@ export function LutaHistoria({
   entrada?: EntradaInimigo;
   /** Ataque surpresa (pegou o inimigo de ronda por trás): ele começa com 30% menos vida. */
   vantagem?: boolean;
+  /** Segunda etapa do chefão: ele já começa com esta parte da vida (0 a 1) e na fase certa. */
+  vidaInicial?: number;
+  /** Segunda etapa do chefão: ele já está na arena (sem a chegada). */
+  semEntrada?: boolean;
 }) {
   const def = INIMIGOS[inimigo]!;
   const [heroi, setHeroi] = useState<Falante>(heroiInicial);
@@ -552,7 +558,7 @@ export function LutaHistoria({
   const [feitos, setFeitos] = useState(0);
   const [cinema, setCinema] = useState<{ tipo: EventoLuta['tipo']; id: number } | null>(null);
   // Antes de tudo, o inimigo CHEGA (inteiro, com animação): ninguém aparece do nada.
-  const entrada = treino ? null : entradaPedida ?? entradaDe(inimigo, !!def.chefao);
+  const entrada = treino || semEntrada ? null : entradaPedida ?? entradaDe(inimigo, !!def.chefao);
   const [fase, setFase] = useState<'chegada' | 'antes' | 'luta' | 'depois' | 'derrota'>(entrada ? 'chegada' : antes?.length ? 'antes' : 'luta');
   useEffect(() => {
     if (!entrada) return;
@@ -561,10 +567,16 @@ export function LutaHistoria({
     ids.push(window.setTimeout(() => setFase(antes?.length ? 'antes' : 'luta'), DURACAO_ENTRADA[entrada]));
     return () => ids.forEach((id) => window.clearTimeout(id));
   }, []);
-  const [e, setE] = useState<EstadoLuta>(() => {
-    const n = novaLuta(def, atributos);
-    return vantagem ? { ...n, inimigo: { ...n.inimigo, vida: Math.round(n.inimigo.vida * 0.7) } } : n;
-  });
+  // A luta nova: com vantagem (ataque surpresa) ou já enfraquecido (segunda etapa do chefão).
+  const lutaNova = (a: AtributosLuta): EstadoLuta => {
+    const n = novaLuta(def, a);
+    const v = vidaInicial ?? (vantagem ? 0.7 : 1);
+    if (v >= 1) return n;
+    let fase = 0;
+    for (let lim = def.trocaDeFase?.[fase]; lim !== undefined && v <= lim && fase + 1 < def.fases.length; lim = def.trocaDeFase?.[fase]) fase += 1;
+    return { ...n, inimigo: { ...n.inimigo, vida: Math.round(def.vida * v), fase } };
+  };
+  const [e, setE] = useState<EstadoLuta>(() => lutaNova(atributos));
   const [tentativas, setTentativas] = useState(1);
   const modo = modoDaLuta(e);
   const escuro = modo.escuro;
@@ -1054,7 +1066,7 @@ export function LutaHistoria({
                 setTentativas((t) => t + 1);
                 // A luta nova conta os acontecimentos do zero: sem isto, os sons ficavam mudos depois de cair.
                 visto.current = 0;
-                setE(novaLuta(def, atributos));
+                setE(lutaNova(atributos));
                 setCombo(0);
                 setPlanosUsados([]);
                 setLuzAte(0);

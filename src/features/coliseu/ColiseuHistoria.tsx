@@ -22,6 +22,8 @@ import { MAPAS, MUNDOS, mundoDoExplorar } from '@/game/historia/mundos';
 import { MundoAberto } from './MundoAberto';
 import { LutaHistoria } from './Luta';
 import { ChefaoNoMapa } from './ChefaoNoMapa';
+import { ChefaoEmEtapas } from './ChefaoEmEtapas';
+import { CHEFES } from '@/game/historia/chefoesDefs';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
 import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
@@ -460,6 +462,33 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         }}
       />
     );
+  // Os chefões em duas etapas (22/11/2026): primeiro o mapa (quebrar a armadura), depois o duelo.
+  if (cena.tipo === 'luta' && !cena.treino && CHEFES[cena.inimigo]) {
+    const chefe = CHEFES[cena.inimigo]!;
+    return (
+      <ChefaoEmEtapas
+        key={cena.id}
+        def={chefe}
+        heroi={heroi}
+        antes={cena.antes}
+        duelo={() => (
+          <LutaHistoria
+            lugar={cena.lugar}
+            inimigo={cena.inimigo}
+            heroi={heroi}
+            antes={[{ quem: heroi, texto: 'A armadura caiu. Agora é cara a cara!', jeito: 'grito' }]}
+            depois={cena.depois}
+            atributos={equipe?.cassius ?? atributosDoSave(save)}
+            equipe={equipe}
+            vidaInicial={chefe.vidaNoDuelo}
+            semEntrada
+            onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
+            onFim={() => proxima()}
+          />
+        )}
+      />
+    );
+  }
   if (cena.tipo === 'luta')
     return (
       <LutaHistoria

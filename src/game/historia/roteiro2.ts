@@ -1193,7 +1193,6 @@ export const CAP6_CASSIUS: Capitulo = {
       id: 'c6-chefao',
       lugar: 'coliseu-arena',
       inimigo: 'leao-mecanico',
-      noMapa: true,
       antes: [{ quem: 'cassius', texto: 'Pela centésima vitória do Brutus.' }],
       depois: [
         { quem: 'povo', texto: 'ELE DERRUBOU O LEÃO! ELE DERRUBOU O LEÃO!', emocao: 'feliz', jeito: 'grito' },

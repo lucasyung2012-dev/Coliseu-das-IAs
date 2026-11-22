@@ -1,4 +1,5 @@
 import { ARENA_RATO_REI, CHEFOES_MAPA, golpearChefao, novoChefao, passoChefao, VIDA_REI, type EstadoChefao } from '@/game/historia/chefaoMapa';
+import { CHEFES } from '@/game/historia/chefoesDefs';
 import { livre } from '@/game/historia/mundo';
 import { CAPITULOS } from '@/game/historia/roteiro';
 
@@ -74,7 +75,7 @@ describe('o Leão Mecânico no mapa aberto (o salto)', () => {
     for (const l of leao.arena.mapa) expect(l.length).toBe(leao.arena.mapa[0]!.length);
     expect(livre(leao.arena, leao.arena.inicio[0] + 0.5, leao.arena.inicio[1] + 0.8)).toBe(true);
     const cena = CAPITULOS.claude.flatMap((c) => c.cenas).find((c) => c.id === 'c6-chefao');
-    expect(cena?.tipo === 'luta' && cena.noMapa).toBe(true);
+    expect(cena?.tipo === 'luta' && CHEFES[cena.inimigo]).toBeTruthy();
   });
 
   it('parado na sombra, ele cai em cima e machuca; depois fica cansado', () => {
