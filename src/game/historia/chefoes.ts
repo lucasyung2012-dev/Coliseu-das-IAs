@@ -76,6 +76,8 @@ export interface EstadoChefe {
   angulo?: number;
   copias?: { x: number; y: number; viva: boolean }[];
   acertou?: boolean;
+  /** Já perdeu uma placa neste cansaço (uma placa por vez: depois ele se recupera). */
+  apanhou?: boolean;
   vida: number;
   vidaMax: number;
   feridoAte: number;
@@ -175,7 +177,7 @@ function comecarMira(d: DefChefe, st: EstadoChefe, heroi: { x: number; y: number
       zonas.push({ x: heroi.x + Math.cos(a) * p.espalha * (0.5 + (k % 3) * 0.4), y: heroi.y + Math.sin(a) * p.espalha * 0.7 });
     }
   }
-  return { ...st, etapa: 'mira', ate: st.tempo + mira, zonas, alvo: p.tipo === 'salto' ? { ...heroi } : undefined, projeteis: [], onda: undefined, angulo: undefined, copias: undefined };
+  return { ...st, etapa: 'mira', apanhou: false, ate: st.tempo + mira, zonas, alvo: p.tipo === 'salto' ? { ...heroi } : undefined, projeteis: [], onda: undefined, angulo: undefined, copias: undefined };
 }
 
 export function passoChefe(d: DefChefe, st0: EstadoChefe, heroi: { x: number; y: number }, dt: number): EstadoChefe {
@@ -300,7 +302,7 @@ export function golpearChefe(d: DefChefe, st: EstadoChefe, heroi: { x: number; y
   if (falsa >= 0) return { ...base, copias: st.copias!.map((c, k) => (k === falsa ? { ...c, viva: false } : c)), eventos: ev(st, 'falsa') };
   if (!perto(st.x, st.y)) return base;
   const vulneravel = st.etapa === 'cansado' || (st.etapa === 'ataque' && d.padroes[st.i % d.padroes.length]!.tipo === 'copias');
-  if (!vulneravel) return { ...base, eventos: ev(st, 'bloqueou') };
+  if (!vulneravel || st.apanhou) return { ...base, eventos: ev(st, 'bloqueou') };
   const armadura = st.armadura - 1;
   const virouFuria = armadura === Math.floor(d.armadura / 2);
   return {
@@ -309,8 +311,10 @@ export function golpearChefe(d: DefChefe, st: EstadoChefe, heroi: { x: number; y
     copias: undefined,
     eventos: ev({ ...st, eventos: ev(st, 'placa') }, virouFuria ? 'furia' : 'placa'),
     fim: armadura <= 0 ? 'quebrou' : null,
-    // Bater no verdadeiro durante as cópias acaba com elas.
-    ...(st.copias ? { etapa: 'cansado' as const, ate: st.tempo + d.cansaMs } : {}),
+    // Uma placa por cansaço: ele cambaleia um instante e volta a atacar.
+    etapa: 'cansado' as const,
+    apanhou: true,
+    ate: st.tempo + 600,
   };
 }
 

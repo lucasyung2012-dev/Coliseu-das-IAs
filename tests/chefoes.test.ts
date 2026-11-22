@@ -95,3 +95,15 @@ describe('a habilidade de cada gladiador na primeira etapa', () => {
     expect(r.st.invulAte).toBeGreaterThan(r.st.tempo);
   });
 });
+
+describe('uma placa por cansaço', () => {
+  it('o segundo golpe no mesmo cansaço não tira outra placa', () => {
+    const d = CHEFES['fornalha']!;
+    const st0 = { ...novoEstadoChefe(d, 100), etapa: 'cansado' as const, ate: 99_999 };
+    const perto = { x: st0.x + 0.9, y: st0.y + 0.2 };
+    const um = golpearChefe(d, st0, perto);
+    expect(um.armadura).toBe(d.armadura - 1);
+    const dois = golpearChefe(d, { ...um, golpeAte: 0 }, perto);
+    expect(dois.armadura).toBe(d.armadura - 1);
+  });
+});

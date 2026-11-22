@@ -186,7 +186,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const tam = GRANDES.has(def.inimigo) ? 2.7 : 2.1;
   const noAr = p.tipo === 'salto' && st.etapa === 'ataque' ? Math.sin((1 - Math.max(0, st.ate - st.tempo) / 850) * Math.PI) : 0;
   const mira = st.etapa === 'mira' && (p.tipo === 'investida' || p.tipo === 'tiros') ? { ang: (Math.atan2(s.y - 0.6 - (st.y - 0.6), s.x - st.x) * 180) / Math.PI, d: Math.hypot(s.x - st.x, s.y - st.y) } : null;
-  const cansado = st.etapa === 'cansado' && !st.fim;
+  const cansado = st.etapa === 'cansado' && !st.fim && !st.apanhou;
   const escudo = st.tempo < st.escudoAte;
   const sombra = st.tempo < st.invulAte;
   const naRede = cansado && st.eventos.some((e) => e.tipo === 'rede' && st.tempo - e.em < def.cansaMs);
@@ -319,7 +319,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           )}
           {recente?.tipo === 'bloqueou' && (
             <span className="pointer-events-none absolute z-[310] -translate-x-1/2 whitespace-nowrap font-pixel text-[8px] text-[#ccc] [text-shadow:1px_1px_0_#000] sm:text-xs" style={emMapa(st.x, st.y - tam - 0.6)}>
-              NÃO ENTRA! ESPERE ELE CANSAR
+              {st.apanhou ? 'ELE SE RECUPEROU! ESPERE O PRÓXIMO' : 'NÃO ENTRA! ESPERE ELE CANSAR'}
             </span>
           )}
           {recente?.tipo === 'falsa' && (
