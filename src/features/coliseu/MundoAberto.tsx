@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji123'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -936,6 +936,49 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
+      // ---- O túnel dos gladiadores (22/11/2026): armas, banco e o balde de água do Brutus ----
+      // Suporte de armas: lanças em pé e um escudo redondo pendurado.
+      if (c === '1')
+        pecas.push(
+          <g key={`ar1${k}`}>
+            <rect x={X + 1} y={Y + 10} width="14" height="2" fill="#6a4220" />
+            <rect x={X + 1} y={Y - 2} width="14" height="2" fill="#6a4220" />
+            {[3, 7, 11].map((px) => (
+              <g key={px}>
+                <rect x={X + px} y={Y - 10} width="1.2" height="23" fill="#8a6a3a" />
+                <rect x={X + px - 0.8} y={Y - 13} width="2.8" height="4" fill="#c8c8d0" />
+              </g>
+            ))}
+            {x % 2 === 0 && (
+              <>
+                <circle cx={X + 8} cy={Y + 5} r="4.5" fill="#a8742a" />
+                <circle cx={X + 8} cy={Y + 5} r="1.5" fill="#e0b870" />
+              </>
+            )}
+          </g>,
+        );
+      // Banco de madeira dos gladiadores.
+      if (c === '2')
+        pecas.push(
+          <g key={`bc${k}`}>
+            <rect x={X} y={Y + 5} width={PX} height="4" fill="#7a5430" />
+            <rect x={X} y={Y + 5} width={PX} height="1" fill="#a87a44" />
+            {t(x - 1, y) !== '2' && <rect x={X + 1} y={Y + 9} width="2" height="5" fill="#4a2a12" />}
+            {t(x + 1, y) !== '2' && <rect x={X + 13} y={Y + 9} width="2" height="5" fill="#4a2a12" />}
+          </g>,
+        );
+      // O balde de água fria do Brutus.
+      if (c === '3')
+        pecas.push(
+          <g key={`bd${k}`}>
+            <ellipse cx={X + 8} cy={Y + 14} rx="6" ry="1.5" fill="#000" opacity="0.3" />
+            <rect x={X + 3} y={Y + 3} width="10" height="11" fill="#6a4a2a" />
+            <rect x={X + 3} y={Y + 5} width="10" height="1.2" fill="#3a3a44" />
+            <rect x={X + 3} y={Y + 11} width="10" height="1.2" fill="#3a3a44" />
+            <ellipse cx={X + 8} cy={Y + 3.5} rx="5" ry="1.6" fill="#4a7ab8" />
+            <path d={`M${X + 3} ${Y + 3} Q${X + 8} ${Y - 5} ${X + 13} ${Y + 3}`} fill="none" stroke="#3a3a44" strokeWidth="0.8" />
+          </g>,
+        );
       // ---- O Fórum (22/11/2026): a tribuna, o povo e os estandartes do Censor ----
       // A tribuna (2 × 2): plataforma de pedra com degraus, grade de bronze e as proas de navio.
       if (c === 'R' && t(x - 1, y) !== 'R' && t(x, y - 1) !== 'R')

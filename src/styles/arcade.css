@@ -1849,3 +1849,13 @@
 .pagina-voa { animation: pagina-voa 1.6s ease-in-out infinite; transform-origin: 0 50%; }
 @keyframes pagina-voa { 0%, 60% { scale: 1 1; opacity: 0; } 70% { opacity: 1; } 85% { scale: -1 1; } 100% { scale: -1 1; opacity: 0; } }
 .menos-movimento .pagina-voa { animation: none; opacity: 0; }
+
+/* O chão dos espetos (22/11/2026): furos piscando, espetos subindo e o pulo de uma placa para outra. */
+.furo-alerta { animation: furo-alerta 0.25s steps(2) infinite; box-shadow: 0 0 6px #ff3a3a; }
+@keyframes furo-alerta { 50% { opacity: 0.4; } }
+.espetos-sobem { animation: espetos-sobem 0.18s cubic-bezier(0.2, 1.6, 0.4, 1) both; transform-origin: 50% 100%; }
+@keyframes espetos-sobem { from { scale: 1 0; } to { scale: 1 1; } }
+.pulo-faixa { animation: pulo-faixa 0.22s ease-out; }
+@keyframes pulo-faixa { 0% { translate: 0 0; } 50% { translate: 0 -22%; } 100% { translate: 0 0; } }
+.menos-movimento .furo-alerta, .menos-movimento .pulo-faixa { animation: none; }
+.menos-movimento .espetos-sobem { animation-duration: 0.01s; }

@@ -547,23 +547,39 @@ export function DesafioArmadilhas({ lugar, heroi, antes, depois, onFim }: { luga
         <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
+        {/* O CHÃO DOS ESPETOS (redesenhado, 22/11/2026): três placas de ferro furadas na areia. Os
+            furos acendem em vermelho antes; depois a fileira de espetos sobe de verdade. O gladiador
+            pula de uma placa para a outra. */}
         {fase === 'jogo' &&
-          [0, 1, 2].map((k) => (
-            <div
-              key={k}
-              className="absolute bottom-[6%] z-[6] h-[16%] w-[30%] -translate-x-1/2 border-2"
-              style={{
-                left: `${faixa(k)}%`,
-                borderColor: perigo.includes(k) ? '#ff3a3a' : '#00000055',
-                background: perigo.includes(k) ? (espetos ? '#5a1a1a' : '#ff3a3a44') : 'transparent',
-              }}
-              aria-hidden
-            >
-              {perigo.includes(k) && espetos && <span className="absolute inset-x-0 -top-[60%] flex justify-center text-2xl sm:text-4xl"><Icone nome="espeto" className="inline-block w-[1.6em]" /></span>}
-            </div>
-          ))}
-        <div className="absolute bottom-[14%] z-10 w-[10%] -translate-x-1/2 transition-[left] duration-150" style={{ left: `${faixa(onde)}%` }} aria-hidden>
-          <Retrato quem={heroi} />
+          [0, 1, 2].map((k) => {
+            const vai = perigo.includes(k);
+            return (
+              <div key={k} className="absolute bottom-[6%] z-[6] h-[16%] w-[30%] -translate-x-1/2" style={{ left: `${faixa(k)}%` }} aria-hidden>
+                <div className="absolute inset-0 border-2 border-[#2a2a30] bg-[linear-gradient(180deg,#5a5a64,#34343c)]" />
+                <div className="absolute inset-x-[6%] inset-y-[22%] flex justify-around">
+                  {Array.from({ length: 7 }, (_, f) => (
+                    <span key={f} className={`block h-full w-[6%] rounded-full ${vai && !espetos ? 'furo-alerta' : ''}`} style={{ background: vai ? (espetos ? '#1a0a0a' : '#ff3a3a') : '#14141a' }} />
+                  ))}
+                </div>
+                {vai && espetos && (
+                  <div className="espetos-sobem absolute inset-x-[4%] bottom-[60%] flex h-[150%] items-end justify-around">
+                    {Array.from({ length: 7 }, (_, f) => (
+                      <span key={f} className="block h-full w-[9%] bg-[linear-gradient(180deg,#f0f0f8,#8a8a98_40%,#4a4a54)]" style={{ clipPath: 'polygon(50% 0, 100% 100%, 0 100%)' }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        {fase === 'jogo' && (
+          <span className="pointer-events-none absolute left-1/2 top-[6%] z-20 -translate-x-1/2 font-pixel text-[8px] text-white [text-shadow:2px_2px_0_#000] sm:text-xs">
+            RODADA {Math.min(rodada + 1, RODADAS_ARMADILHA)}/{RODADAS_ARMADILHA}
+          </span>
+        )}
+        <div className="absolute bottom-[14%] z-10 w-[12%] -translate-x-1/2 transition-[left] duration-150" style={{ left: `${faixa(onde)}%` }} aria-hidden>
+          <div key={onde} className="pulo-faixa">
+            <Retrato quem={heroi} />
+          </div>
         </div>
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
         {fase === 'perdeu' && <Perdeu titulo="OS ESPETOS TE PEGARAM" dica="Olhe o chão vermelho e pule logo para um lado sem vermelho. No fim, são dois de cada vez!" onDeNovo={comecar} />}
