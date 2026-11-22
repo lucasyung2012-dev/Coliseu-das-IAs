@@ -397,7 +397,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
         </button>
       </div>
       </div>
-      <p className="dica-teclado text-center text-[10px] text-muted">Teclado: A e D (ou as setas) para andar · W ou espaço para pular · suba nas mesas e passe por cima do fogo</p>
+      <p className="dica-teclado text-center text-[10px] text-muted">Teclado: A e D (ou as setas) para andar · W ou espaço para pular</p>
     </div>
   );
 }
