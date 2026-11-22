@@ -2506,6 +2506,14 @@ export const CAP4_OCTAVIUS: Capitulo = {
 
     // --- Rota A: telhados ---
     {
+      // NOVA (22/11/2026): o caminho pelo(a) telhados, andando de lado.
+      tipo: 'fase',
+      id: 'o4-fase-telhados',
+      lugar: 'subura-telhados',
+      fase: 'telhados-subura',
+      ...rota('telhados'),
+    },
+    {
       tipo: 'luta',
       id: 'o4-a1',
       lugar: 'subura-telhados',
@@ -2553,6 +2561,14 @@ export const CAP4_OCTAVIUS: Capitulo = {
 
     // --- Rota B: esgoto ---
     {
+      // NOVA (22/11/2026): o caminho pelo(a) esgoto, andando de lado.
+      tipo: 'fase',
+      id: 'o4-fase-esgoto',
+      lugar: 'subura-esgoto',
+      fase: 'esgoto-subura',
+      ...rota('esgoto'),
+    },
+    {
       tipo: 'luta',
       id: 'o4-b1',
       lugar: 'subura-esgoto',
@@ -2599,6 +2615,14 @@ export const CAP4_OCTAVIUS: Capitulo = {
     },
 
     // --- Rota C: feira ---
+    {
+      // NOVA (22/11/2026): o caminho pelo(a) feira, andando de lado.
+      tipo: 'fase',
+      id: 'o4-fase-feira',
+      lugar: 'subura-mercado',
+      fase: 'feira-subura',
+      ...rota('feira'),
+    },
     {
       tipo: 'luta',
       id: 'o4-c1',

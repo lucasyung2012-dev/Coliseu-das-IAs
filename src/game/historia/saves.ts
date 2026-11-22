@@ -87,10 +87,12 @@ export function ajustarOrdem(s: SaveHistoria): SaveHistoria {
   if (ordem < 6 && s.gladiador === 'chatgpt' && !s.secreto && s.capitulo === 1 && cena >= 15) cena += 1;
   // 7: o convés na tempestade entrou no capítulo 2 do Octavius (antes da cena 10).
   if (ordem < 7 && s.gladiador === 'chatgpt' && !s.secreto && s.capitulo === 2 && cena >= 10) cena += 1;
+  // 8: uma fase para cada caminho do capítulo 4 do Octavius (antes das cenas 4, 9 e 14).
+  if (ordem < 8 && s.gladiador === 'chatgpt' && !s.secreto && s.capitulo === 4) cena += (cena >= 4 ? 1 : 0) + (cena >= 9 ? 1 : 0) + (cena >= 14 ? 1 : 0);
   return { ...s, cena, ordem: ORDEM_ATUAL };
 }
 /** A versão atual da ordem das cenas (save novo já nasce nela). */
-export const ORDEM_ATUAL = 7;
+export const ORDEM_ATUAL = 8;
 
 /** Avança o save para uma cena (ou para o próximo capítulo, marcando o atual como concluído). */
 export function avancarSave(s: SaveHistoria, capitulo: number, cena: number, agora = new Date()): SaveHistoria {

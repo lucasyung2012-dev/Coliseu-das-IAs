@@ -1898,3 +1898,6 @@
 @keyframes pedaco-cai { to { translate: 0 400%; rotate: 70deg; opacity: 0; } }
 .menos-movimento .chao-corre, .menos-movimento .poeira-corre, .menos-movimento .arremessa { animation: none; }
 .menos-movimento .pedaco-cai { animation-duration: 0.01s; }
+
+/* O vão entre os telhados (22/11/2026): o buraco escuro com a rua lá embaixo. */
+.vao-fase { background: linear-gradient(180deg, #0a0812 0, #1a1424 60%, #3a2a1a 100%); box-shadow: inset 3px 0 0 #2a1e14, inset -3px 0 0 #2a1e14; }
