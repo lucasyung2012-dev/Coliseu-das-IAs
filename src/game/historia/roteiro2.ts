@@ -316,6 +316,13 @@ export const CAP4_CASSIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): os túneis alagados, andando de lado, logo depois da descida.
+      tipo: 'fase',
+      id: 'c4-alagados',
+      lugar: 'catacumbas',
+      fase: 'tuneis-alagados',
+    },
+    {
       tipo: 'luta',
       id: 'c4-luta-ratos',
       lugar: 'catacumbas',

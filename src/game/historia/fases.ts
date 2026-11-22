@@ -91,4 +91,46 @@ export const FASES: Record<string, Fase> = {
     saida: { x: 194, rotulo: 'PRAÇA DO MERCADO' },
     precisa: 3,
   },
+  // Capítulo 4 do Cassius (22/11/2026): os túneis alagados das catacumbas, logo depois da
+  // descida. Água funda e gelada, pedras, tampas de sarcófago e vigas; as páginas que os
+  // Copistas esconderam entre os ossos. A segunda tela é a primeira espelhada (não repete).
+  // Os comentários do Cassius são rascunho: o Lucas pode reescrever.
+  'tuneis-alagados': {
+    id: 'tuneis-alagados',
+    telas: ['catacumbas', 'catacumbas'],
+    objetivo: 'Atravesse os túneis alagados de pedra em pedra. Recolha as páginas dos Copistas.',
+    plataformas: [
+      { x: 14, w: 8, y: 5, tipo: 'pedra' },
+      { x: 28, w: 8, y: 7, tipo: 'pedra' },
+      { x: 40, w: 12, y: 9, tipo: 'sarcofago' },
+      { x: 58, w: 8, y: 6, tipo: 'pedra' },
+      { x: 70, w: 14, y: 15, tipo: 'viga' },
+      { x: 90, w: 8, y: 8, tipo: 'pedra' },
+      { x: 106, w: 8, y: 6, tipo: 'pedra' },
+      { x: 120, w: 14, y: 10, tipo: 'sarcofago' },
+      { x: 140, w: 8, y: 7, tipo: 'pedra' },
+      { x: 152, w: 12, y: 16, tipo: 'viga' },
+      { x: 170, w: 8, y: 8, tipo: 'pedra' },
+      { x: 184, w: 8, y: 5, tipo: 'pedra' },
+    ],
+    perigos: [
+      { x: 22, w: 36, tipo: 'agua', acesoMs: 0, apagadoMs: 0 },
+      { x: 86, w: 20, tipo: 'agua', acesoMs: 0, apagadoMs: 0 },
+      { x: 132, w: 20, tipo: 'agua', acesoMs: 0, apagadoMs: 0 },
+      { x: 166, w: 16, tipo: 'agua', acesoMs: 0, apagadoMs: 0 },
+    ],
+    coletaveis: [
+      { id: 'pagina-1', x: 46, y: 14, icone: 'pagina', nome: 'Página copiada' },
+      { id: 'pagina-2', x: 77, y: 20, icone: 'pagina', nome: 'Página copiada' },
+      { id: 'pagina-3', x: 158, y: 21, icone: 'pagina', nome: 'Página copiada' },
+      { id: 'pagina-4', x: 188, y: 10, icone: 'pagina', nome: 'Página copiada' },
+    ],
+    comentarios: [
+      { id: 'agua', x: 10, quem: 'cassius', texto: 'A água aqui embaixo é funda e gelada. Pedra por pedra.' },
+      { id: 'pagina', x: 44, quem: 'cassius', texto: 'Uma página copiada a carvão, presa entre os ossos. Os Copistas passaram por aqui.' },
+      { id: 'patinhas', x: 120, quem: 'cassius', texto: 'Patinhas de metal no escuro... Rápido.' },
+    ],
+    saida: { x: 196, rotulo: 'FUNDO DO TÚNEL' },
+    precisa: 3,
+  },
 };

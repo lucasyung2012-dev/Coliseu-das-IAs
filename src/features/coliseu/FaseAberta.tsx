@@ -159,7 +159,10 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
         >
           {fase.telas.map((t, k) => (
             <div key={k} className="absolute inset-y-0" style={{ left: `${(k / fase.telas.length) * 100}%`, width: `${100 / fase.telas.length}%` }}>
-              <CenarioHistoria lugar={t} semEstatua={k > 0} />
+              {/* A mesma tela duas vezes seguidas: a segunda vem espelhada (não fica repetido). */}
+              <div className="h-full w-full" style={{ transform: k > 0 && fase.telas[k - 1] === t ? 'scaleX(-1)' : undefined }}>
+                <CenarioHistoria lugar={t} semEstatua={k > 0} />
+              </div>
             </div>
           ))}
 
@@ -172,6 +175,15 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                   <div className="absolute bottom-0 left-[8%] top-0 w-[8%] bg-[#4a2a14]" />
                   <div className="absolute bottom-0 right-[8%] top-0 w-[8%] bg-[#4a2a14]" />
                 </>
+              )}
+              {/* Pedra no meio da água, e a tampa de um sarcófago boiando */}
+              {p.tipo === 'pedra' && <div className="absolute inset-x-0 bottom-0 top-0 rounded-t-[40%] border-2 border-[#2a2622] bg-[linear-gradient(180deg,#8a8276,#4a443c)]" />}
+              {p.tipo === 'sarcofago' && (
+                <div className="absolute inset-0 border-2 border-[#2a2622] bg-[#6a6258]">
+                  <div className="absolute inset-x-0 top-0 h-[22%] bg-[#8a8276]" />
+                  <div className="absolute left-1/2 top-[30%] h-[50%] w-[8%] -translate-x-1/2 bg-[#4a443c]" />
+                  <div className="absolute left-[30%] right-[30%] top-[42%] h-[10%] bg-[#4a443c]" />
+                </div>
               )}
               {/* Caixote: tábuas e a cruz de madeira */}
               {p.tipo === 'caixote' && (
@@ -207,8 +219,10 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
             const aceso = fogoAceso(p, s.tempo);
             return (
               <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO - 1}%`, height: '12%' }} aria-hidden>
-                <div className="absolute inset-x-0 bottom-0 h-[18%] rounded-[50%] bg-[#2a0a04]/80" />
-                {aceso ? (
+                <div className="absolute inset-x-0 bottom-0 h-[18%] rounded-[50%] bg-[#2a0a04]/80" style={{ opacity: p.tipo === 'agua' ? 0 : 1 }} />
+                {p.tipo === 'agua' ? (
+                  <div className="agua-fase absolute inset-x-0 bottom-[-40%] top-[55%]" />
+                ) : aceso ? (
                   Array.from({ length: Math.max(2, Math.round(p.w / 3)) }, (_, j) => (
                     <span
                       key={j}

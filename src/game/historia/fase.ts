@@ -15,13 +15,14 @@ export interface Plataforma {
   w: number;
   y: number;
   /** Como desenhar: mesa, estante, sacada, viga, caixote (do mercado) ou toldo de barraca. */
-  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo';
+  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo' | 'pedra' | 'sarcofago';
 }
 
 export interface Perigo {
   x: number;
   w: number;
-  tipo: 'fogo';
+  /** Fogo (acende e apaga) ou água funda (sempre: cair nela te leva de volta). */
+  tipo: 'fogo' | 'agua';
   /** O fogo acende e apaga: aceso por `acesoMs`, apagado por `apagadoMs` (0 = sempre aceso). */
   acesoMs: number;
   apagadoMs: number;

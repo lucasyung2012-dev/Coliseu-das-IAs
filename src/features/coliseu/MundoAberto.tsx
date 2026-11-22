@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZ'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlue'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -750,8 +750,8 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
-      if ('#JNoCKWI'.includes(c)) {
-        const frente = !'#JENoCKWIVBX'.includes(t(x, y + 1));
+      if ('#JNoCKWIG'.includes(c)) {
+        const frente = !'#JENoCKWIGVBX'.includes(t(x, y + 1));
         pecas.push(
           <g key={`p${k}`}>
             <rect x={X} y={Y} width={PX} height={PX} fill={cor.parede1} />
@@ -936,6 +936,76 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
+      // ---- As catacumbas (22/11/2026): páginas escritas à mão nas paredes, sarcófagos, crânios,
+      // poças d'água, teias de aranha e os livros escondidos no Arquivo. ----
+      // Página de livro copiada à mão na parede (os Copistas escrevem entre os ossos).
+      if (c === 'G')
+        pecas.push(
+          <g key={`pg${k}`}>
+            <rect x={X + 2} y={Y + 1} width="12" height="9" fill="#d8c8a0" transform={`rotate(${(x % 3) - 1} ${X + 8} ${Y + 5})`} />
+            {[3, 5, 7].map((r) => (
+              <rect key={r} x={X + 3.5} y={Y + r} width={7 + ((x + r) % 3)} height="0.8" fill="#3a2a1a" opacity="0.8" />
+            ))}
+            <rect x={X + 11} y={Y + 6} width="1" height="3" fill="#1a1a1a" transform={`rotate(30 ${X + 11} ${Y + 6})`} />
+          </g>,
+        );
+      // Sarcófago de pedra, com a tampa entalhada.
+      if (c === 'L')
+        pecas.push(
+          <g key={`sf${k}`}>
+            <ellipse cx={X + 8} cy={Y + 15} rx="7" ry="1.5" fill="#000" opacity="0.35" />
+            <rect x={X + 1} y={Y - 3} width="14" height="17" fill="#6a6258" />
+            <rect x={X + 1} y={Y - 4} width="14" height="4" fill="#8a8276" />
+            <rect x={X + 7} y={Y + 1} width="2" height="9" fill="#4a443c" />
+            <rect x={X + 4} y={Y + 3} width="8" height="2" fill="#4a443c" />
+            <rect x={X + 1} y={Y + 12} width="14" height="2" fill="#4a443c" />
+          </g>,
+        );
+      // Pilha de crânios.
+      if (c === 'z')
+        pecas.push(
+          <g key={`cr${k}`}>
+            {[
+              [2, 9],
+              [7, 9],
+              [12, 9],
+              [4.5, 4],
+              [9.5, 4],
+              [7, -1],
+            ].map(([a, b], j) => (
+              <g key={j}>
+                <rect x={X + a!} y={Y + b!} width="4" height="4" fill="#e8dcc0" />
+                <rect x={X + a! + 0.6} y={Y + b! + 1.4} width="1" height="1" fill="#2a2018" />
+                <rect x={X + a! + 2.4} y={Y + b! + 1.4} width="1" height="1" fill="#2a2018" />
+              </g>
+            ))}
+          </g>,
+        );
+      // Poça d'água no chão (dá para pisar), com o brilho da tocha.
+      if (c === 'u')
+        pecas.push(
+          <g key={`po${k}`}>
+            <ellipse cx={X + 8} cy={Y + 9} rx="7" ry="4" fill="#14202e" opacity="0.85" />
+            <ellipse className="agua-onda" cx={X + 6} cy={Y + 8} rx="2.5" ry="0.8" fill="#6a8ab0" opacity="0.6" />
+          </g>,
+        );
+      // Teia de aranha no canto.
+      if (c === 'e')
+        pecas.push(
+          <g key={`te${k}`} stroke="#e8e8f0" strokeWidth="0.4" opacity="0.45" fill="none">
+            <path d={`M${X} ${Y} L${X + 10} ${Y + 10} M${X} ${Y} L${X + 12} ${Y + 3} M${X} ${Y} L${X + 3} ${Y + 12}`} />
+            <path d={`M${X + 4} ${Y + 1} Q${X + 4} ${Y + 4} ${X + 1} ${Y + 4} M${X + 8} ${Y + 2} Q${X + 7} ${Y + 7} ${X + 2} ${Y + 8}`} />
+          </g>,
+        );
+      // Pilha de livros escondidos (o Arquivo do Censor).
+      if (c === 'l')
+        pecas.push(
+          <g key={`lv${k}`}>
+            {['#c0283c', '#2a6aa0', '#d8a83a', '#3a8a4a'].map((cor2, j) => (
+              <rect key={j} x={X + 2 + (j % 2)} y={Y + 10 - j * 4} width={12 - (j % 2) * 2} height="3.5" fill={cor2} stroke="#1a0a04" strokeWidth="0.5" />
+            ))}
+          </g>,
+        );
       // ---- Peças novas (22/11/2026): os mapas do Octavius e do Helios ----
       // Cartaz do Censor na parede: o olho vermelho.
       if (c === 'C')

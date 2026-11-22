@@ -58,7 +58,7 @@ export const NOME_DO_CAMINHO: Record<IaId, string> = {
 
 export function criarSave(gladiador: IaId, agora = new Date()): SaveHistoria {
   const quando = agora.toISOString();
-  return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando, ordem: 3 };
+  return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando, ordem: ORDEM_ATUAL };
 }
 
 /** O save do capítulo secreto: abre pela grade escondida, com os três pedaços da chave. */
@@ -79,10 +79,12 @@ export function ajustarOrdem(s: SaveHistoria): SaveHistoria {
   if (ordem < 2 && cassius && s.capitulo === 1) cena = ORDEM_NOVA_CAP1_CASSIUS[cena] ?? cena + 1;
   // 3: a fuga do mercado entrou no capítulo 2 antes da luta no mercado (que era a cena 6).
   if (ordem < 3 && cassius && s.capitulo === 2 && cena >= 6) cena += 1;
+  // 4: os túneis alagados entraram no capítulo 4 logo depois da descida (antes da cena 2).
+  if (ordem < 4 && cassius && s.capitulo === 4 && cena >= 2) cena += 1;
   return { ...s, cena, ordem: ORDEM_ATUAL };
 }
 /** A versão atual da ordem das cenas (save novo já nasce nela). */
-export const ORDEM_ATUAL = 3;
+export const ORDEM_ATUAL = 4;
 
 /** Avança o save para uma cena (ou para o próximo capítulo, marcando o atual como concluído). */
 export function avancarSave(s: SaveHistoria, capitulo: number, cena: number, agora = new Date()): SaveHistoria {
