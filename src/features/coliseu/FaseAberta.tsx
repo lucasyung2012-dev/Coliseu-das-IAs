@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
 import { NOMES, type Falante } from '@/game/historia/roteiro';
-import { fogoAceso, larguraDa, novaFase, passoFase, saidaAberta, ventoAtivo, xDaPlataforma, xDoPerigo, type Entrada, type Fase, type Perigo } from '@/game/historia/fase';
+import { enchendo, faltaParaEncher, fogoAceso, larguraDa, novaFase, passoFase, plataformaAcesa, saidaAberta, ventoAtivo, visaoAtiva, xDaPlataforma, xDoPerigo, type Entrada, type Fase, type Perigo } from '@/game/historia/fase';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { novaLuta } from '@/game/historia/luta';
 import { SpriteInimigo } from './Luta';
@@ -148,7 +148,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
         <p className="font-pixel text-[9px] text-white sm:text-[10px]" aria-label={`Coletados: ${s.coletados.length} de ${fase.coletaveis.length}`}>
           {fase.coletaveis.map((c) => (
             <span key={c.id} className={s.coletados.includes(c.id) ? 'recurso-cheio' : 'opacity-25 grayscale'}>
-              <Icone nome="livro" className="inline-block w-4 sm:w-5" />
+              <Icone nome={c.icone || 'livro'} className="inline-block w-4 sm:w-5" />
             </span>
           ))}
         </p>
@@ -174,7 +174,14 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
             <div
               key={k}
               className={`absolute ${(s.afundadas?.[k] ?? 0) > s.tempo ? 'plataforma-afundou' : p.afunda && s.pisando?.i === k ? 'plataforma-treme' : ''}`}
-              style={{ left: emX(xDaPlataforma(p, s.tempo)), width: emX(p.w), bottom: `${CHAO}%`, height: `${(p.y / altura) * 100}%` }}
+              style={{
+                left: emX(xDaPlataforma(p, s.tempo)),
+                width: emX(p.w),
+                bottom: `${CHAO}%`,
+                height: `${(p.y / altura) * 100}%`,
+                opacity: plataformaAcesa(p, s.tempo) ? 1 : plataformaAcesa(p, s.tempo + 450) ? 0.6 : 0.18,
+                transition: 'opacity 120ms',
+              }}
               aria-hidden
             >
               {p.afunda && <div className="absolute inset-x-[10%] -top-[3px] z-10 h-[3px] bg-[repeating-linear-gradient(90deg,#1a0a04_0_4px,transparent_4px_8px)]" />}
@@ -224,6 +231,20 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                   <div className="absolute inset-x-[-4%] top-[14%] h-[5%] bg-[repeating-linear-gradient(90deg,#c0283c_0_6px,transparent_6px_12px)]" />
                 </>
               )}
+              {/* Telhado: a chaminé de tijolo embaixo das telhas */}
+              {p.tipo === 'telhado' && <div className="absolute inset-x-[18%] bottom-0 top-[6px] bg-[repeating-linear-gradient(180deg,#6a3a2a_0_6px,#4a2418_6px_8px)]" />}
+              {/* Arco do aqueduto: dois pilares de pedra e o arco no meio */}
+              {p.tipo === 'arco' && (
+                <div className="absolute inset-x-0 bottom-0 top-[5px] bg-[#8a8276]">
+                  <div className="absolute bottom-0 left-[22%] right-[22%] top-[40%] rounded-t-full bg-[#2a3a4a]" />
+                </div>
+              )}
+              {/* Altar rachado do templo */}
+              {p.tipo === 'altar' && (
+                <div className="absolute inset-x-[10%] bottom-0 top-[5px] bg-[linear-gradient(90deg,#d8d0c0,#a8a090)]">
+                  <div className="absolute left-[40%] top-[10%] h-[50%] w-[2px] rotate-12 bg-[#4a443c]" />
+                </div>
+              )}
               {p.tipo === 'estante' && (
                 <div className="absolute inset-x-[16%] bottom-0 top-[12%] flex flex-col justify-around">
                   {[0, 1, 2].map((r) => (
@@ -249,7 +270,10 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                 ) : p.tipo === 'queda' ? (
                   <CoisaQueCai p={p} tempo={s.tempo} />
                 ) : p.tipo === 'agua' ? (
-                  <div className="agua-fase absolute inset-x-0 bottom-[-40%] top-[55%]" />
+                  <div
+                    className="agua-fase absolute inset-x-0 bottom-[-40%]"
+                    style={{ top: enchendo(p, s.tempo) && p.sobe ? `${100 - ((p.sobe.altura + altura * 0.01) / (altura * 0.12)) * 100}%` : '55%', transition: 'top 600ms ease-out' }}
+                  />
                 ) : p.tipo === 'vao' ? (
                   <div className="vao-fase absolute inset-x-[4%] bottom-[-60%] top-[50%]" />
                 ) : p.tipo === 'onda' ? (
@@ -295,7 +319,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
               {aberta ? '' : ''}
             </span>
             <span className="placa-ponto block whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px]">
-              {aberta ? fase.saida.rotulo : `SALVE ${fase.precisa} LIVROS`}
+              {aberta ? fase.saida.rotulo : `PEGUE ${fase.precisa} ${fase.fim?.coisa.split(' ')[0] ?? 'LIVROS'}`}
             </span>
           </div>
 
@@ -327,6 +351,19 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           </div>
         )}
 
+        {fase.escuro && <EscuroDaFase fase={fase} s={s} camera={camera} altura={altura} />}
+        {fase.visao && visaoAtiva(fase, s.tempo) && (
+          <>
+            <div className="visao-fase pointer-events-none absolute inset-0 z-[18]" aria-hidden />
+            <span className="pointer-events-none absolute left-1/2 top-[16%] z-[19] -translate-x-1/2 whitespace-nowrap font-pixel text-xs text-[#e8c8ff] [text-shadow:2px_2px_0_#000] sm:text-lg">VISÃO! OS LADOS TROCARAM!</span>
+          </>
+        )}
+        {fase.visao && !visaoAtiva(fase, s.tempo) && visaoAtiva(fase, s.tempo + 1200) && (
+          <span className="piscar pointer-events-none absolute left-1/2 top-[16%] z-[19] -translate-x-1/2 whitespace-nowrap font-pixel text-[10px] text-[#c8a0ff] [text-shadow:2px_2px_0_#000] sm:text-sm">A FUMAÇA ESTÁ VINDO...</span>
+        )}
+        {fase.perigos.some((p) => p.sobe && !enchendo(p, s.tempo) && faltaParaEncher(p, s.tempo) < 1500) && (
+          <span className="piscar pointer-events-none absolute left-1/2 top-[16%] z-[19] -translate-x-1/2 whitespace-nowrap font-pixel text-[10px] text-[#8ad0ff] [text-shadow:2px_2px_0_#000] sm:text-sm">A COMPORTA VAI ABRIR! SUBA!</span>
+        )}
         {s.tempo < s.feridoAte && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
 
         {acabou && (
@@ -390,7 +427,7 @@ function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
   const fase = (tempo + (p.atrasoMs ?? 0)) % ciclo;
   const noChao = fase < p.acesoMs;
   const caindo = !noChao && fase > ciclo - 700 ? (fase - (ciclo - 700)) / 700 : -1;
-  const icone = p.figura === 'tomate' ? 'tomate' : p.figura === 'bala' ? 'bala' : 'viga';
+  const icone = p.figura === 'tomate' ? 'tomate' : p.figura === 'bala' ? 'bala' : p.figura === 'meteoro' ? 'meteoro' : 'viga';
   if (p.figura === 'tentaculo') {
     // O tentáculo: a água borbulha antes, ele sobe alto e desce.
     if (noChao)
@@ -411,6 +448,8 @@ function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
       <span className="absolute bottom-0 left-1/2 block w-[200%]" style={{ transform: `translate(-50%, ${noChao ? 0 : -(1 - caindo) * 600}%) rotate(${noChao ? 80 : caindo * 80}deg)` }}>
         {icone === 'viga' ? (
           <span className="block h-[10px] w-full bg-[linear-gradient(90deg,#4a2a14,#8a5a2a)] shadow-[0_0_10px_#ff7a2a] sm:h-[16px]" />
+        ) : icone === 'meteoro' ? (
+          <span className="mx-auto block aspect-square w-[55%] rounded-[40%] bg-[radial-gradient(circle_at_35%_35%,#f0e0ff,#6a3aaa_55%,#1a0a2a)] shadow-[0_0_12px_#c8a0ff]" />
         ) : icone === 'bala' ? (
           <span className="mx-auto block aspect-square w-[60%] rounded-full bg-[radial-gradient(circle_at_35%_35%,#6a6a78,#14141a_70%)] shadow-[0_0_6px_#000]" />
         ) : (
@@ -419,5 +458,36 @@ function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
       </span>
       {noChao && icone === 'viga' && <span className="chama-fase absolute bottom-0 left-1/4" />}
     </>
+  );
+}
+
+/**
+ * O ESCURO DAS FASES DO HELIOS: uma máscara preta com buracos de luz em volta do gladiador e
+ * de cada coisa já pega (a lanterna acesa, o espelho refletindo).
+ */
+function EscuroDaFase({ fase, s, camera, altura }: { fase: Fase; s: { x: number; y: number; coletados: string[] }; camera: number; altura: number }) {
+  const raio = fase.escuro!.raio;
+  const naTela = (x: number, y: number) => ({ cx: x - camera, cy: altura - (altura * CHAO) / 100 - y });
+  const luzes = [
+    { ...naTela(s.x, s.y + 7), r: raio },
+    ...fase.coletaveis.filter((c) => s.coletados.includes(c.id)).map((c) => ({ ...naTela(c.x, c.y), r: raio * 0.8 })),
+  ];
+  const id = `escuro-${fase.id}`;
+  return (
+    <svg className="pointer-events-none absolute inset-0 z-[17] h-full w-full" viewBox={`0 0 100 ${altura}`} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <radialGradient id={`${id}-luz`}>
+          <stop offset="0.45" stopColor="black" />
+          <stop offset="1" stopColor="white" />
+        </radialGradient>
+        <mask id={`${id}-mascara`}>
+          <rect width="100" height={altura} fill="white" />
+          {luzes.map((l, k) => (
+            <circle key={k} cx={l.cx} cy={l.cy} r={l.r} fill={`url(#${id}-luz)`} />
+          ))}
+        </mask>
+      </defs>
+      <rect width="100" height={altura} fill="rgba(4,2,14,0.94)" mask={`url(#${id}-mascara)`} />
+    </svg>
   );
 }

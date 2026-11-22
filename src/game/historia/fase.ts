@@ -15,7 +15,9 @@ export interface Plataforma {
   w: number;
   y: number;
   /** Como desenhar: mesa, estante, sacada, viga, caixote (do mercado) ou toldo de barraca. */
-  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo' | 'pedra' | 'sarcofago' | 'barco' | 'cordame';
+  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo' | 'pedra' | 'sarcofago' | 'barco' | 'cordame' | 'luz' | 'telhado' | 'arco' | 'altar';
+  /** Passarela de luz (Helios): acesa por `acesoMs`, apagada por `apagadoMs`. Apagada, não segura ninguém. */
+  pisca?: { acesoMs: number; apagadoMs: number; atrasoMs?: number };
   /** Anda de lado e volta (o barco no porto): até `dx` para a direita, ida e volta em `ms`. Leva quem está em cima. */
   move?: { dx: number; ms: number };
   /** Afunda (ou desmorona) depois de `afunda` ms com alguém em cima; volta 2,5 s depois. */
@@ -30,7 +32,9 @@ export interface Perigo {
   /** Anda pelo chão: de `de` até `ate` em `ms` (vai e volta; com `ida`, só vai e recomeça). */
   move?: { de: number; ate: number; ms: number; ida?: boolean };
   /** O desenho: quem anda (guarda, rato, jacaré, gato, barril rolando) ou o que cai (viga, tomate). */
-  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate' | 'bala' | 'tentaculo';
+  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate' | 'bala' | 'tentaculo' | 'meteoro';
+  /** A ENCHENTE (aqueduto): de tempos em tempos a água sobe até `altura` (pega quem está nos arcos baixos). */
+  sobe?: { altura: number; cicloMs: number; duraMs: number; atrasoMs?: number };
   /** Até que altura pega (o padrão é 5: os pés). O tentáculo do Leviatã pega bem mais alto. */
   altura?: number;
   /** O fogo acende e apaga: aceso por `acesoMs`, apagado por `apagadoMs` (0 = sempre aceso). */
@@ -77,6 +81,34 @@ export interface Fase {
   fim?: { coisa: string; todos: string; alguns: string };
   /** Vento de tempestade: de tempos em tempos empurra o gladiador para trás. */
   vento?: { forca: number; cicloMs: number; duraMs: number };
+  /** No escuro (Helios): só se vê em volta do gladiador e das coisas já pegas (elas ficam acesas). */
+  escuro?: { raio: number };
+  /** As VISÕES do oráculo: de tempos em tempos, esquerda vira direita. */
+  visao?: { cicloMs: number; duraMs: number };
+}
+
+/** A passarela de luz está acesa agora? */
+export function plataformaAcesa(p: Plataforma, tempo: number): boolean {
+  if (!p.pisca) return true;
+  return (tempo + (p.pisca.atrasoMs ?? 0)) % (p.pisca.acesoMs + p.pisca.apagadoMs) < p.pisca.acesoMs;
+}
+/** A água está subindo (enchente) agora? */
+export function enchendo(p: Perigo, tempo: number): boolean {
+  if (!p.sobe) return false;
+  return (tempo + (p.sobe.atrasoMs ?? 0)) % p.sobe.cicloMs > p.sobe.cicloMs - p.sobe.duraMs;
+}
+/** Quanto falta para a água subir (ms), para o aviso. */
+export function faltaParaEncher(p: Perigo, tempo: number): number {
+  if (!p.sobe) return Infinity;
+  const k = (tempo + (p.sobe.atrasoMs ?? 0)) % p.sobe.cicloMs;
+  const comeca = p.sobe.cicloMs - p.sobe.duraMs;
+  return k > comeca ? 0 : comeca - k;
+}
+/** Até que altura o perigo pega agora. */
+export const alturaDoPerigo = (p: Perigo, tempo: number) => (enchendo(p, tempo) ? p.sobe!.altura : (p.altura ?? 5));
+/** A visão está trocando os lados agora? */
+export function visaoAtiva(f: Fase, tempo: number): boolean {
+  return !!f.visao && tempo % f.visao.cicloMs > f.visao.cicloMs - f.visao.duraMs;
 }
 
 /** Onde está a plataforma agora (a que anda vai e volta, suave). */
@@ -174,7 +206,8 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   // Andar: acelera até a velocidade máxima e freia quando solta (no ar, controla um pouco menos).
   // Logo depois de queimar, fica meio segundo parado (antes, dava para sair andando e atravessar o fogo).
   const atordoado = tempo < s0.feridoAte - FERIDO_MS + 500;
-  const mov = atordoado ? 0 : (e.dir ? 1 : 0) - (e.esq ? 1 : 0);
+  // Na visão do oráculo, os lados trocam.
+  const mov = atordoado ? 0 : ((e.dir ? 1 : 0) - (e.esq ? 1 : 0)) * (visaoAtiva(f, tempo) ? -1 : 1);
   if (mov !== 0) dir = mov as 1 | -1;
   const controle = noChao ? 1 : 0.7;
   if (mov !== 0) vx = Math.max(-VELOCIDADE, Math.min(VELOCIDADE, vx + mov * ACELERA * controle * seg));
@@ -208,7 +241,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
     // Plataformas "de mesa": só seguram quem cai em cima (dá para subir por baixo). A que afundou não segura.
     for (let i = 0; i < f.plataformas.length; i++) {
       const p = f.plataformas[i]!;
-      if ((s0.afundadas?.[i] ?? 0) > tempo) continue;
+      if ((s0.afundadas?.[i] ?? 0) > tempo || !plataformaAcesa(p, tempo)) continue;
       const px = xDaPlataforma(p, tempo);
       const emCima = x + LARGURA_HEROI / 2 > px && x - LARGURA_HEROI / 2 < px + p.w;
       if (emCima && yAntes >= p.y - 0.01 && y <= p.y) {
@@ -234,12 +267,15 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   let s: EstadoFase = { ...s0, tempo, x, y, vx, vy, noChao, dir, andando: Math.abs(vx) > 4 && noChao, chaoEm: noChao ? tempo : s0.chaoEm, pisando, afundadas };
   // O ponto de volta: o último lugar seguro em que pisou (em cima de algo, ou no chão longe do fogo).
   // (Não guarda em cima de plataforma que anda ou que afunda: ela pode não estar lá na volta.)
-  const instavel = pisando ? !!(f.plataformas[pisando.i]!.move || f.plataformas[pisando.i]!.afunda) : false;
+  const instavel =
+    (pisando ? !!(f.plataformas[pisando.i]!.move || f.plataformas[pisando.i]!.afunda || f.plataformas[pisando.i]!.pisca) : false) ||
+    // Onde a enchente chega não é lugar seguro.
+    f.perigos.some((p) => p.sobe && x > p.x - 2 && x < p.x + p.w + 2 && y < p.sobe.altura);
   if (tempo >= s0.feridoAte && noChao && !instavel && (y > 0 || !f.perigos.some((p) => { const [a, b] = faixaDoPerigo(p); return x > a - 4 && x < b + 4; }))) s = { ...s, volta: x, voltaY: y };
   // Fogo: encostou com os pés baixos, volta para o ponto seguro.
   if (tempo >= s.feridoAte) {
     for (const p of f.perigos) {
-      if (y < (p.altura ?? 5) && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
+      if (y < alturaDoPerigo(p, tempo) && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s.volta, y: s.voltaY, vx: 0, vy: 0, noChao: true, feridoAte: tempo + FERIDO_MS, queimadas: s.queimadas + 1 };
         break;
       }
@@ -247,7 +283,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   } else {
     // Piscando depois de queimar: o fogo vira parede (não dá para atravessar enquanto não pode se queimar).
     for (const p of f.perigos) {
-      if (y < (p.altura ?? 5) && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
+      if (y < alturaDoPerigo(p, tempo) && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s0.x, vx: 0 };
         break;
       }

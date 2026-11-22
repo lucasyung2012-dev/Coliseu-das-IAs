@@ -93,10 +93,16 @@ export function ajustarOrdem(s: SaveHistoria): SaveHistoria {
   if (ordem < 9 && s.gladiador === 'chatgpt' && !s.secreto && s.capitulo === 5 && cena >= 6) cena += 1;
   // 10: a Naumaquia entrou no capítulo 6 do Octavius (antes da cena 3).
   if (ordem < 10 && s.gladiador === 'chatgpt' && !s.secreto && s.capitulo === 6 && cena >= 3) cena += 1;
+  // 11: as fases do Helios (capítulos 1, 2, 4, 5 e 6).
+  if (ordem < 11 && s.gladiador === 'gemini' && !s.secreto) {
+    const antesDe: Record<number, number> = { 1: 9, 2: 12, 4: 12, 5: 9, 6: 12 };
+    const corte = antesDe[s.capitulo];
+    if (corte !== undefined && cena >= corte) cena += 1;
+  }
   return { ...s, cena, ordem: ORDEM_ATUAL };
 }
 /** A versão atual da ordem das cenas (save novo já nasce nela). */
-export const ORDEM_ATUAL = 10;
+export const ORDEM_ATUAL = 11;
 
 /** Avança o save para uma cena (ou para o próximo capítulo, marcando o atual como concluído). */
 export function avancarSave(s: SaveHistoria, capitulo: number, cena: number, agora = new Date()): SaveHistoria {

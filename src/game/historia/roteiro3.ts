@@ -160,6 +160,13 @@ export const CAP1_HELIOS: Capitulo = {
       antes: [{ quem: 'helios', texto: 'O virote da besta é VERMELHO. Passo de sombra, e ele fica aberto enquanto recarrega.' }],
     },
     {
+      // NOVA (22/11/2026): o Helios no estilo novo, andando de lado.
+      tipo: 'fase',
+      id: 'h1-cupula',
+      lugar: 'observatorio-dentro',
+      fase: 'cupula-observatorio',
+    },
+    {
       tipo: 'explorar',
       id: 'h1-lente',
       mapa: 'observatorio',
@@ -438,6 +445,13 @@ export const CAP2_HELIOS: Capitulo = {
       lugar: 'telhados-noite',
       inimigo: 'gato-telhado',
       antes: [{ quem: 'helios', texto: 'Ninguém come a minha coruja. Nem gato de ferro.' }],
+    },
+    {
+      // NOVA (22/11/2026): o Helios no estilo novo, andando de lado.
+      tipo: 'fase',
+      id: 'h2-telhados',
+      lugar: 'telhados-noite',
+      fase: 'telhados-escuros',
     },
     {
       tipo: 'cutscene',
@@ -879,6 +893,13 @@ export const CAP4_HELIOS: Capitulo = {
       antes: [{ quem: 'helios', texto: 'Um Pretoriano de Elite. Três virotes seguidos: passo de sombra no primeiro e os outros passam.' }],
     },
     {
+      // NOVA (22/11/2026): o Helios no estilo novo, andando de lado.
+      tipo: 'fase',
+      id: 'h4-canal-fase',
+      lugar: 'aqueduto',
+      fase: 'canal-aqueduto',
+    },
+    {
       tipo: 'cutscene',
       id: 'h4-guardiao',
       quadros: [
@@ -1077,6 +1098,13 @@ export const CAP5_HELIOS: Capitulo = {
       lugar: 'templo-oraculo',
       inimigo: 'estatua-arqueira',
       antes: [{ quem: 'helios', texto: 'Três flechas de uma vez. Passo de sombra na primeira, e o resto passa.' }],
+    },
+    {
+      // NOVA (22/11/2026): o Helios no estilo novo, andando de lado.
+      tipo: 'fase',
+      id: 'h5-visoes',
+      lugar: 'templo-apolo',
+      fase: 'templo-visoes',
     },
     {
       tipo: 'cutscene',
@@ -1318,6 +1346,13 @@ export const CAP6_HELIOS: Capitulo = {
       inimigo: 'campeao-sombrio',
       antes: [{ quem: 'arauto', texto: 'O último campeão: o Campeão Sombrio!' }],
       depois: [{ quem: 'helios', texto: 'Cinco. Mas a escuridão ainda não acabou.' }],
+    },
+    {
+      // NOVA (22/11/2026): o Helios no estilo novo, andando de lado.
+      tipo: 'fase',
+      id: 'h6-eclipse-fase',
+      lugar: 'coliseu-eclipse',
+      fase: 'coliseu-do-eclipse',
     },
     {
       tipo: 'cutscene',

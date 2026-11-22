@@ -141,3 +141,32 @@ describe('as fases com coisa acontecendo (22/11/2026)', () => {
     expect(s.x).toBeLessThan(100);
   });
 });
+
+describe('as mecânicas do Helios (22/11/2026)', () => {
+  const vazia: Fase = { ...pequena, plataformas: [], perigos: [], coletaveis: [], comentarios: [] };
+  it('a passarela de luz apagada não segura ninguém', () => {
+    const f: Fase = { ...vazia, plataformas: [{ x: 20, w: 20, y: 8, tipo: 'luz', pisca: { acesoMs: 1000, apagadoMs: 1000 } }] };
+    const acesa = rodar(f, { ...novaFase(), x: 30, y: 8, noChao: true, tempo: 0 }, nada, 500);
+    expect(acesa.y).toBe(8);
+    const apagou = rodar(f, acesa, nada, 1000);
+    expect(apagou.y).toBe(0);
+  });
+  it('a enchente pega quem está no arco baixo, mas não no alto', () => {
+    const f: Fase = {
+      ...vazia,
+      plataformas: [{ x: 20, w: 20, y: 7, tipo: 'arco' }, { x: 60, w: 20, y: 16, tipo: 'arco' }],
+      perigos: [{ x: 10, w: 100, tipo: 'agua', sobe: { altura: 12, cicloMs: 2000, duraMs: 1000 }, acesoMs: 0, apagadoMs: 0 }],
+    };
+    const baixo = rodar(f, { ...novaFase(), x: 30, y: 7, noChao: true }, nada, 800);
+    expect(baixo.queimadas).toBe(0);
+    expect(rodar(f, baixo, nada, 600).queimadas).toBe(1);
+    expect(rodar(f, { ...novaFase(), x: 70, y: 16, noChao: true }, nada, 1600).queimadas).toBe(0);
+  });
+  it('na visão, apertar para a direita anda para a esquerda', () => {
+    const f: Fase = { ...vazia, visao: { cicloMs: 2000, duraMs: 1000 } };
+    const normal = rodar(f, { ...novaFase(), x: 100 }, direita, 600);
+    expect(normal.x).toBeGreaterThan(100);
+    const invertido = rodar(f, { ...novaFase(), x: 100, tempo: 1100 }, direita, 600);
+    expect(invertido.x).toBeLessThan(100);
+  });
+});
