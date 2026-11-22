@@ -145,7 +145,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">{fase.objetivo}</p>
-        <p className="shrink-0 whitespace-nowrap font-pixel text-[9px] text-white sm:text-[10px]" aria-label={`Coletados: ${s.coletados.length} de ${fase.coletaveis.length}`}>
+        <p className="flex shrink-0 gap-0.5 font-pixel text-[9px] text-white sm:text-[10px]" aria-label={`Coletados: ${s.coletados.length} de ${fase.coletaveis.length}`}>
           {fase.coletaveis.map((c) => (
             <span key={c.id} className={s.coletados.includes(c.id) ? 'recurso-cheio' : 'opacity-25 grayscale'}>
               <Icone nome={c.icone || 'livro'} className="inline-block w-4 sm:w-5" />
