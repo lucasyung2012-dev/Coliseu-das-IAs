@@ -1749,3 +1749,6 @@
   .tecla-botao { display: block; }
   .botoes-luta { max-width: 36rem; margin-inline: auto; width: 100%; }
 }
+
+/* O leque do olhar dos inimigos de ronda. */
+.cone-olhar { background: radial-gradient(ellipse at 0% 50%, rgba(255, 90, 60, 0.32), rgba(255, 90, 60, 0.12) 60%, transparent 75%); clip-path: polygon(0 50%, 100% 0, 100% 100%); }

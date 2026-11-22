@@ -8,7 +8,7 @@ import { tocar } from '@/ui/somHistoria';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { novaLuta } from '@/game/historia/luta';
 import { Falas } from './Cenas';
-import { SpriteInimigo } from './Luta';
+import { larguraDoInimigo, SpriteInimigo } from './Luta';
 import { escalaDe, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
 
@@ -251,7 +251,7 @@ export function MundoAberto({
           ]
             .sort((a, b) => a.y - b.y)
             .map((p) => (
-              <div key={p.id} className="absolute" style={{ ...emMundo(p.x, p.y), width: `${((1.15 * escalaDe(p.quem)) / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 5 + Math.floor(p.y * 10) }}>
+              <div key={p.id} className="absolute" style={{ ...emMundo(p.x, p.y), width: `${((p.inimigo ? Math.max(0.95, (1.15 * larguraDoInimigo(p.inimigo)) / 21) : 1.15 * escalaDe(p.quem)) / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 5 + Math.floor(p.y * 10) }}>
                 <span className="absolute bottom-[-4%] left-1/2 h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" />
                 <div className={p.andando || p.inimigo ? 'andar' : 'respirar'}>
                   {p.inimigo ? <InimigoNoMapa id={p.inimigo} espelhar={p.dir !== 'esq'} /> : <Retrato quem={p.quem} espelhar={p.dir === 'esq'} />}
@@ -275,6 +275,21 @@ export function MundoAberto({
               <Emote emocao="surpreso" />
             </span>
           )}
+          {/* O olhar de cada inimigo de ronda: um leque vermelho na frente dele (fora do leque, dá para passar) */}
+          {mundo.pessoas
+            .filter((p) => p.inimigo && !s.vistos.includes(p.id))
+            .map((p) => {
+              const at = s.pessoas[p.id]!;
+              const ang = { dir: 0, baixo: 90, esq: 180, cima: 270 }[at.dir];
+              return (
+                <span
+                  key={`cone-${p.id}`}
+                  className="cone-olhar pointer-events-none absolute block origin-left"
+                  style={{ ...emMundo(at.x, at.y - 0.4), width: `${(3 / W) * 100}%`, height: `${(2.9 / H) * 100}%`, translate: '0 -50%', rotate: `${ang}deg`, zIndex: 4 }}
+                  aria-hidden
+                />
+              );
+            })}
           {/* A saída: placa "SAÍDA" em cima; aberta, brilha e uma seta fica pulando */}
           {saidas.map(([x, y]) => (
             <div key={`${x}-${y}`} className="absolute" style={{ ...emMundo(x, y), width: `${(1 / W) * 100}%`, height: `${(1 / H) * 100}%`, zIndex: 250 }}>
@@ -419,7 +434,7 @@ const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; 
 const InimigoNoMapa = memo(function InimigoNoMapa({ id, espelhar }: { id: string; espelhar: boolean }) {
   const e = useMemo(() => novaLuta(INIMIGOS[id]!), [id]);
   return (
-    <div style={{ transform: espelhar ? undefined : 'scaleX(-1)' }}>
+    <div style={{ transform: espelhar ? undefined : 'scaleX(-1)', filter: 'drop-shadow(0 0 2px #ff5a3a) drop-shadow(0 1px 0 #000)' }}>
       <SpriteInimigo e={e} />
     </div>
   );

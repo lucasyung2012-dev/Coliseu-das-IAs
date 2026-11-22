@@ -214,6 +214,9 @@ const SOMBRAS: Record<string, IaId> = { 'sombra-cassius': 'claude', 'sombra-octa
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */
 const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, 'censor-tita-helios': 38, eclipse: 26, 'guardiao-aqueduto': 26, 'sibila-corrompida': 20, 'gigante-sombras': 32, cobrador: 22, leviata: 34, 'almirante-aco': 24, nucleo: 40, 'guardiao-nucleo': 24, 'sombra-cassius': 14, 'sombra-octavius': 14, 'sombra-helios': 14 };
 
+/** A largura do inimigo na luta (em % do palco); o mapa usa para desenhar do tamanho certo. */
+export const larguraDoInimigo = (id: string) => Math.min(52, (LARGURA_ESPECIAL[id] ?? VISUAL[id]?.largura ?? 13) * 1.32);
+
 export function SpriteInimigo({ e }: { e: EstadoLuta }) {
   const sinalFogo = e.inimigo.estado === 'sinal' && ataqueAtual(e).tipo === 'fogo';
   if (e.def.id === 'fornalha') return <Sprite grade={FORNALHA} paleta={paletaFornalha(sinalFogo, e.inimigo.fase)} espelhar />;
@@ -596,7 +599,7 @@ export function LutaHistoria({
   const cheio = e.animo >= ANIMO_MAX;
   const acaoJ = e.tempo < j.acaoAte ? j.acao : 'parado';
   // Os inimigos também ficaram maiores (pedido do Lucas: "os bonecos estão muito pequenininhos").
-  const largura = Math.min(52, (LARGURA_ESPECIAL[def.id] ?? VISUAL[def.id]?.largura ?? 13) * 1.32);
+  const largura = larguraDoInimigo(def.id);
   const apanhou = e.eventos.some((ev) => ev.tipo === 'acerto' && ev.ate - e.tempo > 550);
   const plateiaLado = e.animo >= 50;
   // O inimigo avança quando o golpe dele chega; cai quando perde.

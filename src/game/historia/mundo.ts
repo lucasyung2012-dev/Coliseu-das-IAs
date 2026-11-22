@@ -233,7 +233,7 @@ export function inimigoQueViu(m: Mundo, s: EstadoMundo): { id: string; inimigo: 
     const [fx, fy] = frente[at.dir];
     const olhando = d > 0 ? (dx * fx + dy * fy) / d : 1;
     if (d < 0.85) return { id: p.id, inimigo: p.inimigo, pelasCostas: olhando < -0.3 };
-    if (d < 3 && olhando > 0.75) return { id: p.id, inimigo: p.inimigo, pelasCostas: false };
+    if (d < 3 && olhando > 0.9) return { id: p.id, inimigo: p.inimigo, pelasCostas: false };
   }
   return null;
 }

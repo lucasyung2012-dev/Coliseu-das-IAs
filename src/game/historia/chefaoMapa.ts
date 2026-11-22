@@ -37,7 +37,8 @@ const TONTO_PAREDE_MS = 2600;
 const TONTO_CANSADO_MS = 900;
 const VEL_CARGA = 8;
 const VEL_FURIA = 10.5;
-const ALCANCE_GOLPE = 1.5;
+// O Rato-Rei é grande (2 ladrilhos): o golpe conta do meio do corpo dele, não dos pés.
+const ALCANCE_GOLPE = 2.1;
 
 export interface Chefao {
   x: number;
@@ -48,6 +49,8 @@ export interface Chefao {
   vx: number;
   vy: number;
   dir: 'esq' | 'dir';
+  /** Já acertou o gladiador nesta investida (só machuca uma vez por corrida). */
+  acertou?: boolean;
 }
 
 export type EventoChefao = { tipo: 'acerto' | 'dano' | 'parede' | 'carga' | 'bloqueou' | 'furia'; em: number };
@@ -94,7 +97,7 @@ export function passoChefao(m: Mundo, st0: EstadoChefao, heroi: { x: number; y: 
       const dy = heroi.y - c.y;
       const d = Math.hypot(dx, dy) || 1;
       const v = raiva ? VEL_FURIA : VEL_CARGA;
-      c = { ...c, estado: 'carga', ate: tempo + CARGA_MS, vx: (dx / d) * v, vy: (dy / d) * v };
+      c = { ...c, estado: 'carga', ate: tempo + CARGA_MS, vx: (dx / d) * v, vy: (dy / d) * v, acertou: false };
       st = { ...st, eventos: ev(st, 'carga', tempo) };
     }
   } else if (c.estado === 'carga') {
@@ -112,9 +115,9 @@ export function passoChefao(m: Mundo, st0: EstadoChefao, heroi: { x: number; y: 
   }
   st = { ...st, chefe: c };
   // A investida pega o gladiador.
-  if (c.estado === 'carga' && tempo >= st.feridoAte && Math.hypot(heroi.x - c.x, heroi.y - c.y) < 0.95) {
+  if (c.estado === 'carga' && !c.acertou && tempo >= st.feridoAte && Math.hypot(heroi.x - c.x, heroi.y - c.y) < 0.95) {
     const vida = Math.max(0, st.vida - DANO_CARGA);
-    st = { ...st, vida, feridoAte: tempo + 1100, eventos: ev(st, 'dano', tempo), fim: vida <= 0 ? 'derrota' : null };
+    st = { ...st, chefe: { ...c, acertou: true }, vida, feridoAte: tempo + 1100, eventos: ev(st, 'dano', tempo), fim: vida <= 0 ? 'derrota' : null };
   }
   return st;
 }
@@ -122,7 +125,7 @@ export function passoChefao(m: Mundo, st0: EstadoChefao, heroi: { x: number; y: 
 /** O golpe do gladiador: só entra com o Rato-Rei TONTO e perto. */
 export function golpearChefao(st: EstadoChefao, heroi: { x: number; y: number }): EstadoChefao {
   if (st.fim || st.tempo < st.golpeAte) return st;
-  const perto = Math.hypot(heroi.x - st.chefe.x, heroi.y - st.chefe.y) < ALCANCE_GOLPE;
+  const perto = Math.hypot(heroi.x - st.chefe.x, heroi.y - 0.4 - (st.chefe.y - 0.6)) < ALCANCE_GOLPE;
   const base = { ...st, golpeAte: st.tempo + 350 };
   if (!perto) return base;
   if (st.chefe.estado !== 'tonto') return { ...base, eventos: ev(st, 'bloqueou', st.tempo) };

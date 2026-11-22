@@ -50,6 +50,11 @@ describe('o Rato-Rei no mapa aberto', () => {
     expect(st.fim).toBe('derrota');
   });
 
+  it('cada investida machuca uma vez só (antes, passava por cima e acertava duas)', () => {
+    const st = rodar(correndo(10.5, 4.8, -8, 0), { x: 6.5, y: 4.8 }, 1000);
+    expect(st.vida).toBe(82);
+  });
+
   it('o último golpe ganha a luta', () => {
     const st = rodar(correndo(2.5, 4.8, -8, 0), { x: 10.5, y: 2.8 }, 400);
     const quase = { ...st, chefe: { ...st.chefe, vida: 1 } };
