@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
-import { ARENA_RATO_REI, furioso, golpearChefao, novoChefao, passoChefao, VIDA_REI, type EstadoChefao } from '@/game/historia/chefaoMapa';
+import { CHEFOES_MAPA, furioso, golpearChefao, novoChefao, passoChefao, type EstadoChefao } from '@/game/historia/chefaoMapa';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { novaLuta } from '@/game/historia/luta';
 import { novoMundo, passoMundo, type EntradaMundo, type EstadoMundo } from '@/game/historia/mundo';
@@ -19,13 +19,15 @@ import { usePausado } from './Pausa';
  * catacumbas. Andar pelas setas (ou WASD), GOLPE no botão (ou J, espaço, E). Ele mira, corre
  * reto e, se bater nas colunas, fica tonto: aí é bater. Cair = tentar de novo.
  */
-export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; antes?: Fala[]; depois?: Fala[]; onFim: () => void }) {
-  const m = ARENA_RATO_REI;
+export function ChefaoNoMapa({ heroi, antes, depois, onFim, chefe = 'rato-rei' }: { heroi: Falante; antes?: Fala[]; depois?: Fala[]; onFim: () => void; chefe?: string }) {
+  const def = CHEFOES_MAPA[chefe] ?? CHEFOES_MAPA['rato-rei']!;
+  const m = def.arena;
+  const nome = (INIMIGOS[def.id]?.nome ?? 'Chefão').toUpperCase();
   const W = m.mapa[0]!.length;
   const H = m.mapa.length;
   const [fase, setFase] = useState<'antes' | 'luta' | 'depois' | 'derrota'>(antes?.length ? 'antes' : 'luta');
   const [s, setS] = useState<EstadoMundo>(() => novoMundo(m));
-  const [st, setSt] = useState<EstadoChefao>(() => novoChefao());
+  const [st, setSt] = useState<EstadoChefao>(() => novoChefao(100, def.id));
   const ref = useRef({ s, st });
   const entrada = useRef<EntradaMundo>({ cima: false, baixo: false, esq: false, dir: false });
   const faseRef = useRef(fase);
@@ -110,18 +112,20 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
     onContextMenu: (ev: MouseEvent) => ev.preventDefault(),
   });
 
-  const rei = useMemo(() => novaLuta(INIMIGOS['rato-rei']!), []);
+  const rei = useMemo(() => novaLuta(INIMIGOS[def.id]!), [def.id]);
   const c = st.chefe;
   const emMapa = (x: number, y: number): CSSProperties => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
   const ferido = st.tempo < st.feridoAte;
   const ultimo = st.eventos[st.eventos.length - 1];
   const recente = ultimo && st.tempo - ultimo.em < 700 ? ultimo : null;
   // A linha da mira: do Rato-Rei até o gladiador.
-  const mira = c.estado === 'mira' ? { ang: (Math.atan2(s.y - 0.6 - (c.y - 0.6), s.x - c.x) * 180) / Math.PI, d: Math.hypot(s.x - c.x, s.y - c.y) } : null;
+  const salto = def.jeito === 'salto';
+  const noAr = salto && c.estado === 'carga' ? Math.sin((1 - Math.max(0, c.ate - st.tempo) / 850) * Math.PI) : 0;
+  const mira = c.estado === 'mira' && !salto ? { ang: (Math.atan2(s.y - 0.6 - (c.y - 0.6), s.x - c.x) * 180) / Math.PI, d: Math.hypot(s.x - c.x, s.y - c.y) } : null;
 
   const tentarDeNovo = () => {
     const s0 = novoMundo(m);
-    const st0 = novoChefao();
+    const st0 = novoChefao(100, def.id);
     ref.current = { s: s0, st: st0 };
     setS(s0);
     setSt(st0);
@@ -138,8 +142,8 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
           <div className="mt-1 h-2 bg-black/60"><div className="h-full bg-[#4ad46a] transition-[width]" style={{ width: `${(st.vida / st.vidaMax) * 100}%` }} /></div>
         </div>
         <div className="text-right">
-          <span className={furioso(st) ? 'piscar text-[#ff5a5a]' : 'text-[#f4e2b4]'}>RATO-REI{furioso(st) ? ' (FURIOSO)' : ''}</span>
-          <div className="mt-1 h-2 bg-black/60"><div className="ml-auto h-full bg-[#e04a3a] transition-[width]" style={{ width: `${(c.vida / VIDA_REI) * 100}%` }} /></div>
+          <span className={furioso(st) ? 'piscar text-[#ff5a5a]' : 'text-[#f4e2b4]'}>{nome}{furioso(st) ? ' (FURIOSO)' : ''}</span>
+          <div className="mt-1 h-2 bg-black/60"><div className="ml-auto h-full bg-[#e04a3a] transition-[width]" style={{ width: `${(c.vida / def.vida) * 100}%` }} /></div>
         </div>
       </div>
       <div className="area-jogo relative flex flex-col gap-2">
@@ -153,7 +157,15 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
               aria-hidden
             />
           )}
-          {/* O gladiador e o Rato-Rei, na ordem de quem está na frente */}
+          {/* O Leão: a sombra redonda onde ele vai cair (pisca mais forte quando trava) */}
+          {salto && c.ax !== undefined && c.ay !== undefined && (c.estado === 'mira' || c.estado === 'carga') && (
+            <span
+              className={`pointer-events-none absolute z-[7] block rounded-[50%] ${c.estado === 'carga' || c.ate - st.tempo <= 500 ? 'sombra-salto-forte' : 'sombra-salto'}`}
+              style={{ ...emMapa(c.ax, c.ay - 0.2), width: `${(2.6 / W) * 100}%`, aspectRatio: '2.4 / 1', translate: '-50% -50%' }}
+              aria-hidden
+            />
+          )}
+          {/* O gladiador e o chefão, na ordem de quem está na frente */}
           {[
             { id: 'heroi', y: s.y },
             { id: 'rei', y: c.y },
@@ -168,7 +180,7 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
                   </div>
                 </div>
               ) : (
-                <div key="r" className="absolute" style={{ ...emMapa(c.x, c.y), width: `${(2.1 / W) * 100}%`, translate: '-50% -92%', zIndex: 10 + Math.floor(c.y * 10) }}>
+                <div key="r" className="absolute" style={{ ...emMapa(c.x, c.y), width: `${((salto ? 2.6 : 2.1) / W) * 100}%`, translate: `-50% ${-92 - noAr * 70}%`, zIndex: salto && noAr > 0 ? 300 : 10 + Math.floor(c.y * 10) }}>
                   <span className="absolute bottom-[2%] left-1/2 h-[10%] w-[80%] -translate-x-1/2 rounded-[50%] bg-black/50" />
                   <div className={st.fim === 'vitoria' ? 'inimigo-vencido' : c.estado === 'mira' ? 'tremer-t' : c.estado === 'carga' ? '' : 'respirar-t'} style={{ transform: c.dir === 'esq' ? undefined : 'scaleX(-1)', filter: c.estado === 'tonto' ? 'saturate(0.4)' : furioso(st) ? 'drop-shadow(0 0 6px #ff3a3a)' : undefined }}>
                     <SpriteInimigo e={rei} />
@@ -190,7 +202,7 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
             </span>
           )}
           {recente?.tipo === 'furia' && (
-            <span className="pointer-events-none absolute left-1/2 top-[10%] z-[300] -translate-x-1/2 font-pixel text-xs text-[#ff5a5a] [text-shadow:1px_1px_0_#000] sm:text-base">O RATO-REI FICOU FURIOSO!</span>
+            <span className="pointer-events-none absolute left-1/2 top-[10%] z-[300] -translate-x-1/2 font-pixel text-xs text-[#ff5a5a] [text-shadow:1px_1px_0_#000] sm:text-base">{nome} FICOU FURIOSO!</span>
           )}
           <div className="pointer-events-none absolute inset-0 z-[250]" style={{ background: 'radial-gradient(ellipse at 50% 55%, transparent 40%, rgba(4,2,12,0.6) 100%)' }} aria-hidden />
 
@@ -207,7 +219,7 @@ export function ChefaoNoMapa({ heroi, antes, depois, onFim }: { heroi: Falante; 
           {fase === 'derrota' && (
             <div className="absolute inset-0 z-[500] flex flex-col items-center justify-center gap-3 bg-black/75 p-3 text-center">
               <p className="font-pixel text-lg text-[#ff5a5a] sm:text-2xl">VOCÊ CAIU</p>
-              <p className="max-w-sm text-sm text-white/80">Fique perto de uma coluna: quando ele mirar, saia do caminho no último segundo. Ele bate na coluna e fica tonto.</p>
+              <p className="max-w-sm text-sm text-white/80">{def.dica}</p>
               <button type="button" onClick={tentarDeNovo} className="pixel-box pixel-hover px-4 py-2 font-pixel text-xs text-[#f2c14e]">
                 TENTAR DE NOVO
               </button>

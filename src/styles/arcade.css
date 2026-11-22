@@ -1859,3 +1859,9 @@
 @keyframes pulo-faixa { 0% { translate: 0 0; } 50% { translate: 0 -22%; } 100% { translate: 0 0; } }
 .menos-movimento .furo-alerta, .menos-movimento .pulo-faixa { animation: none; }
 .menos-movimento .espetos-sobem { animation-duration: 0.01s; }
+
+/* O salto do Leão (22/11/2026): a sombra no chão onde ele vai cair. */
+.sombra-salto { background: radial-gradient(ellipse, rgba(0,0,0,0.45), rgba(0,0,0,0.15) 60%, transparent 70%); box-shadow: 0 0 0 2px rgba(255,90,60,0.5); animation: sombra-salto 0.6s ease-in-out infinite alternate; }
+.sombra-salto-forte { background: radial-gradient(ellipse, rgba(120,0,0,0.6), rgba(255,60,40,0.3) 60%, transparent 72%); box-shadow: 0 0 0 3px #ff3a3a, 0 0 14px #ff3a3a; animation: sombra-salto 0.15s steps(2) infinite alternate; }
+@keyframes sombra-salto { from { opacity: 0.6; } to { opacity: 1; } }
+.menos-movimento .sombra-salto, .menos-movimento .sombra-salto-forte { animation: none; }

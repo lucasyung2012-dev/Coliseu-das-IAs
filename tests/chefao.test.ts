@@ -1,4 +1,4 @@
-import { ARENA_RATO_REI, golpearChefao, novoChefao, passoChefao, VIDA_REI, type EstadoChefao } from '@/game/historia/chefaoMapa';
+import { ARENA_RATO_REI, CHEFOES_MAPA, golpearChefao, novoChefao, passoChefao, VIDA_REI, type EstadoChefao } from '@/game/historia/chefaoMapa';
 import { livre } from '@/game/historia/mundo';
 import { CAPITULOS } from '@/game/historia/roteiro';
 
@@ -59,5 +59,40 @@ describe('o Rato-Rei no mapa aberto', () => {
     const st = rodar(correndo(2.5, 4.8, -8, 0), { x: 10.5, y: 2.8 }, 400);
     const quase = { ...st, chefe: { ...st.chefe, vida: 1 } };
     expect(golpearChefao(quase, { x: st.chefe.x + 0.5, y: st.chefe.y }).fim).toBe('vitoria');
+  });
+});
+
+describe('o Leão Mecânico no mapa aberto (o salto)', () => {
+  const leao = CHEFOES_MAPA['leao-mecanico']!;
+  const rodarL = (st0: EstadoChefao, heroi: { x: number; y: number }, ms: number) => {
+    let st = st0;
+    for (let t = 0; t < ms; t += 20) st = passoChefao(leao.arena, st, heroi, 20);
+    return st;
+  };
+
+  it('a arena é certinha e a luta do capítulo 6 é no mapa', () => {
+    for (const l of leao.arena.mapa) expect(l.length).toBe(leao.arena.mapa[0]!.length);
+    expect(livre(leao.arena, leao.arena.inicio[0] + 0.5, leao.arena.inicio[1] + 0.8)).toBe(true);
+    const cena = CAPITULOS.claude.flatMap((c) => c.cenas).find((c) => c.id === 'c6-chefao');
+    expect(cena?.tipo === 'luta' && cena.noMapa).toBe(true);
+  });
+
+  it('parado na sombra, ele cai em cima e machuca; depois fica cansado', () => {
+    const heroi = { x: 5.5, y: 4.8 };
+    const st = rodarL(novoChefao(100, 'leao-mecanico'), heroi, 4000);
+    expect(st.vida).toBeLessThan(100);
+    expect(st.chefe.estado).toBe('tonto');
+    expect(Math.hypot(st.chefe.x - heroi.x, st.chefe.y - heroi.y)).toBeLessThan(0.5);
+  });
+
+  it('saindo da sombra na última hora, ele cai no vazio; cansado, o golpe entra', () => {
+    let st = novoChefao(100, 'leao-mecanico');
+    // Fica num lugar até a sombra travar, e então sai correndo.
+    st = rodarL(st, { x: 5.5, y: 4.8 }, 2600);
+    st = rodarL(st, { x: 5.5, y: 7.5 }, 1300);
+    expect(st.vida).toBe(100);
+    expect(st.chefe.estado).toBe('tonto');
+    const bateu = golpearChefao(st, { x: st.chefe.x + 0.8, y: st.chefe.y });
+    expect(bateu.chefe.vida).toBe(leao.vida - 1);
   });
 });

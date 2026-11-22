@@ -450,6 +450,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
     return (
       <ChefaoNoMapa
         key={cena.id}
+        chefe={cena.inimigo}
         heroi={heroi}
         antes={cena.antes}
         depois={cena.depois}
