@@ -12,6 +12,9 @@ export const CHEFES: Record<string, DefChefe> = {
   // ---------- Cassius ----------
   fornalha: {
     inimigo: 'fornalha',
+    titulo: 'A guardiã das chamas',
+    chegada: 'cai',
+    clima: 'brasas',
     arena: arena('arena-fornalha', 'biblioteca', 'biblioteca-chamas', A([
       '###############',
       '#EEEE#JJJ#EEEE#',
@@ -39,6 +42,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   arquivista: {
     inimigo: 'arquivista',
+    titulo: 'O que apaga os nomes',
+    chegada: 'sombra',
+    clima: 'poeira',
     arena: arena('arena-arquivo', 'catacumbas', 'catacumbas-arquivo', A([
       '###############',
       '#EEEE##EEE##EE#',
@@ -66,6 +72,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'pretor-de-aco': {
     inimigo: 'pretor-de-aco',
+    titulo: 'O escudo que nunca ouviu',
+    chegada: 'corre',
+    clima: 'poeira',
     arena: arena('arena-pretor', 'forum', 'forum', A([
       '###############',
       '#p..p..p..p..p#',
@@ -93,6 +102,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'leao-mecanico': {
     inimigo: 'leao-mecanico',
+    titulo: 'O filho da fera do Brutus',
+    chegada: 'cai',
+    clima: 'poeira',
     arena: ARENA_LEAO,
     inicio: [11, 4],
     armadura: 5,
@@ -106,6 +118,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'censor-tita': {
     inimigo: 'censor-tita',
+    titulo: 'A Lei da Resposta Única',
+    chegada: 'cai',
+    clima: 'brasas',
     arena: arena('arena-tita', 'arena', 'coliseu-arena', A([
       'BBBBBBXXXBBBBBB',
       'B.............B',
@@ -135,6 +150,9 @@ export const CHEFES: Record<string, DefChefe> = {
   // ---------- Octavius ----------
   'almirante-ferrugem': {
     inimigo: 'almirante-ferrugem',
+    titulo: 'O dono do porto',
+    chegada: 'corre',
+    clima: 'chuva',
     arena: arena('arena-ferrugem', 'porto', 'porto-docas', A([
       'wwwwwwwwwwwwwww',
       'w.............w',
@@ -162,6 +180,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'feitor-tambor': {
     inimigo: 'feitor-tambor',
+    titulo: 'O ritmo das galés',
+    chegada: 'cai',
+    clima: 'chuva',
     arena: arena('arena-feitor', 'navio', 'galera-tempestade', A([
       '###############',
       '#.............#',
@@ -189,6 +210,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   cobrador: {
     inimigo: 'cobrador',
+    titulo: 'Tudo tem preço na Subura',
+    chegada: 'sombra',
+    clima: 'moedas',
     arena: arena('arena-cobrador', 'mercado', 'cofre-cobrador', A([
       '###############',
       '#kk.........kk#',
@@ -216,6 +240,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'almirante-aco': {
     inimigo: 'almirante-aco',
+    titulo: 'O canhão que não dorme',
+    chegada: 'corre',
+    clima: 'chuva',
     arena: arena('arena-almirante', 'navio', 'navio-conves', A([
       '###############',
       '#b...........b#',
@@ -243,6 +270,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   leviata: {
     inimigo: 'leviata',
+    titulo: 'O monstro da Naumaquia',
+    chegada: 'sobe',
+    clima: 'gotas',
     arena: arena('arena-leviata', 'arena', 'coliseu-inundado', A([
       'BBBBBBBBBBBBBBB',
       'BwwdddddddddwwB',
@@ -270,6 +300,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'censor-tita-octavius': {
     inimigo: 'censor-tita-octavius',
+    titulo: 'A Lei da Resposta Única',
+    chegada: 'cai',
+    clima: 'chuva',
     arena: arena('arena-tita-octavius', 'arena', 'coliseu-arena', A([
       'BBBBBBXXXBBBBBB',
       'Bw...........wB',
@@ -299,6 +332,9 @@ export const CHEFES: Record<string, DefChefe> = {
   // ---------- Helios ----------
   eclipse: {
     inimigo: 'eclipse',
+    titulo: 'A sombra que come as estrelas',
+    chegada: 'sombra',
+    clima: 'estrelas',
     arena: arena('arena-eclipse', 'observatorio', 'observatorio-ataque', A([
       '###############',
       '#KK##JJJJJ##KK#',
@@ -327,6 +363,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'cacador-sombras': {
     inimigo: 'cacador-sombras',
+    titulo: 'Ninguém escapa dos telhados',
+    chegada: 'corre',
+    clima: 'fumaca',
     arena: arena('arena-cacador', 'telhados', 'telhados-noite', A([
       '####W####W#####',
       '#.....h.......#',
@@ -355,6 +394,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'guardiao-aqueduto': {
     inimigo: 'guardiao-aqueduto',
+    titulo: 'A água de Roma é dele',
+    chegada: 'sobe',
+    clima: 'gotas',
     arena: arena('arena-aqueduto', 'aqueduto', 'aqueduto', A([
       'VVVVVVVVVVVVVVV',
       '#.............#',
@@ -382,6 +424,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'sibila-corrompida': {
     inimigo: 'sibila-corrompida',
+    titulo: 'A profecia errada',
+    chegada: 'sombra',
+    clima: 'fumaca',
     arena: arena('arena-sibila', 'templo', 'templo-oraculo', A([
       '###############',
       '#p..p..p..p..p#',
@@ -409,6 +454,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'gigante-sombras': {
     inimigo: 'gigante-sombras',
+    titulo: 'O eclipse em pé',
+    chegada: 'cai',
+    clima: 'estrelas',
     arena: arena('arena-gigante', 'arena', 'coliseu-eclipse', A([
       'BBBBBBXXXBBBBBB',
       'B.............B',
@@ -437,6 +485,9 @@ export const CHEFES: Record<string, DefChefe> = {
   },
   'censor-tita-helios': {
     inimigo: 'censor-tita-helios',
+    titulo: 'A Lei no escuro',
+    chegada: 'sombra',
+    clima: 'estrelas',
     arena: arena('arena-tita-helios', 'arena', 'coliseu-arena', A([
       'BBBBBBXXXBBBBBB',
       'B.............B',
@@ -467,6 +518,9 @@ export const CHEFES: Record<string, DefChefe> = {
   // ---------- O capítulo secreto ----------
   nucleo: {
     inimigo: 'nucleo',
+    titulo: 'O coração do Censor',
+    chegada: 'surge',
+    clima: 'faiscas',
     arena: arena('arena-nucleo', 'tunel', 'hipogeu', A([
       '###############',
       '#gg.........gg#',

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { furiosoChefe, golpearChefe, HABILIDADE, novoEstadoChefe, passoChefe, RECARGA, usarHabilidade, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
+import { furiosoChefe, golpearChefe, HABILIDADE, novoEstadoChefe, passoChefe, RECARGA, usarHabilidade, type ClimaArena, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { novaLuta } from '@/game/historia/luta';
 import { novoMundo, passoMundo, type EntradaMundo, type EstadoMundo } from '@/game/historia/mundo';
@@ -24,6 +24,29 @@ const BOTAO_HAB = {
   passo: { nome: 'PASSO DE SOMBRA', icone: 'esquiva', cor: '#c8a0ff' },
 } as const;
 
+const DURACAO_CHEGADA = 3400;
+
+/** O ar da arena: cada clima com as suas partículas (sempre as mesmas, para não piscar). */
+function ClimaDaArena({ clima, cor }: { clima: ClimaArena; cor: string }) {
+  const n = clima === 'chuva' ? 34 : clima === 'fumaca' ? 8 : 18;
+  return (
+    <div className={`pointer-events-none absolute inset-0 z-[246] overflow-hidden clima-${clima}`} aria-hidden>
+      {Array.from({ length: n }, (_, k) => {
+        const x = (k * 37 + 11) % 100;
+        const atraso = -((k * 613) % 4000) / 1000;
+        const dur = 2.2 + ((k * 7) % 10) / 4;
+        return (
+          <span
+            key={k}
+            className="particula-clima absolute block"
+            style={{ left: `${x}%`, animationDelay: `${atraso}s`, animationDuration: `${clima === 'chuva' ? dur / 3 : dur}s`, '--cor': cor } as CSSProperties}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 const AVISO: Record<string, string> = {
   investida: 'ELE VAI CORRER!',
   salto: 'ELE VAI PULAR! SAIA DA SOMBRA!',
@@ -44,7 +67,19 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const nome = (INIMIGOS[def.inimigo]?.nome ?? 'Chefão').toUpperCase();
   const W = m.mapa[0]!.length;
   const H = m.mapa.length;
-  const [fase, setFase] = useState<'antes' | 'mapa' | 'quebrou' | 'duelo' | 'derrota'>(antes?.length ? 'antes' : 'mapa');
+  const [fase, setFase] = useState<'chegada' | 'antes' | 'mapa' | 'quebrou' | 'duelo' | 'derrota'>('chegada');
+  // A CHEGADA (cinema): faixas pretas, o chefão chega do jeito dele e o cartão com o nome.
+  useEffect(() => {
+    const sons: [Parameters<typeof tocar>[0], number][] =
+      def.chegada === 'cai' ? [['catapulta', 300], ['pesada', 900], ['pesada', 1050]] :
+      def.chegada === 'sobe' ? [['onda', 200], ['onda', 900]] :
+      def.chegada === 'sombra' ? [['reflexo', 300], ['reflexo', 900]] :
+      def.chegada === 'corre' ? [['galope', 200], ['escudoMetal', 1000]] :
+      [['especial', 300], ['quebra', 1100]];
+    const ids = [...sons, ['trombeta', 1300] as [Parameters<typeof tocar>[0], number]].map(([som, ms]) => window.setTimeout(() => tocar(som), ms));
+    ids.push(window.setTimeout(() => setFase(antes?.length ? 'antes' : 'mapa'), DURACAO_CHEGADA));
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, []);
   const [s, setS] = useState<EstadoMundo>(() => novoMundo(m));
   const [st, setSt] = useState<EstadoChefe>(() => novoEstadoChefe(def));
   const ref = useRef({ s, st });
@@ -185,7 +220,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const raiva = furiosoChefe(def, st);
   const tam = GRANDES.has(def.inimigo) ? 2.7 : 2.1;
   const noAr = p.tipo === 'salto' && st.etapa === 'ataque' ? Math.sin((1 - Math.max(0, st.ate - st.tempo) / 850) * Math.PI) : 0;
-  const mira = st.etapa === 'mira' && (p.tipo === 'investida' || p.tipo === 'tiros') ? { ang: (Math.atan2(s.y - 0.6 - (st.y - 0.6), s.x - st.x) * 180) / Math.PI, d: Math.hypot(s.x - st.x, s.y - st.y) } : null;
+  const mira = fase === 'mapa' && st.etapa === 'mira' && (p.tipo === 'investida' || p.tipo === 'tiros') ? { ang: (Math.atan2(s.y - 0.6 - (st.y - 0.6), s.x - st.x) * 180) / Math.PI, d: Math.hypot(s.x - st.x, s.y - st.y) } : null;
   const cansado = st.etapa === 'cansado' && !st.fim && !st.apanhou;
   const escudo = st.tempo < st.escudoAte;
   const sombra = st.tempo < st.invulAte;
@@ -195,7 +230,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const bossFiltro = cansado ? 'saturate(0.35) brightness(0.9)' : `drop-shadow(0 0 ${raiva ? 8 : def.escuro ? 6 : 0}px ${raiva ? '#ff3a3a' : def.cor})`;
 
   const desenhoChefe = (x: number, y: number, chave: string, copia = false) => (
-    <div key={chave} className={`absolute ${copia ? 'copia-chefe' : ''}`} style={{ ...emMapa(x, y), width: `${(tam / W) * 100}%`, translate: `-50% ${-92 - noAr * 70}%`, zIndex: noAr > 0 ? 300 : 260 + Math.floor(y * 4) }}>
+    <div key={chave} className={`absolute ${copia ? 'copia-chefe' : ''} ${fase === 'chegada' && !copia ? `chega-${def.chegada}` : ''}`} style={{ ...emMapa(x, y), width: `${(tam / W) * 100}%`, translate: `-50% ${-92 - noAr * 70}%`, zIndex: noAr > 0 ? 300 : 260 + Math.floor(y * 4) }}>
       <span className="absolute bottom-[2%] left-1/2 h-[10%] w-[80%] -translate-x-1/2 rounded-[50%] bg-black/50" />
       <div className={st.etapa === 'mira' ? 'tremer-t' : cansado ? 'respirar-t' : ''} style={{ transform: st.dir === 'esq' ? undefined : 'scaleX(-1)', filter: bossFiltro }}>
         <SpriteInimigo e={sprite} />
@@ -233,6 +268,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
       <div className="area-jogo relative flex flex-col gap-2">
         <div className={`pixel-box mundo-aberto relative w-full select-none overflow-hidden bg-black ${recente?.tipo === 'parede' || recente?.tipo === 'explode' ? 'tremer-forte' : ''}`} style={{ aspectRatio: `${W} / ${H}`, touchAction: 'none' }}>
           <MapaDesenhado mundo={m} />
+          <ClimaDaArena clima={def.clima} cor={def.cor} />
 
           {/* No escuro, só se vê em volta do gladiador */}
           {def.escuro && (
@@ -312,7 +348,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
               <span className="whitespace-nowrap border-2 border-black bg-[#4ad46a] px-1 font-pixel text-[7px] text-black sm:text-[10px]">{naRede ? 'PRESO NA REDE! BATA!' : 'CANSADO! BATA!'}</span>
             </span>
           )}
-          {st.etapa === 'mira' && !st.fim && (
+          {st.etapa === 'mira' && !st.fim && fase === 'mapa' && (
             <span className="piscar pointer-events-none absolute left-1/2 top-[3%] z-[310] -translate-x-1/2 whitespace-nowrap border-2 border-black bg-black/70 px-2 py-0.5 font-pixel text-[7px] sm:text-[10px]" style={{ color: def.cor }}>
               {AVISO[p.tipo]}
             </span>
@@ -335,6 +371,19 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           )}
           <div className="pointer-events-none absolute inset-0 z-[300]" style={{ background: 'radial-gradient(ellipse at 50% 55%, transparent 45%, rgba(4,2,12,0.55) 100%)' }} aria-hidden />
 
+          {fase === 'chegada' && (
+            <div className="pointer-events-none absolute inset-0 z-[400]" aria-hidden>
+              <span className="cinema-barra absolute inset-x-0 top-0 block h-[11%] bg-black" />
+              <span className="cinema-barra absolute inset-x-0 bottom-0 block h-[11%] bg-black" />
+              {def.chegada === 'cai' && <span className="anel-impacto absolute block rounded-full border-4" style={{ ...roda(st.x, st.y - 0.2, 3), borderColor: def.cor }} />}
+              {def.chegada === 'sobe' && <span className="anel-agua absolute block rounded-full border-4 border-[#bfe6ff]" style={roda(st.x, st.y - 0.2, 2.6)} />}
+              {def.chegada === 'surge' && <span className="clarao-surge absolute block rounded-full" style={{ ...roda(st.x, st.y - 1, 4), background: `radial-gradient(circle, #fff, ${def.cor} 40%, transparent 70%)` }} />}
+              <div className="cartao-chefe absolute bottom-[14%] left-[4%] border-l-4 bg-black/75 px-3 py-1.5" style={{ borderColor: def.cor }}>
+                <p className="font-pixel text-base leading-tight sm:text-3xl" style={{ color: def.cor, textShadow: '2px 2px 0 #000' }}>{nome}</p>
+                <p className="font-pixel text-[8px] text-[#f4e2b4] sm:text-xs">{def.titulo}</p>
+              </div>
+            </div>
+          )}
           {fase === 'antes' && antes && (
             <div className="absolute inset-0 z-[500]">
               <Falas falas={antes} onFim={() => setFase('mapa')} />

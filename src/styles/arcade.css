@@ -1957,3 +1957,56 @@
 .rede-cai { animation: rede-cai 0.35s ease-out both; }
 @keyframes rede-cai { from { scale: 2.2; opacity: 0; rotate: -20deg; } to { scale: 1; opacity: 1; rotate: 0deg; } }
 .passo-sombra { opacity: 0.35; filter: drop-shadow(0 0 8px #c8a0ff) brightness(0.6); }
+
+/* A CHEGADA DO CHEFÃO NO MAPA (22/11/2026): cinema com faixas pretas e o cartão do nome. */
+.cinema-barra { animation: cinema-barra 3.4s ease-in-out both; }
+@keyframes cinema-barra { 0% { scale: 1 0; } 12% { scale: 1 1; } 88% { scale: 1 1; } 100% { scale: 1 0; } }
+.cinema-barra:first-child { transform-origin: top; }
+.cinema-barra:nth-child(2) { transform-origin: bottom; }
+.cartao-chefe { animation: cartao-chefe 3.4s cubic-bezier(.2,.9,.3,1) both; }
+@keyframes cartao-chefe { 0%, 36% { translate: -120% 0; opacity: 0; } 46% { translate: 4% 0; opacity: 1; } 52%, 88% { translate: 0 0; opacity: 1; } 100% { translate: 0 0; opacity: 0; } }
+.chega-cai { animation: chega-cai 1.1s cubic-bezier(.55,0,1,.45) both; }
+@keyframes chega-cai { 0%, 25% { translate: -50% -900%; } 100% { translate: -50% -92%; } }
+.chega-sobe { animation: chega-sobe 1.6s cubic-bezier(.2,.8,.3,1.2) both; clip-path: inset(0 0 0 0); }
+@keyframes chega-sobe { 0%, 15% { translate: -50% 10%; opacity: 0; } 30% { opacity: 1; } 100% { translate: -50% -92%; } }
+.chega-sombra { animation: chega-sombra 1.8s ease-out both; }
+@keyframes chega-sombra { 0%, 10% { opacity: 0; filter: brightness(0) blur(6px); scale: 1.6 0.2; } 60% { opacity: 1; filter: brightness(0) blur(1px); scale: 1 1; } 100% { filter: none; } }
+.chega-corre { animation: chega-corre 1.2s cubic-bezier(.1,.9,.2,1) both; }
+@keyframes chega-corre { 0%, 10% { translate: 400% -92%; } 80% { translate: -60% -92%; } 100% { translate: -50% -92%; } }
+.chega-surge { animation: chega-surge 1.6s ease-out both; }
+@keyframes chega-surge { 0%, 25% { opacity: 0; scale: 0.2; filter: brightness(4); } 70% { opacity: 1; scale: 1.15; filter: brightness(2); } 100% { scale: 1; filter: none; } }
+.anel-impacto { animation: anel-impacto 0.8s ease-out 0.95s both; }
+@keyframes anel-impacto { from { opacity: 1; scale: 0.2; } to { opacity: 0; scale: 1.4; } }
+.anel-agua { animation: anel-agua 1.2s ease-out 0.2s both; }
+@keyframes anel-agua { from { opacity: 0.9; scale: 0.1; } to { opacity: 0; scale: 1.3; } }
+.clarao-surge { animation: clarao-surge 1.4s ease-out 0.3s both; }
+@keyframes clarao-surge { 0% { opacity: 0; scale: 0.2; } 40% { opacity: 1; } 100% { opacity: 0; scale: 1.5; } }
+
+/* O ar das arenas: brasas sobem, chuva cai, poeira flutua, estrelas caem, fumaça... */
+.particula-clima { top: 0; width: 4px; height: 4px; animation-name: clima-cai; animation-timing-function: linear; animation-iteration-count: infinite; }
+@keyframes clima-cai { from { translate: 0 -20px; } to { translate: -30px 640px; } }
+@keyframes clima-sobe { from { translate: 0 0; opacity: 0; } 15% { opacity: 1; } to { translate: 20px -640px; opacity: 0; } }
+@keyframes clima-flutua { 0% { translate: 0 0; opacity: 0; } 20% { opacity: 0.7; } 80% { opacity: 0.7; } 100% { translate: 40px 560px; opacity: 0; } }
+.clima-brasas .particula-clima { background: #ffb040; box-shadow: 0 0 6px #ff6a2a; animation-name: clima-sobe; border-radius: 1px; top: auto; bottom: 0; }
+.clima-faiscas .particula-clima { background: #e0fffa; box-shadow: 0 0 6px #4ef0dc; animation-name: clima-sobe; top: auto; bottom: 0; width: 3px; height: 3px; }
+.clima-chuva .particula-clima { width: 1px; height: 18px; background: rgba(180, 210, 255, 0.55); rotate: 12deg; }
+.clima-gotas .particula-clima { width: 3px; height: 6px; border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%; background: rgba(150, 210, 255, 0.7); }
+.clima-estrelas .particula-clima { width: 3px; height: 3px; background: #fff; box-shadow: 0 0 6px #c8a0ff; animation-name: clima-flutua; }
+.clima-poeira .particula-clima { width: 3px; height: 3px; border-radius: 50%; background: rgba(220, 200, 160, 0.5); animation-name: clima-flutua; }
+.clima-moedas .particula-clima { width: 5px; height: 5px; border-radius: 50%; background: #f2c14e; box-shadow: inset -1px -1px 0 #a07818; }
+.clima-fumaca .particula-clima { top: auto; bottom: 0; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(200, 220, 210, 0.18), transparent 70%); animation-name: clima-sobe; }
+
+/* As chegadas novas do duelo: das sombras, do telhado e a estátua que ganha vida. */
+.entrada-sombra { animation: entrada-sombra 1.9s ease-out both; }
+@keyframes entrada-sombra { 0%, 15% { opacity: 0; filter: brightness(0) blur(5px); } 65% { opacity: 1; filter: brightness(0); } 100% { filter: none; } }
+.entrada-teto { animation: entrada-teto 1.3s both; }
+@keyframes entrada-teto { 0%, 20% { translate: 0 -120%; animation-timing-function: ease-in; } 60% { translate: 0 0; scale: 1.1 0.85; } 75% { translate: 0 -6%; scale: 0.95 1.05; } 100% { translate: 0 0; scale: 1; } }
+.entrada-estatua { animation: entrada-estatua 2.3s both; }
+@keyframes entrada-estatua { 0%, 20% { filter: grayscale(1) brightness(0.8) sepia(0.3); } 30% { translate: 0.6% 0; } 34% { translate: -0.6% 0; } 38% { translate: 0.6% 0; } 55% { filter: grayscale(1) brightness(0.8); translate: 0 0; } 62% { filter: grayscale(0.2) brightness(1.5); } 100% { filter: none; } }
+.entrada-teto, .entrada-estatua, .entrada-sombra { transform-origin: 70% 85%; }
+.fiapo-sombra { animation: fiapo-sombra 1.2s ease-in both; }
+@keyframes fiapo-sombra { from { translate: var(--dx) var(--dy); opacity: 0.9; scale: 1.4; } to { translate: 0 0; opacity: 0; scale: 0.4; } }
+.lasca-pedra { opacity: 0; animation: lasca-pedra 0.7s ease-out both; }
+@keyframes lasca-pedra { from { opacity: 1; translate: 0 0; } to { opacity: 0; translate: var(--dx) 60px; rotate: 200deg; } }
+.menos-movimento .particula-clima, .menos-movimento [class*='chega-'], .menos-movimento .cartao-chefe, .menos-movimento .cinema-barra, .menos-movimento .entrada-sombra, .menos-movimento .entrada-teto, .menos-movimento .entrada-estatua { animation-duration: 0.01s; }
+@media (prefers-reduced-motion: reduce) { .particula-clima { animation: none; display: none; } }

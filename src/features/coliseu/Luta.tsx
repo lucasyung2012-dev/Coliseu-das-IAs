@@ -387,13 +387,16 @@ function Impacto({ x, cor, corte = false, grande = false }: { x: string; cor: st
 
 /** O jeito de chegar de cada bicho (quando a cena não pede um jeito especial). */
 function entradaDe(id: string, chefao: boolean): EntradaInimigo {
-  if (/morcego|veloz|gaivota|vigia-telhado/.test(id)) return 'voando';
+  if (/estatua/.test(id)) return 'estatua';
+  if (/apagador|sombra|sombrio|noturno|eclipse/.test(id) && !chefao) return 'sombra';
+  if (/gato|vigia-telhado/.test(id)) return 'teto';
+  if (/morcego|veloz|gaivota/.test(id)) return 'voando';
   if (/jacare|mergulhador|tritao|leviata|limpador-esgoto/.test(id)) return 'agua';
   if (/rato|caes|gato|cacador/.test(id)) return 'rapido';
   if (chefao || /fornalha|tita|colosso|gigante|touro|leao|centuriao|pretor-de-aco/.test(id)) return 'pesado';
   return 'andando';
 }
-const DURACAO_ENTRADA: Record<EntradaInimigo, number> = { janela: 2700, voando: 1700, pesado: 2100, rapido: 900, agua: 1500, andando: 1400 };
+const DURACAO_ENTRADA: Record<EntradaInimigo, number> = { janela: 2700, voando: 1700, pesado: 2100, rapido: 900, agua: 1500, andando: 1400, sombra: 1900, teto: 1300, estatua: 2300 };
 const SONS_ENTRADA: Record<EntradaInimigo, [SomHistoria, number][]> = {
   janela: [['escudoMetal', 800], ['catapulta', 1050], ['pesada', 1900]],
   voando: [['galope', 200], ['escudoMetal', 1350]],
@@ -401,6 +404,9 @@ const SONS_ENTRADA: Record<EntradaInimigo, [SomHistoria, number][]> = {
   rapido: [['galope', 0]],
   agua: [['onda', 100]],
   andando: [['passos', 0], ['passos', 700]],
+  sombra: [['reflexo', 100], ['finta', 1200]],
+  teto: [['esquiva', 200], ['pesada', 800]],
+  estatua: [['martelo', 300], ['martelo', 800], ['quebra', 1400]],
 };
 
 /** O que acontece em volta da chegada: o vidro estourando, a poeira no chão, a água espirrando. */
@@ -435,12 +441,24 @@ function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
         [-12, -6, 0, 6, 12].map((dx, k) => (
           <span key={k} className="respingo-entrada absolute z-[12] bottom-[12%] block h-[5%] w-[3%] rounded-full bg-[#8ad0ff]" style={{ left: `${70 + dx}%`, animationDelay: `${200 + k * 50}ms`, '--dx': `${dx * 3}px` } as CSSProperties} />
         ))}
-      {entrada !== 'voando' && entrada !== 'agua' &&
+      {entrada === 'sombra' &&
+        [0, 1, 2, 3, 4, 5, 6, 7].map((k) => (
+          <span
+            key={`s${k}`}
+            className="fiapo-sombra absolute z-[12] bottom-[30%] block h-[8%] w-[4%] rounded-full bg-[#1a0a2a]"
+            style={{ left: '72%', '--dx': `${Math.cos(k * 0.8) * 160}px`, '--dy': `${Math.sin(k * 0.8) * 90}px`, animationDelay: `${k * 60}ms` } as CSSProperties}
+          />
+        ))}
+      {entrada === 'estatua' &&
+        [-8, -3, 2, 7, 11].map((dx, k) => (
+          <span key={`e${k}`} className="lasca-pedra absolute z-[12] bottom-[40%] block h-[3%] w-[2.5%] bg-[#b8b0a0]" style={{ left: `${70 + dx}%`, '--dx': `${dx * 6}px`, animationDelay: `${1400 + k * 30}ms` } as CSSProperties} />
+        ))}
+      {entrada !== 'voando' && entrada !== 'agua' && entrada !== 'sombra' &&
         [-10, -5, 0, 5, 10].map((dx, k) => (
           <span
             key={k}
             className="poeira-entrada absolute z-[12] bottom-[11%] block h-[6%] w-[6%] rounded-full bg-[#c8b89a]"
-            style={{ left: `${70 + dx}%`, '--dx': `${dx * 4}px`, animationDelay: `${(entrada === 'janela' ? 1900 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : 1100) + k * 30}ms` } as CSSProperties}
+            style={{ left: `${70 + dx}%`, '--dx': `${dx * 4}px`, animationDelay: `${(entrada === 'janela' ? 1900 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : entrada === 'teto' ? 750 : entrada === 'estatua' ? 1500 : 1100) + k * 30}ms` } as CSSProperties}
           />
         ))}
     </div>

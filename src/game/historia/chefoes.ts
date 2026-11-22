@@ -26,9 +26,18 @@ export type Padrao =
   | { tipo: 'feixe'; dur: number; giros: number; comprimento: number }
   | { tipo: 'copias'; n: number; dur: number };
 
+/** Como o chefão chega na arena (a cena de cinema antes da primeira etapa). */
+export type ChegadaChefe = 'cai' | 'sobe' | 'sombra' | 'corre' | 'surge';
+/** O que fica no ar da arena: brasas, chuva, poeira, estrelas caindo... */
+export type ClimaArena = 'brasas' | 'poeira' | 'chuva' | 'gotas' | 'estrelas' | 'fumaca' | 'faiscas' | 'moedas';
+
 export interface DefChefe {
   /** O inimigo (o desenho e o duelo da segunda etapa). */
   inimigo: string;
+  /** O título no cartão da chegada (rascunho: o Lucas pode reescrever). */
+  titulo: string;
+  chegada: ChegadaChefe;
+  clima: ClimaArena;
   arena: Mundo;
   inicio: [number, number];
   armadura: number;

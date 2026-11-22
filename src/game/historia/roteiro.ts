@@ -75,7 +75,7 @@ export interface Fala {
 
 /** Os desenhos de fundo das cenas. */
 /** A chegada do inimigo antes da luta: quebrando a janela, voando, pesado, rápido, saindo da água ou andando. */
-export type EntradaInimigo = 'janela' | 'voando' | 'pesado' | 'rapido' | 'agua' | 'andando';
+export type EntradaInimigo = 'janela' | 'voando' | 'pesado' | 'rapido' | 'agua' | 'andando' | 'sombra' | 'teto' | 'estatua';
 
 export type Lugar =
   | 'titulo'
