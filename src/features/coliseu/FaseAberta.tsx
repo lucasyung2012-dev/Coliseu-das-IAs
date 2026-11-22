@@ -299,8 +299,8 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
 
         {acabou && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/75 p-3 text-center">
-            <p className="font-pixel text-sm text-[#f2c14e] sm:text-xl">{s.coletados.length} DE {fase.coletaveis.length} LIVROS SALVOS!</p>
-            <p className="text-sm text-white/80">{s.coletados.length === fase.coletaveis.length ? 'Todos! O Guardião Zero ficaria orgulhoso.' : 'Os que ficaram para trás viraram cinza... mas esses, ninguém apaga.'}</p>
+            <p className="font-pixel text-sm text-[#f2c14e] sm:text-xl">{s.coletados.length} DE {fase.coletaveis.length} {fase.fim?.coisa ?? 'LIVROS SALVOS'}!</p>
+            <p className="text-sm text-white/80">{s.coletados.length === fase.coletaveis.length ? (fase.fim?.todos ?? 'Todos! O Guardião Zero ficaria orgulhoso.') : (fase.fim?.alguns ?? 'Os que ficaram para trás viraram cinza... mas esses, ninguém apaga.')}</p>
             <button type="button" autoFocus onClick={onFim} className="pixel-box px-4 py-2 font-pixel text-[10px] text-[#f2c14e]">
               SEGUIR ▶
             </button>

@@ -63,6 +63,8 @@ export interface Fase {
   saida: { x: number; rotulo: string };
   /** Quantas coisas precisa pegar para a saída abrir (0 = nenhuma). */
   precisa: number;
+  /** A mensagem do fim: o que foi pego ("LIVROS SALVOS") e a frase quando pegou tudo ou só uma parte. */
+  fim?: { coisa: string; todos: string; alguns: string };
 }
 
 export interface EstadoFase {

@@ -90,6 +90,7 @@ export const FASES: Record<string, Fase> = {
     ],
     saida: { x: 194, rotulo: 'PRAÇA DO MERCADO' },
     precisa: 3,
+    fim: { coisa: 'SINAIS DOS COPISTAS', todos: 'Todos os sinais. O caminho está claro.', alguns: 'O bastante para não se perder.' },
   },
   // Capítulo 4 do Cassius (22/11/2026): os túneis alagados das catacumbas, logo depois da
   // descida. Água funda e gelada, pedras, tampas de sarcófago e vigas; as páginas que os
@@ -132,5 +133,6 @@ export const FASES: Record<string, Fase> = {
     ],
     saida: { x: 196, rotulo: 'FUNDO DO TÚNEL' },
     precisa: 3,
+    fim: { coisa: 'PÁGINAS RECOLHIDAS', todos: 'Todas as páginas, secas e inteiras.', alguns: 'As outras ficaram com a água... mas estas estão salvas.' },
   },
 };
