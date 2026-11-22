@@ -1006,7 +1006,13 @@ export function LutaHistoria({
             <p className="max-w-sm text-sm text-white/80">
               {tentativas >= 2
                 ? 'Dicas: não gaste fôlego à toa (cuidado com as FINTAS); bater na guarda três vezes faz ele CONTRA-ATACAR; espere o ABERTO e bata duas ou três vezes.'
-                : 'Lembre: sinal AMARELO, escudo. VERMELHO, esquiva. E bata quando ele ficar ABERTO.'}
+                : estilo === 'guardiao'
+                  ? 'Lembre: SEGURE O ESCUDO bem quando o golpe vem (amarelo ou vermelho). Depois de bloquear, DEVOLVER. E GLÁDIO quando ele ficar ABERTO.'
+                  : estilo === 'estrategista'
+                    ? 'Lembre: você não bloqueia. ROLE em todo aviso (bem na hora, ele tropeça) e bata pelas costas. A REDE no aviso cancela o golpe.'
+                    : estilo === 'vidente'
+                      ? 'Lembre: PASSO DE SOMBRA no aviso (bem na hora junta luz) e ESPELHO no fogo. Com luz, o LAMPEJO no aviso cancela o golpe.'
+                      : 'Lembre: sinal AMARELO, escudo. VERMELHO, esquiva. E bata quando ele ficar ABERTO.'}
             </p>
             <button
               type="button"
