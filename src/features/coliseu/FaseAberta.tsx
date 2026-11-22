@@ -172,6 +172,21 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
                   <div className="absolute bottom-0 right-[8%] top-0 w-[8%] bg-[#4a2a14]" />
                 </>
               )}
+              {/* Caixote: tábuas e a cruz de madeira */}
+              {p.tipo === 'caixote' && (
+                <div className="absolute inset-0 border-2 border-[#5a3a1c] bg-[repeating-linear-gradient(180deg,#b07c42_0_22%,#8a5a2a_22%_25%)]">
+                  <div className="absolute left-1/2 top-1/2 h-[3px] w-[130%] -translate-x-1/2 -translate-y-1/2 rotate-[35deg] bg-[#6a4220]" />
+                </div>
+              )}
+              {/* Toldo de barraca: pano listrado, a franja e os paus */}
+              {p.tipo === 'toldo' && (
+                <>
+                  <div className="absolute bottom-0 left-[6%] top-0 w-[5%] bg-[#5a3a1c]" />
+                  <div className="absolute bottom-0 right-[6%] top-0 w-[5%] bg-[#5a3a1c]" />
+                  <div className="absolute inset-x-[-4%] top-0 h-[14%] bg-[repeating-linear-gradient(90deg,#c0283c_0_12px,#f0e6cc_12px_24px)] shadow-[0_3px_0_#00000055]" />
+                  <div className="absolute inset-x-[-4%] top-[14%] h-[5%] bg-[repeating-linear-gradient(90deg,#c0283c_0_6px,transparent_6px_12px)]" />
+                </>
+              )}
               {p.tipo === 'estante' && (
                 <div className="absolute inset-x-[16%] bottom-0 top-[12%] flex flex-col justify-around">
                   {[0, 1, 2].map((r) => (

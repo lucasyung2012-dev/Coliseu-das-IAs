@@ -52,4 +52,43 @@ export const FASES: Record<string, Fase> = {
     saida: { x: 286, rotulo: 'ESCADA DAS CATACUMBAS' },
     precisa: 3,
   },
+  // Capítulo 2 do Cassius (22/11/2026): a fuga pelo beco e pelo mercado, de dia. Por cima dos
+  // caixotes e dos toldos, desviando dos braseiros dos assados, seguindo os sinais dos Copistas.
+  // Os comentários do Cassius são rascunho: o Lucas pode reescrever.
+  'fuga-mercado': {
+    id: 'fuga-mercado',
+    telas: ['beco', 'rua-mercado'],
+    objetivo: 'Fuja pelo beco e pelo mercado. Siga os sinais dos Copistas (a pena riscada a carvão).',
+    plataformas: [
+      // Tela 1: o beco (caixotes empilhados e o toldo de um sapateiro)
+      { x: 16, w: 10, y: 8, tipo: 'caixote' },
+      { x: 28, w: 8, y: 15, tipo: 'caixote' },
+      { x: 44, w: 16, y: 18, tipo: 'toldo' },
+      { x: 66, w: 12, y: 9, tipo: 'caixote' },
+      { x: 82, w: 14, y: 16, tipo: 'toldo' },
+      // Tela 2: o mercado (barracas, caixotes de fruta)
+      { x: 104, w: 18, y: 12, tipo: 'toldo' },
+      { x: 128, w: 10, y: 8, tipo: 'caixote' },
+      { x: 142, w: 16, y: 17, tipo: 'toldo' },
+      { x: 166, w: 10, y: 10, tipo: 'caixote' },
+    ],
+    perigos: [
+      { x: 36, w: 6, tipo: 'fogo', acesoMs: 1600, apagadoMs: 1400 },
+      { x: 58, w: 6, tipo: 'fogo', acesoMs: 1400, apagadoMs: 1400, atrasoMs: 700 },
+      { x: 116, w: 8, tipo: 'fogo', acesoMs: 1800, apagadoMs: 1200, atrasoMs: 300 },
+      { x: 156, w: 8, tipo: 'fogo', acesoMs: 0, apagadoMs: 0 },
+    ],
+    coletaveis: [
+      { id: 'pena-1', x: 32, y: 20, icone: 'pagina', nome: 'Sinal dos Copistas' },
+      { id: 'pena-2', x: 89, y: 22, icone: 'pagina', nome: 'Sinal dos Copistas' },
+      { id: 'pena-3', x: 150, y: 23, icone: 'pagina', nome: 'Sinal dos Copistas' },
+    ],
+    comentarios: [
+      { id: 'pena', x: 26, quem: 'cassius', texto: 'Uma pena riscada a carvão. O sinal dos Copistas. Eles marcam o caminho seguro.' },
+      { id: 'braseiro', x: 52, quem: 'cassius', texto: 'Os braseiros dos assados. Por cima dos toldos!' },
+      { id: 'mercado', x: 102, quem: 'cassius', texto: 'O mercado. Gente demais para a Guarda ver a gente... por enquanto.' },
+    ],
+    saida: { x: 194, rotulo: 'PRAÇA DO MERCADO' },
+    precisa: 3,
+  },
 };

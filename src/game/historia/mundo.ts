@@ -72,6 +72,18 @@ export interface Mundo {
   tema: TemaMundo;
   /** O lugar para a música e para o cartão do save. */
   lugar: Lugar;
+  /**
+   * Como se sai daqui (22/11/2026, pedido do Lucas: cada mapa com a sua saída, ou nenhuma).
+   * Com `estilo`, o mapa tem o ladrilho P desenhado do jeito do lugar e com o nome dele.
+   * Sem `estilo`, não há lugar de saída: depois de ver o que precisa, aparece um botão.
+   */
+  saida?: SaidaMundo;
+}
+
+export type EstiloSaida = 'escada' | 'arco' | 'portao' | 'prancha' | 'escadaMao' | 'grade' | 'porta';
+export interface SaidaMundo {
+  rotulo: string;
+  estilo?: EstiloSaida;
 }
 
 /** As cores do mapa: biblioteca, catacumbas (escuro, com tochas), Fórum (claro, ao ar livre) e o túnel. */

@@ -1,4 +1,4 @@
-import type { Coisa, Mundo, Pessoa, TemaMundo } from './mundo';
+import type { Coisa, Mundo, Pessoa, SaidaMundo, TemaMundo } from './mundo';
 import type { Cena, ConversaLudus, Lugar } from './roteiro';
 
 /**
@@ -15,6 +15,7 @@ export const MUNDOS: Record<string, Mundo> = {
     tema: 'biblioteca',
     lugar: 'biblioteca-estantes',
     objetivo: 'Ande pela Biblioteca e encontre a Lívia.',
+    saida: { rotulo: 'ESCADA DAS CATACUMBAS', estilo: 'escada' },
     inicio: [3, 12],
     mapa: [
       '########################',
@@ -566,6 +567,39 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
 };
 
 /** Monta o mapa de uma cena de explorar: os pontos dela, nos lugares que o mapa diz. */
+/**
+ * A SAÍDA DE CADA CENA (22/11/2026): cada lugar sai do seu jeito, com o seu nome. Sem
+ * `estilo`, o mapa não tem lugar de saída (o P vira chão) e aparece o botão de seguir.
+ */
+export const SAIDAS: Record<string, SaidaMundo> = {
+  // Cassius
+  'c4-tuneis': { rotulo: 'TÚNEL DOS SINAIS', estilo: 'arco' },
+  'c4-ossario': { rotulo: 'NINHO DOS RATOS', estilo: 'arco' },
+  'c4-gavetas': { rotulo: 'SEGUIR COM A LÍVIA' },
+  'c5-povo': { rotulo: 'COMEÇAR A LEITURA' },
+  'c6-nomes': { rotulo: 'PORTÃO DA ARENA', estilo: 'grade' },
+  'f-biblioteca': { rotulo: 'FECHAR O LIVRO' },
+  // Octavius
+  'o1-cais': { rotulo: 'BOLAR UM PLANO' },
+  'o2-planejar': { rotulo: 'ESCOTILHA DO CONVÉS', estilo: 'escadaMao' },
+  'o4-feira': { rotulo: 'BECO DO COFRE', estilo: 'portao' },
+  'o5-tripulacao': { rotulo: 'SUBIR NO ESPERANÇA', estilo: 'prancha' },
+  'o6-jangada': { rotulo: 'REMAR PARA O MEIO' },
+  'fo-porto': { rotulo: 'ZARPAR' },
+  // Helios
+  'h1-observatorio': { rotulo: 'IR PARA O TELESCÓPIO' },
+  'h1-lente': { rotulo: 'PORTA DOS FUNDOS', estilo: 'porta' },
+  'h2-janelas': { rotulo: 'SEGUIR PELOS TELHADOS' },
+  'h4-canal': { rotulo: 'CAMINHO DO TEMPLO', estilo: 'arco' },
+  'h5-oraculo': { rotulo: 'SEGUIR A SIBILA' },
+  'h6-arena-olhar': { rotulo: 'COMEÇAR O DUELO' },
+  'fh-observatorio': { rotulo: 'OLHAR O CÉU' },
+  // O capítulo secreto
+  's-hipogeu': { rotulo: 'GALERIA DOS MURAIS', estilo: 'arco' },
+  's-galeria': { rotulo: 'SEGUIR EM FRENTE' },
+  's-coliseu-livre': { rotulo: 'FIM' },
+};
+
 export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: MapaDeExplorar): Mundo {
   const coisas: Coisa[] = [];
   const pessoas: Pessoa[] = [];
@@ -577,7 +611,10 @@ export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: Ma
       coisas.push({ id: p.id, x, y, falas: p.falas, obrigatorio: p.obrigatorio, segredo: p.segredo });
     }
   }
-  return { id: cena.id, tema: m.tema, lugar: cena.lugar as Lugar, mapa: m.mapa, objetivo: cena.objetivo, inicio: m.inicio, coisas, pessoas };
+  const saida = SAIDAS[cena.id];
+  // Sem lugar de saída: o P vira chão.
+  const mapa = saida && !saida.estilo ? m.mapa.map((l) => l.replace('P', '.')) : m.mapa;
+  return { id: cena.id, tema: m.tema, lugar: cena.lugar as Lugar, mapa, objetivo: cena.objetivo, inicio: m.inicio, coisas, pessoas, saida };
 }
 
 /**

@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type Mundo, type TemaMundo } from '@/game/historia/mundo';
+import { livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type EstiloSaida, type Mundo, type TemaMundo } from '@/game/historia/mundo';
 import type { Fala, Falante } from '@/game/historia/roteiro';
 import Emote from '@/ui/pixel/Emotes';
 import Icone from '@/ui/pixel/Icones';
@@ -242,7 +242,7 @@ export function MundoAberto({
           {saidas.map(([x, y]) => (
             <div key={`${x}-${y}`} className="absolute" style={{ ...emMundo(x, y), width: `${(1 / W) * 100}%`, height: `${(1 / H) * 100}%`, zIndex: 250 }}>
               <span className={`absolute inset-0 block ${aberta ? 'saida-brilha' : ''}`} />
-              <span className={`placa-ponto absolute -top-[95%] left-1/2 -translate-x-1/2 whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px] ${aberta ? '' : 'vista'}`}>SAÍDA</span>
+              <span className={`placa-ponto absolute -top-[95%] left-1/2 -translate-x-1/2 whitespace-nowrap px-1 font-pixel text-[6px] sm:text-[8px] ${aberta ? '' : 'vista'}`}>{mundo.saida?.rotulo ?? 'SAÍDA'}</span>
               {aberta && (
                 <span className="seta-pula absolute -top-[190%] left-1/2 block w-[70%]">
                   <Icone nome="baixo" className="w-full" />
@@ -283,8 +283,23 @@ export function MundoAberto({
 
         {avisoSaida && (
           <span className="aviso-saida placa-ponto pointer-events-none absolute left-1/2 top-[8%] z-[460] whitespace-nowrap px-2 py-1 font-pixel text-[9px] sm:text-xs" style={{ translate: '-50% 0' }} aria-live="polite">
-            SIGA A SETA ATÉ A SAÍDA
+            SIGA A SETA: {mundo.saida?.rotulo ?? 'SAÍDA'}
           </span>
+        )}
+        {/* Sem lugar de saída: depois de ver o que precisa, um botão para seguir a história (dá para continuar andando) */}
+        {aberta && saidas.length === 0 && mundo.saida && !conversa && !acabou && (
+          <button
+            type="button"
+            onClick={() => {
+              desbloquear();
+              tocar('portao');
+              setAcabou(true);
+              window.setTimeout(onFim, 300);
+            }}
+            className="botao-seguir pixel-box absolute bottom-[4%] right-[3%] z-[460] px-3 py-2 font-pixel text-[9px] text-[#f2c14e] sm:text-xs"
+          >
+            <span className="inline-flex items-center gap-1">{mundo.saida.rotulo} <Icone nome="dir" className="w-3 sm:w-4" /></span>
+          </button>
         )}
         {/* A luz: escuro em volta, como uma noite de verdade */}
         <div
@@ -361,6 +376,108 @@ const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; 
   templo: { chao1: '#d8ccb4', chao2: '#cec2aa', parede1: '#6a5e4c', parede2: '#746856', face: '#b8ac94', faceTopo: '#e0d4bc', escuro: 0.4 },
   arena: { chao1: '#c8a870', chao2: '#c0a068', parede1: '#5a4a38', parede2: '#645240', face: '#8a7a64', faceTopo: '#a89880', escuro: 0.25 },
 };
+
+/** Cada saída do seu jeito (22/11/2026): escada, arco de pedra, portão, prancha, escada de mão, grade e porta. */
+function DesenhoSaida({ estilo, X, Y }: { estilo: EstiloSaida; X: number; Y: number }) {
+  switch (estilo) {
+    case 'arco':
+      // Arco de pedra com a passagem escura e uma tocha do lado.
+      return (
+        <g>
+          <rect x={X} y={Y - 10} width={PX} height={PX + 10} fill="#6a5a4a" />
+          <rect x={X + 1} y={Y - 10} width={PX - 2} height="2" fill="#8a7a66" />
+          <rect x={X + 3} y={Y - 6} width="10" height="22" fill="#0a0806" />
+          <rect x={X + 4} y={Y - 8} width="8" height="2" fill="#0a0806" />
+          <rect x={X + 5} y={Y - 9} width="6" height="1" fill="#0a0806" />
+          {[-4, 2, 8].map((r) => (
+            <rect key={r} x={X} y={Y + r} width="3" height="1" fill="#4a3e32" />
+          ))}
+          <rect x={X + 14} y={Y - 4} width="1.5" height="5" fill="#5a3a1c" />
+          <rect x={X + 13.5} y={Y - 7} width="2.5" height="3" fill="#ffb03a" className="chama-vela" />
+        </g>
+      );
+    case 'portao':
+      // Portão de madeira de duas folhas, com cintas de ferro e argolas.
+      return (
+        <g>
+          <rect x={X} y={Y - 10} width={PX} height={PX + 10} fill="#3a2e24" />
+          <rect x={X + 1} y={Y - 8} width="7" height="24" fill="#6a4220" />
+          <rect x={X + 8} y={Y - 8} width="7" height="24" fill="#5a3818" />
+          {[-4, 6].map((r) => (
+            <rect key={r} x={X + 1} y={Y + r} width="14" height="1.5" fill="#3a3a44" />
+          ))}
+          <circle cx={X + 6.5} cy={Y + 2} r="1.2" fill="none" stroke="#8a8a98" strokeWidth="0.8" />
+          <circle cx={X + 9.5} cy={Y + 2} r="1.2" fill="none" stroke="#8a8a98" strokeWidth="0.8" />
+          <rect x={X + 7.6} y={Y - 8} width="0.8" height="24" fill="#2a1a0e" />
+        </g>
+      );
+    case 'prancha':
+      // A prancha de embarque: tábuas subindo para o navio, com as cordas dos lados.
+      return (
+        <g>
+          {[0, 1, 2, 3, 4].map((d) => (
+            <rect key={d} x={X + 3} y={Y + 13 - d * 3.6} width="10" height="3" fill={d % 2 ? '#8a6438' : '#9a7444'} />
+          ))}
+          <rect x={X + 2} y={Y - 6} width="1" height="22" fill="#c8b890" />
+          <rect x={X + 13} y={Y - 6} width="1" height="22" fill="#c8b890" />
+          <rect x={X + 1.5} y={Y - 7} width="2" height="2" fill="#5a3a1c" />
+          <rect x={X + 12.5} y={Y - 7} width="2" height="2" fill="#5a3a1c" />
+        </g>
+      );
+    case 'escadaMao':
+      // Escada de mão subindo para a escotilha aberta, com a luz do convés lá em cima.
+      return (
+        <g>
+          <rect x={X + 2} y={Y - 14} width="12" height="5" fill="#ffe8a0" opacity="0.85" />
+          <rect x={X + 1} y={Y - 15} width="14" height="1.5" fill="#4a2a12" />
+          <rect x={X + 4} y={Y - 12} width="1.5" height="28" fill="#8a6438" />
+          <rect x={X + 10.5} y={Y - 12} width="1.5" height="28" fill="#8a6438" />
+          {[-8, -4, 0, 4, 8, 12].map((r) => (
+            <rect key={r} x={X + 4} y={Y + r} width="8" height="1.2" fill="#a87a44" />
+          ))}
+        </g>
+      );
+    case 'grade':
+      // A grade de ferro do portão da arena, meio levantada, com a luz da arena atrás.
+      return (
+        <g>
+          <rect x={X} y={Y - 10} width={PX} height={PX + 10} fill="#f0c878" opacity="0.5" />
+          <rect x={X} y={Y - 10} width={PX} height="3" fill="#4a3e32" />
+          {[1, 5, 9, 13].map((b) => (
+            <rect key={b} x={X + b} y={Y - 8} width="2" height="14" fill="#4a4a54" />
+          ))}
+          <rect x={X} y={Y - 2} width={PX} height="2" fill="#3a3a44" />
+          {[1, 5, 9, 13].map((b) => (
+            <rect key={`p${b}`} x={X + b + 0.5} y={Y + 6} width="1" height="2" fill="#4a4a54" />
+          ))}
+        </g>
+      );
+    case 'porta':
+      // Porta de madeira com a janelinha redonda e as estrelas lá fora.
+      return (
+        <g>
+          <rect x={X} y={Y - 10} width={PX} height={PX + 10} fill="#2a2a3e" />
+          <rect x={X + 2} y={Y - 8} width="12" height="24" fill="#6a4220" />
+          <rect x={X + 2} y={Y - 8} width="12" height="1.5" fill="#8a5a2a" />
+          <circle cx={X + 8} cy={Y - 2} r="3" fill="#14204a" stroke="#c8a050" strokeWidth="0.8" />
+          <rect x={X + 7} y={Y - 3} width="1" height="1" fill="#fff4c0" />
+          <rect x={X + 9} y={Y - 1} width="0.8" height="0.8" fill="#fff4c0" />
+          <rect x={X + 11} y={Y + 5} width="1.5" height="1.5" fill="#c8a050" />
+        </g>
+      );
+    default:
+      // A escada que desce: degraus escurecendo.
+      return (
+        <g>
+          {[0, 1, 2, 3].map((d) => (
+            <rect key={d} x={X + 1 + d} y={Y + 2 + d * 3.4} width={PX - 2 - d * 2} height="3" fill={['#3a2e26', '#2e241c', '#221a14', '#16100c'][d]} />
+          ))}
+          <rect x={X} y={Y} width="1" height={PX} fill="#6a5a4a" />
+          <rect x={X + PX - 1} y={Y} width="1" height={PX} fill="#6a5a4a" />
+        </g>
+      );
+  }
+}
 
 /**
  * O mapa desenhado em pixel, ladrilho por ladrilho (feito uma vez só: memo). Cada ladrilho
@@ -1052,18 +1169,7 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
             </g>,
           );
       }
-      if (c === 'P') {
-        pecas.push(
-          // A escada que desce: degraus escurecendo e uma placa pendurada em cima.
-          <g key={`sa${k}`}>
-            {[0, 1, 2, 3].map((d) => (
-              <rect key={d} x={X + 1 + d} y={Y + 2 + d * 3.4} width={PX - 2 - d * 2} height="3" fill={['#3a2e26', '#2e241c', '#221a14', '#16100c'][d]} />
-            ))}
-            <rect x={X} y={Y} width="1" height={PX} fill="#6a5a4a" />
-            <rect x={X + PX - 1} y={Y} width="1" height={PX} fill="#6a5a4a" />
-          </g>,
-        );
-      }
+      if (c === 'P') pecas.push(<DesenhoSaida key={`sa${k}`} estilo={mundo.saida?.estilo ?? 'escada'} X={X} Y={Y} />);
     }),
   );
   return (

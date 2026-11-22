@@ -143,7 +143,8 @@ describe('saves e roteiro', () => {
     // Outro capítulo ou outro gladiador: não muda a cena.
     expect(ajustarOrdem({ ...antigo, capitulo: 2, cena: 4 }).cena).toBe(4);
     expect(ajustarOrdem({ ...antigo, gladiador: 'chatgpt', cena: 4 }).cena).toBe(4);
-    expect(criarSave('claude').ordem).toBe(2);
+    expect(criarSave('claude').ordem).toBe(3);
+    expect(ajustarOrdem({ ...antigo, capitulo: 2, cena: 6 }).cena).toBe(7);
   });
 
   it('o Capítulo 2 tem 4 batalhas (a última no Coliseu), o desafio da carroça e nenhum chefão', () => {

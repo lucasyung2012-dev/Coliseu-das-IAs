@@ -14,8 +14,8 @@ export interface Plataforma {
   x: number;
   w: number;
   y: number;
-  /** Como desenhar: mesa, estante, sacada ou viga. */
-  tipo: 'mesa' | 'estante' | 'sacada' | 'viga';
+  /** Como desenhar: mesa, estante, sacada, viga, caixote (do mercado) ou toldo de barraca. */
+  tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo';
 }
 
 export interface Perigo {

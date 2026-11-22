@@ -900,6 +900,13 @@ const CAP2_CASSIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): a fuga, andando de lado, pelo beco e pelo mercado.
+      tipo: 'fase',
+      id: 'c2-fuga-mercado',
+      lugar: 'rua-mercado',
+      fase: 'fuga-mercado',
+    },
+    {
       tipo: 'luta',
       id: 'c2-luta2',
       lugar: 'rua-mercado',

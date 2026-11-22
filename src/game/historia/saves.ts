@@ -32,7 +32,7 @@ export interface SaveHistoria {
   escolhas?: Record<string, string>;
   /** O capítulo secreto, Os Três (os três gladiadores juntos; o `gladiador` é só quem começa). */
   secreto?: boolean;
-  /** Versão da ordem das cenas (2 = o capítulo 1 do Cassius com o treino no começo, 22/11/2026). */
+  /** Versão da ordem das cenas (2 = capítulo 1 do Cassius com o treino no começo; 3 = a fuga do mercado no capítulo 2). */
   ordem?: number;
 }
 
@@ -58,7 +58,7 @@ export const NOME_DO_CAMINHO: Record<IaId, string> = {
 
 export function criarSave(gladiador: IaId, agora = new Date()): SaveHistoria {
   const quando = agora.toISOString();
-  return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando, ordem: 2 };
+  return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando, ordem: 3 };
 }
 
 /** O save do capítulo secreto: abre pela grade escondida, com os três pedaços da chave. */
@@ -72,10 +72,17 @@ export function criarSaveSecreto(agora = new Date()): SaveHistoria {
  */
 const ORDEM_NOVA_CAP1_CASSIUS = [0, 1, 2, 5, 6, 8, 9, 3, 4, 10, 11, 12];
 export function ajustarOrdem(s: SaveHistoria): SaveHistoria {
-  if ((s.ordem ?? 1) >= 2) return s;
-  const cena = s.gladiador === 'claude' && s.capitulo === 1 && !s.secreto ? (ORDEM_NOVA_CAP1_CASSIUS[s.cena] ?? s.cena + 1) : s.cena;
-  return { ...s, cena, ordem: 2 };
+  const ordem = s.ordem ?? 1;
+  if (ordem >= ORDEM_ATUAL) return s;
+  const cassius = s.gladiador === 'claude' && !s.secreto;
+  let cena = s.cena;
+  if (ordem < 2 && cassius && s.capitulo === 1) cena = ORDEM_NOVA_CAP1_CASSIUS[cena] ?? cena + 1;
+  // 3: a fuga do mercado entrou no capítulo 2 antes da luta no mercado (que era a cena 6).
+  if (ordem < 3 && cassius && s.capitulo === 2 && cena >= 6) cena += 1;
+  return { ...s, cena, ordem: ORDEM_ATUAL };
 }
+/** A versão atual da ordem das cenas (save novo já nasce nela). */
+export const ORDEM_ATUAL = 3;
 
 /** Avança o save para uma cena (ou para o próximo capítulo, marcando o atual como concluído). */
 export function avancarSave(s: SaveHistoria, capitulo: number, cena: number, agora = new Date()): SaveHistoria {

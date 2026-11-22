@@ -86,10 +86,9 @@ describe('a fase aberta', () => {
   });
 });
 
-describe('a Biblioteca em chamas (capítulo 1 do Cassius)', () => {
-  const f = FASES['biblioteca-em-chamas']!;
-  it('está no capítulo 1 e dá para sair (livros suficientes, alcançáveis)', () => {
-    expect(CAPITULOS.claude[0]!.cenas.some((c) => c.tipo === 'fase' && c.fase === f.id)).toBe(true);
+describe.each(Object.values(FASES).map((f) => [f.id, f] as const))('a fase %s', (_, f) => {
+  it('está numa história e dá para sair (coisas suficientes, alcançáveis)', () => {
+    expect(Object.values(CAPITULOS).flat().some((cap) => cap.cenas.some((c) => c.tipo === 'fase' && c.fase === f.id))).toBe(true);
     expect(f.coletaveis.length).toBeGreaterThanOrEqual(f.precisa);
     const alcance = (PULO * PULO) / (2 * GRAVIDADE);
     // Cada livro fica ao alcance de um pulo a partir do chão ou de alguma plataforma.

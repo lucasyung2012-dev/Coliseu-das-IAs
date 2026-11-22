@@ -81,9 +81,14 @@ describe('os mapas das cenas de explorar (os três caminhos e o secreto)', () =>
     expect(layout).toBeDefined();
     const largura = layout.mapa[0]!.length;
     for (const linha of layout.mapa) expect(linha.length).toBe(largura);
-    expect(layout.mapa.some((l) => l.includes('P'))).toBe(true);
     for (const p of cena.pontos) expect(layout.pontos[p.id], `${cena.id}: ${p.id}`).toBeDefined();
     const m = mundoDoExplorar(cena, layout);
+    // Cada cena tem a sua saída: um lugar do mapa (com nome) ou o botão de seguir (sem P, e com algo para ver antes).
+    expect(m.saida, `${cena.id} sem saída definida`).toBeDefined();
+    const temP = m.mapa.some((l) => l.includes('P'));
+    expect(temP).toBe(!!m.saida?.estilo);
+    if (!temP) expect(cena.pontos.some((p) => p.obrigatorio)).toBe(true);
+    expect(m.saida?.rotulo).not.toBe('SAÍDA');
     expect(livre(m, m.inicio[0] + 0.5, m.inicio[1] + 0.8)).toBe(true);
     for (const pessoa of m.pessoas) for (const [x, y] of pessoa.rota) expect(livre(m, x + 0.5, y + 0.8), `${pessoa.id} em ${x},${y}`).toBe(true);
     // O pedaço da chave continua no mapa do final.
