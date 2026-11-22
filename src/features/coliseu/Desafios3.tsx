@@ -85,6 +85,15 @@ export function DesafioFurtivo({
   const [trocaEm, setTrocaEm] = useState(0);
   const [andando, setAndando] = useState(false);
   const [pego, setPego] = useState(false);
+  // Os três jeitos (22/11/2026): a lanterna da patrulha (Cassius), o FAROL que varre o cais
+  // (Octavius: fique atrás dos caixotes quando o facho passar) e a lanterna do CAÇADOR, que às
+  // vezes finge que vai olhar (Helios: o Vidente sabe quando é finta).
+  const farol = vigia.includes('farol');
+  const cacador = vigia.toLowerCase().includes('caçador');
+  const [finta, setFinta] = useState(false);
+  const [agoraT, setAgoraT] = useState(0);
+  const facho = 50 + 46 * Math.sin((2 * Math.PI * agoraT) / 4400);
+  const escondido = (p: number) => p < 2 || [25, 50, 75].some((h) => Math.abs(p - h) < 3.5);
 
   const recomecar = () => {
     setPos(0);
@@ -100,15 +109,21 @@ export function DesafioFurtivo({
 
   useTique(fase === 'jogo', 50, () => {
     const agora = Date.now();
-    if (agora >= trocaEm) {
-      const nova = PROXIMA_LUZ[luz];
-      const [a, b] = DURACAO_LUZ[nova];
+    setAgoraT(agora);
+    if (!farol && agora >= trocaEm) {
+      // O Caçador: do amarelo, às vezes volta para o verde (finta) em vez de olhar.
+      const nova: Luz = cacador && luz === 'amarela' && finta ? 'verde' : PROXIMA_LUZ[luz];
+      const [a, b] = cacador && nova === 'verde' ? [1100, 1900] : cacador && nova === 'amarela' ? [600, 600] : DURACAO_LUZ[nova];
       setLuz(nova);
       setTrocaEm(agora + a + Math.random() * (b - a));
+      if (nova === 'amarela') setFinta(cacador && Math.random() < 0.4);
       if (nova === 'vermelha') tocar('pergunta');
     }
-    if (!andando || pego) return;
-    if (luz === 'vermelha') {
+    if (pego) return;
+    // O farol: o facho no chão pega quem estiver nele fora de um esconderijo (andando ou parado).
+    const pegoPeloFarol = farol && Math.abs(pos - facho) < 9 && !escondido(pos);
+    if (!andando && !pegoPeloFarol) return;
+    if ((!farol && luz === 'vermelha') || pegoPeloFarol) {
       // Pego no flagra: volta para o último esconderijo.
       tocar('falha');
       setPego(true);
@@ -183,6 +198,16 @@ export function DesafioFurtivo({
             <Retrato quem="guarda" espelhar={luz !== 'verde'} />
           </div>
         )}
+        {/* O facho do farol varrendo o chão */}
+        {farol && fase === 'jogo' && (
+          <span className="pointer-events-none absolute bottom-[8%] z-[9] block h-[14%] w-[18%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse,#fff4c0cc,#ffe08a55_60%,transparent_72%)]" style={{ left: `${6 + facho * 0.86}%` }} aria-hidden />
+        )}
+        {/* O Vidente vê o que vem: finta ou de verdade */}
+        {cacador && fase === 'jogo' && luz === 'amarela' && (
+          <span className="pointer-events-none absolute left-1/2 top-[24%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-black bg-[#2a1e4a] px-2 py-1 font-pixel text-[8px] text-[#ffe08a] sm:text-xs">
+            VIDENTE: {finta ? 'É FINTA, PODE ANDAR!' : 'VAI OLHAR, PARE!'}
+          </span>
+        )}
         {/* esconderijos: barris e caixotes grandes, com sombra */}
         {[25, 50, 75].map((x, j) => (
           <span key={x} className="absolute bottom-[11%] z-[11] block w-[9%] -translate-x-1/2" style={{ left: `${6 + x * 0.86}%` }} aria-hidden>
@@ -201,7 +226,7 @@ export function DesafioFurtivo({
         </div>
         {fase === 'jogo' && (
           <span className="absolute left-1/2 top-[12%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-black px-2 py-1 font-pixel text-[8px] text-black sm:text-xs" style={{ background: cor }}>
-            {luz === 'verde' ? `${vigia.toUpperCase()} OLHANDO PRO OUTRO LADO: ANDE!` : luz === 'amarela' ? 'CUIDADO...' : `${vigia.toUpperCase()} OLHANDO: PARADO!`}
+            {farol ? 'O FACHO PASSA: FIQUE ATRÁS DOS CAIXOTES!' : luz === 'verde' ? `${vigia.toUpperCase()} OLHANDO PRO OUTRO LADO: ANDE!` : luz === 'amarela' ? 'CUIDADO...' : `${vigia.toUpperCase()} OLHANDO: PARADO!`}
           </span>
         )}
         {pego && <span className="absolute left-1/2 top-[40%] z-20 -translate-x-1/2 font-pixel text-sm text-[#ff5a5a] [text-shadow:2px_2px_0_#000] sm:text-xl">VISTO! DE VOLTA AO ESCONDERIJO</span>}
@@ -259,7 +284,9 @@ export function DesafioRitmo({
   const velocidade = 0.9 + feitos * 0.08;
   // O ponteiro vai e volta de 0 a 100.
   const ponteiro = Math.abs(((t * velocidade) % 200) - 100);
-  const zona: [number, number] = [42, 58];
+  // O guincho (Octavius): a faixa muda de lugar a cada acerto. A comporta (capítulo secreto): a faixa fica andando.
+  const centro = lugar === 'hipogeu' ? 50 + 28 * Math.sin(t / 45) : 30 + ((feitos * 37) % 40);
+  const zona: [number, number] = [centro - 8, centro + 8];
 
   useTique(fase === 'jogo', 30, () => setT((x) => x + 2.2));
 

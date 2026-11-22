@@ -532,7 +532,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'telescopio') return <MinigameTelescopio lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
-  if (cena.desafio === 'saltos') return <MinigameSaltos lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'saltos') return <MinigameSaltos lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} nivel={cena.nivel} onFim={() => proxima()} />;
   if (cena.desafio === 'espelhos')
     return <MinigameEspelhos lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} nivel={cena.nivel} titulo={cena.objetivo} onFim={() => proxima()} />;
   if (cena.desafio === 'mapa-ceu') return <MinigameMapaCeu lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;

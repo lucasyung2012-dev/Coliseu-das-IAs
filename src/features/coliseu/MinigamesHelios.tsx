@@ -200,7 +200,12 @@ export function MinigameTelescopio({ lugar, antes, depois, onFim }: Base) {
 // ---------- SALTOS NOS TELHADOS ----------
 const VAOS = 10;
 
-export function MinigameSaltos({ lugar, antes, depois, onFim }: Base) {
+/**
+ * SALTOS (22/11/2026: os três ficaram diferentes). Nível 1: a força certa para cada vão.
+ * Nível 2: o vento mexe a faixa verde enquanto você carrega. Nível 3 (o aqueduto): a força
+ * sobe e desce sozinha, mais rápido, e a faixa é mais estreita.
+ */
+export function MinigameSaltos({ lugar, antes, depois, onFim, nivel = 1 }: Base & { nivel?: number }) {
   const [fase, setFase] = useState<Fase>(antes?.length ? 'antes' : 'jogo');
   const [vao, setVao] = useState(0);
   const [forca, setForca] = useState(0);
@@ -213,9 +218,28 @@ export function MinigameSaltos({ lugar, antes, depois, onFim }: Base) {
     const largura = Math.max(10, 22 - n);
     return [centro - largura / 2, centro + largura / 2];
   };
-  const [min, max] = faixa(vao);
-
-  useTique(fase === 'jogo' && carregando, 30, () => setForca((f) => (f >= 100 ? 100 : f + 1.6)));
+  const [tic, setTic] = useState(0);
+  const [subindo, setSubindo] = useState(true);
+  const [min0, max0] = faixa(vao);
+  // Nível 2: o vento empurra a faixa de um lado para o outro. Nível 3: a faixa fica mais estreita.
+  const vento = nivel === 2 ? Math.sin(tic / 14) * 12 : 0;
+  const aperta = nivel === 3 ? 3 : 0;
+  const min = Math.max(2, min0 + vento + aperta);
+  const max = Math.min(98, max0 + vento - aperta);
+  useTique(fase === 'jogo', 30, () => {
+    setTic((n) => n + 1);
+    if (!carregando) return;
+    const passo = nivel === 3 ? 2.6 : nivel === 2 ? 1.9 : 1.6;
+    // Nível 3: a força sobe e desce sozinha (solte na hora certa).
+    if (nivel === 3)
+      setForca((f) => {
+        const n = subindo ? f + passo : f - passo;
+        if (n >= 100) setSubindo(false);
+        if (n <= 0) setSubindo(true);
+        return Math.max(0, Math.min(100, n));
+      });
+    else setForca((f) => (f >= 100 ? 100 : f + passo));
+  });
 
   const soltar = () => {
     if (fase !== 'jogo' || !carregando) return;
@@ -258,8 +282,11 @@ export function MinigameSaltos({ lugar, antes, depois, onFim }: Base) {
             <Retrato quem="helios" />
           </div>
         </div>
-        {/* o vão entre os telhados */}
-        <div className="absolute bottom-0 z-[6] h-[14%] bg-black" style={{ left: '36%', width: `${12 + ((min + max) / 2) * 0.2}%` }} aria-hidden />
+        {/* os dois telhados (de telhas) e o vão entre eles, do tamanho da força que pede */}
+        <div className="pointer-events-none absolute bottom-0 left-0 z-[6] h-[16%] w-[36%] border-t-4 border-[#5a2418] bg-[repeating-linear-gradient(90deg,#9a4a32_0_10px,#8a422c_10px_12px)]" aria-hidden />
+        <div className="pointer-events-none absolute bottom-0 z-[6] h-[22%] bg-[linear-gradient(180deg,#0a0812,#1a1424)]" style={{ left: '36%', width: `${12 + ((min + max) / 2) * 0.2}%` }} aria-hidden />
+        <div className="pointer-events-none absolute bottom-0 right-0 z-[6] h-[30%] border-t-4 border-[#5a2418] bg-[repeating-linear-gradient(90deg,#9a4a32_0_10px,#8a422c_10px_12px)]" style={{ left: `${48 + ((min + max) / 2) * 0.2}%` }} aria-hidden />
+        {nivel === 2 && <div className="vento-fase pointer-events-none absolute inset-0 z-[7] opacity-60" aria-hidden />}
         {fase === 'jogo' && (
           <div className="absolute inset-x-[8%] top-[10%] z-20 h-6 border-2 border-black bg-black/70 sm:h-8">
             <div className="absolute inset-y-0 bg-[#4ad46a]/70" style={{ left: `${min}%`, width: `${max - min}%` }} />
