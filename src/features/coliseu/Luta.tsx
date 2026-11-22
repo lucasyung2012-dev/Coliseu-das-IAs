@@ -1121,7 +1121,13 @@ export function LutaHistoria({
         </p>
       )}
       <p className="dica-luta text-center text-[10px] text-muted">
-        Amarelo: {bot.escudo[1]} · Vermelho: {bot.esquiva[1]} · {bot.golpe[1]} no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas<span className="dica-teclado"> · teclado: J, K, L e espaço</span>
+        {estilo === 'guardiao'
+          ? 'Amarelo ou vermelho: SEGURE O ESCUDO (na hora certa segura tudo) · depois, DEVOLVER · GLÁDIO no ABERTO · '
+          : estilo === 'estrategista'
+            ? 'Qualquer aviso: ROLAR (ou a REDE, que cancela o ataque) · TRIDENTE no ABERTO · '
+            : estilo === 'vidente'
+              ? 'Fogo: ESPELHO · o resto: PASSO DE SOMBRA · com luz, LAMPEJO no aviso · '
+              : `Amarelo: ${bot.escudo[1]} · Vermelho: ${bot.esquiva[1]} · ${bot.golpe[1]} no ABERTO · `}cada ação gasta fôlego (barra azul) · cuidado com as fintas<span className="dica-teclado"> · teclado: J, K, L e espaço</span>
       </p>
     </div>
   );
