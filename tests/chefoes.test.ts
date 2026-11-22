@@ -1,4 +1,4 @@
-import { golpearChefe, novoEstadoChefe, passoChefe, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
+import { golpearChefe, novoEstadoChefe, passoChefe, type DefChefe, type EstadoChefe, usarHabilidade } from '@/game/historia/chefoes';
 import { CHEFES } from '@/game/historia/chefoesDefs';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { livre } from '@/game/historia/mundo';
@@ -69,8 +69,8 @@ describe('a habilidade de cada gladiador na primeira etapa', () => {
   it('Cassius: o escudo segura quase todo o dano das zonas', () => {
     const st0 = novoEstadoChefe(d, 100);
     const heroi = { x: st0.zonas![0]!.x, y: st0.zonas![0]!.y };
-    const semEscudo = rodar(d, st0, heroi, 2500);
-    const comEscudo = rodar(d, { ...st0, escudoAte: 99_999 }, heroi, 2500);
+    const semEscudo = rodar(d, st0, heroi, 3200);
+    const comEscudo = rodar(d, { ...st0, escudoAte: 99_999 }, heroi, 3200);
     expect(semEscudo.vida).toBe(100 - d.dano);
     expect(comEscudo.vida).toBeGreaterThan(semEscudo.vida);
   });
