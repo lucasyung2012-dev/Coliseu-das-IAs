@@ -1906,3 +1906,15 @@
 .pose-devolver { animation: pose-golpe 0.45s ease-out; filter: drop-shadow(0 0 8px #5ab0ff); }
 .pose-devolver-b { animation: pose-golpe-b 0.45s ease-out; filter: drop-shadow(0 0 8px #5ab0ff); }
 .menos-movimento .pose-devolver, .menos-movimento .pose-devolver-b { animation: none; }
+
+/* As fases com mais coisa acontecendo (22/11/2026): plataforma que treme e afunda, barril rolando, vento. */
+.plataforma-treme { animation: plataforma-treme 0.12s steps(2) infinite; }
+@keyframes plataforma-treme { 50% { translate: 1px 1px; } }
+.plataforma-afundou { animation: plataforma-afundou 0.5s ease-in forwards; }
+@keyframes plataforma-afundou { to { translate: 0 60%; opacity: 0.15; } }
+.barril-rola { animation: barril-rola 0.6s linear infinite; }
+@keyframes barril-rola { to { rotate: -360deg; } }
+.andar-perigo { animation: respirar-t 0.4s steps(2) infinite; }
+.vento-fase { background: repeating-linear-gradient(170deg, transparent 0 22px, rgba(230,240,255,0.25) 22px 24px); animation: vento-fase 0.25s linear infinite; }
+@keyframes vento-fase { from { background-position: 0 0; } to { background-position: -60px 8px; } }
+.menos-movimento .plataforma-treme, .menos-movimento .barril-rola, .menos-movimento .andar-perigo, .menos-movimento .vento-fase { animation: none; }

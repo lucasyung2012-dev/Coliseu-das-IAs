@@ -1,4 +1,4 @@
-import { fogoAceso, GRAVIDADE, novaFase, passoFase, PULO, saidaAberta, type Entrada, type EstadoFase, type Fase } from '@/game/historia/fase';
+import { fogoAceso, GRAVIDADE, novaFase, passoFase, PULO, saidaAberta, xDoPerigo, type Entrada, type EstadoFase, type Fase } from '@/game/historia/fase';
 import { FASES } from '@/game/historia/fases';
 import { CAPITULOS } from '@/game/historia/roteiro';
 
@@ -101,5 +101,43 @@ describe.each(Object.values(FASES).map((f) => [f.id, f] as const))('a fase %s', 
       const degraus = [0, ...f.plataformas.filter((q) => q !== p && Math.abs(q.x + q.w / 2 - (p.x + p.w / 2)) < 30).map((q) => q.y)];
       expect(degraus.some((d) => d < p.y && p.y - d <= alcance), `plataforma em ${p.x}`).toBe(true);
     }
+  });
+});
+
+describe('as fases com coisa acontecendo (22/11/2026)', () => {
+  const base: Fase = { ...pequena, plataformas: [], perigos: [], coletaveis: [], comentarios: [], precisa: 0 };
+
+  it('a plataforma que anda leva o gladiador junto', () => {
+    const f: Fase = { ...base, plataformas: [{ x: 20, w: 12, y: 6, tipo: 'barco', move: { dx: 20, ms: 2000 } }] };
+    let s: EstadoFase = { ...novaFase(), x: 26, y: 8, vy: 0, noChao: false };
+    s = rodar(f, s, nada, 200);
+    expect(s.y).toBe(6);
+    const x0 = s.x;
+    s = rodar(f, s, nada, 600);
+    expect(s.y).toBe(6);
+    expect(s.x).toBeGreaterThan(x0 + 4);
+  });
+
+  it('a plataforma que afunda derruba depois de um tempo', () => {
+    const f: Fase = { ...base, plataformas: [{ x: 20, w: 12, y: 6, tipo: 'pedra', afunda: 500 }] };
+    let s: EstadoFase = { ...novaFase(), x: 26, y: 8, vy: 0, noChao: false };
+    s = rodar(f, s, nada, 300);
+    expect(s.y).toBe(6);
+    s = rodar(f, s, nada, 1200);
+    expect(s.y).toBe(0);
+  });
+
+  it('quem anda pelo chão machuca onde estiver agora', () => {
+    const f: Fase = { ...base, perigos: [{ x: 40, w: 5, tipo: 'inimigo', acesoMs: 0, apagadoMs: 0, move: { de: 40, ate: 80, ms: 2000 } }] };
+    expect(xDoPerigo(f.perigos[0]!, 500)).toBeCloseTo(60);
+    // Parado no meio do caminho, uma hora ele passa e machuca.
+    const s = rodar(f, { ...novaFase(), x: 70 }, nada, 2000);
+    expect(s.queimadas).toBeGreaterThan(0);
+  });
+
+  it('o vento empurra para trás', () => {
+    const f: Fase = { ...base, vento: { forca: 120, cicloMs: 1000, duraMs: 1000 } };
+    const s = rodar(f, { ...novaFase(), x: 100 }, nada, 500);
+    expect(s.x).toBeLessThan(100);
   });
 });

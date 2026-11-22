@@ -16,13 +16,21 @@ export interface Plataforma {
   y: number;
   /** Como desenhar: mesa, estante, sacada, viga, caixote (do mercado) ou toldo de barraca. */
   tipo: 'mesa' | 'estante' | 'sacada' | 'viga' | 'caixote' | 'toldo' | 'pedra' | 'sarcofago' | 'barco';
+  /** Anda de lado e volta (o barco no porto): até `dx` para a direita, ida e volta em `ms`. Leva quem está em cima. */
+  move?: { dx: number; ms: number };
+  /** Afunda (ou desmorona) depois de `afunda` ms com alguém em cima; volta 2,5 s depois. */
+  afunda?: number;
 }
 
 export interface Perigo {
   x: number;
   w: number;
   /** Fogo (acende e apaga) ou água funda (sempre: cair nela te leva de volta). */
-  tipo: 'fogo' | 'agua' | 'onda' | 'vao';
+  tipo: 'fogo' | 'agua' | 'onda' | 'vao' | 'inimigo' | 'queda';
+  /** Anda pelo chão: de `de` até `ate` em `ms` (vai e volta; com `ida`, só vai e recomeça). */
+  move?: { de: number; ate: number; ms: number; ida?: boolean };
+  /** O desenho: quem anda (guarda, rato, jacaré, gato, barril rolando) ou o que cai (viga, tomate). */
+  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate';
   /** O fogo acende e apaga: aceso por `acesoMs`, apagado por `apagadoMs` (0 = sempre aceso). */
   acesoMs: number;
   apagadoMs: number;
@@ -65,6 +73,30 @@ export interface Fase {
   precisa: number;
   /** A mensagem do fim: o que foi pego ("LIVROS SALVOS") e a frase quando pegou tudo ou só uma parte. */
   fim?: { coisa: string; todos: string; alguns: string };
+  /** Vento de tempestade: de tempos em tempos empurra o gladiador para trás. */
+  vento?: { forca: number; cicloMs: number; duraMs: number };
+}
+
+/** Onde está a plataforma agora (a que anda vai e volta, suave). */
+export function xDaPlataforma(p: Plataforma, tempo: number): number {
+  if (!p.move) return p.x;
+  return p.x + p.move.dx * (0.5 - 0.5 * Math.cos((2 * Math.PI * tempo) / p.move.ms));
+}
+/** Onde está o perigo agora (o que anda pelo chão). */
+export function xDoPerigo(p: Perigo, tempo: number): number {
+  if (!p.move) return p.x;
+  const { de, ate, ms, ida } = p.move;
+  const k = ((tempo + (p.atrasoMs ?? 0)) % ms) / ms;
+  return ida ? de + (ate - de) * k : de + (ate - de) * (k < 0.5 ? k * 2 : 2 - k * 2);
+}
+/** Por onde o perigo passa (para o lugar seguro de voltar). */
+export function faixaDoPerigo(p: Perigo): [number, number] {
+  if (!p.move) return [p.x, p.x + p.w];
+  return [Math.min(p.move.de, p.move.ate), Math.max(p.move.de, p.move.ate) + p.w];
+}
+/** O vento está soprando agora? */
+export function ventoAtivo(f: Fase, tempo: number): boolean {
+  return !!f.vento && tempo % f.vento.cicloMs > f.vento.cicloMs - f.vento.duraMs;
 }
 
 export interface EstadoFase {
@@ -92,6 +124,10 @@ export interface EstadoFase {
   /** O comentário na tela agora e até quando. */
   falando: { id: string; ate: number } | null;
   fim: boolean;
+  /** Em cima de qual plataforma está e desde quando (para afundar e para ser levado pela que anda). */
+  pisando?: { i: number; desde: number } | null;
+  /** Plataformas afundadas e até quando. */
+  afundadas?: Record<number, number>;
 }
 
 export interface Entrada {
@@ -141,6 +177,14 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   const controle = noChao ? 1 : 0.7;
   if (mov !== 0) vx = Math.max(-VELOCIDADE, Math.min(VELOCIDADE, vx + mov * ACELERA * controle * seg));
   else vx = Math.sign(vx) * Math.max(0, Math.abs(vx) - FREIA * controle * seg);
+  // O vento empurra para trás.
+  if (ventoAtivo(f, tempo)) vx = Math.max(-VELOCIDADE, vx - f.vento!.forca * seg);
+  // Em cima de uma plataforma que anda: vai junto.
+  const pis = s0.pisando;
+  if (pis && s0.noChao) {
+    const pp = f.plataformas[pis.i];
+    if (pp?.move) x += xDaPlataforma(pp, tempo) - xDaPlataforma(pp, s0.tempo);
+  }
   x = Math.max(3, Math.min(larguraDa(f) - 3, x + vx * seg));
   if (x <= 3 || x >= larguraDa(f) - 3) vx = 0;
   // Pular: do chão, de cima de uma plataforma, ou logo depois de sair da beirada.
@@ -149,6 +193,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
     noChao = false;
   }
   // Cair
+  let pisouEm = -1;
   const yAntes = y;
   vy -= GRAVIDADE * seg;
   y += vy * seg;
@@ -158,24 +203,41 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
     vy = 0;
     noChao = true;
   } else if (vy <= 0) {
-    // Plataformas "de mesa": só seguram quem cai em cima (dá para subir por baixo).
-    for (const p of f.plataformas) {
-      const emCima = x + LARGURA_HEROI / 2 > p.x && x - LARGURA_HEROI / 2 < p.x + p.w;
+    // Plataformas "de mesa": só seguram quem cai em cima (dá para subir por baixo). A que afundou não segura.
+    for (let i = 0; i < f.plataformas.length; i++) {
+      const p = f.plataformas[i]!;
+      if ((s0.afundadas?.[i] ?? 0) > tempo) continue;
+      const px = xDaPlataforma(p, tempo);
+      const emCima = x + LARGURA_HEROI / 2 > px && x - LARGURA_HEROI / 2 < px + p.w;
       if (emCima && yAntes >= p.y - 0.01 && y <= p.y) {
         y = p.y;
         vy = 0;
         noChao = true;
+        pisouEm = i;
         break;
       }
     }
   }
-  let s: EstadoFase = { ...s0, tempo, x, y, vx, vy, noChao, dir, andando: Math.abs(vx) > 4 && noChao, chaoEm: noChao ? tempo : s0.chaoEm };
+  let afundadas = s0.afundadas ?? {};
+  let pisando: EstadoFase['pisando'] = pisouEm >= 0 ? { i: pisouEm, desde: s0.pisando?.i === pisouEm ? s0.pisando.desde : tempo } : null;
+  // A que afunda: depois de um tempo com ele em cima, afunda (e ele cai).
+  if (pisando) {
+    const pa = f.plataformas[pisando.i]!;
+    if (pa.afunda && tempo - pisando.desde >= pa.afunda) {
+      afundadas = { ...afundadas, [pisando.i]: tempo + 2500 };
+      pisando = null;
+      noChao = false;
+    }
+  }
+  let s: EstadoFase = { ...s0, tempo, x, y, vx, vy, noChao, dir, andando: Math.abs(vx) > 4 && noChao, chaoEm: noChao ? tempo : s0.chaoEm, pisando, afundadas };
   // O ponto de volta: o último lugar seguro em que pisou (em cima de algo, ou no chão longe do fogo).
-  if (tempo >= s0.feridoAte && noChao && (y > 0 || !f.perigos.some((p) => x > p.x - 4 && x < p.x + p.w + 4))) s = { ...s, volta: x, voltaY: y };
+  // (Não guarda em cima de plataforma que anda ou que afunda: ela pode não estar lá na volta.)
+  const instavel = pisando ? !!(f.plataformas[pisando.i]!.move || f.plataformas[pisando.i]!.afunda) : false;
+  if (tempo >= s0.feridoAte && noChao && !instavel && (y > 0 || !f.perigos.some((p) => { const [a, b] = faixaDoPerigo(p); return x > a - 4 && x < b + 4; }))) s = { ...s, volta: x, voltaY: y };
   // Fogo: encostou com os pés baixos, volta para o ponto seguro.
   if (tempo >= s.feridoAte) {
     for (const p of f.perigos) {
-      if (y < 5 && x > p.x && x < p.x + p.w && fogoAceso(p, tempo)) {
+      if (y < 5 && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s.volta, y: s.voltaY, vx: 0, vy: 0, noChao: true, feridoAte: tempo + FERIDO_MS, queimadas: s.queimadas + 1 };
         break;
       }
@@ -183,7 +245,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   } else {
     // Piscando depois de queimar: o fogo vira parede (não dá para atravessar enquanto não pode se queimar).
     for (const p of f.perigos) {
-      if (y < 5 && x > p.x && x < p.x + p.w && fogoAceso(p, tempo)) {
+      if (y < 5 && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s0.x, vx: 0 };
         break;
       }

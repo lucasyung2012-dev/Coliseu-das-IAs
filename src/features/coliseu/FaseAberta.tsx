@@ -1,6 +1,9 @@
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
 import { NOMES, type Falante } from '@/game/historia/roteiro';
-import { fogoAceso, larguraDa, novaFase, passoFase, saidaAberta, type Entrada, type Fase } from '@/game/historia/fase';
+import { fogoAceso, larguraDa, novaFase, passoFase, saidaAberta, ventoAtivo, xDaPlataforma, xDoPerigo, type Entrada, type Fase, type Perigo } from '@/game/historia/fase';
+import { INIMIGOS } from '@/game/historia/inimigos';
+import { novaLuta } from '@/game/historia/luta';
+import { SpriteInimigo } from './Luta';
 import { desbloquear } from '@/ui/som';
 import { tocar, voz } from '@/ui/somHistoria';
 import { CenarioHistoria, escalaDe, Retrato } from './Cenarios';
@@ -168,7 +171,13 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
 
           {/* Mesas, estantes, sacadas e vigas */}
           {fase.plataformas.map((p, k) => (
-            <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO}%`, height: `${(p.y / altura) * 100}%` }} aria-hidden>
+            <div
+              key={k}
+              className={`absolute ${(s.afundadas?.[k] ?? 0) > s.tempo ? 'plataforma-afundou' : p.afunda && s.pisando?.i === k ? 'plataforma-treme' : ''}`}
+              style={{ left: emX(xDaPlataforma(p, s.tempo)), width: emX(p.w), bottom: `${CHAO}%`, height: `${(p.y / altura) * 100}%` }}
+              aria-hidden
+            >
+              {p.afunda && <div className="absolute inset-x-[10%] -top-[3px] z-10 h-[3px] bg-[repeating-linear-gradient(90deg,#1a0a04_0_4px,transparent_4px_8px)]" />}
               <div className={`plataforma plataforma-${p.tipo} absolute inset-x-0 top-0`} />
               {(p.tipo === 'mesa' || p.tipo === 'estante') && (
                 <>
@@ -222,13 +231,17 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
             </div>
           ))}
 
-          {/* O fogo (o que pisca mostra a fumaça antes de acender) */}
+          {/* O fogo (o que pisca mostra a fumaça antes de acender), quem anda e o que cai */}
           {fase.perigos.map((p, k) => {
             const aceso = fogoAceso(p, s.tempo);
             return (
-              <div key={k} className="absolute" style={{ left: emX(p.x), width: emX(p.w), bottom: `${CHAO - 1}%`, height: '12%' }} aria-hidden>
-                <div className="absolute inset-x-0 bottom-0 h-[18%] rounded-[50%] bg-[#2a0a04]/80" style={{ opacity: p.tipo === 'agua' ? 0 : 1 }} />
-                {p.tipo === 'agua' ? (
+              <div key={k} className="absolute" style={{ left: emX(xDoPerigo(p, s.tempo)), width: emX(p.w), bottom: `${CHAO - 1}%`, height: '12%' }} aria-hidden>
+                <div className="absolute inset-x-0 bottom-0 h-[18%] rounded-[50%] bg-[#2a0a04]/80" style={{ opacity: p.tipo === 'agua' || p.tipo === 'inimigo' || p.tipo === 'queda' ? 0 : 1 }} />
+                {p.tipo === 'inimigo' ? (
+                  <FiguraQueAnda p={p} tempo={s.tempo} />
+                ) : p.tipo === 'queda' ? (
+                  <CoisaQueCai p={p} tempo={s.tempo} />
+                ) : p.tipo === 'agua' ? (
                   <div className="agua-fase absolute inset-x-0 bottom-[-40%] top-[55%]" />
                 ) : p.tipo === 'vao' ? (
                   <div className="vao-fase absolute inset-x-[4%] bottom-[-60%] top-[50%]" />
@@ -253,7 +266,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           {fase.coletaveis.map((c) =>
             s.coletados.includes(c.id) ? null : (
               <span key={c.id} className="coletavel-fase absolute text-lg sm:text-3xl" style={{ left: emX(c.x), bottom: emY(c.y) }} title={c.nome} aria-label={c.nome}>
-                <Icone nome="livro" className="w-6 sm:w-10" />
+                <Icone nome={c.icone || 'livro'} className="w-6 sm:w-10" />
               </span>
             ),
           )}
@@ -318,6 +331,12 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
             </button>
           </div>
         )}
+        {ventoAtivo(fase, s.tempo) && (
+          <>
+            <div className="vento-fase pointer-events-none absolute inset-0 z-[18]" aria-hidden />
+            <span className="pointer-events-none absolute left-1/2 top-[16%] z-[19] -translate-x-1/2 font-pixel text-xs text-white [text-shadow:2px_2px_0_#000] sm:text-lg">VENTO!</span>
+          </>
+        )}
       </div>
 
       {/* Os controles na tela (bons para o celular): segure ◀ ▶ e toque ⤒ para pular */}
@@ -336,5 +355,43 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
       </div>
       <p className="dica-teclado text-center text-[10px] text-muted">Teclado: A e D (ou as setas) para andar · W ou espaço para pular · suba nas mesas e passe por cima do fogo</p>
     </div>
+  );
+}
+
+/** Quem anda pelo chão da fase: guarda, rato, jacaré, gato (o desenho da luta) ou o barril rolando. */
+const FiguraQueAnda = memo(function FiguraQueAnda({ p, tempo }: { p: Perigo; tempo: number }) {
+  const id = { rato: 'rato-engrenagem', jacare: 'jacare-esgoto', gato: 'gato-ferro' }[p.figura as 'rato' | 'jacare' | 'gato'];
+  const e = useMemo(() => (id && INIMIGOS[id] ? novaLuta(INIMIGOS[id]!) : null), [id]);
+  // Indo para a esquerda ou para a direita (para virar o desenho).
+  const indo = p.move ? xDoPerigo(p, tempo + 50) - xDoPerigo(p, tempo) : -1;
+  if (p.figura === 'barril')
+    return (
+      <span className="barril-rola absolute bottom-0 left-1/2 block w-[180%] -translate-x-1/2">
+        <Icone nome="barril" className="w-full" />
+      </span>
+    );
+  return (
+    <span className="andar-perigo absolute bottom-0 left-1/2 block w-[260%] -translate-x-1/2" style={{ transform: `translateX(-50%) scaleX(${indo > 0 ? -1 : 1})` }}>
+      {e ? <SpriteInimigo e={e} /> : <Retrato quem="guarda" />}
+    </span>
+  );
+});
+
+/** O que cai do teto (viga em chamas, tomate): a sombra avisa, cai, e fica no chão um instante. */
+function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
+  const ciclo = p.acesoMs + p.apagadoMs;
+  const fase = (tempo + (p.atrasoMs ?? 0)) % ciclo;
+  const noChao = fase < p.acesoMs;
+  const caindo = !noChao && fase > ciclo - 700 ? (fase - (ciclo - 700)) / 700 : -1;
+  const icone = p.figura === 'tomate' ? 'tomate' : 'viga';
+  if (!noChao && caindo < 0) return null;
+  return (
+    <>
+      <span className="absolute inset-x-[-20%] bottom-0 h-[20%] rounded-[50%] bg-black/50" style={{ opacity: noChao ? 0.7 : 0.2 + caindo * 0.6 }} />
+      <span className="absolute bottom-0 left-1/2 block w-[200%]" style={{ transform: `translate(-50%, ${noChao ? 0 : -(1 - caindo) * 600}%) rotate(${noChao ? 80 : caindo * 80}deg)` }}>
+        {icone === 'viga' ? <span className="block h-[10px] w-full bg-[linear-gradient(90deg,#4a2a14,#8a5a2a)] shadow-[0_0_10px_#ff7a2a] sm:h-[16px]" /> : <Icone nome="tomate" className="w-full" />}
+      </span>
+      {noChao && icone === 'viga' && <span className="chama-fase absolute bottom-0 left-1/4" />}
+    </>
   );
 }
