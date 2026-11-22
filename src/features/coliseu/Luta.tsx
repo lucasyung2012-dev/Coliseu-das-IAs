@@ -406,32 +406,32 @@ function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
           {/* O vidro da janela do cenário, NA FRENTE dele: primeiro ele chega lá fora (escuro, pequeno,
               chegando perto), o vidro racha, estoura, e ele pula para dentro. */}
           <div className="vidro-entrada absolute z-[11] left-[33%] top-[9%] h-[50%] w-[38%] rounded-t-[50%] bg-[linear-gradient(135deg,#8aa8e855,#c8dcff33_40%,#3a4a9a44)]">
-            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[45%] w-[2px] origin-top rotate-[20deg] bg-white" />
-            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[35%] w-[2px] origin-top rotate-[-35deg] bg-white" />
-            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[30%] w-[2px] origin-top rotate-[100deg] bg-white" />
-            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[28%] w-[2px] origin-top rotate-[-120deg] bg-white" />
-            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[25%] w-[2px] origin-top rotate-[170deg] bg-white" />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[45%] w-[2px] origin-top bg-white" style={{ rotate: '20deg' }} />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[35%] w-[2px] origin-top bg-white" style={{ rotate: '-35deg' }} />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[30%] w-[2px] origin-top bg-white" style={{ rotate: '100deg' }} />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[28%] w-[2px] origin-top bg-white" style={{ rotate: '-120deg' }} />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[25%] w-[2px] origin-top bg-white" style={{ rotate: '170deg' }} />
           </div>
           {cacos.map(([dx, dy], k) => (
             <span
               key={k}
               className="caco-vidro absolute z-[12] left-[52%] top-[32%] block h-[3%] w-[2%] bg-[#c8dcff]"
-              style={{ '--dx': `${dx * 3}%`, '--dy': `${dy * 3}%`, animationDelay: `${1050 + (k % 3) * 40}ms`, rotate: `${k * 37}deg` } as CSSProperties}
+              style={{ '--dx': `${dx * 2}px`, '--dy': `${dy * 2}px`, animationDelay: `${1050 + (k % 3) * 40}ms`, rotate: `${k * 37}deg` } as CSSProperties}
             />
           ))}
-          <span className="clarao-entrada absolute z-[12] left-[52%] top-[32%] block h-[30%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+          <span className="clarao-entrada absolute z-[12] left-[52%] top-[32%] block h-[30%] w-[22%] rounded-full bg-white" style={{ translate: '-50% -50%' }} />
         </>
       )}
       {entrada === 'agua' &&
         [-12, -6, 0, 6, 12].map((dx, k) => (
-          <span key={k} className="respingo-entrada absolute z-[12] bottom-[12%] block h-[5%] w-[3%] rounded-full bg-[#8ad0ff]" style={{ left: `${70 + dx}%`, animationDelay: `${200 + k * 50}ms`, '--dx': `${dx * 4}%` } as CSSProperties} />
+          <span key={k} className="respingo-entrada absolute z-[12] bottom-[12%] block h-[5%] w-[3%] rounded-full bg-[#8ad0ff]" style={{ left: `${70 + dx}%`, animationDelay: `${200 + k * 50}ms`, '--dx': `${dx * 3}px` } as CSSProperties} />
         ))}
       {entrada !== 'voando' && entrada !== 'agua' &&
         [-10, -5, 0, 5, 10].map((dx, k) => (
           <span
             key={k}
             className="poeira-entrada absolute z-[12] bottom-[11%] block h-[6%] w-[6%] rounded-full bg-[#c8b89a]"
-            style={{ left: `${70 + dx}%`, '--dx': `${dx * 5}%`, animationDelay: `${(entrada === 'janela' ? 1900 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : 1100) + k * 30}ms` } as CSSProperties}
+            style={{ left: `${70 + dx}%`, '--dx': `${dx * 4}px`, animationDelay: `${(entrada === 'janela' ? 1900 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : 1100) + k * 30}ms` } as CSSProperties}
           />
         ))}
     </div>
@@ -629,7 +629,7 @@ export function LutaHistoria({
 
   return (
     <div className="flex flex-col gap-2">
-      <Palco lugar={lugar} className={acaoJ === 'ferido' || (fase === 'chegada' && entrada === 'pesado') ? 'tremer-forte' : ''}>
+      <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer-forte' : fase === 'chegada' && entrada === 'pesado' ? 'tremer-passos' : ''}>
         {fase === 'chegada' && entrada && <EfeitoEntrada entrada={entrada} />}
         {/* Placar: vida dos dois, o fôlego e o Ânimo (ou a plateia, no Coliseu) */}
         <div className="absolute inset-x-2 top-2 z-20 grid grid-cols-2 gap-3">

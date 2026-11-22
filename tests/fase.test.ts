@@ -59,6 +59,17 @@ describe('a fase aberta', () => {
     expect(s.y).toBe(0);
   });
 
+  it('depois de queimar, não dá para atravessar o fogo piscando (o bug do Lucas)', () => {
+    let s = rodar(pequena, { ...novaFase(), x: 50 }, nada, 100);
+    for (let k = 0; k < 100 && s.queimadas === 0; k++) s = passoFase(pequena, s, direita, 20);
+    expect(s.queimadas).toBe(1);
+    // Segurando para a direita o tempo todo: nunca passa do fogo (60 a 70).
+    for (let k = 0; k < 150; k++) {
+      s = passoFase(pequena, s, direita, 20);
+      expect(s.x).toBeLessThan(70);
+    }
+  });
+
   it('a saída só abre com as coisas que precisa', () => {
     const sem = rodar(pequena, { ...novaFase(), x: 189 }, nada, 100);
     expect(sem.fim).toBe(false);

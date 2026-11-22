@@ -282,7 +282,7 @@ export function MundoAberto({
         )}
 
         {avisoSaida && (
-          <span className="aviso-saida placa-ponto pointer-events-none absolute left-1/2 top-[8%] z-[460] -translate-x-1/2 whitespace-nowrap px-2 py-1 font-pixel text-[9px] sm:text-xs" aria-live="polite">
+          <span className="aviso-saida placa-ponto pointer-events-none absolute left-1/2 top-[8%] z-[460] whitespace-nowrap px-2 py-1 font-pixel text-[9px] sm:text-xs" style={{ translate: '-50% 0' }} aria-live="polite">
             SIGA A SETA ATÉ A SAÍDA
           </span>
         )}
@@ -745,7 +745,7 @@ const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
             <rect x={X + 23} y={Y - 22} width="3.5" height="5" fill="#c8c8d0" />
             {/* o brilho do bronze */}
             <rect x={X + 12} y={Y - 10} width="1" height="4" fill="#f0d090" opacity="0.7" />
-            {/* no FÃ³rum, a estÃ¡tua Ã© a do Censor: capuz vermelho por cima do elmo */}
+            {/* no Fórum, a estátua é a do Censor: capuz vermelho por cima do elmo */}
             {mundo.tema === 'forum' && (
               <>
                 <rect x={X + 11} y={Y - 17} width="10" height="9" fill="#8a1a1a" />

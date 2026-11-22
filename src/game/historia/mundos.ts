@@ -243,8 +243,9 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
   // Capítulo 1: o cais de Óstia de noite, com o farol, a amarra e o píer.
   'porto-cais': {
     tema: 'porto',
-    inicio: [2, 6],
+    inicio: [2, 7],
     mapa: [
+      'wwwwwwwwwwwwwwwwwwwwww',
       'wwwwwwwwwwwwwwwwwwwwww',
       'www..wwwwwwwwwwwHHwwww',
       'www..wwwwwwwwwwwHHwwww',
@@ -256,15 +257,15 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
       '#v..................P#',
       '######################',
     ],
-    pontos: { corrente: [6, 4], farol: [16, 2], gaivota: [3, 2], ordem: [12, 6] },
+    pontos: { corrente: [6, 5], farol: [16, 3], gaivota: [3, 3], ordem: [12, 7] },
     rotas: {
       gaivota: [
-        [3, 2],
-        [4, 3],
+        [3, 3],
+        [4, 4],
       ],
       ordem: [
-        [12, 6],
-        [16, 6],
+        [12, 7],
+        [16, 7],
       ],
     },
   },
@@ -322,8 +323,9 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
   // Capítulo 5: o cais da frota, de noite, com os navios encostados.
   'frota-cais': {
     tema: 'porto',
-    inicio: [2, 6],
+    inicio: [2, 7],
     mapa: [
+      'wwwwwwwwwwwwwwwwwwwwww',
       'wwwwwwwwwwwwwwwwwwwwww',
       'wnnnnnwwwwnnnnnwwwwwww',
       'wnnnnnwwwwnnnnnwwwwwww',
@@ -334,11 +336,11 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
       '#v...kk.........v...P#',
       '######################',
     ],
-    pontos: { padeiro: [6, 4], refugiados: [3, 5], gaivota: [12, 3] },
+    pontos: { padeiro: [6, 5], refugiados: [3, 6], gaivota: [12, 4] },
     rotas: {
       gaivota: [
-        [12, 3],
-        [12, 6],
+        [12, 4],
+        [12, 7],
       ],
     },
   },
@@ -361,8 +363,9 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
   // O final: o Porto de Óstia livre, de dia, com o Esperança no cais.
   'porto-livre': {
     tema: 'porto',
-    inicio: [2, 6],
+    inicio: [2, 7],
     mapa: [
+      'wwwwwwwwwwwwwwwwwwwwww',
       'wwwwwwwwwwwwwwwwwwwwww',
       'www..wwwwwwwnnnnnnwwww',
       'www..wwwwwwwnnnnnnwwww',
@@ -374,11 +377,11 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
       '#v..................P#',
       '######################',
     ],
-    pontos: { marco: [8, 5], pistao: [13, 2], 'pistao-vivo': [16, 4], brutus: [5, 6], gaivota: [3, 2], 'chave-octavius': [20, 7] },
+    pontos: { marco: [8, 6], pistao: [13, 3], 'pistao-vivo': [16, 5], brutus: [5, 7], gaivota: [3, 3], 'chave-octavius': [20, 8] },
     rotas: {
       'pistao-vivo': [
-        [16, 4],
-        [16, 6],
+        [16, 5],
+        [16, 7],
       ],
     },
   },

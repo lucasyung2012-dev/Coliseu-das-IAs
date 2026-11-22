@@ -131,7 +131,9 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   const tempo = s0.tempo + dt;
   let { x, y, vx, vy, noChao, dir } = s0;
   // Andar: acelera até a velocidade máxima e freia quando solta (no ar, controla um pouco menos).
-  const mov = (e.dir ? 1 : 0) - (e.esq ? 1 : 0);
+  // Logo depois de queimar, fica meio segundo parado (antes, dava para sair andando e atravessar o fogo).
+  const atordoado = tempo < s0.feridoAte - FERIDO_MS + 500;
+  const mov = atordoado ? 0 : (e.dir ? 1 : 0) - (e.esq ? 1 : 0);
   if (mov !== 0) dir = mov as 1 | -1;
   const controle = noChao ? 1 : 0.7;
   if (mov !== 0) vx = Math.max(-VELOCIDADE, Math.min(VELOCIDADE, vx + mov * ACELERA * controle * seg));
@@ -139,7 +141,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   x = Math.max(3, Math.min(larguraDa(f) - 3, x + vx * seg));
   if (x <= 3 || x >= larguraDa(f) - 3) vx = 0;
   // Pular: do chão, de cima de uma plataforma, ou logo depois de sair da beirada.
-  if (e.pular && vy <= 0 && (noChao || tempo - s0.chaoEm <= FOLGA_PULO)) {
+  if (!atordoado && e.pular && vy <= 0 && (noChao || tempo - s0.chaoEm <= FOLGA_PULO)) {
     vy = PULO;
     noChao = false;
   }
@@ -166,12 +168,20 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   }
   let s: EstadoFase = { ...s0, tempo, x, y, vx, vy, noChao, dir, andando: Math.abs(vx) > 4 && noChao, chaoEm: noChao ? tempo : s0.chaoEm };
   // O ponto de volta: o último lugar seguro em que pisou (em cima de algo, ou no chão longe do fogo).
-  if (noChao && (y > 0 || !f.perigos.some((p) => x > p.x - 4 && x < p.x + p.w + 4))) s = { ...s, volta: x, voltaY: y };
+  if (tempo >= s0.feridoAte && noChao && (y > 0 || !f.perigos.some((p) => x > p.x - 4 && x < p.x + p.w + 4))) s = { ...s, volta: x, voltaY: y };
   // Fogo: encostou com os pés baixos, volta para o ponto seguro.
   if (tempo >= s.feridoAte) {
     for (const p of f.perigos) {
       if (y < 5 && x > p.x && x < p.x + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s.volta, y: s.voltaY, vx: 0, vy: 0, noChao: true, feridoAte: tempo + FERIDO_MS, queimadas: s.queimadas + 1 };
+        break;
+      }
+    }
+  } else {
+    // Piscando depois de queimar: o fogo vira parede (não dá para atravessar enquanto não pode se queimar).
+    for (const p of f.perigos) {
+      if (y < 5 && x > p.x && x < p.x + p.w && fogoAceso(p, tempo)) {
+        s = { ...s, x: s0.x, vx: 0 };
         break;
       }
     }

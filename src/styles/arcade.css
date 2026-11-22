@@ -1673,13 +1673,24 @@
 .rachadura-entrada { opacity: 0; scale: 1 0; animation: rachadura-entrada 2.7s ease-out both; box-shadow: 0 0 3px #fff; }
 @keyframes rachadura-entrada { 0%, 26% { opacity: 0; scale: 1 0; } 30% { opacity: 0.9; scale: 1 0.6; } 36% { scale: 1 1; } 39% { opacity: 1; } 40%, 100% { opacity: 0; } }
 .caco-vidro { opacity: 0; animation: caco-vidro 0.9s ease-out both; box-shadow: 0 0 3px #fff; }
-@keyframes caco-vidro { 0% { opacity: 1; translate: 0 0; } 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 200%); } }
+@keyframes caco-vidro { 0% { opacity: 1; translate: 0 0; } 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 120px); } }
 .clarao-entrada { opacity: 0; animation: clarao-entrada 0.5s ease-out 1.05s both; }
 @keyframes clarao-entrada { 0% { opacity: 0.85; scale: 0.3; } 100% { opacity: 0; scale: 1.4; } }
 .poeira-entrada { opacity: 0; animation: poeira-entrada 0.7s ease-out both; }
-@keyframes poeira-entrada { 0% { opacity: 0.8; translate: 0 0; scale: 0.5; } 100% { opacity: 0; translate: var(--dx) -60%; scale: 1.6; } }
+@keyframes poeira-entrada { 0% { opacity: 0.8; translate: 0 0; scale: 0.5; } 100% { opacity: 0; translate: var(--dx) -14px; scale: 1.6; } }
+/* Os passos pesados: a tela treme a cada passo (4 vezes na chegada). */
+.tremer-passos { animation: tremer-passos 2.1s linear both; }
+@keyframes tremer-passos {
+  0%, 9%, 26%, 33%, 50%, 57%, 74%, 81%, 100% { translate: 0 0; }
+  3%, 27%, 51%, 75% { translate: 0 1.5%; }
+  6%, 30%, 54%, 78% { translate: 0 -1%; }
+}
+/* A opção "menos movimento" do jogo também vale para as chegadas e os mapas. */
+.menos-movimento .entrada-andando, .menos-movimento .entrada-rapido, .menos-movimento .entrada-voando, .menos-movimento .entrada-pesado, .menos-movimento .entrada-agua, .menos-movimento .entrada-janela { animation-duration: 0.01s; }
+.menos-movimento .caco-vidro, .menos-movimento .rachadura-entrada, .menos-movimento .poeira-entrada, .menos-movimento .respingo-entrada, .menos-movimento .clarao-entrada { display: none; }
+.menos-movimento .tremer-passos, .menos-movimento .agua-onda, .menos-movimento .fumaca-mapa, .menos-movimento .brilho-coisa, .menos-movimento .guia-saida, .menos-movimento .seta-borda, .menos-movimento .estrela-objetivo { animation: none; }
 .respingo-entrada { opacity: 0; animation: respingo-entrada 0.8s ease-out both; }
-@keyframes respingo-entrada { 0% { opacity: 1; translate: 0 0; } 50% { translate: calc(var(--dx) / 2) -300%; } 100% { opacity: 0; translate: var(--dx) 0; } }
+@keyframes respingo-entrada { 0% { opacity: 1; translate: 0 0; } 50% { translate: calc(var(--dx) / 2) -40px; } 100% { opacity: 0; translate: var(--dx) 0; } }
 @media (prefers-reduced-motion: reduce) {
   .entrada-andando, .entrada-rapido, .entrada-voando, .entrada-pesado, .entrada-agua, .entrada-janela { animation-duration: 0.01s; }
   .caco-vidro, .rachadura-entrada, .poeira-entrada, .respingo-entrada, .clarao-entrada { display: none; }
