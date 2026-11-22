@@ -160,7 +160,9 @@ export interface EventoLuta {
     // as lutas únicas
     | 'planob'
     | 'lampejo'
-    | 'escapou';
+    | 'escapou'
+    // a sequência perfeita (o valor diz de quem: 0 Cassius, 1 Octavius, 2 Helios)
+    | 'arremate';
   valor?: number;
   lado: 'jogador' | 'inimigo';
   ate: number;
@@ -182,6 +184,8 @@ export interface EstadoLuta {
     esquivaPronta: number;
     /** Octavius: quando a REDE pode ser jogada de novo. */
     redePronta: number;
+    /** A SEQUÊNCIA PERFEITA: golpes logo depois de uma boa defesa, sem levar dano (3 = o arremate). */
+    combo?: number;
   };
   inimigo: {
     vida: number;
@@ -256,6 +260,38 @@ export function ataqueAtual(s: EstadoLuta): AtaqueInimigo {
   return fase.ataques[s.inimigo.ataque % fase.ataques.length]!;
 }
 
+/**
+ * A SEQUÊNCIA PERFEITA (22/11/2026, "lutas ainda mais diferentes"): só conta o golpe que vem
+ * logo depois de uma boa defesa (quem só aperta GOLPE nunca chega lá). Três seguidas, sem levar
+ * dano, soltam o ARREMATE de cada um:
+ * - Cassius, GOLPE DE ESCUDO: pancada pesada, ele fica tonto e o Cassius guarda uma página;
+ * - Octavius, ESTOCADA TRIPLA: três furadas do tridente e ele tropeça;
+ * - Helios, CONSTELAÇÃO: o raio de estrelas e a luz enche de uma vez.
+ */
+export const COMBO_PERFEITO = 3;
+function golpePerfeito(r: EstadoLuta, a: AtributosLuta): EstadoLuta {
+  if (r.fim || !a.estilo) return r;
+  const n = (r.jogador.combo ?? 0) + 1;
+  if (n < COMBO_PERFEITO) return { ...r, jogador: { ...r.jogador, combo: n } };
+  const forca = 1 + (a.forca - 1) * 0.2;
+  let x: EstadoLuta = { ...r, jogador: { ...r.jogador, combo: 0 } };
+  if (a.estilo === 'guardiao') {
+    x = bater(x, 10 * forca, true);
+    x = { ...x, estilo: { ...x.estilo, paginas: Math.min(3, x.estilo.paginas + 1) } };
+  } else if (a.estilo === 'estrategista') {
+    x = bater(x, 12 * forca, true);
+  } else {
+    x = bater(x, 8 * forca, true);
+    x = { ...x, estilo: { ...x.estilo, luz: 3 } };
+  }
+  if (!x.fim) {
+    const ate = Math.max(x.inimigo.estado === 'atordoado' ? x.inimigo.estadoAte : 0, x.tempo + 1000);
+    x = { ...x, inimigo: { ...x.inimigo, estado: 'atordoado', estadoAte: ate, combo: 0, contra: false } };
+  }
+  const quem = a.estilo === 'guardiao' ? 0 : a.estilo === 'estrategista' ? 1 : 2;
+  return ganharAnimo(evento(x, 'arremate', 'inimigo', quem), 12, a);
+}
+
 /** O jogador apertou um botão. */
 export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'especial' | 'soltar', a: AtributosLuta = ATRIBUTOS_INICIAIS): EstadoLuta {
   if (s.fim) return s;
@@ -303,7 +339,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     const r: EstadoLuta = { ...s, jogador: { ...j, folego: j.folego - 10, ripostaAte: 0, acao: 'golpe', acaoDesde: s.tempo, acaoAte: s.tempo + GOLPE_MS, golpePronto: s.tempo + RECARGA_GOLPE_MS } };
     const g = bater({ ...r, inimigo: { ...r.inimigo, guardas: 0 } }, 7 * forcaG * 2.4);
     const tonto = g.fim ? g : { ...g, inimigo: { ...g.inimigo, estado: 'atordoado' as const, estadoAte: s.tempo + 800, combo: 0, contra: false } };
-    return ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a);
+    return golpePerfeito(ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a), a);
   }
   // OCTAVIUS, REDE: presa quem está atacando (cancela o golpe) ou aberto; na guarda, ele escapa.
   if (a.estilo === 'estrategista' && acao === 'escudo') {
@@ -313,7 +349,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     const i = r.inimigo;
     if (i.estado === 'espera') return evento(r, 'escapou', 'inimigo');
     const preso: EstadoLuta = { ...r, estilo: { ...r.estilo, redeAte: s.tempo + REDE_PRESO_MS }, inimigo: { ...i, estado: 'atordoado', estadoAte: s.tempo + REDE_PRESO_MS, combo: 0, contra: false, guardas: 0, ataque: i.estado === 'sinal' ? i.ataque + 1 : i.ataque } };
-    return ganharAnimo(evento(preso, 'rede', 'inimigo'), 8, a);
+    return golpePerfeito(ganharAnimo(evento(preso, 'rede', 'inimigo'), 8, a), a);
   }
   // HELIOS, LAMPEJO no aviso: com luz guardada, o raio cancela o ataque e ele fica aberto.
   if (a.estilo === 'vidente' && acao === 'golpe' && s.inimigo.estado === 'sinal' && s.estilo.luz > 0 && ataqueAtual(s).tipo !== 'finta') {
@@ -324,7 +360,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
     const g = bater(r, 7 * forcaG * 0.8);
     if (g.fim) return evento(g, 'lampejo', 'jogador');
     const aberto: EstadoLuta = { ...g, inimigo: { ...g.inimigo, estado: 'aberto', estadoAte: s.tempo + at.abertoMs + 300, combo: 0, contra: false, ataque: g.inimigo.ataque + 1 } };
-    return ganharAnimo(evento(aberto, 'lampejo', 'jogador'), 10, a);
+    return golpePerfeito(ganharAnimo(evento(aberto, 'lampejo', 'jogador'), 10, a), a);
   }
   if (acao !== 'golpe' && ocupado) return s;
   if (acao === 'golpe' && (ocupado || s.tempo < j.golpePronto)) return s;
@@ -344,7 +380,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
       const rr: EstadoLuta = { ...r, jogador: { ...r.jogador, ripostaAte: 0 } };
       const g = bater({ ...rr, inimigo: { ...i, guardas: 0 } }, base * 2.2);
       const tonto = g.fim ? g : { ...g, inimigo: { ...g.inimigo, estado: 'atordoado' as const, estadoAte: s.tempo + 700, combo: 0, contra: false } };
-      return ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a);
+      return golpePerfeito(ganharAnimo(evento(tonto, 'riposta', 'inimigo'), 10, a), a);
     }
     // Escudo gigante: só entra golpe cheio com a guarda quebrada (tonto).
     const gigante = s.def.escudoGigante || s.def.fases[i.fase]?.escudoGigante;
@@ -356,7 +392,7 @@ export function agir(s: EstadoLuta, acao: 'golpe' | 'escudo' | 'esquiva' | 'espe
       if (a.estilo === 'guardiao' && s.estilo.paginas > 0) {
         const n = s.estilo.paginas;
         const c = bater({ ...r, estilo: { ...r.estilo, paginas: 0 }, inimigo: { ...i, guardas: 0 } }, (i.estado === 'atordoado' ? base * 1.5 : base) * (1 + 0.6 * n));
-        return ganharAnimo(evento(c, 'citacao', 'inimigo', n), 6 + 3 * n, a);
+        return golpePerfeito(ganharAnimo(evento(c, 'citacao', 'inimigo', n), 6 + 3 * n, a), a);
       }
       // Estrategista: preso na rede, cada estocada do tridente entra 25% mais forte (além do golpe no tonto).
       const naRede = a.estilo === 'estrategista' && s.tempo < s.estilo.redeAte ? 1.25 : 1;
@@ -486,7 +522,7 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
     if (a.estilo === 'vidente') {
       const vaza = Math.round((at.dano * 0.5) / (1 + (a.defesa - 1) * 0.15));
       const vida = Math.max(0, bloqueou.jogador.vida - vaza);
-      bloqueou = evento({ ...bloqueou, jogador: { ...bloqueou.jogador, vida } }, 'dano', 'jogador', vaza);
+      bloqueou = evento({ ...bloqueou, jogador: { ...bloqueou.jogador, vida, combo: 0 } }, 'dano', 'jogador', vaza);
       if (vida <= 0) return { ...bloqueou, fim: 'derrota' };
     }
     // Cassius sempre pode DEVOLVER logo depois de bloquear (os outros, com o contra-ataque do Ludus).
@@ -503,7 +539,7 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
   const fator = fazendo === 'escudo' ? (a.estilo === 'guardiao' ? 0.25 : a.estilo === 'vidente' && at.tipo === 'investida' ? 1 : 0.5) : 1;
   const dano = Math.round((at.dano * fator) / (1 + (a.defesa - 1) * 0.15));
   const vida = Math.max(0, j.vida - dano);
-  let r: EstadoLuta = evento({ ...s, jogador: { ...j, vida, acao: 'ferido', acaoDesde: s.tempo, acaoAte: s.tempo + FERIDO_MS } }, 'dano', 'jogador', dano);
+  let r: EstadoLuta = evento({ ...s, jogador: { ...j, vida, combo: 0, acao: 'ferido', acaoDesde: s.tempo, acaoAte: s.tempo + FERIDO_MS } }, 'dano', 'jogador', dano);
   r = depoisDoGolpe(r, at, Math.round(at.abertoMs * 0.5));
   return vida <= 0 ? { ...r, fim: 'derrota' } : r;
 }

@@ -249,6 +249,7 @@ function Barra({ valor, max, cor, rotulo, fina = false }: { valor: number; max: 
 }
 
 const SOM: Partial<Record<string, SomHistoria>> = {
+  arremate: 'quebra',
   acerto: 'espadas',
   bloqueio: 'escudoMetal',
   esquiva: 'esquiva',
@@ -289,7 +290,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
     esquiva: ['', 'DEVOLVER'],
     especial: ['', 'MURALHA'],
     icones: { golpe: 'gladio', escudo: 'escudo', esquiva: 'aparar', especial: 'muralha' },
-    dica: 'GUARDIÃO: SEGURE o escudo (não tem esquiva). Levantado NA ÚLTIMA HORA, segura até o fogo e guarda uma página. Depois de bloquear, DEVOLVER bate dobrado. O golpe no ABERTO cita as páginas.',
+    dica: 'GUARDIÃO: SEGURE o escudo (não tem esquiva). Levantado NA ÚLTIMA HORA, segura até o fogo e guarda uma página. Depois de bloquear, DEVOLVER bate dobrado. O golpe no ABERTO cita as páginas. 3 DEVOLVER seguidos sem apanhar: GOLPE DE ESCUDO.',
     cor: '#e0782c',
   },
   estrategista: {
@@ -298,7 +299,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
     esquiva: ['', 'ROLAR'],
     especial: ['', 'PLANO B'],
     icones: { golpe: 'tridente', escudo: 'rede', esquiva: 'rolar', especial: 'mapa' },
-    dica: 'ESTRATEGISTA: não bloqueia. ROLE (na última hora ele tropeça) e o próximo golpe é pelas costas. A REDE prende quem está atacando ou aberto. O TRIDENTE fura a guarda de longe. Use os PLANOS do cenário.',
+    dica: 'ESTRATEGISTA: não bloqueia. ROLE (na última hora ele tropeça) e o próximo golpe é pelas costas. A REDE prende quem está atacando ou aberto. O TRIDENTE fura a guarda de longe. Use os PLANOS do cenário. 3 golpes pelas costas (ou redes) seguidos sem apanhar: ESTOCADA TRIPLA.',
     cor: '#2aa08a',
   },
   vidente: {
@@ -307,7 +308,7 @@ const BOTOES: Record<Estilo | 'neutro', { golpe: [string, string]; escudo: [stri
     esquiva: ['', 'PASSO DE SOMBRA'],
     especial: ['', 'ECLIPSE'],
     icones: { golpe: 'lampejo', escudo: 'espelho', esquiva: 'esquiva', especial: 'eclipse' },
-    dica: 'VIDENTE: você vê o PRÓXIMO golpe. PASSO DE SOMBRA na última hora junta LUZ. Com luz, o LAMPEJO no aviso cancela o ataque. O ESPELHO devolve o fogo (pancada passa metade). ECLIPSE: 3 golpes erram.',
+    dica: 'VIDENTE: você vê o PRÓXIMO golpe. PASSO DE SOMBRA na última hora junta LUZ. Com luz, o LAMPEJO no aviso cancela o ataque. O ESPELHO devolve o fogo (pancada passa metade). ECLIPSE: 3 golpes erram. 3 lampejos seguidos sem apanhar: CONSTELAÇÃO.',
     cor: '#f2c14e',
   },
   neutro: {
@@ -617,7 +618,7 @@ export function LutaHistoria({
       if (ev.id <= visto.current) continue;
       const som = SOM[ev.tipo];
       if (som) tocar(som);
-      if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao') setCombo((c) => c + 1);
+      if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao' || ev.tipo === 'arremate') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
       // No treino do ESPECIAL vale o especial de qualquer jeito de lutar (Muralha, Rede, Eclipse).
       // Cada um treina com a defesa dele: o Cassius não esquiva (bloqueia) e o Octavius não bloqueia (rola).
@@ -1014,6 +1015,15 @@ export function LutaHistoria({
           if (ev.tipo === 'reflexo') return <Impacto key={`fx${ev.id}`} x="66%" cor="#ffe08a" corte grande />;
           if (ev.tipo === 'citacao') return <Impacto key={`fx${ev.id}`} x="70%" cor="#e0782c" corte grande />;
           if (ev.tipo === 'tropeco') return <Impacto key={`fx${ev.id}`} x="70%" cor="#2aa08a" />;
+          if (ev.tipo === 'arremate')
+            return (
+              <span key={`fx${ev.id}`}>
+                <Impacto x="70%" cor={['#e0782c', '#2aa08a', '#ffe08a'][ev.valor ?? 0]!} corte grande />
+                <span className="lute-entra pointer-events-none absolute left-1/2 top-[30%] z-30 -translate-x-1/2 whitespace-nowrap font-pixel text-base [text-shadow:3px_3px_0_#000] sm:text-3xl" style={{ color: ['#ffb060', '#6af0d0', '#fff0a8'][ev.valor ?? 0] }}>
+                  {['GOLPE DE ESCUDO!', 'ESTOCADA TRIPLA!', 'CONSTELAÇÃO!'][ev.valor ?? 0]}
+                </span>
+              </span>
+            );
           if (ev.tipo === 'pagina') return <Impacto key={`fx${ev.id}`} x="30%" cor="#f0dcae" />;
           if (ev.tipo === 'luz') return <Impacto key={`fx${ev.id}`} x="22%" cor="#ffe08a" />;
           if (ev.tipo === 'muralha' || ev.tipo === 'rede' || ev.tipo === 'eclipse') return <Impacto key={`fx${ev.id}`} x="70%" cor={bot.cor} corte grande />;
@@ -1022,6 +1032,12 @@ export function LutaHistoria({
         {e.eventos.some((ev) => ev.tipo === 'dano' || ev.tipo === 'contra') && <div className="clarao-vermelho pointer-events-none absolute inset-0 z-[19]" aria-hidden />}
         {e.eventos.some((ev) => ev.tipo === 'especial' || ev.tipo === 'fase' || ev.tipo === 'muralha' || ev.tipo === 'rede' || ev.tipo === 'eclipse') && <div className="clarao pointer-events-none absolute inset-0 z-[19] bg-white" aria-hidden />}
         {/* pouca vida: as bordas pulsam vermelho */}
+        {/* A sequência perfeita: quantos golpes depois de boa defesa já emendou (3 = arremate) */}
+        {fase === 'luta' && !treino && (j.combo ?? 0) > 0 && (
+          <span className="pointer-events-none absolute left-[22%] top-[34%] z-20 -translate-x-1/2 whitespace-nowrap border-2 border-black bg-black/70 px-1 font-pixel text-[7px] text-[#9fe8ff] sm:text-[10px]">
+            PERFEITO {j.combo}/3
+          </span>
+        )}
         {fase === 'luta' && j.vida / j.vidaMax < 0.3 && <div className="perigo-bordas pointer-events-none absolute inset-0 z-[18]" aria-hidden />}
         {/* A faixa do especial: o gladiador grande na diagonal e o nome do golpe */}
         {cinema && <CinemaEspecial key={cinema.id} tipo={cinema.tipo} heroi={heroi} cor={bot.cor} />}

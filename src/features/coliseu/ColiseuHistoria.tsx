@@ -477,7 +477,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         key={cena.id}
         def={chefe}
         heroi={heroi}
-        antes={[{ quem: heroi, texto: `Primeiro, a armadura. ${chefe.dica} ${FALA_HABILIDADE[heroi] ?? ''}` }]}
+        antes={[{ quem: heroi, texto: `Primeiro, a armadura. ${chefe.dica}` }, ...(FALA_HABILIDADE[heroi] ? [{ quem: heroi, texto: FALA_HABILIDADE[heroi]! }] : [])]}
         duelo={() => (
           <LutaHistoria
             lugar={cena.lugar}

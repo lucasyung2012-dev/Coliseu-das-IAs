@@ -166,3 +166,34 @@ describe('o capítulo 1 ensina o jeito de lutar de cada um', () => {
     expect(a.estilo).toBe(ESTILO_DA_IA[ia]);
   });
 });
+
+describe('a sequência perfeita: três golpes depois de boa defesa soltam o arremate (22/11/2026)', () => {
+  it('Cassius: o terceiro DEVOLVER vira GOLPE DE ESCUDO (e guarda uma página)', () => {
+    const a = com('guardiao');
+    const s = novaLuta(boneco(), a);
+    const g = agir({ ...s, jogador: { ...s.jogador, ripostaAte: s.tempo + 1000, combo: 2, acaoAte: 0 } }, 'esquiva', a);
+    expect(g.eventos.some((e) => e.tipo === 'arremate' && e.valor === 0)).toBe(true);
+    expect(g.estilo.paginas).toBe(1);
+    expect(g.jogador.combo).toBe(0);
+  });
+  it('Octavius: o terceiro golpe pelas costas vira ESTOCADA TRIPLA', () => {
+    const a = com('estrategista');
+    const s = novaLuta(boneco(), a);
+    const g = agir({ ...s, jogador: { ...s.jogador, ripostaAte: s.tempo + 1000, combo: 2, acaoAte: 0, golpePronto: 0 } }, 'golpe', a);
+    expect(g.eventos.some((e) => e.tipo === 'arremate' && e.valor === 1)).toBe(true);
+    expect(g.inimigo.estado).toBe('atordoado');
+  });
+  it('Helios: a CONSTELAÇÃO enche a luz', () => {
+    const a = com('vidente');
+    const s = novaLuta(boneco(), a);
+    const g = agir({ ...s, jogador: { ...s.jogador, ripostaAte: s.tempo + 1000, combo: 2, acaoAte: 0, golpePronto: 0 } }, 'golpe', a);
+    expect(g.eventos.some((e) => e.tipo === 'arremate' && e.valor === 2)).toBe(true);
+    expect(g.estilo.luz).toBe(3);
+  });
+  it('golpe comum (sem defesa antes) não conta para a sequência', () => {
+    const a = com('guardiao');
+    let s = novaLuta(boneco(), a);
+    for (let k = 0; k < 5; k++) s = agir({ ...s, jogador: { ...s.jogador, golpePronto: 0, acaoAte: 0 } }, 'golpe', a);
+    expect(s.jogador.combo ?? 0).toBe(0);
+  });
+});
