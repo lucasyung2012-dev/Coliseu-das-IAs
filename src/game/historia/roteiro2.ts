@@ -2254,7 +2254,7 @@ export const CAP3_OCTAVIUS: Capitulo = {
       tipo: 'ludus',
       id: 'o3-ludus',
       lugar: 'ludus-patio',
-      objetivo: 'Aprenda a ESQUIVA DUPLA com o Brutus. Converse com todo mundo, se quiser.',
+      objetivo: 'Aprenda o ROLAMENTO DUPLO com o Brutus. Converse com todo mundo, se quiser.',
       obrigatorio: 'esquiva-dupla',
       conversas: [
         {

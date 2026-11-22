@@ -74,9 +74,9 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
         {aba === 'controles' && (
           <div className="flex flex-col gap-2 text-sm text-white/85">
             <p className="font-pixel text-[9px] text-[#f2c14e]">NA LUTA</p>
-            <p>Golpe: <b>J</b> ou →  ·  Defesa: <b>K</b> ou ↓  ·  Esquiva: <b>L</b> ou ←  ·  Especial: <b>espaço</b></p>
+            <p>Botão 1: <b>J</b> ou →  ·  Botão 2: <b>K</b> ou ↓  ·  Botão 3: <b>L</b> ou ←  ·  Especial: <b>espaço</b></p>
             <p>Luz (no escuro): <b>U</b>  ·  Trocar de gladiador (capítulo secreto): <b>1</b>, <b>2</b>, <b>3</b></p>
-            <p className="text-xs text-muted">Sinal AMARELO: defenda. VERMELHO: esquive. Bata quando ele ficar ABERTO. Defesa e esquiva NA ÚLTIMA HORA ativam o jeito de lutar de cada um.</p>
+            <p className="text-xs text-muted">Cada gladiador luta do seu jeito, e o nome de cada botão aparece na luta. Cassius: GLÁDIO, SEGURE O ESCUDO e DEVOLVER. Octavius: TRIDENTE, REDE e ROLAR. Helios: LAMPEJO, ESPELHO e PASSO DE SOMBRA. Bata quando o inimigo ficar ABERTO.</p>
             <p className="mt-1 font-pixel text-[9px] text-[#f2c14e]">NAS FASES</p>
             <p>Andar: <b>A</b> e <b>D</b> (ou as setas)  ·  Pular: <b>W</b> ou <b>espaço</b></p>
             <p className="text-xs text-muted">No celular, use os botões ◀ ▶ e PULAR embaixo da tela.</p>

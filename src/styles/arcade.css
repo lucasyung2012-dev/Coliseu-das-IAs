@@ -1901,3 +1901,8 @@
 
 /* O vão entre os telhados (22/11/2026): o buraco escuro com a rua lá embaixo. */
 .vao-fase { background: linear-gradient(180deg, #0a0812 0, #1a1424 60%, #3a2a1a 100%); box-shadow: inset 3px 0 0 #2a1e14, inset -3px 0 0 #2a1e14; }
+
+/* A memória dos golpes: o DEVOLVER é um empurrão de escudo para a frente, brilhando. */
+.pose-devolver { animation: pose-golpe 0.45s ease-out; filter: drop-shadow(0 0 8px #5ab0ff); }
+.pose-devolver-b { animation: pose-golpe-b 0.45s ease-out; filter: drop-shadow(0 0 8px #5ab0ff); }
+.menos-movimento .pose-devolver, .menos-movimento .pose-devolver-b { animation: none; }

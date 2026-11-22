@@ -217,7 +217,7 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
 const GOLPES = [
   { id: 'golpe', icone: 'gladio', nome: 'GOLPE', cor: '#e04a3a' },
   { id: 'escudo', icone: 'escudo', nome: 'ESCUDO', cor: '#ffd04a' },
-  { id: 'esquiva', icone: 'esquiva', nome: 'ESQUIVA', cor: '#5ab0ff' },
+  { id: 'devolver', icone: 'aparar', nome: 'DEVOLVER', cor: '#5ab0ff' },
 ] as const;
 const RODADAS_MEMORIA = [3, 4, 5, 6, 7];
 

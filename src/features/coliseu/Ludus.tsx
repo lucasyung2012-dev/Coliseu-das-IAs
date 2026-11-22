@@ -46,7 +46,7 @@ const TREINOS_GOLPE: Record<Tecnica, DefTreino> = {
     evento: 'riposta',
     quantos: 3,
     rotulo: 'CONTRA-ATAQUES',
-    explica: 'Segura o ESCUDO quando a espada vier e, assim que bloquear, GOLPE na hora! Três vezes.',
+    explica: 'Segura o ESCUDO quando a espada vier e, assim que bloquear, DEVOLVER na hora! Três vezes.',
   },
   'quebra-guarda': {
     id: 'quebra-guarda',
@@ -66,17 +66,17 @@ const TREINOS_GOLPE: Record<Tecnica, DefTreino> = {
     evento: 'reflexo',
     quantos: 3,
     rotulo: 'REFLEXOS',
-    explica: 'Vidente, você vê as coisas antes de acontecer, né? Então levanta o ESCUDO BEM na hora em que a minha espada chegar. Nem antes, nem depois. Três vezes.',
+    explica: 'Vidente, você vê as coisas antes de acontecer, né? Então levanta o ESPELHO BEM na hora em que a minha espada chegar. Nem antes, nem depois. Três vezes.',
   },
   'esquiva-dupla': {
     id: 'esquiva-dupla',
-    nome: 'ESQUIVA DUPLA',
+    nome: 'ROLAMENTO DUPLO',
     icone: 'rolar',
-    efeito: 'A esquiva recarrega na metade do tempo; golpe logo depois de esquivar entra dobrado',
+    efeito: 'O ROLAR recarrega na metade do tempo: dá para rolar duas vezes seguidas',
     evento: 'riposta',
     quantos: 3,
-    rotulo: 'ESQUIVA E GOLPE',
-    explica: 'Tagarela, você é rápido de boca. Agora seja rápido de perna: ESQUIVA do meu golpe e, na hora, GOLPE! Três vezes.',
+    rotulo: 'ROLA E GOLPE',
+    explica: 'Tagarela, você é rápido de boca. Agora seja rápido de perna: ROLA do meu golpe e, na hora, GOLPE pelas costas! Três vezes.',
   },
 };
 
@@ -86,6 +86,16 @@ const TREINOS_ATRIBUTO: DefTreino[] = [
   { id: 'vida', nome: 'RESISTÊNCIA', icone: 'coracao', efeito: '+10 Vida', evento: 'esquiva', quantos: 5, rotulo: 'ESQUIVAS', explica: 'Esquiva cinco golpes meus. Pernas leves!' },
   { id: 'carisma', nome: 'CARISMA', icone: 'estrela', efeito: '+1 Carisma (Ânimo e plateia enchem mais rápido)', evento: 'especial', quantos: 1, rotulo: 'ESPECIAIS', explica: 'Enche o Ânimo com boas jogadas e solta o SEU especial em mim: a Muralha do Lata de Biblioteca, a Rede do Tagarela ou o Eclipse do Vidente.' },
 ];
+
+/** Os treinos de atributo falam da defesa de cada gladiador (o Cassius não esquiva, o Octavius não bloqueia). */
+function treinoDoHeroi(t: DefTreino, heroi: Falante): DefTreino {
+  if (heroi === 'cassius' && t.id === 'vida') return { ...t, rotulo: 'BLOQUEIOS', explica: 'Segura cinco golpes meus no escudo. Braço firme!' };
+  if (heroi === 'octavius' && t.id === 'defesa') return { ...t, rotulo: 'ROLAMENTOS', explica: 'Rola de cinco golpes meus. Cuidado com as fintas!' };
+  if (heroi === 'octavius' && t.id === 'vida') return { ...t, rotulo: 'ROLAMENTOS', explica: 'Rola de cinco golpes meus. Pernas leves!' };
+  if (heroi === 'helios' && t.id === 'vida') return { ...t, rotulo: 'PASSOS DE SOMBRA', explica: 'Some de cinco golpes meus com o passo de sombra.' };
+  if (heroi === 'helios' && t.id === 'defesa') return { ...t, rotulo: 'NO ESPELHO', explica: 'Segura cinco golpes meus no espelho. Cuidado com as fintas!' };
+  return t;
+}
 
 const NOME_HEROI: Partial<Record<Falante, string>> = { cassius: 'Lata', octavius: 'Tagarela', helios: 'Vidente' };
 
@@ -207,7 +217,7 @@ export function Ludus({
 
       {painel === 'treinos' && (
         <ul className="grid gap-2 sm:grid-cols-2">
-          {[...golpes, ...TREINOS_ATRIBUTO].map((t) => {
+          {[...golpes, ...TREINOS_ATRIBUTO.map((x) => treinoDoHeroi(x, heroi))].map((t) => {
             const feito = treinoFeito(save, t.id);
             const ehGolpe = t.id in TREINOS_GOLPE;
             return (
