@@ -1927,3 +1927,10 @@
 .fumaca-tiro { animation: fumaca-tiro 0.6s ease-out forwards; }
 @keyframes fumaca-tiro { from { opacity: 0.9; scale: 0.4; } to { opacity: 0; scale: 1.8; translate: 30% -20%; } }
 .menos-movimento .nevoa-mapa, .menos-movimento .coice-canhao, .menos-movimento .fumaca-tiro { animation: none; }
+
+/* A Naumaquia (22/11/2026): o tentáculo subindo e as faixas de mar do minigame dos barcos. */
+.tentaculo-sobe { animation: tentaculo-sobe 0.9s ease-in-out both; transform-origin: 50% 100%; }
+@keyframes tentaculo-sobe { 0% { scale: 1 0; } 25% { scale: 1 1; rotate: -6deg; } 60% { rotate: 6deg; } 100% { scale: 1 0.2; rotate: 0deg; } }
+.mar-faixa { background: repeating-linear-gradient(90deg, transparent 0 18px, rgba(170, 210, 255, 0.45) 18px 26px, transparent 26px 40px); animation: mar-faixa 2s linear infinite; }
+@keyframes mar-faixa { from { background-position: 0 0; } to { background-position: 80px 0; } }
+.menos-movimento .tentaculo-sobe, .menos-movimento .mar-faixa { animation: none; }

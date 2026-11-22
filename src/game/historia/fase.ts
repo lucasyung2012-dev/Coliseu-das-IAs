@@ -30,7 +30,9 @@ export interface Perigo {
   /** Anda pelo chão: de `de` até `ate` em `ms` (vai e volta; com `ida`, só vai e recomeça). */
   move?: { de: number; ate: number; ms: number; ida?: boolean };
   /** O desenho: quem anda (guarda, rato, jacaré, gato, barril rolando) ou o que cai (viga, tomate). */
-  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate' | 'bala';
+  figura?: 'guarda' | 'rato' | 'jacare' | 'gato' | 'barril' | 'viga' | 'tomate' | 'bala' | 'tentaculo';
+  /** Até que altura pega (o padrão é 5: os pés). O tentáculo do Leviatã pega bem mais alto. */
+  altura?: number;
   /** O fogo acende e apaga: aceso por `acesoMs`, apagado por `apagadoMs` (0 = sempre aceso). */
   acesoMs: number;
   apagadoMs: number;
@@ -237,7 +239,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   // Fogo: encostou com os pés baixos, volta para o ponto seguro.
   if (tempo >= s.feridoAte) {
     for (const p of f.perigos) {
-      if (y < 5 && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
+      if (y < (p.altura ?? 5) && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s.volta, y: s.voltaY, vx: 0, vy: 0, noChao: true, feridoAte: tempo + FERIDO_MS, queimadas: s.queimadas + 1 };
         break;
       }
@@ -245,7 +247,7 @@ export function passoFase(f: Fase, s0: EstadoFase, e: Entrada, dt: number): Esta
   } else {
     // Piscando depois de queimar: o fogo vira parede (não dá para atravessar enquanto não pode se queimar).
     for (const p of f.perigos) {
-      if (y < 5 && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
+      if (y < (p.altura ?? 5) && x > xDoPerigo(p, tempo) && x < xDoPerigo(p, tempo) + p.w && fogoAceso(p, tempo)) {
         s = { ...s, x: s0.x, vx: 0 };
         break;
       }

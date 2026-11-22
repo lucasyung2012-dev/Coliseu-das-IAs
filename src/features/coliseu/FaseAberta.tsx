@@ -391,6 +391,19 @@ function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
   const noChao = fase < p.acesoMs;
   const caindo = !noChao && fase > ciclo - 700 ? (fase - (ciclo - 700)) / 700 : -1;
   const icone = p.figura === 'tomate' ? 'tomate' : p.figura === 'bala' ? 'bala' : 'viga';
+  if (p.figura === 'tentaculo') {
+    // O tentáculo: a água borbulha antes, ele sobe alto e desce.
+    if (noChao)
+      return (
+        <span className="tentaculo-sobe absolute bottom-[10%] left-1/2 block h-[260%] w-[70%] -translate-x-1/2 rounded-t-full bg-[linear-gradient(90deg,#4a2a6a,#8a5ab8_50%,#4a2a6a)]">
+          {[20, 45, 70].map((y) => (
+            <span key={y} className="absolute left-[60%] block h-[8%] w-[30%] rounded-full bg-[#d8b8f0]" style={{ top: `${y}%` }} />
+          ))}
+        </span>
+      );
+    if (caindo < 0) return null;
+    return <span className="absolute bottom-[10%] left-1/2 block h-[30%] w-[90%] -translate-x-1/2 rounded-[50%] bg-[#d8b8f0]/60 animate-pulse" />;
+  }
   if (!noChao && caindo < 0) return null;
   return (
     <>

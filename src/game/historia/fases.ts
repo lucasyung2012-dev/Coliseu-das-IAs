@@ -417,4 +417,46 @@ export const FASES: Record<string, Fase> = {
     precisa: 3,
     fim: { coisa: 'BANDEIRAS ARRANCADAS', todos: 'Nenhum Olho no navio. Ele agora é nosso.', alguns: 'O bastante para a tripulação saber quem manda.' },
   },
+  // Capítulo 6 do Octavius (22/11/2026): a Naumaquia. A arena inundada, de destroço em
+  // destroço (alguns afundam), pelos cascos dos navios afundados, e os TENTÁCULOS do Leviatã
+  // subindo da água (pegam até quem pula baixo: espere descerem). A plateia joga estrelas de
+  // pano para quem passa. Comentários em rascunho (o Lucas pode reescrever).
+  'naumaquia': {
+    id: 'naumaquia',
+    telas: ['coliseu-inundado', 'coliseu-inundado'],
+    objetivo: 'Atravesse a arena inundada. Cuidado com os tentáculos! Pegue as estrelas que a plateia joga.',
+    plataformas: [
+      { x: 12, w: 10, y: 5, tipo: 'barco' },
+      { x: 28, w: 8, y: 8, tipo: 'caixote', afunda: 900 },
+      { x: 42, w: 16, y: 11, tipo: 'barco' },
+      { x: 64, w: 8, y: 7, tipo: 'caixote', afunda: 800 },
+      { x: 78, w: 10, y: 16, tipo: 'viga' },
+      { x: 94, w: 14, y: 6, tipo: 'barco' },
+      { x: 114, w: 8, y: 11, tipo: 'caixote', afunda: 800 },
+      { x: 128, w: 16, y: 14, tipo: 'barco' },
+      { x: 150, w: 8, y: 7, tipo: 'caixote', afunda: 700 },
+      { x: 164, w: 10, y: 17, tipo: 'viga' },
+      { x: 180, w: 10, y: 6, tipo: 'barco' },
+    ],
+    perigos: [
+      { x: 10, w: 180, tipo: 'agua', acesoMs: 0, apagadoMs: 0 },
+      { x: 36, w: 6, tipo: 'queda', figura: 'tentaculo', altura: 15, acesoMs: 900, apagadoMs: 2200, atrasoMs: 400 },
+      { x: 88, w: 6, tipo: 'queda', figura: 'tentaculo', altura: 15, acesoMs: 900, apagadoMs: 2000, atrasoMs: 1300 },
+      { x: 144, w: 6, tipo: 'queda', figura: 'tentaculo', altura: 15, acesoMs: 900, apagadoMs: 1800, atrasoMs: 700 },
+    ],
+    coletaveis: [
+      { id: 'estrela-1', x: 50, y: 24, icone: 'estrela', nome: 'Estrela da plateia' },
+      { id: 'estrela-2', x: 83, y: 29, icone: 'estrela', nome: 'Estrela da plateia' },
+      { id: 'estrela-3', x: 136, y: 27, icone: 'estrela', nome: 'Estrela da plateia' },
+      { id: 'estrela-4', x: 169, y: 30, icone: 'estrela', nome: 'Estrela da plateia' },
+    ],
+    comentarios: [
+      { id: 'arena', x: 6, quem: 'octavius', texto: 'A arena virou mar. Destroço por destroço.' },
+      { id: 'tentaculo', x: 30, quem: 'octavius', texto: 'Tentáculo! Espera ele descer antes de passar.' },
+      { id: 'fim', x: 176, quem: 'octavius', texto: 'Lá na frente, o portão das galés.' },
+    ],
+    saida: { x: 194, rotulo: 'O PORTÃO DAS GALÉS' },
+    precisa: 3,
+    fim: { coisa: 'ESTRELAS DA PLATEIA', todos: 'A plateia inteira grita o seu nome.', alguns: 'Metade da plateia já está do seu lado.' },
+  },
 };

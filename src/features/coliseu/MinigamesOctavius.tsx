@@ -493,6 +493,11 @@ export function MinigameBarcos({ lugar, antes, depois, onFim }: Base) {
       </div>
       <Palco lugar={lugar} className={caiu ? 'tremer-forte' : ''}>
         <div className="absolute inset-0 z-[5] bg-[#1a4a7a]/35" aria-hidden />
+        {/* as faixas de mar com as ondinhas correndo */}
+        {fase === 'jogo' &&
+          Array.from({ length: FILEIRAS }, (_, f) => (
+            <div key={`m${f}`} className="mar-faixa pointer-events-none absolute inset-x-0 z-[6] h-[6%] -translate-y-1/2" style={{ top: `${yFileira(f + 1)}%`, animationDuration: `${2.4 - f * 0.25}s` }} aria-hidden />
+          ))}
         {fase === 'jogo' &&
           Array.from({ length: FILEIRAS }, (_, f) => (
             <span key={f} className="absolute z-10 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl" style={{ left: `${barco(f)}%`, top: `${yFileira(f + 1)}%`, opacity: f === fileira ? 1 : 0.65 }} aria-hidden>

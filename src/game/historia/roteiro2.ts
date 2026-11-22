@@ -3093,6 +3093,13 @@ export const CAP6_OCTAVIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): a Naumaquia, andando de lado pela arena inundada.
+      tipo: 'fase',
+      id: 'o6-naumaquia',
+      lugar: 'coliseu-inundado',
+      fase: 'naumaquia',
+    },
+    {
       tipo: 'luta',
       id: 'o6-tritao',
       lugar: 'coliseu-inundado',
