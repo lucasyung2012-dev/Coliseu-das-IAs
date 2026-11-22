@@ -4,6 +4,7 @@ import type { Fala, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
+import { Retrato } from './Cenarios';
 
 /** Embaralha uma lista (cópia). */
 function embaralhar<T>(xs: T[]): T[] {
@@ -73,6 +74,8 @@ export function DesafioMarcas({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
   const [inicio, setInicio] = useState(0);
   const [agora, setAgora] = useState(0);
   const [erro, setErro] = useState(false);
+  // O túnel escolhido: o Cassius anda até ele; no errado, os olhos dos ratos acendem lá dentro.
+  const [escolha, setEscolha] = useState<{ k: number; certo: boolean } | null>(null);
 
   const nova = (r: number) => {
     // Com o tempo, mais falsas para comparar.
@@ -80,6 +83,7 @@ export function DesafioMarcas({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
     setOpcoes(embaralhar([VERDADEIRA, ...embaralhar(FALSAS).slice(0, n - 1)]));
     setInicio(Date.now());
     setAgora(Date.now());
+    setEscolha(null);
   };
   useEffect(() => {
     if (fase === 'jogo') nova(rodada);
@@ -106,9 +110,18 @@ export function DesafioMarcas({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
     if (fase === 'jogo' && restante <= 0 && opcoes.length) errar();
   }, [restante <= 0]);
 
-  const escolher = (m: Marca) => {
-    if (fase !== 'jogo') return;
+  const escolher = (m: Marca, k = -1) => {
+    if (fase !== 'jogo' || escolha) return;
     desbloquear();
+    // Primeiro ele anda até o túnel; o resultado vem um instante depois.
+    if (k >= 0) {
+      setEscolha({ k, certo: m === VERDADEIRA });
+      window.setTimeout(() => escolher2(m), 650);
+      return;
+    }
+    escolher2(m);
+  };
+  const escolher2 = (m: Marca) => {
     if (m === VERDADEIRA) {
       tocar('selecionar');
       if (rodada + 1 >= RODADAS_MARCAS) {
@@ -126,23 +139,53 @@ export function DesafioMarcas({ lugar, antes, onFim }: { lugar: Lugar; antes?: F
       </div>
       <Palco lugar={lugar} className={erro ? 'tremer-forte' : ''}>
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
+        {/* AS MARCAS (redesenhadas, 22/11/2026): uma encruzilhada de túneis de verdade. Cada boca
+            de túnel tem a sua pena desenhada na pedra; o Cassius, de lamparina, anda até o túnel que
+            você tocar. No errado, olhos vermelhos acendem lá dentro. A vela queima com o tempo. */}
         {fase === 'jogo' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/45 p-3">
-            <span className="font-pixel text-[9px] text-white sm:text-xs">
-              TÚNEL {rodada + 1} DE {RODADAS_MARCAS} · qual parede seguir?
+          <div className="absolute inset-0">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_85%,transparent_10%,rgba(0,0,0,0.75)_70%)]" />
+            <span className="pointer-events-none absolute left-1/2 top-[3%] z-20 -translate-x-1/2 whitespace-nowrap font-pixel text-[8px] text-white [text-shadow:2px_2px_0_#000] sm:text-xs">
+              TÚNEL {rodada + 1} DE {RODADAS_MARCAS} · qual caminho seguir?
             </span>
-            <div className="grid w-full max-w-xl gap-2" style={{ gridTemplateColumns: `repeat(${opcoes.length}, minmax(0, 1fr))` }}>
-              {opcoes.map((m, k) => (
-                <button key={`${rodada}-${k}`} type="button" onClick={() => escolher(m)} className="pixel-box pixel-hover flex flex-col items-center gap-1 bg-[#b8a888] p-2">
-                  <span className="w-full">
-                    <Pena m={m} />
-                  </span>
-                  <span className="font-pixel text-[8px] text-black">{['ESQUERDA', 'MEIO', 'DIREITA', 'FUNDO'][k]}</span>
-                </button>
-              ))}
+            <div className="absolute inset-x-[3%] bottom-[24%] top-[12%] z-10 flex justify-around gap-[2%]">
+              {opcoes.map((m, k) => {
+                const esta = escolha?.k === k;
+                return (
+                  <button key={`${rodada}-${k}`} type="button" onClick={() => escolher(m, k)} className="tunel-marca group relative max-w-[30%] flex-1" aria-label={`Túnel ${k + 1}`}>
+                    {/* a boca do túnel, em arco de pedra */}
+                    <span className="absolute inset-x-[8%] bottom-0 top-[30%] rounded-t-full border-[5px] border-b-0 border-[#5a5248] bg-[#050302] shadow-[inset_0_10px_18px_#000]" />
+                    {esta && !escolha!.certo && (
+                      <span className="olhos-ratos absolute left-1/2 top-[62%] flex -translate-x-1/2 gap-[18%]">
+                        {[0, 1, 2].map((o) => (
+                          <span key={o} className="block h-[5px] w-[5px] rounded-full bg-[#ff2a2a] shadow-[0_0_6px_#ff2a2a]" />
+                        ))}
+                      </span>
+                    )}
+                    {esta && escolha!.certo && <span className="absolute inset-x-[20%] bottom-0 top-[40%] rounded-t-full bg-[#ffd04a]/30 blur-sm" />}
+                    {/* a pena desenhada na pedra, em cima da boca */}
+                    <span className="absolute inset-x-[4%] top-0 h-[34%] border-2 border-[#3a3228] bg-[#a89a80] p-[3%] transition-transform group-hover:scale-105">
+                      <Pena m={m} />
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            <div className="h-2 w-full max-w-xl border border-black bg-black/60">
-              <div className="h-full bg-[#f2c14e]" style={{ width: `${(restante / TEMPO_MARCA_MS) * 100}%` }} />
+            {/* o Cassius de lamparina, andando até o túnel escolhido */}
+            <div
+              className="pointer-events-none absolute bottom-[4%] z-20 w-[12%] -translate-x-1/2 transition-all duration-500"
+              style={{ left: escolha ? `${8 + ((escolha.k + 0.5) / opcoes.length) * 84}%` : '50%', bottom: escolha ? '16%' : '4%', opacity: escolha ? 0.6 : 1 }}
+            >
+              <span className="absolute -inset-[60%] rounded-full bg-[#ffb03a]/25 blur-xl" />
+              <div className={escolha ? 'andar' : 'respirar'}>
+                <Retrato quem="cassius" />
+              </div>
+            </div>
+            {/* a vela queimando: o tempo para escolher */}
+            <div className="pointer-events-none absolute bottom-[5%] right-[4%] z-20 flex h-[26%] w-[3%] flex-col justify-end">
+              <span className="chama-vela mx-auto mb-[2px] block h-[10%] w-[60%] rounded-full bg-[#ffd04a]" />
+              <span className="block w-full bg-[#f4ecd0]" style={{ height: `${(restante / TEMPO_MARCA_MS) * 80}%` }} />
+              <span className="block h-[6%] w-[160%] -translate-x-[20%] bg-[#6a5a3a]" />
             </div>
           </div>
         )}

@@ -6,6 +6,7 @@ import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
 import { Retrato } from './Cenarios';
+import Emote from '@/ui/pixel/Emotes';
 
 /**
  * Desafios novos (21/11/2026), para as lutas não virem uma atrás da outra:
@@ -151,16 +152,50 @@ export function DesafioFurtivo({
             aria-hidden
           />
         )}
-        {/* esconderijos */}
-        {[25, 50, 75].map((x) => (
-          <span key={x} className="absolute bottom-[12%] z-[6] -translate-x-1/2 text-xl sm:text-3xl" style={{ left: `${6 + x * 0.86}%`, opacity: salvo >= x ? 1 : 0.6 }} aria-hidden>
-            <Icone nome="caixote" className="inline-block w-[100%] align-middle" />
+        {/* O FURTIVO (redesenhado, 22/11/2026): quem vigia aparece de verdade (o farol girando, ou
+            alguém com a lanterna), e o facho de luz varre o chão quando ele olha. Esconderijos maiores. */}
+        {fase === 'jogo' && (
+          <div
+            className="pointer-events-none absolute bottom-[10%] right-[12%] z-[7] h-[46%] w-[82%] transition-opacity duration-200"
+            style={{
+              background: `linear-gradient(270deg, ${cor}cc, ${cor}55 55%, transparent)`,
+              clipPath: 'polygon(100% 18%, 0 70%, 0 100%, 100% 26%)',
+              opacity: luz === 'vermelha' ? 0.75 : luz === 'amarela' ? 0.25 : 0,
+            }}
+            aria-hidden
+          />
+        )}
+        {vigia.includes('farol') ? (
+          <div className="pointer-events-none absolute bottom-[12%] right-[3%] z-[8] h-[62%] w-[9%]" aria-hidden>
+            <div className="absolute inset-x-[15%] bottom-0 top-[22%] bg-[repeating-linear-gradient(180deg,#f0e6d0_0_14%,#c0283c_14%_28%)]" />
+            <div className="absolute inset-x-0 top-[8%] h-[16%] border-2 border-[#2a2a34] bg-[#ffe08a]" style={{ boxShadow: luz === 'vermelha' ? '0 0 30px 10px #ffe08a' : '0 0 8px #ffe08a' }} />
+            <div className="absolute inset-x-[10%] top-0 h-[9%] bg-[#3a3a44]" />
+          </div>
+        ) : (
+          <div className="pointer-events-none absolute bottom-[12%] right-[3%] z-[8] w-[11%]" aria-hidden>
+            {pego && (
+              <span className="emote-pula absolute -top-[30%] left-1/2 block w-[45%] -translate-x-1/2">
+                <Emote emocao="bravo" />
+              </span>
+            )}
+            {/* a lanterna na mão */}
+            <span className="absolute left-[8%] top-[46%] z-10 block aspect-square w-[22%] rounded-sm border-2 border-[#3a2a1a] bg-[#ffe08a]" style={{ boxShadow: luz === 'verde' ? '0 0 6px #ffe08a' : '0 0 18px 6px #ffe08a' }} />
+            <Retrato quem="guarda" espelhar={luz !== 'verde'} />
+          </div>
+        )}
+        {/* esconderijos: barris e caixotes grandes, com sombra */}
+        {[25, 50, 75].map((x, j) => (
+          <span key={x} className="absolute bottom-[11%] z-[11] block w-[9%] -translate-x-1/2" style={{ left: `${6 + x * 0.86}%` }} aria-hidden>
+            <span className="absolute -bottom-[6%] left-[5%] h-[14%] w-[90%] rounded-[50%] bg-black/45" />
+            <Icone nome={j === 1 ? 'barril' : 'caixote'} className="w-full" />
+            {salvo >= x && <span className="absolute -top-[30%] left-1/2 -translate-x-1/2 font-pixel text-[7px] text-[#4ad46a] [text-shadow:1px_1px_0_#000] sm:text-[9px]">OK</span>}
           </span>
         ))}
         <span className="absolute bottom-[14%] right-[3%] z-[6] font-pixel text-[8px] text-[#4ad46a] sm:text-[10px]">CHEGADA ▶</span>
         {/* o herói */}
         <div className="absolute bottom-[14%] z-10 w-[12%] -translate-x-1/2" style={{ left: `${6 + pos * 0.86}%` }} aria-hidden>
-          <div className={andando ? 'andar' : 'respirar'}>
+          {/* parado, ele se agacha (fica menor e mais escuro) */}
+          <div className={andando ? 'andar' : 'respirar'} style={{ scale: andando ? undefined : '1 0.88', transformOrigin: '50% 100%', filter: andando ? undefined : 'brightness(0.7)' }}>
             <Retrato quem={heroi} />
           </div>
         </div>
