@@ -23,7 +23,7 @@ describe('o Rato-Rei no mapa aberto', () => {
   });
 
   it('ele mira e depois corre na direção de onde você estava', () => {
-    const st = rodar(novoChefao(), { x: 3.5, y: 4.8 }, 1900);
+    const st = rodar(novoChefao(), { x: 3.5, y: 4.8 }, 2900);
     expect(st.chefe.estado === 'carga' || st.chefe.estado === 'tonto').toBe(true);
     expect(st.chefe.x).toBeLessThan(9.5);
   });

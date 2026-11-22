@@ -1788,3 +1788,11 @@
 @media (hover: none) and (pointer: coarse) and (min-width: 700px) {
   .botoes-guardiao { grid-template-columns: 7rem 8rem 1fr 7rem 7rem; }
 }
+
+/* Ajustes (22/11/2026): a LUZ do Helios pulsando, o DEVOLVER brilhando e o aviso do escuro. */
+.pronto-luz { animation: pronto-luz 0.8s ease-in-out infinite alternate; }
+@keyframes pronto-luz { from { box-shadow: 0 0 6px #ffe08a; scale: 1; } to { box-shadow: 0 0 22px 6px #ffe08a; scale: 1.08; } }
+.devolver-agora { animation: devolver-agora 0.35s ease-in-out infinite alternate; }
+@keyframes devolver-agora { from { box-shadow: inset 0 0 0 3px #c8962a, 0 0 6px #ffd04a; } to { box-shadow: inset 0 0 0 3px #ffd04a, 0 0 20px 4px #ffd04a; } }
+.aviso-escuro { animation: aviso-saida 4s ease-out forwards; }
+.menos-movimento .pronto-luz, .menos-movimento .devolver-agora { animation: none; }

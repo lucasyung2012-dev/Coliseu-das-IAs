@@ -912,6 +912,27 @@ export function LutaHistoria({
         {escuro && fase === 'luta' && !aceso && sinal && (
           <span className="pointer-events-none absolute left-[70%] top-[30%] z-20 -translate-x-1/2 font-pixel text-[9px] text-white/80 sm:text-xs">ALGO SE MEXE... (LUZ!)</span>
         )}
+        {/* No escuro: o aviso no começo e o botão da LUZ grande, dentro da tela (antes ficava escondido lá embaixo) */}
+        {escuro && fase === 'luta' && e.tempo < 4000 && !aceso && (
+          <span className="aviso-escuro pointer-events-none absolute left-1/2 top-[18%] z-30 whitespace-nowrap border-2 border-[#ffe08a] bg-black/85 px-2 py-1 font-pixel text-[8px] text-[#ffe08a] sm:text-sm" style={{ translate: '-50% 0' }}>
+            ESTÁ ESCURO! TOQUE NA LUZ PARA VER O ATAQUE
+          </span>
+        )}
+        {escuro && fase === 'luta' && (
+          <button
+            type="button"
+            disabled={!podeLuz}
+            onPointerDown={(ev) => {
+              ev.preventDefault();
+              acenderRef.current();
+            }}
+            className={`botao-luz absolute right-[3%] top-[34%] z-30 flex flex-col items-center gap-1 rounded-full border-4 border-[#ffe08a] bg-[#2a1e08]/90 p-2 disabled:opacity-40 ${podeLuz && !aceso ? 'pronto-luz' : ''}`}
+            aria-label="Acender a luz"
+          >
+            <Icone nome="sol" className="w-8 sm:w-12" />
+            <span className="font-pixel text-[7px] text-[#ffe08a] sm:text-[9px]">{aceso ? 'ACESA' : podeLuz ? 'LUZ' : '...'}</span>
+          </button>
+        )}
 
         {/* Os PLANOS do Octavius: a cada 7 segundos aparece algo no cenário para usar */}
         {comPlanos && fase === 'luta' && !vencido && (() => {
@@ -1064,7 +1085,7 @@ export function LutaHistoria({
             onPointerUp={() => acao === 'escudo' && estilo === 'guardiao' && setE((s) => agir(s, 'soltar', atributosRef.current))}
             onPointerCancel={() => acao === 'escudo' && estilo === 'guardiao' && setE((s) => agir(s, 'soltar', atributosRef.current))}
             onContextMenu={(ev) => ev.preventDefault()}
-            className={`pixel-box botao-luta botao-${acao} flex select-none flex-col items-center gap-1 pb-2 pt-3 disabled:opacity-40 sm:pb-3 sm:pt-4 ${
+            className={`pixel-box botao-luta botao-${acao} ${acao === 'esquiva' && estilo === 'guardiao' && e.tempo < j.ripostaAte ? 'devolver-agora' : ''} flex select-none flex-col items-center gap-1 pb-2 pt-3 disabled:opacity-40 sm:pb-3 sm:pt-4 ${
               (acao === 'especial' && cheio) ||
               (acao === 'esquiva' && estilo === 'guardiao' && e.tempo < j.ripostaAte) ||
               (acao === 'golpe' && estilo === 'vidente' && e.inimigo.estado === 'sinal' && rec.luz > 0)
@@ -1074,8 +1095,14 @@ export function LutaHistoria({
             style={{ '--cor': cor } as CSSProperties}
             aria-label={nome}
           >
-            <span className="medalhao" aria-hidden>
+            <span className="medalhao relative" aria-hidden>
               <Icone nome={icone} className="w-[62%]" />
+              {acao === 'escudo' && estilo === 'estrategista' && e.tempo < j.redePronta && (
+                <span
+                  className="absolute inset-0 rounded-full"
+                  style={{ background: `conic-gradient(#ffffff66 ${(1 - (j.redePronta - e.tempo) / 5000) * 360}deg, #00000088 0deg)` }}
+                />
+              )}
             </span>
             <span className="font-pixel text-[7px] text-[#f4e2b4] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{nome}</span>
             <span className="tecla-botao font-pixel text-[7px] text-white/50">{{ golpe: 'J', escudo: 'K', esquiva: 'L', especial: 'ESPAÇO' }[acao]}</span>

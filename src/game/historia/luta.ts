@@ -489,7 +489,7 @@ function impacto(s: EstadoLuta, at: AtaqueInimigo, a: AtributosLuta): EstadoLuta
     }
     // Cassius sempre pode DEVOLVER logo depois de bloquear (os outros, com o contra-ataque do Ludus).
     const comContra =
-      a.estilo === 'guardiao' ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 900 } } : a.tecnicas?.includes('contra-ataque') ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } } : bloqueou;
+      a.estilo === 'guardiao' ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 1400 } } : a.tecnicas?.includes('contra-ataque') ? { ...bloqueou, jogador: { ...bloqueou.jogador, ripostaAte: s.tempo + 550 } } : bloqueou;
     return protegerCombo(depoisDoGolpe(comContra, at, at.abertoMs), 'escudo');
   }
   // Cassius: escudo levantado na hora certa segura até o fogo e a investida, inteiros.

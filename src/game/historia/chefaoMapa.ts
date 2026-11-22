@@ -71,7 +71,7 @@ export const furioso = (st: EstadoChefao) => st.chefe.vida <= VIDA_REI / 2;
 export function novoChefao(vidaHeroi = 100): EstadoChefao {
   return {
     tempo: 0,
-    chefe: { x: 9.5, y: 4.8, vida: VIDA_REI, estado: 'mira', ate: 1800, vx: 0, vy: 0, dir: 'esq' },
+    chefe: { x: 9.5, y: 4.8, vida: VIDA_REI, estado: 'mira', ate: 2800, vx: 0, vy: 0, dir: 'esq' },
     vida: vidaHeroi,
     vidaMax: vidaHeroi,
     feridoAte: 0,
