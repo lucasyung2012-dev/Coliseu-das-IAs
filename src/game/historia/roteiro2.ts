@@ -446,6 +446,7 @@ export const CAP4_CASSIUS: Capitulo = {
       id: 'c4-luta-rato-rei',
       lugar: 'catacumbas',
       inimigo: 'rato-rei',
+      noMapa: true,
       antes: [{ quem: 'cassius', texto: 'Os ratos se juntam num só... uma coroa de engrenagens. O maior. O Rato-Rei.', emocao: 'medo', zoom: 'perto' }],
       depois: [{ quem: 'cassius', texto: 'O caminho está livre. E lá no fundo, uma luz violeta.' }],
     },

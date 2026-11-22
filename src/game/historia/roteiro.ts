@@ -213,6 +213,8 @@ export type Cena = (
       treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
       /** Como o inimigo chega (sem isso, o jeito vem do tipo de bicho). */
       entrada?: EntradaInimigo;
+      /** Luta no mapa aberto, andando (o teste do Rato-Rei com o Lucas), no lugar do duelo. */
+      noMapa?: boolean;
     }
   | {
       tipo: 'desafio';

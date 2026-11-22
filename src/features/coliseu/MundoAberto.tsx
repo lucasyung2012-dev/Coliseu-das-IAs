@@ -390,7 +390,7 @@ export function MundoAberto({
 
 type PropsSeta = { onPointerDown: (ev: PointerEvent) => void; onPointerUp: () => void; onPointerCancel: () => void; onContextMenu: (ev: MouseEvent) => void };
 
-function BotaoSeta({ nome, props }: { nome: string; props: PropsSeta }) {
+export function BotaoSeta({ nome, props }: { nome: string; props: PropsSeta }) {
   return (
     <button type="button" {...props} className="pixel-box flex aspect-square items-center justify-center" aria-label={`Andar: ${nome}`}>
       <Icone nome={nome} className="w-[60%]" />
@@ -532,7 +532,7 @@ function DesenhoSaida({ estilo, X, Y }: { estilo: EstiloSaida; X: number; Y: num
  * tem o seu desenho: pedra, tapete com borda dourada, parede com tijolos e a face de frente,
  * janela com a lua, estante com livros coloridos, mesa, coluna, castiçal, estátua e a escada.
  */
-const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
+export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mundo }) {
   const W = mundo.mapa[0]!.length;
   const H = mundo.mapa.length;
   const t = (x: number, y: number) => mundo.mapa[y]?.[x] ?? '#';

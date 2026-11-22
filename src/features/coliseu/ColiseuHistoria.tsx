@@ -21,6 +21,7 @@ import { FASES } from '@/game/historia/fases';
 import { MAPAS, MUNDOS, mundoDoExplorar } from '@/game/historia/mundos';
 import { MundoAberto } from './MundoAberto';
 import { LutaHistoria } from './Luta';
+import { ChefaoNoMapa } from './ChefaoNoMapa';
 import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
 import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
@@ -442,6 +443,20 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
           if (ponto.segredo) ganharSegredoHistoria(ponto.segredo);
         }}
         onFim={() => proxima()}
+      />
+    );
+  // O chefão no mapa aberto (o teste do Rato-Rei, 22/11/2026).
+  if (cena.tipo === 'luta' && cena.noMapa)
+    return (
+      <ChefaoNoMapa
+        key={cena.id}
+        heroi={heroi}
+        antes={cena.antes}
+        depois={cena.depois}
+        onFim={() => {
+          gravarSaveHistoria(ganharPecas(save, INIMIGOS[cena.inimigo]?.pecas ?? 0));
+          proxima();
+        }}
       />
     );
   if (cena.tipo === 'luta')
