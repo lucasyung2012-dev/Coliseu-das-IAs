@@ -143,7 +143,8 @@ describe('saves e roteiro', () => {
     // Outro capítulo ou outro gladiador: não muda a cena.
     expect(ajustarOrdem({ ...antigo, capitulo: 2, cena: 4 }).cena).toBe(4);
     expect(ajustarOrdem({ ...antigo, gladiador: 'chatgpt', cena: 4 }).cena).toBe(4);
-    expect(criarSave('claude').ordem).toBe(4);
+    expect(criarSave('claude').ordem).toBe(5);
+    expect(ajustarOrdem({ ...antigo, ordem: 4, capitulo: 5, cena: 3 }).cena).toBe(4);
     expect(ajustarOrdem({ ...antigo, capitulo: 4, cena: 2 }).cena).toBe(3);
     expect(ajustarOrdem({ ...antigo, ordem: 3, capitulo: 4, cena: 8 }).cena).toBe(9);
     expect(ajustarOrdem({ ...antigo, capitulo: 2, cena: 6 }).cena).toBe(7);

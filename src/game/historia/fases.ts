@@ -135,4 +135,43 @@ export const FASES: Record<string, Fase> = {
     precisa: 3,
     fim: { coisa: 'PÁGINAS RECOLHIDAS', todos: 'Todas as páginas, secas e inteiras.', alguns: 'As outras ficaram com a água... mas estas estão salvas.' },
   },
+  // Capítulo 5 do Cassius (22/11/2026): abrindo caminho pelo Fórum até a tribuna, antes da
+  // leitura. Por cima das barracas e dos degraus dos templos, desviando dos incensários acesos;
+  // o povo escondeu perguntas escritas em papel pelo caminho. Comentários em rascunho.
+  'caminho-tribuna': {
+    id: 'caminho-tribuna',
+    telas: ['forum', 'forum'],
+    objetivo: 'Abra caminho até a tribuna. Recolha as perguntas que o povo escondeu pelo Fórum.',
+    plataformas: [
+      { x: 14, w: 16, y: 9, tipo: 'toldo' },
+      { x: 34, w: 14, y: 6, tipo: 'sacada' },
+      { x: 52, w: 10, y: 14, tipo: 'sacada' },
+      { x: 68, w: 16, y: 9, tipo: 'toldo' },
+      { x: 90, w: 12, y: 17, tipo: 'sacada' },
+      { x: 108, w: 16, y: 10, tipo: 'toldo' },
+      { x: 130, w: 10, y: 6, tipo: 'caixote' },
+      { x: 144, w: 14, y: 15, tipo: 'sacada' },
+      { x: 164, w: 16, y: 8, tipo: 'toldo' },
+    ],
+    perigos: [
+      { x: 30, w: 6, tipo: 'fogo', acesoMs: 1500, apagadoMs: 1500 },
+      { x: 62, w: 6, tipo: 'fogo', acesoMs: 1500, apagadoMs: 1300, atrasoMs: 600 },
+      { x: 124, w: 6, tipo: 'fogo', acesoMs: 1700, apagadoMs: 1200, atrasoMs: 300 },
+      { x: 158, w: 6, tipo: 'fogo', acesoMs: 0, apagadoMs: 0 },
+    ],
+    coletaveis: [
+      { id: 'pergunta-1', x: 57, y: 19, icone: 'pagina', nome: 'Pergunta escrita' },
+      { id: 'pergunta-2', x: 96, y: 22, icone: 'pagina', nome: 'Pergunta escrita' },
+      { id: 'pergunta-3', x: 150, y: 20, icone: 'pagina', nome: 'Pergunta escrita' },
+      { id: 'pergunta-4', x: 172, y: 13, icone: 'pagina', nome: 'Pergunta escrita' },
+    ],
+    comentarios: [
+      { id: 'papel', x: 20, quem: 'cassius', texto: 'Papeizinhos dobrados entre as barracas. Perguntas! O povo escreveu e escondeu.' },
+      { id: 'incenso', x: 60, quem: 'cassius', texto: 'Os incensários dos templos. Espere a brasa baixar.' },
+      { id: 'tribuna', x: 170, quem: 'cassius', texto: 'A tribuna. Daqui ninguém chega na Lívia.' },
+    ],
+    saida: { x: 194, rotulo: 'A TRIBUNA' },
+    precisa: 3,
+    fim: { coisa: 'PERGUNTAS DO POVO', todos: 'Todas. Hoje elas vão ser lidas.', alguns: 'As outras, o povo vai ter coragem de dizer em voz alta.' },
+  },
 };

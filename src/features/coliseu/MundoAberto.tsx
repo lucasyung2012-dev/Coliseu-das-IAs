@@ -608,7 +608,7 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>
         );
       };
-      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlue'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
+      if ('.PTSpvftgxMDFbkrqAUOhQYZLzlueRji'.includes(c)) fundo.push(chao(cor.chao1, cor.chao2));
       // Água (cais, aqueduto, arena inundada): fundo azul com ondinhas e a espuma na beirada.
       if (c === 'w' || c === 'n' || c === 'H')
         fundo.push(
@@ -936,6 +936,55 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
           </g>,
         );
       }
+      // ---- O Fórum (22/11/2026): a tribuna, o povo e os estandartes do Censor ----
+      // A tribuna (2 × 2): plataforma de pedra com degraus, grade de bronze e as proas de navio.
+      if (c === 'R' && t(x - 1, y) !== 'R' && t(x, y - 1) !== 'R')
+        pecas.push(
+          <g key={`ro${k}`}>
+            <ellipse cx={X + 16} cy={Y + 31} rx="16" ry="2.5" fill="#000" opacity="0.3" />
+            <rect x={X} y={Y + 4} width="32" height="20" fill="#d8ccb4" />
+            <rect x={X} y={Y + 4} width="32" height="3" fill="#f0e6d0" />
+            <rect x={X} y={Y + 18} width="32" height="6" fill="#b8ac94" />
+            {[0, 1, 2].map((d) => (
+              <rect key={d} x={X + 10 - d * 2} y={Y + 24 + d * 2.5} width={12 + d * 4} height="2.5" fill={['#c8bca4', '#b8ac94', '#a89c84'][d]} />
+            ))}
+            {[2, 9, 23, 30].map((px) => (
+              <rect key={px} x={X + px - 1} y={Y - 2} width="1.5" height="7" fill="#a8742a" />
+            ))}
+            <rect x={X + 1} y={Y - 2} width="30" height="1.5" fill="#c8943a" />
+            {[5, 25].map((px) => (
+              <g key={`pr${px}`}>
+                <rect x={X + px - 3} y={Y + 10} width="6" height="5" fill="#a8742a" />
+                <rect x={X + px - 1} y={Y + 15} width="2" height="3" fill="#8a5a22" />
+              </g>
+            ))}
+          </g>,
+        );
+      // O povo do Fórum: três pessoas juntas, cada uma de uma cor.
+      if (c === 'j')
+        pecas.push(
+          <g key={`pv${k}`}>
+            {[0, 1, 2].map((p) => (
+              <g key={p}>
+                <rect x={X + 1 + p * 5} y={Y + 3 + (p % 2) * 2} width="4" height="9" fill={['#2a6aa0', '#c0583a', '#3a8a4a', '#8a3aa0', '#d8a83a'][(x + y + p) % 5]} />
+                <rect x={X + 1.5 + p * 5} y={Y - 1 + (p % 2) * 2} width="3" height="4" fill={['#e8c8a0', '#c89a70', '#8a5a3a'][(x + p) % 3]} />
+                <rect x={X + 1.5 + p * 5} y={Y - 1.5 + (p % 2) * 2} width="3" height="1.5" fill="#3a2414" />
+              </g>
+            ))}
+          </g>,
+        );
+      // O estandarte do Censor: mastro e o pano vermelho com o Olho.
+      if (c === 'i')
+        pecas.push(
+          <g key={`ec${k}`}>
+            <rect x={X + 7} y={Y - 12} width="1.5" height="26" fill="#6a4220" />
+            <rect x={X + 3} y={Y - 10} width="10" height="14" fill="#a81a1a" />
+            <rect x={X + 3} y={Y + 4} width="3" height="2" fill="#a81a1a" />
+            <rect x={X + 10} y={Y + 4} width="3" height="2" fill="#a81a1a" />
+            <ellipse cx={X + 8} cy={Y - 4} rx="3.5" ry="2" fill="#f0e6d0" />
+            <circle cx={X + 8} cy={Y - 4} r="1.2" fill="#c0283c" />
+          </g>,
+        );
       // ---- As catacumbas (22/11/2026): páginas escritas à mão nas paredes, sarcófagos, crânios,
       // poças d'água, teias de aranha e os livros escondidos no Arquivo. ----
       // Página de livro copiada à mão na parede (os Copistas escrevem entre os ossos).

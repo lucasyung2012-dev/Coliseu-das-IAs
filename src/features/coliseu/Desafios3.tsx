@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import Icone from '@/ui/pixel/Icones';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import { prefereMenosMovimento } from '@/ui/movimento';
@@ -358,9 +358,13 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
   const [agora, setAgora] = useState(0);
   const seq = useRef(0);
   const proxima = useRef(0);
+  // O que o Cassius derrubou (estoura no ar) e quantas vezes ele defendeu (ele levanta o escudo).
+  const [estouros, setEstouros] = useState<{ id: number; icone: string; x: number; y: number }[]>([]);
+  const [defesas, setDefesas] = useState(0);
 
   const comecar = () => {
     setCoisas([]);
+    setEstouros([]);
     setVoz(3);
     setInicio(Date.now());
     setAgora(Date.now());
@@ -405,14 +409,35 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
         <Vidas n={Math.max(0, voz)} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
-        <div className="absolute bottom-[14%] left-[14%] z-10 w-[7%] -translate-x-1/2" aria-hidden>
+        {/* PROTEGER A LÍVIA (redesenhado, 22/11/2026): a Lívia lendo em cima da tribuna, com o livro
+            brilhando; o Cassius na frente, levantando o escudo a cada defesa; o que ele derruba
+            estoura no ar (tomate espirra, pedra vira poeira, fogo vira faísca). */}
+        <div className="pointer-events-none absolute bottom-[10%] left-[4%] z-[8] h-[20%] w-[22%]" aria-hidden>
+          <div className="absolute inset-0 border-2 border-[#8a7e6a] bg-[#d8ccb4]" />
+          <div className="absolute inset-x-0 top-0 h-[16%] bg-[#f0e6d0]" />
+          <div className="absolute left-[10%] top-[40%] h-[30%] w-[18%] bg-[#a8742a]" />
+          <div className="absolute right-[10%] top-[40%] h-[30%] w-[18%] bg-[#a8742a]" />
+        </div>
+        <div className="pointer-events-none absolute bottom-[29%] left-[15%] z-10 w-[9%] -translate-x-1/2" aria-hidden>
+          <span className="absolute -inset-[40%] rounded-full bg-[#fff4c0]/25 blur-lg" />
           <div className="brilho-heroi">
             <Retrato quem="livia" />
           </div>
+          <span className="pagina-voa absolute right-[-20%] top-[30%] block h-[14%] w-[22%] bg-[#f4ecd0]" />
         </div>
-        <div className="absolute bottom-[14%] left-[26%] z-10 w-[10%] -translate-x-1/2" aria-hidden>
-          <Retrato quem="cassius" />
+        <div className="pointer-events-none absolute bottom-[12%] left-[31%] z-10 w-[13%] -translate-x-1/2" aria-hidden>
+          <div key={defesas} className={defesas ? 'pose-escudo' : 'respirar'}>
+            <Retrato quem="cassius" />
+          </div>
         </div>
+        {estouros.map((e) => (
+          <span key={`e${e.id}`} className="pointer-events-none absolute z-[21]" style={{ left: `${e.x}%`, top: `${e.y}%` }} aria-hidden>
+            {[-50, -10, 30, 70, 110, 150, 190, 230].map((a, k) => (
+              <span key={k} className="faisca-forja absolute block h-[5px] w-[5px]" style={{ '--ang': `${a}deg`, background: e.icone === 'tomate' ? '#e0282c' : e.icone === 'pedra' ? '#b8b0a0' : '#ffb03a' } as CSSProperties} />
+            ))}
+            <span className="tang absolute -left-3 -top-6 font-pixel text-[8px] text-white [text-shadow:1px_1px_0_#000] sm:text-sm">{e.icone === 'tomate' ? 'SPLAT!' : 'PAH!'}</span>
+          </span>
+        ))}
         {fase === 'jogo' &&
           coisas.map((c) => {
             const p = Math.min(1, (agora - c.nasceu) / c.voo);
@@ -425,8 +450,12 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
                   desbloquear();
                   tocar('espadas');
                   setCoisas((x) => x.filter((y) => y.id !== c.id));
+                  setDefesas((n) => n + 1);
+                  const id = c.id;
+                  setEstouros((x) => [...x.slice(-5), { id, icone: c.icone, x: 96 - p * 80, y: c.y + p * (62 - c.y) }]);
+                  window.setTimeout(() => setEstouros((x) => x.filter((y) => y.id !== id)), 600);
                 }}
-                className="absolute z-20 -translate-x-1/2 -translate-y-1/2 p-1 text-2xl sm:text-4xl"
+                className="absolute z-20 -translate-x-1/2 -translate-y-1/2 p-1 text-3xl drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] sm:text-5xl"
                 style={{ left: `${96 - p * 80}%`, top: `${c.y + p * (62 - c.y)}%` }}
                 aria-label={`Derrubar: ${c.icone}`}
               >
@@ -435,8 +464,12 @@ export function DesafioProteger({ lugar, antes, depois, onFim }: { lugar: Lugar;
             );
           })}
         {fase === 'jogo' && (
-          <div className="absolute inset-x-[10%] top-[6%] z-20 h-2 border border-black bg-black/60">
-            <div className="h-full bg-[#f2c14e]" style={{ width: `${100 - (restante / DURACAO_PROTEGER) * 100}%` }} />
+          <div className="pointer-events-none absolute inset-x-[10%] top-[5%] z-20 flex items-center gap-2" aria-hidden>
+            <Icone nome="livro" className="w-5 sm:w-7" />
+            <span className="font-pixel text-[7px] text-white [text-shadow:1px_1px_0_#000] sm:text-[10px]">PÁGINA</span>
+            <div className="h-2 flex-1 border border-black bg-black/60">
+              <div className="h-full bg-[#f2c14e]" style={{ width: `${100 - (restante / DURACAO_PROTEGER) * 100}%` }} />
+            </div>
           </div>
         )}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}

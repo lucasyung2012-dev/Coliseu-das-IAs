@@ -711,6 +711,13 @@ export const CAP5_CASSIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026): abrindo caminho pelo Fórum até a tribuna, andando de lado.
+      tipo: 'fase',
+      id: 'c5-caminho',
+      lugar: 'forum',
+      fase: 'caminho-tribuna',
+    },
+    {
       tipo: 'cutscene',
       id: 'c5-forum',
       quadros: [
