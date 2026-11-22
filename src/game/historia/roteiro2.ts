@@ -154,7 +154,7 @@ export const CAP3_CASSIUS: Capitulo = {
           rotulo: 'Brutus',
           falas: [
             { quem: 'brutus', texto: 'Escudo levantado, cabeça fria, boca fechada. Tagarela, isso vale pra você também, mesmo de longe!' },
-            { quem: 'brutus', texto: 'O segredo é este, Lata: bloqueou, BATEU. Na hora em que o golpe dele quica no seu escudo, ele fica aberto por um instante. É o CONTRA-ATAQUE.' },
+            { quem: 'brutus', texto: 'O segredo é este, Lata: bloqueou, BATEU. Na hora em que o golpe dele quica no seu escudo, ele fica aberto por um instante. É o CONTRA-ATAQUE: o botão DEVOLVER.' },
             { quem: 'brutus', texto: 'E quer saber? Eu fiz o almoço. Mingau de cevada com sardinha. Uma delícia.' },
             { quem: 'cassius', texto: '(Eu sou uma IA. Eu nem como. E mesmo assim fiquei com medo do mingau.)' },
           ],
@@ -914,7 +914,7 @@ export const CAP5_CASSIUS: Capitulo = {
           ],
           texto: 'Eu sou o Pretor de Aço. Em quinhentos anos, nada passou por este escudo. Nem uma espada. Nem uma pergunta.',
         },
-        { lugar: 'forum', quem: 'brutus', texto: '(Lá de trás, a voz do Brutus) Lata! Ele bate o escudo no chão antes de investir: ESQUIVA! E na guarda dele: golpe, golpe, GOLPE!' },
+        { lugar: 'forum', quem: 'brutus', texto: '(Lá de trás, a voz do Brutus) Lata! Ele bate o escudo no chão antes de investir: ESCUDO NA HORA CERTA! E na guarda dele: golpe, golpe, GOLPE!' },
       ],
     },
     {
@@ -1185,7 +1185,7 @@ export const CAP6_CASSIUS: Capitulo = {
           ],
           texto: 'GRRRROOOOAAAARRR!',
         },
-        { lugar: 'coliseu-arena', quem: 'brutus', texto: '(Do túnel) É filho do bicho que levou o meu braço! O rugido atravessa escudo: ESQUIVA quando ele encher o peito!' },
+        { lugar: 'coliseu-arena', quem: 'brutus', texto: '(Do túnel) É filho do bicho que levou o meu braço! Quando ele pular, SAI DA SOMBRA! E bate quando ele cair cansado!' },
       ],
     },
     {
@@ -1669,7 +1669,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
       id: 'o1-luta2',
       lugar: 'porto-docas',
       inimigo: 'marinheiro-arpao',
-      antes: [{ quem: 'octavius', texto: 'Um arpoador! Quando o arpão brilhar vermelho, nada de escudo: pula para o lado!' }],
+      antes: [{ quem: 'octavius', texto: 'Um arpoador! Quando o arpão brilhar vermelho, nada de escudo: ROLA para o lado!' }],
       depois: [{ quem: 'marco', texto: '(Lá do Esperança, cantando bem alto e bem desafinado) O pássaro vai cantaaaar! ' }],
     },
     {
@@ -1787,7 +1787,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
       id: 'o1-chefao',
       lugar: 'navio-conves',
       inimigo: 'almirante-ferrugem',
-      antes: [{ quem: 'octavius', texto: 'Quando o braço-canhão dele brilhar: esquiva. E fique de olho nos planos do convés: tem corda, barril e gancho por todo lado.' }],
+      antes: [{ quem: 'octavius', texto: 'Quando o braço-canhão dele brilhar: ROLA. E fique de olho nos planos do convés: tem corda, barril e gancho por todo lado.' }],
       depois: [{ quem: 'almirante', texto: 'Você... ganhou a luta... mas perdeu o navio, Comandante. Olhe para trás.' }],
     },
     {
@@ -1959,7 +1959,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
       inimigo: 'guarda-chicote',
       antes: [
         { quem: 'guarda', texto: 'Voltem para os remos! TODOS!' },
-        { quem: 'octavius', texto: 'O chicote dele estala longe (VERMELHO): esquiva. E olha os PLANOS do porão: remos, correntes, barris!' },
+        { quem: 'octavius', texto: 'O chicote dele estala longe (VERMELHO): ROLA. E olha os PLANOS do porão: remos, correntes, barris!' },
       ],
       depois: [{ quem: 'pistao', texto: 'Ha! Quarenta anos esperando para ver isso.' }],
     },
@@ -2262,7 +2262,7 @@ export const CAP3_OCTAVIUS: Capitulo = {
           rotulo: 'Brutus',
           falas: [
             { quem: 'brutus', texto: 'O Lata de Biblioteca segura no escudo. Você não tem paciência pra isso, Tagarela. Você tem perna.' },
-            { quem: 'brutus', texto: 'Então: esquivou, BATEU. E esquiva de novo, rápido. Quem esquiva duas vezes nunca é pego.' },
+            { quem: 'brutus', texto: 'Então: rolou, BATEU. E rola de novo, rápido. Quem rola duas vezes nunca é pego.' },
             { quem: 'brutus', texto: 'E come o mingau. É de sardinha.' },
             { quem: 'octavius', texto: 'Sardinha? A Gaivota Sete ia amar esse lugar.' },
           ],
@@ -2296,7 +2296,7 @@ export const CAP3_OCTAVIUS: Capitulo = {
       antes: [
         { quem: 'brutus', texto: 'Treino acabou. Agora o teste. Soltem o Touro de Bronze!' },
         { quem: 'octavius', texto: 'Ele tem dois chifres e eu tenho zero planos. Péssima matemática.' },
-        { quem: 'brutus', texto: 'Ele só sabe correr em linha reta, Tagarela. Esquiva e bate. Esquiva e bate!' },
+        { quem: 'brutus', texto: 'Ele só sabe correr em linha reta, Tagarela. Rola e bate. Rola e bate!' },
       ],
       depois: [
         { quem: 'brutus', texto: 'Hunf. Igualzinho a um toureiro de Hispânia. Só que tagarela.' },
@@ -2519,7 +2519,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       lugar: 'subura-telhados',
       inimigo: 'vigia-telhado',
       ...rota('telhados'),
-      antes: [{ quem: 'octavius', texto: 'Um vigia! A pedra da funda vem de longe (VERMELHO): esquiva.' }],
+      antes: [{ quem: 'octavius', texto: 'Um vigia! A pedra da funda vem de longe (VERMELHO): ROLA.' }],
       depois: [{ quem: 'octavius', texto: 'Pulei de telhado em telhado a vida inteira. Bom, a vida inteira de navio. Mas é parecido.' }],
     },
     {
@@ -2556,7 +2556,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       lugar: 'subura-telhados',
       inimigo: 'vigia-chefe',
       ...rota('telhados'),
-      antes: [{ quem: 'guarda', texto: 'Ninguém passa pelos telhados da Subura!' }, { quem: 'octavius', texto: 'Ele atira três pedras de uma vez. Esquivar a primeira protege das outras!' }],
+      antes: [{ quem: 'guarda', texto: 'Ninguém passa pelos telhados da Subura!' }, { quem: 'octavius', texto: 'Ele atira três pedras de uma vez. Rolar na primeira protege das outras!' }],
     },
 
     // --- Rota B: esgoto ---
@@ -2574,7 +2574,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       lugar: 'subura-esgoto',
       inimigo: 'limpador-esgoto',
       ...rota('esgoto'),
-      antes: [{ quem: 'octavius', texto: 'Um limpador de esgoto! O jato de lodo é VERMELHO: esquiva. O resto, escudo.' }],
+      antes: [{ quem: 'octavius', texto: 'Um limpador de esgoto! O jato de lodo é VERMELHO: ROLA. Ou joga a REDE quando ele for atacar!' }],
       depois: [{ quem: 'octavius', texto: 'Desculpa, amigo. Você limpa muito bem. Só não limpa o meu caminho.' }],
     },
     {
@@ -2667,7 +2667,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       lugar: 'subura-mercado',
       inimigo: 'feirante-chefe',
       ...rota('feira'),
-      antes: [{ quem: 'octavius', texto: 'O Fiscal da Feira! Chuva de frutas (VERMELHO) e carimbos. Bloqueia o primeiro carimbo e segura!' }],
+      antes: [{ quem: 'octavius', texto: 'O Fiscal da Feira! Chuva de frutas (VERMELHO) e carimbos. Rola no primeiro carimbo e o resto passa!' }],
     },
 
     // --- O cofre (todas as rotas se encontram aqui) ---
@@ -2716,7 +2716,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       id: 'o4-chefao',
       lugar: 'cofre-cobrador',
       inimigo: 'cobrador',
-      antes: [{ quem: 'octavius', texto: 'Quando a boca de moeda ficar vermelha: JATO DE MOEDAS. Esquiva! E olha os planos do cofre: sacos, balanças, ábacos...' }],
+      antes: [{ quem: 'octavius', texto: 'Quando a boca de moeda ficar vermelha: JATO DE MOEDAS. ROLA! E olha os planos do cofre: sacos, balanças, ábacos...' }],
       depois: [{ quem: 'cobrador', texto: 'Isso... vai... custar... caro...' }],
     },
     {
@@ -2858,7 +2858,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
       id: 'o5-sentinela',
       lugar: 'porto-docas',
       inimigo: 'sentinela-cais',
-      antes: [{ quem: 'octavius', texto: '"Quase ninguém" incluía uma sentinela. A lanterna acesa é VERMELHA: esquiva!' }],
+      antes: [{ quem: 'octavius', texto: '"Quase ninguém" incluía uma sentinela. A lanterna acesa é VERMELHA: ROLA!' }],
       depois: [{ quem: 'octavius', texto: 'Silêncio... Tripulação, aos navios do Censor. Vamos pegar emprestado.' }],
     },
     {
@@ -2930,7 +2930,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
       id: 'o5-chefao',
       lugar: 'navio-conves',
       inimigo: 'almirante-aco',
-      antes: [{ quem: 'octavius', texto: 'Canhão duplo, bordada, abalroar. Esquiva o primeiro tiro e você escapa da bordada inteira!' }],
+      antes: [{ quem: 'octavius', texto: 'Canhão duplo, bordada, abalroar. Rola no primeiro tiro e você escapa da bordada inteira!' }],
       depois: [{ quem: 'almirante', texto: 'Impossível... eu era... perfeito...' }],
     },
     {
@@ -3176,7 +3176,7 @@ export const CAP6_OCTAVIUS: Capitulo = {
       id: 'o6-chefao',
       lugar: 'coliseu-inundado',
       inimigo: 'leviata',
-      antes: [{ quem: 'octavius', texto: 'Bote da serpente e jato de vapor: VERMELHO, esquiva. Os anéis vêm em sequência: bloqueia o primeiro!' }],
+      antes: [{ quem: 'octavius', texto: 'Bote da serpente e jato de vapor: VERMELHO, ROLA. Os anéis vêm em sequência: rola no primeiro!' }],
       depois: [{ quem: 'povo', texto: 'ELE DERRUBOU O LEVIATÃ! ELE DERRUBOU O LEVIATÃ!' }],
     },
     {

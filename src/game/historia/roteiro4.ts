@@ -257,7 +257,7 @@ export const CAP_SECRETO: Capitulo = {
         { quem: 'octavius', texto: 'Uma cópia. Ela sabe tudo o que você sabe. Então luta com quem ela NÃO conhece: troca de gladiador!' },
       ],
       depois: [
-        { quem: 'cassius', texto: 'Ela se defendia igualzinho a mim. Mas não sabia esquivar do jeito do Octavius.' },
+        { quem: 'cassius', texto: 'Ela se defendia igualzinho a mim. Mas não sabia rolar do jeito do Octavius.' },
         { quem: 'helios', texto: 'Uma cópia só tem um jeito de lutar. A gente tem três.' },
       ],
     },

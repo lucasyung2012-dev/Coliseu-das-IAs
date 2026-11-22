@@ -620,8 +620,8 @@ const CAP1_CASSIUS: Capitulo = {
       lugar: 'biblioteca-escada',
       inimigo: 'incinerador-lanca-chamas',
       antes: [
-        { quem: 'cassius', texto: 'Um Lança-Chamas! O fogo atravessa o escudo.' },
-        { quem: 'cassius', texto: 'Quando ele piscar em VERMELHO, eu esquivo. E cuidado: às vezes ele finge que vai atacar e não ataca. É a FINTA.' },
+        { quem: 'cassius', texto: 'Um Lança-Chamas! O fogo só para no escudo levantado bem na hora.' },
+        { quem: 'cassius', texto: 'Quando ele piscar em VERMELHO, eu levanto o escudo bem na hora. E cuidado: às vezes ele finge que vai atacar e não ataca. É a FINTA.' },
       ],
     },
     {
@@ -642,7 +642,7 @@ const CAP1_CASSIUS: Capitulo = {
       id: 'c1-luta4',
       lugar: 'biblioteca-escada',
       inimigo: 'incinerador-duplo',
-      antes: [{ quem: 'cassius', texto: 'Dois braseiros num corpo só. Faísca, fogo, trombada e três golpes seguidos. Amarelo, escudo. Vermelho, esquiva.' }],
+      antes: [{ quem: 'cassius', texto: 'Dois braseiros num corpo só. Faísca, fogo, trombada e três golpes seguidos. Amarelo ou vermelho: escudo na hora certa. Depois, DEVOLVER.' }],
     },
     {
       tipo: 'cutscene',
@@ -701,7 +701,7 @@ const CAP1_CASSIUS: Capitulo = {
       lugar: 'biblioteca-chamas',
       inimigo: 'fornalha',
       antes: [
-        { quem: 'cassius', texto: 'A porta da barriga dela acende antes do bafo de fogo. Esquivo e bato enquanto ela esfria.' },
+        { quem: 'cassius', texto: 'A porta da barriga dela acende antes do bafo de fogo. Levanto o escudo bem na hora e bato enquanto ela esfria.' },
         { quem: 'cassius', texto: 'E ela vai esquentar. Cada vez mais rápida, cada vez mais vermelha.' },
       ],
       depois: [
@@ -915,7 +915,7 @@ const CAP2_CASSIUS: Capitulo = {
       inimigo: 'pretoriano-lanceiro',
       antes: [
         { quem: 'guarda', texto: 'Ali! Entre as barracas!', emocao: 'bravo', jeito: 'grito' },
-        { quem: 'cassius', texto: 'Uma lança: a estocada vem de longe (VERMELHO, esquiva). E ele finge muito.' },
+        { quem: 'cassius', texto: 'Uma lança: a estocada vem de longe (VERMELHO: escudo bem na hora). E ele finge muito.' },
       ],
     },
     {

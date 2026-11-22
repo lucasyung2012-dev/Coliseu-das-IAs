@@ -111,8 +111,8 @@ export const CAP1_HELIOS: Capitulo = {
       lugar: 'observatorio-ataque',
       inimigo: 'apagador',
       antes: [
-        { quem: 'helios', texto: 'Amarelo: escudo. Vermelho: esquiva. E quando ele ficar ABERTO, bater.' },
-        { quem: 'lumen', texto: 'Uuh! (A fumaça preta é VERMELHA: escudo não segura!)' },
+        { quem: 'helios', texto: 'Fogo: ESPELHO. O resto: PASSO DE SOMBRA. E quando ele ficar ABERTO, LAMPEJO.' },
+        { quem: 'lumen', texto: 'Uuh! (A fumaça preta é VERMELHA: passo de sombra!)' },
       ],
       depois: [{ quem: 'helios', texto: 'Um a menos. Mas ainda tem fumaça subindo da escada.' }],
     },
@@ -157,7 +157,7 @@ export const CAP1_HELIOS: Capitulo = {
       id: 'h1-luta3',
       lugar: 'observatorio-ataque',
       inimigo: 'pretoriano-noturno',
-      antes: [{ quem: 'helios', texto: 'O virote da besta é VERMELHO. Esquiva, e ele fica aberto enquanto recarrega.' }],
+      antes: [{ quem: 'helios', texto: 'O virote da besta é VERMELHO. Passo de sombra, e ele fica aberto enquanto recarrega.' }],
     },
     {
       tipo: 'explorar',
@@ -197,8 +197,8 @@ export const CAP1_HELIOS: Capitulo = {
       antes: [
         { quem: 'helios', texto: 'A lente rachada junta a luz num ponto só... e eu enxergo. Não o que é. O que VAI SER.' },
         { quem: 'narrador', texto: 'Em cima do Apagador aparece um olho: PRÓXIMO. Helios vê o próximo golpe antes do sinal. Até as fintas.' },
-        { quem: 'helios', texto: 'Se eu sei o que vem, não preciso fugir cedo. Posso sumir no último instante, num lampejo.' },
-        { quem: 'narrador', texto: 'TREINO DO VIDENTE: olhe o PRÓXIMO, espere o golpe e aperte LAMPEJO NA ÚLTIMA HORA. Cada lampejo assim junta uma LUZ.' },
+        { quem: 'helios', texto: 'Se eu sei o que vem, não preciso fugir cedo. Posso sumir no último instante, num passo de sombra.' },
+        { quem: 'narrador', texto: 'TREINO DO VIDENTE: olhe o PRÓXIMO, espere o golpe e aperte PASSO DE SOMBRA NA ÚLTIMA HORA. Cada passo assim junta uma LUZ.' },
       ],
       treino: { evento: 'luz', quantos: 2, rotulo: 'LUZ (lampejo na última hora)' },
       depois: [
@@ -327,7 +327,7 @@ export const CAP2_HELIOS: Capitulo = {
       id: 'h2-luta1',
       lugar: 'telhados-noite',
       inimigo: 'vigia-noturno',
-      antes: [{ quem: 'helios', texto: 'Um vigia de telhado. A pedra dele vem do escuro: VERMELHO, esquiva.' }],
+      antes: [{ quem: 'helios', texto: 'Um vigia de telhado. A pedra dele vem do escuro: VERMELHO, passo de sombra.' }],
       depois: [{ quem: 'helios', texto: 'Ele vai acordar com dor de cabeça. E com uma vista linda das estrelas.' }],
     },
     {
@@ -402,7 +402,7 @@ export const CAP2_HELIOS: Capitulo = {
       id: 'h2-luta3',
       lugar: 'telhados-noite',
       inimigo: 'pretoriano-besteiro',
-      antes: [{ quem: 'helios', texto: 'Um besteiro. Dois virotes seguidos: esquivando o primeiro, o segundo passa por cima.' }],
+      antes: [{ quem: 'helios', texto: 'Um besteiro. Dois virotes seguidos: com o passo de sombra no primeiro, o segundo passa por cima.' }],
     },
     {
       tipo: 'conversa',
@@ -461,7 +461,7 @@ export const CAP2_HELIOS: Capitulo = {
       id: 'h2-chefao',
       lugar: 'telhados-noite',
       inimigo: 'cacador-sombras',
-      antes: [{ quem: 'helios', texto: 'No escuro de novo. LUZ quando ele se mexer. E a lanterna vermelha dele é VERMELHA mesmo: esquiva!' }],
+      antes: [{ quem: 'helios', texto: 'No escuro de novo. LUZ quando ele se mexer. E a lanterna vermelha dele é VERMELHA mesmo: passo de sombra!' }],
       depois: [{ quem: 'cacador', texto: 'Cem anos... e uma IA que brilha me derruba...' }],
     },
     {
@@ -589,7 +589,7 @@ export const CAP3_HELIOS: Capitulo = {
           falas: [
             { quem: 'brutus', texto: 'O Lata de Biblioteca segura no escudo. O marinheiro que chega hoje, dizem que fala pelos cotovelos, vai fugir com as pernas. E você, Vidente?' },
             { quem: 'helios', texto: 'Eu vejo o golpe antes dele chegar.' },
-            { quem: 'brutus', texto: 'Então usa isso: escudo levantado BEM na hora. Não antes. Na hora certa, o escudo vira espelho e o golpe volta pra quem bateu.' },
+            { quem: 'brutus', texto: 'Então usa isso: o ESPELHO levantado BEM na hora. Não antes. Na hora certa, o golpe volta pra quem bateu.' },
             { quem: 'brutus', texto: 'Chamo isso de ESPELHO DE SOL. O Pólux sabia fazer. Ninguém mais aprendeu.' },
           ],
         },
@@ -790,7 +790,7 @@ export const CAP4_HELIOS: Capitulo = {
       id: 'h4-luta1',
       lugar: 'aqueduto',
       inimigo: 'guarda-aqueduto',
-      antes: [{ quem: 'helios', texto: 'O jato de água é VERMELHO: esquiva. E use o Espelho de Sol no escudo de válvula dele.' }],
+      antes: [{ quem: 'helios', texto: 'O jato de água é VERMELHO: passo de sombra. E use o Espelho de Sol no escudo de válvula dele.' }],
       depois: [{ quem: 'helios', texto: 'Ele vai se secar ao sol. Daqui a umas três horas.' }],
     },
     {
@@ -874,7 +874,7 @@ export const CAP4_HELIOS: Capitulo = {
       id: 'h4-luta5',
       lugar: 'aqueduto',
       inimigo: 'pretoriano-noturno-elite',
-      antes: [{ quem: 'helios', texto: 'Um Pretoriano de Elite. Três virotes seguidos: esquiva o primeiro e os outros passam.' }],
+      antes: [{ quem: 'helios', texto: 'Um Pretoriano de Elite. Três virotes seguidos: passo de sombra no primeiro e os outros passam.' }],
     },
     {
       tipo: 'cutscene',
@@ -1074,7 +1074,7 @@ export const CAP5_HELIOS: Capitulo = {
       id: 'h5-luta4',
       lugar: 'templo-oraculo',
       inimigo: 'estatua-arqueira',
-      antes: [{ quem: 'helios', texto: 'Três flechas de uma vez. Esquivo a primeira, e o resto passa.' }],
+      antes: [{ quem: 'helios', texto: 'Três flechas de uma vez. Passo de sombra na primeira, e o resto passa.' }],
     },
     {
       tipo: 'cutscene',
