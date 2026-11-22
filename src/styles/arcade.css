@@ -1796,3 +1796,14 @@
 @keyframes devolver-agora { from { box-shadow: inset 0 0 0 3px #c8962a, 0 0 6px #ffd04a; } to { box-shadow: inset 0 0 0 3px #ffd04a, 0 0 20px 4px #ffd04a; } }
 .aviso-escuro { animation: aviso-saida 4s ease-out forwards; }
 .menos-movimento .pronto-luz, .menos-movimento .devolver-agora { animation: none; }
+
+/* A forja do Brutus (22/11/2026). */
+.brasa-forja { background: radial-gradient(circle, #fff4c0 0 25%, #ffb03a 45%, #ff5a1a 70%, transparent 72%); box-shadow: 0 0 10px #ff7a2a; }
+.forja-fogo { animation: chama-fase 0.3s steps(2) infinite alternate; transform-origin: 50% 100%; }
+.faisca-forja { animation: faisca-forja 0.45s ease-out forwards; }
+@keyframes faisca-forja { from { opacity: 1; transform: rotate(var(--ang)) translateX(0); } to { opacity: 0; transform: rotate(var(--ang)) translateX(46px); } }
+.tang { animation: tang 0.5s ease-out forwards; }
+@keyframes tang { 0% { opacity: 0; scale: 0.4; } 30% { opacity: 1; scale: 1.2; } 100% { opacity: 0; scale: 1; translate: 0 -10px; } }
+.martelada { animation: martelada 0.25s ease-out; transform-origin: 60% 90%; }
+@keyframes martelada { 0% { rotate: -14deg; } 50% { rotate: 10deg; } 100% { rotate: 0deg; } }
+.menos-movimento .faisca-forja, .menos-movimento .tang, .menos-movimento .martelada { animation-duration: 0.01s; }

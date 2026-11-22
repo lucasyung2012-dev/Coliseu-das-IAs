@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import Emote from '@/ui/pixel/Emotes';
 import Icone from '@/ui/pixel/Icones';
 import type { Fala, Falante, Lugar } from '@/game/historia/roteiro';
 import { desbloquear } from '@/ui/som';
@@ -86,6 +87,9 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
   const [acertos, setAcertos] = useState(0);
   const [resolvidas, setResolvidas] = useState<number[]>([]);
   const [brilho, setBrilho] = useState<'ok' | 'erro' | null>(null);
+  // Quantas certas seguidas (o Brutus gosta) e o número da martelada (as faíscas recomeçam a cada uma).
+  const [seguidas, setSeguidas] = useState(0);
+  const [batida, setBatida] = useState(0);
   // Cada batida chega na linha num tempo (em décimos de segundo); o ritmo aperta no fim.
   const chegadas = useRef(Array.from({ length: BATIDAS }, (_, k) => 20 + k * (k < 10 ? 8 : 6) + (k % 3 === 2 ? 3 : 0)));
   const pos = (k: number) => 15 + (chegadas.current[k]! - t) * 2.2;
@@ -111,10 +115,13 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
       setAcertos((a) => a + 1);
       setResolvidas((r) => [...r, k]);
       setBrilho('ok');
+      setSeguidas((n) => n + 1);
     } else {
       tocar('falha');
       setBrilho('erro');
+      setSeguidas(0);
     }
+    setBatida((n) => n + 1);
     window.setTimeout(() => setBrilho(null), 150);
   };
 
@@ -127,23 +134,69 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
         </span>
       </div>
       <Palco lugar={lugar} className={brilho === 'erro' ? 'tremer' : ''}>
+        {/* A FORJA (redesenhada, 22/11/2026): a fornalha acesa à direita, a barra de ferro em brasa
+            trazendo o calor, a bigorna com a armadura amassada (fica reta a cada martelada certa),
+            o Cassius de martelo e o Brutus olhando. Faíscas e TANG! quando acerta. */}
+        <div className="pointer-events-none absolute bottom-[10%] right-[2%] top-[22%] z-[5] w-[16%]" aria-hidden>
+          <div className="absolute inset-0 border-4 border-[#3a2a20] bg-[#5a4a40]" />
+          <div className="absolute inset-x-[14%] bottom-[12%] h-[46%] bg-[#1a0e08]" />
+          <div className="forja-fogo absolute inset-x-[18%] bottom-[14%] h-[36%] bg-[radial-gradient(ellipse_at_50%_100%,#fff0a0_0,#ffb03a_35%,#ff5a1a_65%,transparent_80%)]" />
+          <div className="absolute -inset-[30%] rounded-full bg-[#ff7a2a]/20 blur-xl" />
+        </div>
         {fase === 'jogo' && (
-          <div className="absolute inset-x-0 top-[40%] z-20 h-[18%]">
-            <div className="absolute inset-0 bg-black/50" />
-            {/* a bigorna (a linha) */}
-            <div className={`absolute inset-y-0 left-[13%] w-[5%] border-x-4 ${brilho === 'ok' ? 'border-[#ffd04a] bg-[#ffd04a]/40' : 'border-white/70'}`} />
-            {chegadas.current.map((_, k) =>
-              resolvidas.includes(k) || pos(k) > 102 || pos(k) < 5 ? null : (
-                <span key={k} className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl" style={{ left: `${pos(k)}%` }} aria-hidden>
-                  <Icone nome="brasa" className="inline-block w-[1em] align-middle" />
-                </span>
-              ),
-            )}
+          <div className="pointer-events-none absolute left-[14%] right-[18%] top-[44%] z-20 h-[12%]" aria-hidden>
+            {/* a barra de ferro: esquenta do lado da fornalha */}
+            <div className="absolute inset-x-0 top-1/2 h-[30%] -translate-y-1/2 bg-[linear-gradient(90deg,#3a3a44,#5a4a4a_60%,#c8501a)] shadow-[0_2px_0_#000]" />
+            {chegadas.current.map((_, k) => {
+              const x = ((pos(k) - 15) / 87) * 100;
+              return resolvidas.includes(k) || x > 100 || x < -6 ? null : (
+                <span key={k} className="brasa-forja absolute top-1/2 block aspect-square w-[5%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${x}%` }} />
+              );
+            })}
           </div>
         )}
-        <div className="absolute bottom-[12%] left-[30%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
-          <Retrato quem="brutus" />
+        {/* a bigorna e a armadura em cima dela */}
+        <div className="pointer-events-none absolute bottom-[12%] left-[16%] z-[12] w-[16%] -translate-x-1/2" aria-hidden>
+          <div className={`mx-auto h-[14px] w-[70%] rounded-t-[40%] border-2 border-black sm:h-[26px] ${acertos >= PRECISA_FORJA ? 'bg-[#d8d8e8]' : acertos > PRECISA_FORJA / 2 ? 'bg-[#a8a8b8]' : 'bg-[#8a6a5a]'}`} style={{ clipPath: `polygon(0 ${Math.max(0, 40 - acertos * 4)}%, 30% 0, 50% ${Math.max(0, 30 - acertos * 3)}%, 70% 0, 100% ${Math.max(0, 40 - acertos * 4)}%, 100% 100%, 0 100%)` }} />
+          <div className="h-[10px] w-full bg-[#3a3a44] sm:h-[18px]" />
+          <div className="mx-auto h-[14px] w-[40%] bg-[#2a2a34] sm:h-[24px]" />
+          <div className="mx-auto h-[6px] w-[70%] bg-[#3a3a44] sm:h-[10px]" />
+          <div className={`absolute inset-x-[10%] top-0 h-[40%] rounded-full ${brilho === 'ok' ? 'bg-[#ffd04a]/60' : 'bg-transparent'} blur-md`} />
         </div>
+        {/* faíscas e TANG! na martelada certa */}
+        {brilho === 'ok' && (
+          <div key={batida} className="pointer-events-none absolute bottom-[30%] left-[16%] z-[25]" aria-hidden>
+            {[-60, -35, -10, 15, 40, 65, 90, -85].map((a, k) => (
+              <span key={k} className="faisca-forja absolute block h-[3px] w-[3px] bg-[#ffe08a]" style={{ '--ang': `${a}deg` } as CSSProperties} />
+            ))}
+            <span className="tang absolute -top-8 left-2 font-pixel text-sm text-[#ffd04a] [text-shadow:2px_2px_0_#000] sm:text-2xl">TANG!</span>
+          </div>
+        )}
+        {/* o Cassius com o martelo (balança a cada martelada) */}
+        <div className="pointer-events-none absolute bottom-[12%] left-[6%] z-[11] w-[15%] -translate-x-1/2" aria-hidden>
+          <div key={batida} className={batida ? 'martelada' : 'respirar'}>
+            <Retrato quem="cassius" />
+          </div>
+        </div>
+        {/* o Brutus olhando: gosta das seguidas, bufa no erro */}
+        <div className="pointer-events-none absolute bottom-[12%] left-[44%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
+          {(brilho === 'erro' || seguidas >= 3) && (
+            <span className="emote-pula absolute -top-[20%] left-1/2 block w-[40%] -translate-x-1/2">
+              <Emote emocao={brilho === 'erro' ? 'bravo' : 'feliz'} />
+            </span>
+          )}
+          <Retrato quem="brutus" espelhar />
+        </div>
+        {/* a armadura ficando pronta */}
+        {fase === 'jogo' && (
+          <div className="pointer-events-none absolute inset-x-[4%] top-[6%] z-20 flex items-center gap-2" aria-hidden>
+            <span className="font-pixel text-[7px] text-white [text-shadow:1px_1px_0_#000] sm:text-[10px]">ARMADURA</span>
+            <div className="h-2 flex-1 border border-black bg-black/60">
+              <div className="h-full bg-[linear-gradient(90deg,#8a6a5a,#d8d8e8)] transition-[width]" style={{ width: `${Math.min(100, (acertos / PRECISA_FORJA) * 100)}%` }} />
+            </div>
+            {seguidas >= 3 && <span className="font-pixel text-[7px] text-[#ffd04a] sm:text-[10px]">×{seguidas}</span>}
+          </div>
+        )}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
         {fase === 'perdeu' && (
           <Perdeu
