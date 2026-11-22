@@ -1807,3 +1807,18 @@
 .martelada { animation: martelada 0.25s ease-out; transform-origin: 60% 90%; }
 @keyframes martelada { 0% { rotate: -14deg; } 50% { rotate: 10deg; } 100% { rotate: 0deg; } }
 .menos-movimento .faisca-forja, .menos-movimento .tang, .menos-movimento .martelada { animation-duration: 0.01s; }
+
+/* A memória dos golpes (22/11/2026): cada golpe é um movimento do corpo. */
+.pose-golpe, .pose-golpe-b { animation: pose-golpe 0.45s ease-out; }
+@keyframes pose-golpe { 0% { translate: 0 0; } 35% { translate: 22% 0; } 100% { translate: 0 0; } }
+.pose-golpe-b { animation-name: pose-golpe-b; }
+@keyframes pose-golpe-b { 0% { translate: 0 0; } 35% { translate: -22% 0; } 100% { translate: 0 0; } }
+.pose-escudo, .pose-escudo-b { animation: pose-escudo 0.5s ease-out; }
+@keyframes pose-escudo { 0% { translate: 0 0; filter: none; } 30% { translate: 0 6%; filter: drop-shadow(0 0 10px #ffd04a); } 100% { translate: 0 0; filter: none; } }
+.pose-esquiva, .pose-esquiva-b { animation: pose-esquiva 0.5s ease-out; }
+@keyframes pose-esquiva { 0% { translate: 0 0; } 40% { translate: -16% -18%; } 100% { translate: 0 0; } }
+.pose-esquiva-b { animation-name: pose-esquiva-b; }
+@keyframes pose-esquiva-b { 0% { translate: 0 0; } 40% { translate: 16% -18%; } 100% { translate: 0 0; } }
+.tropeca { animation: tropeca 0.5s ease-out; }
+@keyframes tropeca { 0% { rotate: 0deg; } 30% { rotate: -12deg; translate: -6% 4%; } 60% { rotate: 6deg; } 100% { rotate: 0deg; translate: 0 0; } }
+.menos-movimento .pose-golpe, .menos-movimento .pose-escudo, .menos-movimento .pose-esquiva, .menos-movimento .tropeca, .menos-movimento .pose-golpe-b, .menos-movimento .pose-escudo-b, .menos-movimento .pose-esquiva-b { animation: none; }

@@ -228,6 +228,9 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
   const [mostrando, setMostrando] = useState(-1);
   const [resposta, setResposta] = useState<number[]>([]);
   const [vidas, setVidas] = useState(3);
+  // O que o Cassius acabou de fazer (repete o golpe com o corpo) e se acertou.
+  const [ultimo, setUltimo] = useState<{ g: number; ok: boolean; n: number } | null>(null);
+  const [rodadaCerta, setRodadaCerta] = useState(false);
 
   const nova = (r: number) => {
     const s = Array.from({ length: RODADAS_MEMORIA[r]! }, () => Math.floor(Math.random() * 3));
@@ -253,6 +256,7 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
   const apertar = (g: number) => {
     if (fase !== 'jogo' || mostrando >= 0) return;
     const r = [...resposta, g];
+    setUltimo((u) => ({ g, ok: seq[r.length - 1] === g, n: (u?.n ?? 0) + 1 }));
     if (seq[r.length - 1] !== g) {
       tocar('falha');
       if (vidas <= 1) setFase('perdeu');
@@ -268,7 +272,13 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
       if (rodada + 1 >= RODADAS_MEMORIA.length) {
         tocar('fanfarra');
         setFase('ok');
-      } else window.setTimeout(() => setRodada((x) => x + 1), 500);
+      } else {
+        setRodadaCerta(true);
+        window.setTimeout(() => {
+          setRodadaCerta(false);
+          setRodada((x) => x + 1);
+        }, 900);
+      }
     }
   };
 
@@ -282,27 +292,55 @@ export function MinigameMemoria({ lugar, antes, depois, onFim }: Base) {
         <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
-        <div className="absolute bottom-[12%] left-[40%] z-10 w-[15%] -translate-x-1/2" aria-hidden>
-          <div className={atual ? 'investida-dir' : 'respirar'} key={mostrando}>
-            <Retrato quem="brutus" />
+        {/* A MEMÓRIA (redesenhada, 22/11/2026): o Brutus e o Cassius frente a frente na areia. O
+            Brutus faz cada golpe com o corpo (avança, levanta o escudo, pula de lado) e a placa
+            mostra qual é; depois o Cassius repete com o corpo o que você apertar. */}
+        <div className="pointer-events-none absolute inset-x-[10%] bottom-[9%] z-[4] h-[6%] rounded-[50%] bg-black/30" aria-hidden />
+        {/* o Brutus */}
+        <div className="pointer-events-none absolute bottom-[12%] left-[68%] z-10 w-[17%] -translate-x-1/2" aria-hidden>
+          {atual && (
+            <span key={`p${mostrando}`} className="surgir absolute -top-[46%] left-1/2 flex -translate-x-1/2 flex-col items-center gap-1">
+              <span className="flex aspect-square w-14 items-center justify-center rounded-full border-4 border-black sm:w-24" style={{ background: atual.cor, boxShadow: `0 0 18px ${atual.cor}` }}>
+                <Icone nome={atual.icone} className="w-[62%]" />
+              </span>
+              <span className="whitespace-nowrap border-2 border-black bg-[#f4e2b4] px-1 font-pixel text-[7px] text-black sm:text-[10px]">{atual.nome}</span>
+            </span>
+          )}
+          {(ultimo && !ultimo.ok) || rodadaCerta ? (
+            <span className="emote-pula absolute -top-[18%] left-[80%] block w-[34%]">
+              <Emote emocao={rodadaCerta ? 'feliz' : 'bravo'} />
+            </span>
+          ) : null}
+          <div key={`b${mostrando}`} className={atual ? `pose-${atual.id}-b` : 'respirar'}>
+            <Retrato quem="brutus" espelhar />
+          </div>
+        </div>
+        {/* o Cassius, repetindo */}
+        <div className="pointer-events-none absolute bottom-[12%] left-[30%] z-10 w-[15%] -translate-x-1/2" aria-hidden>
+          {ultimo && !ultimo.ok && (
+            <span key={`x${ultimo.n}`} className="tang absolute -top-[30%] left-1/2 -translate-x-1/2 font-pixel text-2xl text-[#ff4a4a] [text-shadow:2px_2px_0_#000] sm:text-4xl">X</span>
+          )}
+          <div key={`c${ultimo?.n ?? 0}`} className={ultimo ? (ultimo.ok ? `pose-${GOLPES[ultimo.g]!.id}` : 'tropeca') : 'respirar'}>
+            <Retrato quem="cassius" />
           </div>
         </div>
         {fase === 'jogo' && (
-          <div className="absolute right-[8%] top-[24%] z-20 flex flex-col items-center gap-2">
-            {atual ? (
-              <span key={mostrando} className="surgir text-5xl sm:text-7xl" style={{ filter: `drop-shadow(0 0 10px ${atual.cor})` }}>
-                <Icone nome={atual.icone} className="inline-block w-[1em]" />
-              </span>
-            ) : (
-              <span className="font-pixel text-[10px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">
-                SUA VEZ! {resposta.length}/{seq.length}
-              </span>
-            )}
-            <div className="flex gap-1">
-              {seq.map((_, k) => (
-                <span key={k} className={`h-2 w-4 border border-black ${k < resposta.length ? 'bg-[#4ad46a]' : 'bg-black/60'}`} />
-              ))}
+          <div className="pointer-events-none absolute inset-x-0 top-[5%] z-20 flex flex-col items-center gap-1" aria-hidden>
+            {/* as placas da sequência: vão se acendendo com o que você acertou */}
+            <div className="flex gap-1 sm:gap-2">
+              {seq.map((s, k) => {
+                const feito = k < resposta.length;
+                const g = GOLPES[s]!;
+                return (
+                  <span key={k} className={`flex aspect-square w-6 items-center justify-center border-2 sm:w-10 ${feito ? 'border-[#4ad46a] bg-black/70' : 'border-[#6a5a48] bg-[#3a2e24]/80'}`} style={feito ? { boxShadow: `0 0 8px ${g.cor}` } : undefined}>
+                    {feito && <Icone nome={g.icone} className="w-[70%]" />}
+                  </span>
+                );
+              })}
             </div>
+            <span className="font-pixel text-[8px] text-white [text-shadow:2px_2px_0_#000] sm:text-xs">
+              {rodadaCerta ? 'RODADA CERTA!' : atual ? 'OLHE O BRUTUS...' : mostrando < 0 ? `SUA VEZ! ${resposta.length}/${seq.length}` : ''}
+            </span>
           </div>
         )}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
