@@ -367,6 +367,7 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
   // O final: o Porto de Óstia livre, de dia, com o Esperança no cais.
   'porto-livre': {
     tema: 'porto',
+    claro: true,
     inicio: [2, 7],
     mapa: [
       'wwwwwwwwwwwwwwwwwwwwww',
@@ -376,7 +377,7 @@ export const MAPAS: Record<string, MapaDeExplorar> = {
       'www..wwwwwwww..wwwwwww',
       'w.....r..............w',
       'w..bb..............b.w',
-      'w....................w',
+      'w......j......j......w',
       '#kk.......bb.......kk#',
       '#v..................P#',
       '######################',
