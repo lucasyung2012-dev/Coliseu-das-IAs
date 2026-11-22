@@ -610,9 +610,17 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
   const seq = useRef(0);
   const proximo = useRef(0);
   const ANDA = 3200;
+  // Os bonecos derrubados voam girando; e cada gladiador ataca (a animação recomeça a cada golpe).
+  const [caidos, setCaidos] = useState<{ id: number; faixa: number; x: number; em: number }[]>([]);
+  const [ataques, setAtaques] = useState([0, 0, 0]);
+  const derrubar = (b: { id: number; faixa: number; nasceu: number }, t: number) => {
+    setCaidos((c) => [...c.filter((x) => t - x.em < 700), { id: b.id, faixa: b.faixa, x: 92 - Math.min(1, (t - b.nasceu) / ANDA) * 78, em: t }]);
+    setAtaques((a) => a.map((n, k) => (k === b.faixa ? n + 1 : n)));
+  };
 
   const comecar = () => {
     setBonecos([]);
+    setCaidos([]);
     setDerrubados(0);
     setVidas(3);
     seq.current = 0;
@@ -638,6 +646,7 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
       // Os aliados derrubam o boneco deles quando chega na linha.
       if (!minha(b.faixa) && p >= 0.75) {
         setBonecos((x) => x.filter((y) => y.id !== b.id));
+        derrubar(b, t);
         tocar('clique');
       }
       if (minha(b.faixa) && p >= 1) {
@@ -662,6 +671,7 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
     const alvo = bonecos.find((b) => b.faixa === lane && (agora - b.nasceu) / ANDA >= 0.55);
     if (alvo) {
       tocar('espadas');
+      derrubar(alvo, Date.now());
       setBonecos((x) => x.filter((y) => y.id !== alvo.id));
       setDerrubados((d) => d + 1);
     } else tocar('falha');
@@ -677,15 +687,35 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
         <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
+        {/* O TRIO (redesenhado, 22/11/2026): três raias de areia com cerca de madeira, cada
+            gladiador grande na ponta da raia dele, a zona de acertar marcada no chão, os bonecos
+            de palha marchando e voando girando quando apanham. */}
         {ORDEM.map((q, k) => (
           <div key={q} className="absolute inset-x-0 z-[6]" style={{ top: `${22 + k * 24}%`, height: '22%' }} aria-hidden>
-            <div className="absolute inset-0" style={{ background: minha(k) ? `${PAPEL[q].cor}33` : 'transparent', borderTop: `2px dashed ${PAPEL[q].cor}66` }} />
-            <div className="absolute left-[3%] top-0 h-full w-[9%]">
-              <Retrato quem={q} />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${minha(k) ? PAPEL[q].cor + '40' : '#00000030'}, ${minha(k) ? PAPEL[q].cor + '18' : '#00000010'})` }} />
+            {/* a cerca de madeira em cima da raia */}
+            <div className="absolute inset-x-0 top-0 h-[8%] bg-[#6a4220]" />
+            {Array.from({ length: 12 }, (_, j) => (
+              <span key={j} className="absolute top-[-6%] block h-[18%] w-[1.2%] bg-[#4a2a14]" style={{ left: `${4 + j * 8.4}%` }} />
+            ))}
+            {/* a zona de acertar: um círculo no chão, aceso na sua raia */}
+            {minha(k) && <div className="zona-trio absolute bottom-[6%] left-[16%] h-[34%] w-[22%] rounded-[50%] border-2" style={{ borderColor: PAPEL[q].cor, boxShadow: `0 0 12px ${PAPEL[q].cor}` }} />}
+            {/* o gladiador da raia, grande, atacando a cada boneco derrubado */}
+            <div className="absolute bottom-[2%] left-[2%] w-[13%]">
+              <div key={ataques[k]} className={ataques[k] ? 'pose-golpe' : 'respirar'}>
+                <Retrato quem={q} />
+              </div>
             </div>
-            {/* a zona de acertar */}
-            {minha(k) && <div className="absolute inset-y-0 left-[16%] w-[22%] border-x-2 border-white/40" />}
+            <span className="absolute left-[15%] top-[10%] font-pixel text-[6px] sm:text-[9px]" style={{ color: PAPEL[q].cor, textShadow: '1px 1px 0 #000' }}>
+              {minha(k) ? 'VOCÊ' : ''}
+            </span>
           </div>
+        ))}
+        {caidos.map((c) => (
+          <span key={`c${c.id}`} className="boneco-voa absolute z-[11] block w-[7%]" style={{ left: `${c.x}%`, top: `${33 + c.faixa * 24}%`, translate: '-50% -50%' }} aria-hidden>
+            <Icone nome="boneco" className="w-full" />
+            <span className="tang absolute -top-[60%] left-0 font-pixel text-[8px] text-[#ffd04a] [text-shadow:1px_1px_0_#000] sm:text-sm">PUM!</span>
+          </span>
         ))}
         {fase === 'jogo' &&
           bonecos.map((b) => {
@@ -694,11 +724,11 @@ export function MinigameTrio({ lugar, antes, depois, onFim, heroi, todos = false
             return (
               <span
                 key={b.id}
-                className="absolute z-10 -translate-x-1/2 -translate-y-1/2 text-2xl sm:text-4xl"
-                style={{ left: `${92 - p * 78}%`, top: `${33 + b.faixa * 24}%`, opacity: escondido ? 0.25 : 1 }}
+                className="boneco-anda absolute z-10 block w-[7%]"
+                style={{ left: `${92 - p * 78}%`, top: `${33 + b.faixa * 24}%`, opacity: escondido ? 0.25 : 1, translate: '-50% -50%', filter: 'drop-shadow(0 3px 0 #00000066)' }}
                 aria-hidden
               >
-                <Icone nome="boneco" className="inline-block w-[100%] align-middle" />
+                <Icone nome="boneco" className="w-full" />
               </span>
             );
           })}

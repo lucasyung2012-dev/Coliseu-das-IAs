@@ -1822,3 +1822,13 @@
 .tropeca { animation: tropeca 0.5s ease-out; }
 @keyframes tropeca { 0% { rotate: 0deg; } 30% { rotate: -12deg; translate: -6% 4%; } 60% { rotate: 6deg; } 100% { rotate: 0deg; translate: 0 0; } }
 .menos-movimento .pose-golpe, .menos-movimento .pose-escudo, .menos-movimento .pose-esquiva, .menos-movimento .tropeca, .menos-movimento .pose-golpe-b, .menos-movimento .pose-escudo-b, .menos-movimento .pose-esquiva-b { animation: none; }
+
+/* O trio contra a muralha (22/11/2026): bonecos marchando, voando quando apanham, e a zona acesa. */
+.boneco-anda { animation: boneco-anda 0.35s steps(2) infinite alternate; }
+@keyframes boneco-anda { from { rotate: -6deg; } to { rotate: 6deg; } }
+.boneco-voa { animation: boneco-voa 0.7s ease-out forwards; }
+@keyframes boneco-voa { 0% { opacity: 1; rotate: 0deg; } 100% { opacity: 0; rotate: 540deg; translate: 40% -260%; } }
+.zona-trio { animation: zona-trio 1s ease-in-out infinite alternate; }
+@keyframes zona-trio { from { opacity: 0.55; } to { opacity: 1; } }
+.menos-movimento .boneco-anda, .menos-movimento .zona-trio { animation: none; }
+.menos-movimento .boneco-voa { animation-duration: 0.01s; }
