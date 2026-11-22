@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, modoDaLuta, usarPlano, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type Estilo, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
+import { CLIMA_DO_LUGAR, ClimaDaArena } from './Clima';
 import { NOMES, type EntradaInimigo, type Fala, type Falante, type Lugar } from '@/game/historia/roteiro';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import {
@@ -733,6 +734,7 @@ export function LutaHistoria({
   return (
     <div className="flex flex-col gap-2">
       <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer-forte' : fase === 'chegada' && entrada === 'pesado' ? 'tremer-passos' : ''}>
+        {CLIMA_DO_LUGAR[lugar] && <ClimaDaArena clima={CLIMA_DO_LUGAR[lugar]!} z={5} />}
         {fase === 'chegada' && entrada && <EfeitoEntrada entrada={entrada} />}
         {/* Placar: vida dos dois, o fôlego e o Ânimo (ou a plateia, no Coliseu) */}
         <div className="absolute inset-x-2 top-2 z-20 grid grid-cols-2 gap-3">

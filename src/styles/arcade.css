@@ -107,12 +107,13 @@
 }
 
 /* Respira devagar, como o personagem parado num jogo antigo (em degraus). */
+/* 22/11/2026: agora suave (o Lucas pediu animações mais lisas). */
 .respirar {
-  animation: respirar 1.2s steps(2) infinite;
+  animation: respirar 1.8s ease-in-out infinite;
 }
 @keyframes respirar {
   50% {
-    transform: translateY(-3%);
+    transform: translateY(-3%) scaleY(1.015);
   }
 }
 
@@ -1127,8 +1128,14 @@
 
 /* ===== Modo História v2 (21/11/2026): andar, panorâmica e efeitos de luta ===== */
 /* Andar: passo em degraus, balançando de um lado para o outro. */
-.andar { animation: andar 0.42s steps(2) infinite; }
-@keyframes andar { 0% { translate: 0 0; rotate: -3deg; } 50% { translate: 0 -7%; rotate: 3deg; } 100% { translate: 0 0; rotate: -3deg; } }
+.andar { animation: andar 0.5s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes andar {
+  0% { translate: 0 0; rotate: -3deg; scale: 1.03 0.97; }
+  25% { translate: 0 -8%; rotate: 0deg; scale: 0.98 1.02; }
+  50% { translate: 0 0; rotate: 3deg; scale: 1.03 0.97; }
+  75% { translate: 0 -8%; rotate: 0deg; scale: 0.98 1.02; }
+  100% { translate: 0 0; rotate: -3deg; scale: 1.03 0.97; }
+}
 .poeira-passo { animation: poeira-passo 0.5s ease-out infinite both; }
 @keyframes poeira-passo { from { translate: 0 0; scale: 0.6; opacity: 0.9; } to { translate: -260% -120%; scale: 1.8; opacity: 0; } }
 /* Panorâmica: a câmera passa devagar pela cidade. */
@@ -1157,13 +1164,14 @@
 .menos-movimento .corte-golpe, .menos-movimento .perigo-bordas, .menos-movimento .lute-entra, .menos-movimento .combo-pop, .menos-movimento .rastro-esquiva { animation: none; }
 .menos-movimento .faisca-voa, .menos-movimento .anel-impacto, .menos-movimento .corte-golpe, .menos-movimento .lute-entra, .menos-movimento .rastro-esquiva { display: none; }
 /* Investida da luta da História (usa translate/rotate para somar com o -translate-x-1/2). */
-.investida-dir { animation: investida-dir 0.25s ease-out both; }
-.investida-esq { animation: investida-esq 0.3s ease-out both; }
-@keyframes investida-dir { 40% { translate: 38% 0; rotate: 5deg; } }
-@keyframes investida-esq { 40% { translate: -45% 0; rotate: -6deg; } }
+/* O golpe com preparo (recua um tiquinho), o bote e a volta com balanço. */
+.investida-dir { animation: investida-dir 0.34s ease-out both; }
+.investida-esq { animation: investida-esq 0.38s ease-out both; }
+@keyframes investida-dir { 12% { translate: -6% 0; rotate: -4deg; } 42% { translate: 38% 0; rotate: 6deg; } 62% { translate: 30% 0; rotate: 3deg; } 85% { translate: -2% 0; rotate: -1deg; } }
+@keyframes investida-esq { 12% { translate: 6% 0; rotate: 4deg; } 42% { translate: -45% 0; rotate: -7deg; } 62% { translate: -36% 0; rotate: -3deg; } 85% { translate: 2% 0; rotate: 1deg; } }
 .menos-movimento .investida-dir, .menos-movimento .investida-esq { animation-duration: 1ms; }
 /* Respirar e tremer com translate (para elementos centralizados com -translate-x-1/2). */
-.respirar-t { animation: respirar-t 1.2s steps(2) infinite; }
+.respirar-t { animation: respirar-t 1.8s ease-in-out infinite; }
 @keyframes respirar-t { 50% { translate: 0 -3%; } }
 .tremer-t { animation: tremer-t 380ms steps(6) infinite; }
 @keyframes tremer-t { 0%, 100% { translate: 0 0; } 25% { translate: -3% 0; } 50% { translate: 3% 0; } 75% { translate: -2% 0; } }
@@ -1954,8 +1962,8 @@
 /* A habilidade de cada um no mapa do chefão: escudo, rede e passo de sombra. */
 .escudo-ergue { animation: escudo-ergue 0.15s ease-out both; }
 @keyframes escudo-ergue { from { scale: 0.4; opacity: 0; } to { scale: 1; opacity: 1; } }
-.rede-cai { animation: rede-cai 0.35s ease-out both; }
-@keyframes rede-cai { from { scale: 2.2; opacity: 0; rotate: -20deg; } to { scale: 1; opacity: 1; rotate: 0deg; } }
+.rede-chefe { animation: rede-chefe 0.35s ease-out both; }
+@keyframes rede-chefe { from { scale: 2.2; opacity: 0; rotate: -20deg; } to { scale: 1; opacity: 1; rotate: 0deg; } }
 .passo-sombra { opacity: 0.35; filter: drop-shadow(0 0 8px #c8a0ff) brightness(0.6); }
 
 /* A CHEGADA DO CHEFÃO NO MAPA (22/11/2026): cinema com faixas pretas e o cartão do nome. */
@@ -1975,8 +1983,8 @@
 @keyframes chega-corre { 0%, 10% { translate: 400% -92%; } 80% { translate: -60% -92%; } 100% { translate: -50% -92%; } }
 .chega-surge { animation: chega-surge 1.6s ease-out both; }
 @keyframes chega-surge { 0%, 25% { opacity: 0; scale: 0.2; filter: brightness(4); } 70% { opacity: 1; scale: 1.15; filter: brightness(2); } 100% { scale: 1; filter: none; } }
-.anel-impacto { animation: anel-impacto 0.8s ease-out 0.95s both; }
-@keyframes anel-impacto { from { opacity: 1; scale: 0.2; } to { opacity: 0; scale: 1.4; } }
+.anel-chegada { animation: anel-chegada 0.8s ease-out 0.95s both; }
+@keyframes anel-chegada { from { opacity: 1; scale: 0.2; } to { opacity: 0; scale: 1.4; } }
 .anel-agua { animation: anel-agua 1.2s ease-out 0.2s both; }
 @keyframes anel-agua { from { opacity: 0.9; scale: 0.1; } to { opacity: 0; scale: 1.3; } }
 .clarao-surge { animation: clarao-surge 1.4s ease-out 0.3s both; }

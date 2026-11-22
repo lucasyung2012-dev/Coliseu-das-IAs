@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { furiosoChefe, golpearChefe, HABILIDADE, novoEstadoChefe, passoChefe, RECARGA, usarHabilidade, type ClimaArena, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
+import { furiosoChefe, golpearChefe, HABILIDADE, novoEstadoChefe, passoChefe, RECARGA, usarHabilidade, type DefChefe, type EstadoChefe } from '@/game/historia/chefoes';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { novaLuta } from '@/game/historia/luta';
 import { novoMundo, passoMundo, type EntradaMundo, type EstadoMundo } from '@/game/historia/mundo';
@@ -13,6 +13,7 @@ import { escalaDe, Retrato } from './Cenarios';
 import { SpriteInimigo } from './Luta';
 import { BotaoSeta, MapaDesenhado } from './MundoAberto';
 import { usePausado } from './Pausa';
+import { ClimaDaArena } from './Clima';
 
 /** Os chefões grandes ocupam mais espaço no mapa. */
 const GRANDES = new Set(['censor-tita', 'censor-tita-octavius', 'censor-tita-helios', 'leviata', 'gigante-sombras', 'nucleo', 'leao-mecanico']);
@@ -25,27 +26,6 @@ const BOTAO_HAB = {
 } as const;
 
 const DURACAO_CHEGADA = 3400;
-
-/** O ar da arena: cada clima com as suas partículas (sempre as mesmas, para não piscar). */
-function ClimaDaArena({ clima, cor }: { clima: ClimaArena; cor: string }) {
-  const n = clima === 'chuva' ? 34 : clima === 'fumaca' ? 8 : 18;
-  return (
-    <div className={`pointer-events-none absolute inset-0 z-[246] overflow-hidden clima-${clima}`} aria-hidden>
-      {Array.from({ length: n }, (_, k) => {
-        const x = (k * 37 + 11) % 100;
-        const atraso = -((k * 613) % 4000) / 1000;
-        const dur = 2.2 + ((k * 7) % 10) / 4;
-        return (
-          <span
-            key={k}
-            className="particula-clima absolute block"
-            style={{ left: `${x}%`, animationDelay: `${atraso}s`, animationDuration: `${clima === 'chuva' ? dur / 3 : dur}s`, '--cor': cor } as CSSProperties}
-          />
-        );
-      })}
-    </div>
-  );
-}
 
 const AVISO: Record<string, string> = {
   investida: 'ELE VAI CORRER!',
@@ -227,7 +207,9 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const naRede = cansado && st.eventos.some((e) => e.tipo === 'rede' && st.tempo - e.em < def.cansaMs);
   const recarga = Math.max(0, st.habPronta - st.tempo) / RECARGA[hab];
   const bh = BOTAO_HAB[hab];
-  const bossFiltro = cansado ? 'saturate(0.35) brightness(0.9)' : `drop-shadow(0 0 ${raiva ? 8 : def.escuro ? 6 : 0}px ${raiva ? '#ff3a3a' : def.cor})`;
+  // O chefão pisca branco quando perde uma placa.
+  const levouPlaca = st.eventos.some((e) => (e.tipo === 'placa' || e.tipo === 'furia') && st.tempo - e.em < 160);
+  const bossFiltro = levouPlaca ? 'brightness(2.6)' : cansado ? 'saturate(0.35) brightness(0.9)' : `drop-shadow(0 0 ${raiva ? 8 : def.escuro ? 6 : 0}px ${raiva ? '#ff3a3a' : def.cor})`;
 
   const desenhoChefe = (x: number, y: number, chave: string, copia = false) => (
     <div key={chave} className={`absolute ${copia ? 'copia-chefe' : ''} ${fase === 'chegada' && !copia ? `chega-${def.chegada}` : ''}`} style={{ ...emMapa(x, y), width: `${(tam / W) * 100}%`, translate: `-50% ${-92 - noAr * 70}%`, zIndex: noAr > 0 ? 300 : 260 + Math.floor(y * 4) }}>
@@ -268,7 +250,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
       <div className="area-jogo relative flex flex-col gap-2">
         <div className={`pixel-box mundo-aberto relative w-full select-none overflow-hidden bg-black ${recente?.tipo === 'parede' || recente?.tipo === 'explode' ? 'tremer-forte' : ''}`} style={{ aspectRatio: `${W} / ${H}`, touchAction: 'none' }}>
           <MapaDesenhado mundo={m} />
-          <ClimaDaArena clima={def.clima} cor={def.cor} />
+          <ClimaDaArena clima={def.clima} />
 
           {/* No escuro, só se vê em volta do gladiador */}
           {def.escuro && (
@@ -328,7 +310,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           {(st.copias ?? []).filter((c) => c.viva).map((c, k) => desenhoChefe(c.x, c.y, `c${k}`, true))}
 
           {naRede && (
-            <span className="rede-cai pointer-events-none absolute z-[305] block" style={{ ...emMapa(st.x, st.y - tam * 0.45), width: `${((tam * 0.9) / W) * 100}%`, aspectRatio: '1', translate: '-50% -50%' }} aria-hidden>
+            <span className="rede-chefe pointer-events-none absolute z-[305] block" style={{ ...emMapa(st.x, st.y - tam * 0.45), width: `${((tam * 0.9) / W) * 100}%`, aspectRatio: '1', translate: '-50% -50%' }} aria-hidden>
               <Icone nome="rede" className="h-full w-full opacity-90" />
             </span>
           )}
@@ -375,7 +357,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
             <div className="pointer-events-none absolute inset-0 z-[400]" aria-hidden>
               <span className="cinema-barra absolute inset-x-0 top-0 block h-[11%] bg-black" />
               <span className="cinema-barra absolute inset-x-0 bottom-0 block h-[11%] bg-black" />
-              {def.chegada === 'cai' && <span className="anel-impacto absolute block rounded-full border-4" style={{ ...roda(st.x, st.y - 0.2, 3), borderColor: def.cor }} />}
+              {def.chegada === 'cai' && <span className="anel-chegada absolute block rounded-full border-4" style={{ ...roda(st.x, st.y - 0.2, 3), borderColor: def.cor }} />}
               {def.chegada === 'sobe' && <span className="anel-agua absolute block rounded-full border-4 border-[#bfe6ff]" style={roda(st.x, st.y - 0.2, 2.6)} />}
               {def.chegada === 'surge' && <span className="clarao-surge absolute block rounded-full" style={{ ...roda(st.x, st.y - 1, 4), background: `radial-gradient(circle, #fff, ${def.cor} 40%, transparent 70%)` }} />}
               <div className="cartao-chefe absolute bottom-[14%] left-[4%] border-l-4 bg-black/75 px-3 py-1.5" style={{ borderColor: def.cor }}>
