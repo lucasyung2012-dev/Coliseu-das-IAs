@@ -384,9 +384,9 @@ function entradaDe(id: string, chefao: boolean): EntradaInimigo {
   if (chefao || /fornalha|tita|colosso|gigante|touro|leao|centuriao|pretor-de-aco/.test(id)) return 'pesado';
   return 'andando';
 }
-const DURACAO_ENTRADA: Record<EntradaInimigo, number> = { janela: 1900, voando: 1700, pesado: 2100, rapido: 900, agua: 1500, andando: 1400 };
+const DURACAO_ENTRADA: Record<EntradaInimigo, number> = { janela: 2700, voando: 1700, pesado: 2100, rapido: 900, agua: 1500, andando: 1400 };
 const SONS_ENTRADA: Record<EntradaInimigo, [SomHistoria, number][]> = {
-  janela: [['catapulta', 350], ['pesada', 1250]],
+  janela: [['escudoMetal', 800], ['catapulta', 1050], ['pesada', 1900]],
   voando: [['galope', 200], ['escudoMetal', 1350]],
   pesado: [['pesada', 150], ['pesada', 650], ['pesada', 1150], ['pesada', 1650]],
   rapido: [['galope', 0]],
@@ -403,15 +403,20 @@ function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
     <div className="pointer-events-none absolute inset-0" aria-hidden>
       {entrada === 'janela' && (
         <>
-          {/* a janela alta da biblioteca, de noite, que ele estoura para entrar */}
-          <div className="janela-entrada absolute z-[9] left-[33%] top-[9%] h-[50%] w-[38%] rounded-t-[50%]">
-            <span className="vidro-entrada absolute inset-0 rounded-t-[50%] bg-[linear-gradient(135deg,#6a8ad8aa,#a8c8ff66_40%,#3a4a9a88)]" />
+          {/* O vidro da janela do cenário, NA FRENTE dele: primeiro ele chega lá fora (escuro, pequeno,
+              chegando perto), o vidro racha, estoura, e ele pula para dentro. */}
+          <div className="vidro-entrada absolute z-[11] left-[33%] top-[9%] h-[50%] w-[38%] rounded-t-[50%] bg-[linear-gradient(135deg,#8aa8e855,#c8dcff33_40%,#3a4a9a44)]">
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[45%] w-[2px] origin-top rotate-[20deg] bg-white" />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[35%] w-[2px] origin-top rotate-[-35deg] bg-white" />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[30%] w-[2px] origin-top rotate-[100deg] bg-white" />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[28%] w-[2px] origin-top rotate-[-120deg] bg-white" />
+            <span className="rachadura-entrada absolute left-[48%] top-[30%] block h-[25%] w-[2px] origin-top rotate-[170deg] bg-white" />
           </div>
           {cacos.map(([dx, dy], k) => (
             <span
               key={k}
               className="caco-vidro absolute z-[12] left-[52%] top-[32%] block h-[3%] w-[2%] bg-[#c8dcff]"
-              style={{ '--dx': `${dx * 3}%`, '--dy': `${dy * 3}%`, animationDelay: `${330 + (k % 3) * 40}ms`, rotate: `${k * 37}deg` } as CSSProperties}
+              style={{ '--dx': `${dx * 3}%`, '--dy': `${dy * 3}%`, animationDelay: `${1050 + (k % 3) * 40}ms`, rotate: `${k * 37}deg` } as CSSProperties}
             />
           ))}
           <span className="clarao-entrada absolute z-[12] left-[52%] top-[32%] block h-[30%] w-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
@@ -426,7 +431,7 @@ function EfeitoEntrada({ entrada }: { entrada: EntradaInimigo }) {
           <span
             key={k}
             className="poeira-entrada absolute z-[12] bottom-[11%] block h-[6%] w-[6%] rounded-full bg-[#c8b89a]"
-            style={{ left: `${70 + dx}%`, '--dx': `${dx * 5}%`, animationDelay: `${(entrada === 'janela' ? 1250 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : 1100) + k * 30}ms` } as CSSProperties}
+            style={{ left: `${70 + dx}%`, '--dx': `${dx * 5}%`, animationDelay: `${(entrada === 'janela' ? 1900 : entrada === 'pesado' ? 1650 : entrada === 'rapido' ? 600 : 1100) + k * 30}ms` } as CSSProperties}
           />
         ))}
     </div>

@@ -1652,25 +1652,29 @@
 .entrada-agua { animation: entrada-agua 1.5s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
 @keyframes entrada-agua { 0% { translate: 0 45%; opacity: 0; } 20% { opacity: 1; } 100% { translate: 0 0; } }
 /* Pela janela: some, estoura o vidro lá em cima, pula em arco e cai no chão. */
-.entrada-janela { animation: entrada-janela 1.9s both; }
+.entrada-janela { animation: entrada-janela 2.7s both; }
+/* Lá fora: pequeno e escuro, chegando perto do vidro; o vidro estoura; ele pula em arco e cai. */
 @keyframes entrada-janela {
-  0% { translate: -18% -50%; opacity: 0; scale: 0.6; }
-  17% { translate: -18% -50%; opacity: 0; scale: 0.6; }
-  20% { translate: -18% -50%; opacity: 1; scale: 0.65; }
-  45% { translate: -12% -62%; scale: 0.9; animation-timing-function: ease-in; }
-  66% { translate: -2% 0; scale: 1; }
-  72% { translate: -1% -5%; }
+  0% { translate: -18% -44%; scale: 0.3; filter: brightness(0.2); }
+  30% { translate: -18% -44%; scale: 0.5; filter: brightness(0.3); }
+  34% { translate: -17% -44%; scale: 0.55; }
+  36% { translate: -19% -44%; }
+  38% { translate: -18% -44%; scale: 0.58; filter: brightness(0.35); }
+  39% { filter: brightness(1.6); }
+  44% { translate: -14% -58%; scale: 0.8; filter: brightness(1); animation-timing-function: ease-in; }
+  68% { translate: -2% 0; scale: 1; }
+  73% { translate: -1% -5%; }
   78% { translate: 0 0; }
-  100% { translate: 0 0; opacity: 1; scale: 1; }
+  100% { translate: 0 0; scale: 1; filter: none; }
 }
 .entrada-janela, .entrada-voando, .entrada-agua { transform-origin: 70% 85%; }
-.janela-entrada { animation: janela-entrada 1.9s both; }
-@keyframes janela-entrada { 0% { opacity: 0; } 8% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
-.vidro-entrada { animation: vidro-entrada 1.9s steps(1) both; }
-@keyframes vidro-entrada { 0% { opacity: 1; } 18% { opacity: 0.4; } 19% { opacity: 1; } 20% { opacity: 0; } 100% { opacity: 0; } }
+.vidro-entrada { animation: vidro-entrada 2.7s steps(1) both; }
+@keyframes vidro-entrada { 0% { opacity: 1; } 39% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; } }
+.rachadura-entrada { opacity: 0; scale: 1 0; animation: rachadura-entrada 2.7s ease-out both; box-shadow: 0 0 3px #fff; }
+@keyframes rachadura-entrada { 0%, 26% { opacity: 0; scale: 1 0; } 30% { opacity: 0.9; scale: 1 0.6; } 36% { scale: 1 1; } 39% { opacity: 1; } 40%, 100% { opacity: 0; } }
 .caco-vidro { opacity: 0; animation: caco-vidro 0.9s ease-out both; box-shadow: 0 0 3px #fff; }
 @keyframes caco-vidro { 0% { opacity: 1; translate: 0 0; } 100% { opacity: 0; translate: var(--dx) calc(var(--dy) + 200%); } }
-.clarao-entrada { opacity: 0; animation: clarao-entrada 0.5s ease-out 0.33s both; }
+.clarao-entrada { opacity: 0; animation: clarao-entrada 0.5s ease-out 1.05s both; }
 @keyframes clarao-entrada { 0% { opacity: 0.85; scale: 0.3; } 100% { opacity: 0; scale: 1.4; } }
 .poeira-entrada { opacity: 0; animation: poeira-entrada 0.7s ease-out both; }
 @keyframes poeira-entrada { 0% { opacity: 0.8; translate: 0 0; scale: 0.5; } 100% { opacity: 0; translate: var(--dx) -60%; scale: 1.6; } }
@@ -1678,7 +1682,7 @@
 @keyframes respingo-entrada { 0% { opacity: 1; translate: 0 0; } 50% { translate: calc(var(--dx) / 2) -300%; } 100% { opacity: 0; translate: var(--dx) 0; } }
 @media (prefers-reduced-motion: reduce) {
   .entrada-andando, .entrada-rapido, .entrada-voando, .entrada-pesado, .entrada-agua, .entrada-janela { animation-duration: 0.01s; }
-  .caco-vidro, .poeira-entrada, .respingo-entrada, .clarao-entrada { display: none; }
+  .caco-vidro, .rachadura-entrada, .poeira-entrada, .respingo-entrada, .clarao-entrada { display: none; }
 }
 
 /* Os mapas novos: a água mexendo e a fumaça das chaminés e do oráculo. */
