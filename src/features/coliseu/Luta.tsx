@@ -214,7 +214,7 @@ const SOMBRAS: Record<string, IaId> = { 'sombra-cassius': 'claude', 'sombra-octa
 /** Larguras dos inimigos que mudam de cor com a fase (desenhados à parte). */
 const LARGURA_ESPECIAL: Record<string, number> = { fornalha: 30, arquivista: 20, 'leao-mecanico': 32, 'censor-tita': 38, 'censor-tita-octavius': 38, 'censor-tita-helios': 38, eclipse: 26, 'guardiao-aqueduto': 26, 'sibila-corrompida': 20, 'gigante-sombras': 32, cobrador: 22, leviata: 34, 'almirante-aco': 24, nucleo: 40, 'guardiao-nucleo': 24, 'sombra-cassius': 14, 'sombra-octavius': 14, 'sombra-helios': 14 };
 
-function SpriteInimigo({ e }: { e: EstadoLuta }) {
+export function SpriteInimigo({ e }: { e: EstadoLuta }) {
   const sinalFogo = e.inimigo.estado === 'sinal' && ataqueAtual(e).tipo === 'fogo';
   if (e.def.id === 'fornalha') return <Sprite grade={FORNALHA} paleta={paletaFornalha(sinalFogo, e.inimigo.fase)} espelhar />;
   if (e.def.id === 'arquivista') return <Sprite grade={ARQUIVISTA} paleta={paletaArquivista(false)} espelhar />;
@@ -456,6 +456,7 @@ export function LutaHistoria({
   onVitoria,
   equipe,
   entrada: entradaPedida,
+  vantagem,
 }: {
   lugar: Lugar;
   inimigo: string;
@@ -473,6 +474,8 @@ export function LutaHistoria({
   equipe?: Partial<Record<Falante, AtributosLuta>>;
   /** Como o inimigo chega (a janela quebrando no capítulo 1, por exemplo). */
   entrada?: EntradaInimigo;
+  /** Ataque surpresa (pegou o inimigo de ronda por trás): ele começa com 30% menos vida. */
+  vantagem?: boolean;
 }) {
   const def = INIMIGOS[inimigo]!;
   const [heroi, setHeroi] = useState<Falante>(heroiInicial);
@@ -508,7 +511,10 @@ export function LutaHistoria({
     ids.push(window.setTimeout(() => setFase(antes?.length ? 'antes' : 'luta'), DURACAO_ENTRADA[entrada]));
     return () => ids.forEach((id) => window.clearTimeout(id));
   }, []);
-  const [e, setE] = useState<EstadoLuta>(() => novaLuta(def, atributos));
+  const [e, setE] = useState<EstadoLuta>(() => {
+    const n = novaLuta(def, atributos);
+    return vantagem ? { ...n, inimigo: { ...n.inimigo, vida: Math.round(n.inimigo.vida * 0.7) } } : n;
+  });
   const [tentativas, setTentativas] = useState(1);
   const modo = modoDaLuta(e);
   const escuro = modo.escuro;
@@ -992,6 +998,7 @@ export function LutaHistoria({
               <Icone nome={icone} className="w-[62%]" />
             </span>
             <span className="font-pixel text-[7px] text-[#f4e2b4] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{nome}</span>
+            <span className="tecla-botao font-pixel text-[7px] text-white/50">{{ golpe: 'J', escudo: 'K', esquiva: 'L', especial: 'ESPAÇO' }[acao]}</span>
           </button>
         ))}
       </div>
@@ -1040,7 +1047,7 @@ export function LutaHistoria({
         </p>
       )}
       <p className="dica-luta text-center text-[10px] text-muted">
-        Amarelo: {bot.escudo[1]} · Vermelho: {bot.esquiva[1]} · {bot.golpe[1]} no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas · teclado: J, K, L e espaço
+        Amarelo: {bot.escudo[1]} · Vermelho: {bot.esquiva[1]} · {bot.golpe[1]} no ABERTO · cada ação gasta fôlego (barra azul) · cuidado com as fintas<span className="dica-teclado"> · teclado: J, K, L e espaço</span>
       </p>
     </div>
   );

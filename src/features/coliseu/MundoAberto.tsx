@@ -1,11 +1,14 @@
-import { memo, useEffect, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
-import { livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type EstiloSaida, type Mundo, type TemaMundo } from '@/game/historia/mundo';
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from 'react';
+import { inimigoQueViu, livre, marcarVisto, novoMundo, vencerInimigo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo, type EstadoMundo, type EstiloSaida, type Mundo, type TemaMundo } from '@/game/historia/mundo';
 import type { Fala, Falante } from '@/game/historia/roteiro';
 import Emote from '@/ui/pixel/Emotes';
 import Icone from '@/ui/pixel/Icones';
 import { desbloquear } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
+import { INIMIGOS } from '@/game/historia/inimigos';
+import { novaLuta } from '@/game/historia/luta';
 import { Falas } from './Cenas';
+import { SpriteInimigo } from './Luta';
 import { escalaDe, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
 
@@ -22,14 +25,16 @@ export function MundoAberto({
   heroi,
   onFim,
   onSegredo,
-  onCoisa,
-}: {
+  onCoisa, lutar }: {
   mundo: Mundo;
   heroi: Falante;
   onFim: () => void;
   onSegredo?: (id: string) => void;
   /** Coisa especial (o boneco de treino, a forja): se devolver true, não abre conversa. */
-  onCoisa?: (id: string) => boolean }) {
+  onCoisa?: (id: string) => boolean;
+  /** O duelo com um inimigo de ronda (sem isso, o mapa não tem ronda). Chama onVenceu quando ganhar. */
+  lutar?: (inimigo: string, pelasCostas: boolean, onVenceu: () => void) => ReactNode;
+}) {
   const W = mundo.mapa[0]!.length;
   const H = mundo.mapa.length;
   const [s, setS] = useState<EstadoMundo>(() => novoMundo(mundo));
@@ -42,6 +47,10 @@ export function MundoAberto({
   const pausadoRef = useRef(pausado);
   pausadoRef.current = pausado;
   const [acabou, setAcabou] = useState(false);
+  // O duelo com um inimigo de ronda: primeiro o "!" em cima dele, depois a luta.
+  const [luta, setLuta] = useState<{ id: string; inimigo: string; pelasCostas: boolean; ja: boolean } | null>(null);
+  const lutaRef = useRef(luta);
+  lutaRef.current = luta;
 
   // O tamanho da tela em ladrilhos (a altura depende do celular em pé ou deitado).
   const palcoRef = useRef<HTMLDivElement>(null);
@@ -66,9 +75,19 @@ export function MundoAberto({
       const dt = Math.min(50, agora - ultimo);
       ultimo = agora;
       if (!pausadoRef.current) {
-        const novo = passoMundo(mundo, estado.current, entrada.current, dt, !!conversaRef.current);
+        const novo = passoMundo(mundo, estado.current, entrada.current, dt, !!conversaRef.current || !!lutaRef.current);
         estado.current = novo;
         setS(novo);
+        if (lutar && !conversaRef.current && !lutaRef.current) {
+          const viu = inimigoQueViu(mundo, novo);
+          if (viu) {
+            tocar(viu.pelasCostas ? 'escudoMetal' : 'pergunta');
+            const l = { ...viu, ja: false };
+            lutaRef.current = l;
+            setLuta(l);
+            window.setTimeout(() => setLuta((x) => (x && x.id === l.id ? { ...x, ja: true } : x)), 750);
+          }
+        }
         // A câmera segue com suavidade, sem sair do mapa.
         const alvoX = Math.max(0, Math.min(W - VISIVEL, novo.x - VISIVEL / 2));
         const alvoY = Math.max(0, Math.min(H - alturaRef.current, novo.y - 0.6 - alturaRef.current / 2));
@@ -196,11 +215,23 @@ export function MundoAberto({
     onContextMenu: (ev: MouseEvent) => ev.preventDefault(),
   });
 
+  if (luta?.ja && lutar)
+    return (
+      <>
+        {lutar(luta.inimigo, luta.pelasCostas, () => {
+          estado.current = vencerInimigo(estado.current, luta.id);
+          setS(estado.current);
+          lutaRef.current = null;
+          setLuta(null);
+        })}
+      </>
+    );
   return (
     <div className="flex flex-col gap-2">
       <p className="font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]">
         {mundo.objetivo}{aberta && mundo.mapa.some((l) => l.includes('P')) ? ' · a saída está aberta' : ''}
       </p>
+      <div className="area-jogo relative flex flex-col gap-2">
       <div ref={palcoRef} className="pixel-box mundo-aberto relative w-full select-none overflow-hidden bg-black" style={{ touchAction: 'none' }}>
         {/* O mundo inteiro, que anda com a câmera */}
         <div
@@ -215,16 +246,22 @@ export function MundoAberto({
 
           {/* Pessoas e o gladiador, na ordem de quem está mais na frente */}
           {[
-            ...mundo.pessoas.map((p) => ({ id: p.id, quem: p.quem, ...s.pessoas[p.id]!, andando: false })),
-            { id: '__heroi', quem: heroi, x: s.x, y: s.y, dir: s.dir, andando: s.andando },
+            ...mundo.pessoas.filter((p) => !(p.inimigo && s.vistos.includes(p.id))).map((p) => ({ id: p.id, quem: p.quem, ...s.pessoas[p.id]!, andando: false, inimigo: p.inimigo })),
+            { id: '__heroi', quem: heroi, x: s.x, y: s.y, dir: s.dir, andando: s.andando, inimigo: undefined as string | undefined },
           ]
             .sort((a, b) => a.y - b.y)
             .map((p) => (
               <div key={p.id} className="absolute" style={{ ...emMundo(p.x, p.y), width: `${((1.15 * escalaDe(p.quem)) / W) * 100}%`, transform: 'translate(-50%, -100%)', zIndex: 5 + Math.floor(p.y * 10) }}>
                 <span className="absolute bottom-[-4%] left-1/2 h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" />
-                <div className={p.andando ? 'andar' : 'respirar'}>
-                  <Retrato quem={p.quem} espelhar={p.dir === 'esq'} />
+                <div className={p.andando || p.inimigo ? 'andar' : 'respirar'}>
+                  {p.inimigo ? <InimigoNoMapa id={p.inimigo} espelhar={p.dir !== 'esq'} /> : <Retrato quem={p.quem} espelhar={p.dir === 'esq'} />}
                 </div>
+                {/* O inimigo que te pegou: o "!" bravo em cima dele */}
+                {luta?.id === p.id && (
+                  <span className="emote-pula absolute -top-[30%] left-1/2 block w-[45%] -translate-x-1/2">
+                    <Emote emocao={luta.pelasCostas ? 'surpreso' : 'bravo'} />
+                  </span>
+                )}
                 {/* O "!" de quando dá para interagir */}
                 {alvo?.tipo === 'pessoa' && alvo.p.id === p.id && (
                   <span className="emote-pula absolute -top-[30%] left-1/2 block w-[45%] -translate-x-1/2">
@@ -345,7 +382,8 @@ export function MundoAberto({
           <span className="font-pixel text-[8px] text-[#f4e2b4]">{alvo ? (alvo.tipo === 'pessoa' ? 'FALAR' : 'EXAMINAR') : 'INTERAGIR'}</span>
         </button>
       </div>
-      <p className="text-center text-[10px] text-muted">Teclado: setas ou WASD para andar · E, Z ou espaço para interagir</p>
+      </div>
+      <p className="dica-teclado text-center text-[10px] text-muted">Teclado: setas ou WASD para andar · E, Z ou espaço para interagir</p>
     </div>
   );
 }
@@ -376,6 +414,16 @@ const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; 
   templo: { chao1: '#d8ccb4', chao2: '#cec2aa', parede1: '#6a5e4c', parede2: '#746856', face: '#b8ac94', faceTopo: '#e0d4bc', escuro: 0.4 },
   arena: { chao1: '#c8a870', chao2: '#c0a068', parede1: '#5a4a38', parede2: '#645240', face: '#8a7a64', faceTopo: '#a89880', escuro: 0.25 },
 };
+
+/** O inimigo de ronda no mapa: o mesmo desenho da luta, parado (feito uma vez só). */
+const InimigoNoMapa = memo(function InimigoNoMapa({ id, espelhar }: { id: string; espelhar: boolean }) {
+  const e = useMemo(() => novaLuta(INIMIGOS[id]!), [id]);
+  return (
+    <div style={{ transform: espelhar ? undefined : 'scaleX(-1)' }}>
+      <SpriteInimigo e={e} />
+    </div>
+  );
+});
 
 /** Cada saída do seu jeito (22/11/2026): escada, arco de pedra, portão, prancha, escada de mão, grade e porta. */
 function DesenhoSaida({ estilo, X, Y }: { estilo: EstiloSaida; X: number; Y: number }) {

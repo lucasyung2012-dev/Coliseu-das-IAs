@@ -404,7 +404,32 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
       </Palco>
     );
   if (cena.tipo === 'explorar' && cena.mapa && MAPAS[cena.mapa])
-    return <MundoAberto key={cena.id} mundo={mundoDoExplorar(cena, MAPAS[cena.mapa]!)} heroi={heroi} onSegredo={ganharSegredoHistoria} onFim={() => proxima()} />;
+    return (
+      <MundoAberto
+        key={cena.id}
+        mundo={mundoDoExplorar(cena, MAPAS[cena.mapa]!)}
+        heroi={heroi}
+        onSegredo={ganharSegredoHistoria}
+        onFim={() => proxima()}
+        lutar={(inimigo, pelasCostas, onVenceu) => (
+          <LutaHistoria
+            key={`ronda-${inimigo}`}
+            lugar={cena.lugar}
+            inimigo={inimigo}
+            heroi={heroi}
+            vantagem={pelasCostas}
+            antes={[
+              pelasCostas
+                ? { quem: 'narrador', texto: 'ATAQUE SURPRESA! Você chegou por trás: ele começa a luta com menos vida.' }
+                : { quem: 'narrador', texto: 'Ele te viu! Da próxima, passe por trás dele, sem ele olhar.' },
+            ]}
+            atributos={atributosDoSave(save)}
+            onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
+            onFim={onVenceu}
+          />
+        )}
+      />
+    );
   if (cena.tipo === 'explorar')
     return (
       <Explorar

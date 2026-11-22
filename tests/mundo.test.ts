@@ -1,4 +1,4 @@
-import { ladrilhoEm, livre, marcarVisto, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo } from '@/game/historia/mundo';
+import { inimigoQueViu, ladrilhoEm, livre, marcarVisto, vencerInimigo, novoMundo, passoMundo, pertoDe, saidaAbertaMundo, type EntradaMundo } from '@/game/historia/mundo';
 import { MAPAS, MUNDOS, mundoDoExplorar, mundoDoLudus } from '@/game/historia/mundos';
 import { CAPITULOS } from '@/game/historia/roteiro';
 import { CAP_SECRETO } from '@/game/historia/roteiro4';
@@ -93,6 +93,35 @@ describe('os mapas das cenas de explorar (os três caminhos e o secreto)', () =>
     for (const pessoa of m.pessoas) for (const [x, y] of pessoa.rota) expect(livre(m, x + 0.5, y + 0.8), `${pessoa.id} em ${x},${y}`).toBe(true);
     // O pedaço da chave continua no mapa do final.
     for (const p of cena.pontos) if (p.segredo) expect(m.coisas.find((c) => c.id === p.id)?.segredo).toBe(p.segredo);
+  });
+});
+
+describe('os inimigos de ronda', () => {
+  const cena = CAPITULOS.claude.flatMap((c) => c.cenas).find((c) => c.id === 'c4-tuneis');
+  if (!cena || cena.tipo !== 'explorar') throw new Error('sem cena');
+  const m = mundoDoExplorar(cena, MAPAS[cena.mapa!]!);
+  const rato = m.pessoas.find((p) => p.inimigo)!;
+  const comRato = (x: number, y: number, dir: 'esq' | 'dir') => {
+    const s = novoMundo(m);
+    return { ...s, pessoas: { ...s.pessoas, [rato.id]: { ...s.pessoas[rato.id]!, x: 14.5, y: 6.8, dir } } , x, y };
+  };
+
+  it('existe e o inimigo dele está na lista de inimigos', () => {
+    expect(rato.inimigo).toBe('rato-engrenagem');
+  });
+
+  it('na frente dele, até 3 ladrilhos: ele te vê; longe ou atrás: não', () => {
+    expect(inimigoQueViu(m, comRato(16.5, 6.8, 'dir'))?.pelasCostas).toBe(false);
+    expect(inimigoQueViu(m, comRato(16.5, 6.8, 'esq'))).toBeNull();
+    expect(inimigoQueViu(m, comRato(19.5, 6.8, 'dir'))).toBeNull();
+  });
+
+  it('encostar por trás é ataque surpresa; venceu, ele some', () => {
+    const s = comRato(13.9, 6.8, 'dir');
+    expect(inimigoQueViu(m, s)?.pelasCostas).toBe(true);
+    const depois = vencerInimigo(s, rato.id);
+    expect(inimigoQueViu(m, depois)).toBeNull();
+    expect(pertoDe(m, { ...depois, dir: 'dir' })?.tipo === 'pessoa').toBe(false);
   });
 });
 

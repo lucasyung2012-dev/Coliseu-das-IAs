@@ -57,6 +57,8 @@ export interface Pessoa {
   rota: [number, number][];
   falas: Fala[];
   obrigatorio?: boolean;
+  /** Inimigo de ronda (22/11/2026): anda e olha para a frente; se vê o gladiador, começa o duelo. */
+  inimigo?: string;
 }
 
 export interface Mundo {
@@ -174,9 +176,9 @@ export function passoMundo(m: Mundo, s: EstadoMundo, e: EntradaMundo, dt: number
   if (!parado) {
     for (const p of m.pessoas) {
       const at = pessoas[p.id]!;
-      if (p.rota.length < 2 || tempo < at.esperaAte) continue;
-      // Perto do gladiador, a pessoa para e olha para ele.
-      if (Math.hypot(at.x - x, at.y - y) < PERTO + 0.4) continue;
+      if (p.rota.length < 2 || tempo < at.esperaAte || s.vistos.includes(p.id)) continue;
+      // Perto do gladiador, a pessoa para e olha para ele (o inimigo de ronda não: segue a ronda).
+      if (!p.inimigo && Math.hypot(at.x - x, at.y - y) < PERTO + 0.4) continue;
       const [ax, ay] = p.rota[at.alvo]!;
       const tx = ax + 0.5;
       const ty = ay + 0.8;
@@ -204,6 +206,7 @@ export function pertoDe(m: Mundo, s: EstadoMundo): { tipo: 'coisa'; c: Coisa } |
   const fy = s.y - 0.3 + frente[1]!;
   let melhor: { d: number; r: { tipo: 'coisa'; c: Coisa } | { tipo: 'pessoa'; p: Pessoa } } | null = null;
   for (const p of m.pessoas) {
+    if (p.inimigo) continue;
     const at = s.pessoas[p.id]!;
     const d = Math.hypot(at.x - fx, at.y - 0.3 - fy);
     if (d < PERTO && (!melhor || d < melhor.d)) melhor = { d, r: { tipo: 'pessoa', p } };
@@ -213,6 +216,32 @@ export function pertoDe(m: Mundo, s: EstadoMundo): { tipo: 'coisa'; c: Coisa } |
     if (d < PERTO && (!melhor || d < melhor.d)) melhor = { d, r: { tipo: 'coisa', c } };
   }
   return melhor?.r ?? null;
+}
+
+/**
+ * Algum inimigo de ronda pegou o gladiador? Encostou (de frente ou de lado: ele te viu; por
+ * trás: ATAQUE SURPRESA, você começa com vantagem) ou te viu na frente dele, até 3 ladrilhos.
+ */
+export function inimigoQueViu(m: Mundo, s: EstadoMundo): { id: string; inimigo: string; pelasCostas: boolean } | null {
+  const frente = { cima: [0, -1], baixo: [0, 1], esq: [-1, 0], dir: [1, 0] } as const;
+  for (const p of m.pessoas) {
+    if (!p.inimigo || s.vistos.includes(p.id)) continue;
+    const at = s.pessoas[p.id]!;
+    const dx = s.x - at.x;
+    const dy = s.y - at.y;
+    const d = Math.hypot(dx, dy);
+    const [fx, fy] = frente[at.dir];
+    const olhando = d > 0 ? (dx * fx + dy * fy) / d : 1;
+    if (d < 0.85) return { id: p.id, inimigo: p.inimigo, pelasCostas: olhando < -0.3 };
+    if (d < 3 && olhando > 0.75) return { id: p.id, inimigo: p.inimigo, pelasCostas: false };
+  }
+  return null;
+}
+
+/** Venceu o inimigo de ronda: ele some do mapa. */
+export function vencerInimigo(s: EstadoMundo, id: string): EstadoMundo {
+  const at = s.pessoas[id];
+  return { ...marcarVisto(s, id), pessoas: at ? { ...s.pessoas, [id]: { ...at, x: -99, y: -99 } } : s.pessoas };
 }
 
 /** Marcou como visto (depois de ler ou conversar). */

@@ -1713,3 +1713,39 @@
 @keyframes botao-seguir { from { scale: 1; } to { scale: 1.06; } }
 .menos-movimento .botao-seguir { animation: none; }
 @media (prefers-reduced-motion: reduce) { .botao-seguir { animation: none; } }
+
+/* ---- AS TRÊS INTERFACES (22/11/2026, pedido do Lucas): celular, iPad e computador ---- */
+/* Em lugar nenhum do Coliseu dá para selecionar texto segurando o dedo (o azul do "copiar"). */
+[data-area='coliseu'], [data-area='coliseu'] * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+[data-area='coliseu'] input, [data-area='coliseu'] textarea { -webkit-user-select: text; user-select: text; }
+.tecla-botao { display: none; }
+
+/* CELULAR e IPAD (tela de toque): sem dica de teclado. */
+@media (hover: none) and (pointer: coarse) {
+  .dica-teclado { display: none; }
+}
+
+/* IPAD (toque e tela larga): os controles ficam POR CIMA da tela do jogo, nos cantos de baixo,
+   meio transparentes, como num videogame de mão; a tela do jogo fica maior. Na luta, defesa
+   na esquerda (escudo e esquiva) e ataque na direita (golpe e especial), para os dois polegares. */
+@media (hover: none) and (pointer: coarse) and (min-width: 700px) {
+  .area-jogo .controles-jogo { position: absolute; left: 2%; right: 2%; bottom: 3%; z-index: 600; pointer-events: none; opacity: 0.88; }
+  .area-jogo .controles-jogo > * { pointer-events: auto; }
+  .area-jogo .controles-jogo .grid { width: 11rem; }
+  .area-jogo .controles-fase { display: flex; justify-content: space-between; }
+  .area-jogo .controles-fase > button { width: 6.5rem; }
+  .area-jogo .controles-fase > button:nth-child(2) { margin-right: auto; margin-left: 0.5rem; }
+  .botoes-luta { grid-template-columns: 7rem 7rem 1fr 7rem 7rem; }
+  .botoes-luta > :nth-child(1) { grid-column: 4; grid-row: 1; }
+  .botoes-luta > :nth-child(2) { grid-column: 1; grid-row: 1; }
+  .botoes-luta > :nth-child(3) { grid-column: 2; grid-row: 1; }
+  .botoes-luta > :nth-child(4) { grid-column: 5; grid-row: 1; }
+}
+
+/* COMPUTADOR (mouse e teclado): sem setas na tela (anda pelo teclado), e cada botão da luta
+   mostra a tecla dele. */
+@media (hover: hover) and (pointer: fine) {
+  .area-jogo .controles-jogo { display: none; }
+  .tecla-botao { display: block; }
+  .botoes-luta { max-width: 36rem; margin-inline: auto; width: 100%; }
+}

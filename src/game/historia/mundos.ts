@@ -600,6 +600,22 @@ export const SAIDAS: Record<string, SaidaMundo> = {
   's-coliseu-livre': { rotulo: 'FIM' },
 };
 
+/**
+ * OS INIMIGOS DE RONDA (22/11/2026): andam pelo mapa olhando para a frente. Se te veem, começa
+ * o duelo; chegando por trás, ataque surpresa (ele começa com menos vida). Dá para passar
+ * escondido e não lutar.
+ */
+export const RONDAS: Record<string, { id: string; inimigo: string; rota: [number, number][] }[]> = {
+  'c4-tuneis': [{ id: 'ronda-rato', inimigo: 'rato-engrenagem', rota: [[11, 6], [18, 6]] }],
+  'c4-ossario': [{ id: 'ronda-rato', inimigo: 'rato-engrenagem', rota: [[4, 5], [14, 5]] }],
+  'c4-gavetas': [{ id: 'ronda-patrulha', inimigo: 'patrulha-catacumba', rota: [[4, 6], [16, 6]] }],
+  'o1-cais': [{ id: 'ronda-sentinela', inimigo: 'sentinela-cais', rota: [[6, 6], [17, 6]] }],
+  'o2-planejar': [{ id: 'ronda-chicote', inimigo: 'guarda-chicote', rota: [[3, 6], [13, 6]] }],
+  'o4-feira': [{ id: 'ronda-guarda', inimigo: 'guarda-feira', rota: [[3, 2], [18, 2]] }],
+  'h2-janelas': [{ id: 'ronda-vigia', inimigo: 'vigia-telhado', rota: [[7, 4], [17, 4]] }],
+  'h4-canal': [{ id: 'ronda-guarda', inimigo: 'guarda-aqueduto', rota: [[3, 5], [15, 5]] }],
+};
+
 export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: MapaDeExplorar): Mundo {
   const coisas: Coisa[] = [];
   const pessoas: Pessoa[] = [];
@@ -611,6 +627,7 @@ export function mundoDoExplorar(cena: Extract<Cena, { tipo: 'explorar' }>, m: Ma
       coisas.push({ id: p.id, x, y, falas: p.falas, obrigatorio: p.obrigatorio, segredo: p.segredo });
     }
   }
+  for (const r of RONDAS[cena.id] ?? []) pessoas.push({ id: r.id, quem: 'guarda', rota: r.rota, falas: [], inimigo: r.inimigo });
   const saida = SAIDAS[cena.id];
   // Sem lugar de saída: o P vira chão.
   const mapa = saida && !saida.estilo ? m.mapa.map((l) => l.replace('P', '.')) : m.mapa;

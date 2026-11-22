@@ -150,6 +150,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           ))}
         </p>
       </div>
+      <div className="area-jogo relative flex flex-col gap-2">
       <div ref={palcoRef} className="pixel-box fase-aberta relative w-full select-none overflow-hidden" style={{ touchAction: 'none' }}>
         {/* O mundo inteiro, que anda com a câmera */}
         <div
@@ -294,7 +295,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
       </div>
 
       {/* Os controles na tela (bons para o celular): segure ◀ ▶ e toque ⤒ para pular */}
-      <div className="controles-jogo grid grid-cols-[1fr_1fr_1.4fr] gap-2">
+      <div className="controles-jogo controles-fase grid grid-cols-[1fr_1fr_1.4fr] gap-2">
         <button type="button" {...botao('esq')} className="pixel-box botao-luta flex items-center justify-center py-3" style={{ '--cor': '#c8962a' } as CSSProperties} aria-label="Andar para a esquerda">
           <span className="medalhao"><Icone nome="esq" className="w-[62%]" /></span>
         </button>
@@ -306,7 +307,8 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           <span className="font-pixel text-[8px] text-[#f4e2b4] sm:text-[10px]">PULAR</span>
         </button>
       </div>
-      <p className="text-center text-[10px] text-muted">Teclado: A e D (ou as setas) para andar · W ou espaço para pular · suba nas mesas e passe por cima do fogo</p>
+      </div>
+      <p className="dica-teclado text-center text-[10px] text-muted">Teclado: A e D (ou as setas) para andar · W ou espaço para pular · suba nas mesas e passe por cima do fogo</p>
     </div>
   );
 }
