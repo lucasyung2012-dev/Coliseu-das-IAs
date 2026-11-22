@@ -451,6 +451,13 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
         <Vidas n={vidas} max={3} icone="" />
       </div>
       <Palco lugar={lugar}>
+        {/* A CORRIDA (redesenhada, 22/11/2026): a areia passando embaixo, a poeira dos pés, a sombra
+            de cada coisa no chão e o Brutus arremessando. */}
+        <div className="chao-corre pointer-events-none absolute inset-x-0 bottom-[6%] z-[5] h-[8%]" aria-hidden />
+        <span className="pointer-events-none absolute bottom-[10%] left-[20%] z-[6] block h-[3%] w-[10%] -translate-x-1/2 rounded-[50%] bg-black/40" style={{ scale: pose === 'pulo' ? '0.6' : '1' }} aria-hidden />
+        {pose === 'corre' && fase === 'jogo' && (
+          <span className="poeira-corre pointer-events-none absolute bottom-[11%] left-[13%] z-[6] block h-[5%] w-[5%] rounded-full bg-[#d8c8a0]" aria-hidden />
+        )}
         <div
           className="absolute left-[20%] z-10 w-[14%] -translate-x-1/2 transition-[bottom] duration-100"
           style={{ bottom: pose === 'pulo' ? '34%' : '12%', scale: pose === 'abaixa' ? '1 0.6' : undefined, transformOrigin: 'bottom' }}
@@ -461,7 +468,9 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
           </div>
         </div>
         <div className="absolute bottom-[12%] right-[4%] z-10 w-[16%]" aria-hidden>
-          <Retrato quem="brutus" espelhar />
+          <div key={obs.length ? obs[obs.length - 1]!.id : 0} className={obs.length ? 'arremessa' : 'respirar'}>
+            <Retrato quem="brutus" espelhar />
+          </div>
         </div>
         {fase === 'jogo' &&
           obs.map((o) => {
@@ -475,6 +484,19 @@ export function MinigameCorrida({ lugar, antes, depois, onFim }: Base) {
               >
                 <Icone nome={o.tipo === 'barril' ? 'barril' : 'saco'} className="inline-block w-[1em]" />
               </span>
+            );
+          })}
+        {/* a sombra de cada coisa no chão (o saco voa alto: a sombra fica pequena) */}
+        {fase === 'jogo' &&
+          obs.map((o) => {
+            const p = Math.min(1, (agora - o.nasceu) / VOO);
+            return (
+              <span
+                key={`s${o.id}`}
+                className="pointer-events-none absolute bottom-[10%] z-[6] block h-[3%] -translate-x-1/2 rounded-[50%] bg-black/40"
+                style={{ left: `${88 - p * 80}%`, width: o.tipo === 'barril' ? '7%' : '4%' }}
+                aria-hidden
+              />
             );
           })}
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('jogo')} />}
@@ -502,6 +524,8 @@ export function MinigameTorre({ lugar, antes, depois, onFim }: Base) {
   const [torre, setTorre] = useState<{ x: number; w: number }[]>([{ x: 40, w: 20 }]);
   const [t, setT] = useState(0);
   const [caindo, setCaindo] = useState(false);
+  // O pedaço que sobrou para fora e cai girando.
+  const [pedaco, setPedaco] = useState<{ x: number; w: number; k: number; id: number } | null>(null);
   const topo = torre[torre.length - 1]!;
   const w = topo.w;
   // Balança de um lado para o outro, cada vez mais rápido.
@@ -522,6 +546,8 @@ export function MinigameTorre({ lugar, antes, depois, onFim }: Base) {
       return;
     }
     tocar('escudoMetal');
+    // O pedaço que ficou para fora cai.
+    if (w - sobra > 0.5) setPedaco({ x: x < topo.x ? x : esq + sobra, w: w - sobra, k: torre.length, id: Date.now() });
     const nova = [...torre, { x: esq, w: sobra }];
     setTorre(nova);
     if (nova.length - 1 >= ALTURA_TORRE) {
@@ -540,21 +566,32 @@ export function MinigameTorre({ lugar, antes, depois, onFim }: Base) {
         </span>
       </div>
       <Palco lugar={lugar}>
-        {/* a janela da cela lá no alto */}
-        <span className="absolute left-1/2 top-[4%] z-10 -translate-x-1/2 font-pixel text-[8px] text-[#4ad46a] [text-shadow:1px_1px_0_#000] sm:text-[10px]">A JANELA</span>
+        {/* A TORRE (redesenhada, 22/11/2026): a janela gradeada da cela lá no alto, com as estrelas;
+            caixotes de madeira de verdade; o pedaço que fica para fora cai girando. */}
+        <div className="pointer-events-none absolute left-1/2 top-[2%] z-10 h-[12%] w-[14%] -translate-x-1/2 border-4 border-[#3a3030] bg-[#14204a]" aria-hidden>
+          {[20, 50, 80].map((px) => (
+            <span key={px} className="absolute inset-y-0 block w-[8%] bg-[#4a4a54]" style={{ left: `${px}%` }} />
+          ))}
+          <span className="absolute left-[30%] top-[30%] block h-[2px] w-[2px] bg-white" />
+          <span className="absolute left-[64%] top-[60%] block h-[2px] w-[2px] bg-white" />
+          <span className="absolute -bottom-[60%] left-1/2 -translate-x-1/2 whitespace-nowrap font-pixel text-[7px] text-[#4ad46a] [text-shadow:1px_1px_0_#000] sm:text-[9px]">A JANELA</span>
+        </div>
         {torre.map((c, k) => (
           <div
             key={k}
-            className="absolute z-10 border-2 border-[#3a2210] bg-[#8a5a2a]"
+            className="caixote-torre absolute z-10"
             style={{ left: `${c.x}%`, width: `${c.w}%`, bottom: `${10 + k * altura}%`, height: `${altura}%`, opacity: k === 0 ? 0.6 : 1 }}
             aria-hidden
           />
         ))}
+        {pedaco && (
+          <div key={pedaco.id} className="caixote-torre pedaco-cai absolute z-[11]" style={{ left: `${pedaco.x}%`, width: `${pedaco.w}%`, bottom: `${10 + pedaco.k * altura}%`, height: `${altura}%` }} aria-hidden />
+        )}
         {fase === 'jogo' && (
           <>
             <div className="absolute top-0 z-10 w-0.5 bg-[#3a3040]" style={{ left: `${x + w / 2}%`, height: `${Math.max(4, 86 - (10 + torre.length * altura) - altura)}%` }} aria-hidden />
             <div
-              className="absolute z-10 border-2 border-[#3a2210] bg-[#c8862a]"
+              className="caixote-torre absolute z-10 brightness-125"
               style={{ left: `${x}%`, width: `${w}%`, bottom: `${Math.min(86 - altura, 10 + torre.length * altura + 10)}%`, height: `${altura}%` }}
               aria-hidden
             />

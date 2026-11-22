@@ -1886,3 +1886,15 @@
 .menos-movimento .onda-fase, .menos-movimento .remo-puxa, .menos-movimento .tambor-bate, .menos-movimento .chuva-forte, .menos-movimento .onda-varre { animation: none; }
 .menos-movimento .relampago { display: none; }
 @media (prefers-reduced-motion: reduce) { .relampago { display: none; } }
+
+/* A corrida e a torre do Octavius (22/11/2026). */
+.chao-corre { background: repeating-linear-gradient(90deg, #c8a870 0 18px, #b89860 18px 22px); animation: chao-corre 0.4s linear infinite; }
+@keyframes chao-corre { from { background-position: 0 0; } to { background-position: -22px 0; } }
+.poeira-corre { animation: poeira-entrada 0.5s ease-out infinite; --dx: -18px; }
+.arremessa { animation: arremessa 0.4s ease-out; transform-origin: 50% 100%; }
+@keyframes arremessa { 0% { rotate: 0deg; } 40% { rotate: -10deg; translate: 6% 0; } 100% { rotate: 0deg; translate: 0 0; } }
+.caixote-torre { background: linear-gradient(135deg, transparent 46%, #6a4220 46% 54%, transparent 54%), repeating-linear-gradient(180deg, #b07c42 0 30%, #8a5a2a 30% 34%); border: 2px solid #3a2210; box-shadow: inset 0 2px 0 #d8a868; }
+.pedaco-cai { animation: pedaco-cai 0.8s ease-in forwards; }
+@keyframes pedaco-cai { to { translate: 0 400%; rotate: 70deg; opacity: 0; } }
+.menos-movimento .chao-corre, .menos-movimento .poeira-corre, .menos-movimento .arremessa { animation: none; }
+.menos-movimento .pedaco-cai { animation-duration: 0.01s; }
