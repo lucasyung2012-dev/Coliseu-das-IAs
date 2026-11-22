@@ -9,6 +9,7 @@ import { tocar, voz } from '@/ui/somHistoria';
 import { CenarioHistoria, escalaDe, Retrato } from './Cenarios';
 import { usePausado } from './Pausa';
 import Icone from '@/ui/pixel/Icones';
+import { usePerto } from './usePerto';
 
 /**
  * A FASE ABERTA (teste, 22/11/2026): o lugar é maior que a tela e a câmera segue o
@@ -25,6 +26,11 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
   const entrada = useRef<Entrada>({ esq: false, dir: false, pular: false });
   const [acabou, setAcabou] = useState(false);
   const largura = larguraDa(fase);
+  // No celular em pé, a câmera mostra 70 de largura (os bonecos ficam maiores); no resto, 100.
+  const perto = usePerto();
+  const VIS = perto ? 70 : 100;
+  const visRef = useRef(VIS);
+  visRef.current = VIS;
   // A altura do palco em unidades (100 = a largura), medida de verdade.
   const palcoRef = useRef<HTMLDivElement>(null);
   const [altura, setAltura] = useState(ALTURA_PADRAO);
@@ -32,13 +38,13 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
     const el = palcoRef.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
     const medir = () => {
-      if (el.clientWidth > 0) setAltura((el.clientHeight / el.clientWidth) * 100);
+      if (el.clientWidth > 0) setAltura((el.clientHeight / el.clientWidth) * VIS);
     };
     medir();
     const ro = new ResizeObserver(medir);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [VIS]);
   // O menu de pausa para a fase (o relógio não anda).
   const pausado = usePausado();
   const pausadoRef = useRef(pausado);
@@ -68,7 +74,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
         if (novo.vy > antes.vy + 1) pularAte.current = 0;
         estado.current = novo;
         setS(novo);
-        const alvo = Math.max(0, Math.min(larguraDa(fase) - 100, novo.x - 45));
+        const alvo = Math.max(0, Math.min(larguraDa(fase) - visRef.current, novo.x - visRef.current * 0.45));
         cameraRef.current += (alvo - cameraRef.current) * Math.min(1, dt / 120);
         setCamera(cameraRef.current);
       }
@@ -158,7 +164,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
         {/* O mundo inteiro, que anda com a câmera */}
         <div
           className="absolute inset-y-0 left-0"
-          style={{ width: `${fase.telas.length * 100}%`, transform: `translateX(${(-camera / largura) * 100}%)` }}
+          style={{ width: `${(largura / VIS) * 100}%`, transform: `translateX(${(-camera / largura) * 100}%)` }}
         >
           {fase.telas.map((t, k) => (
             <div key={k} className="absolute inset-y-0" style={{ left: `${(k / fase.telas.length) * 100}%`, width: `${100 / fase.telas.length}%` }}>
@@ -351,7 +357,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
           </div>
         )}
 
-        {fase.escuro && <EscuroDaFase fase={fase} s={s} camera={camera} altura={altura} />}
+        {fase.escuro && <EscuroDaFase fase={fase} s={s} camera={camera} altura={altura} vis={VIS} />}
         {fase.visao && visaoAtiva(fase, s.tempo) && (
           <>
             <div className="visao-fase pointer-events-none absolute inset-0 z-[18]" aria-hidden />
@@ -465,7 +471,7 @@ function CoisaQueCai({ p, tempo }: { p: Perigo; tempo: number }) {
  * O ESCURO DAS FASES DO HELIOS: uma máscara preta com buracos de luz em volta do gladiador e
  * de cada coisa já pega (a lanterna acesa, o espelho refletindo).
  */
-function EscuroDaFase({ fase, s, camera, altura }: { fase: Fase; s: { x: number; y: number; coletados: string[] }; camera: number; altura: number }) {
+function EscuroDaFase({ fase, s, camera, altura, vis }: { fase: Fase; s: { x: number; y: number; coletados: string[] }; camera: number; altura: number; vis: number }) {
   const raio = fase.escuro!.raio;
   const naTela = (x: number, y: number) => ({ cx: x - camera, cy: altura - (altura * CHAO) / 100 - y });
   const luzes = [
@@ -474,20 +480,20 @@ function EscuroDaFase({ fase, s, camera, altura }: { fase: Fase; s: { x: number;
   ];
   const id = `escuro-${fase.id}`;
   return (
-    <svg className="pointer-events-none absolute inset-0 z-[17] h-full w-full" viewBox={`0 0 100 ${altura}`} preserveAspectRatio="none" aria-hidden>
+    <svg className="pointer-events-none absolute inset-0 z-[17] h-full w-full" viewBox={`0 0 ${vis} ${altura}`} preserveAspectRatio="none" aria-hidden>
       <defs>
         <radialGradient id={`${id}-luz`}>
           <stop offset="0.45" stopColor="black" />
           <stop offset="1" stopColor="white" />
         </radialGradient>
         <mask id={`${id}-mascara`}>
-          <rect width="100" height={altura} fill="white" />
+          <rect width={vis} height={altura} fill="white" />
           {luzes.map((l, k) => (
             <circle key={k} cx={l.cx} cy={l.cy} r={l.r} fill={`url(#${id}-luz)`} />
           ))}
         </mask>
       </defs>
-      <rect width="100" height={altura} fill="rgba(4,2,14,0.94)" mask={`url(#${id}-mascara)`} />
+      <rect width={vis} height={altura} fill="rgba(4,2,14,0.94)" mask={`url(#${id}-mascara)`} />
     </svg>
   );
 }

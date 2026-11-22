@@ -14,6 +14,7 @@ import { SpriteInimigo } from './Luta';
 import { BotaoSeta, MapaDesenhado } from './MundoAberto';
 import { usePausado } from './Pausa';
 import { ClimaDaArena } from './Clima';
+import { usePerto } from './usePerto';
 
 /** Os chefões grandes ocupam mais espaço no mapa. */
 const GRANDES = new Set(['censor-tita', 'censor-tita-octavius', 'censor-tita-helios', 'leviata', 'gigante-sombras', 'nucleo', 'leao-mecanico']);
@@ -67,6 +68,12 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const faseRef = useRef(fase);
   faseRef.current = fase;
   const pausado = usePausado();
+  // No celular em pé, a câmera mostra 10 ladrilhos de largura e segue o gladiador.
+  const perto = usePerto();
+  const VIS = perto ? Math.min(10, W) : W;
+  const visRef = useRef(VIS);
+  visRef.current = VIS;
+  const camRef = useRef<number | null>(null);
   const pausadoRef = useRef(pausado);
   pausadoRef.current = pausado;
 
@@ -130,6 +137,8 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           if (p.tipo === 'copias') tocar('reflexo');
           if (p.tipo === 'investida') tocar('galope');
         }
+        const alvoCam = Math.max(0, Math.min(W - visRef.current, s2.x - visRef.current / 2));
+        camRef.current = camRef.current === null ? alvoCam : camRef.current + (alvoCam - camRef.current) * Math.min(1, dt / 140);
         ref.current = { s: s2, st: st2 };
         setS(s2);
         setSt(st2);
@@ -192,8 +201,10 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   if (fase === 'duelo') return <>{duelo()}</>;
 
   const p = def.padroes[st.i % def.padroes.length]!;
-  const emMapa = (x: number, y: number): CSSProperties => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` });
-  const roda = (x: number, y: number, r: number): CSSProperties => ({ ...emMapa(x, y), width: `${((2 * r) / W) * 100}%`, height: `${((2 * r) / H) * 100}%`, translate: '-50% -50%' });
+  // A câmera (no computador fica em 0 e mostra a arena inteira).
+  const camX = VIS >= W ? 0 : (camRef.current ?? Math.max(0, Math.min(W - VIS, s.x - VIS / 2)));
+  const emMapa = (x: number, y: number): CSSProperties => ({ left: `${((x - camX) / VIS) * 100}%`, top: `${(y / H) * 100}%` });
+  const roda = (x: number, y: number, r: number): CSSProperties => ({ ...emMapa(x, y), width: `${((2 * r) / VIS) * 100}%`, height: `${((2 * r) / H) * 100}%`, translate: '-50% -50%' });
   const ferido = st.tempo < st.feridoAte;
   const ultimo = st.eventos[st.eventos.length - 1];
   const recente = ultimo && st.tempo - ultimo.em < 800 ? ultimo : null;
@@ -212,7 +223,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const bossFiltro = levouPlaca ? 'brightness(2.6)' : cansado ? 'saturate(0.35) brightness(0.9)' : `drop-shadow(0 0 ${raiva ? 8 : def.escuro ? 6 : 0}px ${raiva ? '#ff3a3a' : def.cor})`;
 
   const desenhoChefe = (x: number, y: number, chave: string, copia = false) => (
-    <div key={chave} className={`absolute ${copia ? 'copia-chefe' : ''} ${fase === 'chegada' && !copia ? `chega-${def.chegada}` : ''}`} style={{ ...emMapa(x, y), width: `${(tam / W) * 100}%`, translate: `-50% ${-92 - noAr * 70}%`, zIndex: noAr > 0 ? 300 : 260 + Math.floor(y * 4) }}>
+    <div key={chave} className={`absolute ${copia ? 'copia-chefe' : ''} ${fase === 'chegada' && !copia ? `chega-${def.chegada}` : ''}`} style={{ ...emMapa(x, y), width: `${(tam / VIS) * 100}%`, translate: `-50% ${-92 - noAr * 70}%`, zIndex: noAr > 0 ? 300 : 260 + Math.floor(y * 4) }}>
       <span className="absolute bottom-[2%] left-1/2 h-[10%] w-[80%] -translate-x-1/2 rounded-[50%] bg-black/50" />
       <div className={st.etapa === 'mira' ? 'tremer-t' : cansado ? 'respirar-t' : ''} style={{ transform: st.dir === 'esq' ? undefined : 'scaleX(-1)', filter: bossFiltro }}>
         <SpriteInimigo e={sprite} />
@@ -223,6 +234,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const tentarDeNovo = () => {
     const s0 = novoMundo(m);
     const st0 = novoEstadoChefe(def);
+    camRef.current = null;
     ref.current = { s: s0, st: st0 };
     setS(s0);
     setSt(st0);
@@ -248,26 +260,28 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
         </div>
       </div>
       <div className="area-jogo relative flex flex-col gap-2">
-        <div className={`pixel-box mundo-aberto relative w-full select-none overflow-hidden bg-black ${recente?.tipo === 'parede' || recente?.tipo === 'explode' ? 'tremer-forte' : ''}`} style={{ aspectRatio: `${W} / ${H}`, touchAction: 'none' }}>
-          <MapaDesenhado mundo={m} />
+        <div className={`pixel-box mundo-aberto relative w-full select-none overflow-hidden bg-black ${recente?.tipo === 'parede' || recente?.tipo === 'explode' ? 'tremer-forte' : ''}`} style={{ aspectRatio: `${VIS} / ${H}`, touchAction: 'none' }}>
+          <div className="absolute inset-y-0 left-0" style={{ width: `${(W / VIS) * 100}%`, transform: `translateX(${(-camX / W) * 100}%)` }}>
+            <MapaDesenhado mundo={m} />
+          </div>
           <ClimaDaArena clima={def.clima} />
 
           {/* No escuro, só se vê em volta do gladiador */}
           {def.escuro && (
             <div
               className="pointer-events-none absolute inset-0 z-[240]"
-              style={{ background: `radial-gradient(circle at ${(s.x / W) * 100}% ${((s.y - 0.5) / H) * 100}%, transparent 0, transparent 9%, rgba(4,2,14,0.93) 24%)` }}
+              style={{ background: `radial-gradient(circle at ${((s.x - camX) / VIS) * 100}% ${((s.y - 0.5) / H) * 100}%, transparent 0, transparent 9%, rgba(4,2,14,0.93) 24%)` }}
               aria-hidden
             />
           )}
 
           {/* A mira: a linha piscando até você */}
           {mira && (
-            <span className="piscar pointer-events-none absolute z-[270] block h-[3px] origin-left" style={{ ...emMapa(st.x, st.y - 0.6), width: `${(mira.d / W) * 100}%`, rotate: `${mira.ang}deg`, background: def.cor }} aria-hidden />
+            <span className="piscar pointer-events-none absolute z-[270] block h-[3px] origin-left" style={{ ...emMapa(st.x, st.y - 0.6), width: `${(mira.d / VIS) * 100}%`, rotate: `${mira.ang}deg`, background: def.cor }} aria-hidden />
           )}
           {/* O salto: a sombra onde ele vai cair */}
           {p.tipo === 'salto' && st.alvo && st.etapa !== 'cansado' && (
-            <span className={`pointer-events-none absolute z-[250] block rounded-[50%] ${st.etapa === 'ataque' || st.ate - st.tempo <= 500 ? 'sombra-salto-forte' : 'sombra-salto'}`} style={{ ...emMapa(st.alvo.x, st.alvo.y - 0.2), width: `${(2.8 / W) * 100}%`, aspectRatio: '2.4 / 1', translate: '-50% -50%' }} aria-hidden />
+            <span className={`pointer-events-none absolute z-[250] block rounded-[50%] ${st.etapa === 'ataque' || st.ate - st.tempo <= 500 ? 'sombra-salto-forte' : 'sombra-salto'}`} style={{ ...emMapa(st.alvo.x, st.alvo.y - 0.2), width: `${(2.8 / VIS) * 100}%`, aspectRatio: '2.4 / 1', translate: '-50% -50%' }} aria-hidden />
           )}
           {/* As zonas: o chão marca e depois explode */}
           {p.tipo === 'zonas' &&
@@ -286,7 +300,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           )}
           {/* O raio que gira */}
           {p.tipo === 'feixe' && st.angulo !== undefined && (
-            <span className="pointer-events-none absolute z-[256] block h-[6px] origin-left rounded-full" style={{ ...emMapa(st.x, st.y - 0.4), width: `${(p.comprimento / W) * 100}%`, rotate: `${(st.angulo * 180) / Math.PI}deg`, translate: '0 -50%', background: `linear-gradient(90deg, #fff, ${def.cor} 30%, ${def.cor}00)`, boxShadow: `0 0 10px ${def.cor}` }} aria-hidden />
+            <span className="pointer-events-none absolute z-[256] block h-[6px] origin-left rounded-full" style={{ ...emMapa(st.x, st.y - 0.4), width: `${(p.comprimento / VIS) * 100}%`, rotate: `${(st.angulo * 180) / Math.PI}deg`, translate: '0 -50%', background: `linear-gradient(90deg, #fff, ${def.cor} 30%, ${def.cor}00)`, boxShadow: `0 0 10px ${def.cor}` }} aria-hidden />
           )}
           {/* Os projéteis */}
           {(st.projeteis ?? []).map((q, k) => (
@@ -294,7 +308,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           ))}
 
           {/* O gladiador */}
-          <div className={`absolute ${ferido && !escudo ? 'piscar' : ''} ${sombra ? 'passo-sombra' : ''}`} style={{ ...emMapa(s.x, s.y), width: `${((1.15 * escalaDe(heroi)) / W) * 100}%`, translate: '-50% -100%', zIndex: Math.hypot(s.x - st.x, s.y - st.y) < 1.8 ? 299 : 260 + Math.floor(s.y * 4) }}>
+          <div className={`absolute ${ferido && !escudo ? 'piscar' : ''} ${sombra ? 'passo-sombra' : ''}`} style={{ ...emMapa(s.x, s.y), width: `${((1.15 * escalaDe(heroi)) / VIS) * 100}%`, translate: '-50% -100%', zIndex: Math.hypot(s.x - st.x, s.y - st.y) < 1.8 ? 299 : 260 + Math.floor(s.y * 4) }}>
             <span className="absolute bottom-[-4%] left-1/2 h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" />
             <div className={s.andando ? 'andar' : 'respirar'}>
               <Retrato quem={heroi} espelhar={s.dir === 'esq'} />
@@ -310,7 +324,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           {(st.copias ?? []).filter((c) => c.viva).map((c, k) => desenhoChefe(c.x, c.y, `c${k}`, true))}
 
           {naRede && (
-            <span className="rede-chefe pointer-events-none absolute z-[305] block" style={{ ...emMapa(st.x, st.y - tam * 0.45), width: `${((tam * 0.9) / W) * 100}%`, aspectRatio: '1', translate: '-50% -50%' }} aria-hidden>
+            <span className="rede-chefe pointer-events-none absolute z-[305] block" style={{ ...emMapa(st.x, st.y - tam * 0.45), width: `${((tam * 0.9) / VIS) * 100}%`, aspectRatio: '1', translate: '-50% -50%' }} aria-hidden>
               <Icone nome="rede" className="h-full w-full opacity-90" />
             </span>
           )}
@@ -325,7 +339,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
             </span>
           )}
           {cansado && (
-            <span className="pointer-events-none absolute z-[310] flex -translate-x-1/2 flex-col items-center" style={emMapa(Math.min(W - 2.2, Math.max(2.2, st.x)), st.y - tam - 0.3)}>
+            <span className="pointer-events-none absolute z-[310] flex -translate-x-1/2 flex-col items-center" style={emMapa(Math.min(camX + VIS - 2.2, Math.max(camX + 2.2, st.x)), st.y - tam - 0.3)}>
               <span className="emote-pula block w-6 sm:w-8"><Emote emocao="surpreso" /></span>
               <span className="whitespace-nowrap border-2 border-black bg-[#4ad46a] px-1 font-pixel text-[7px] text-black sm:text-[10px]">{naRede ? 'PRESO NA REDE! BATA!' : 'CANSADO! BATA!'}</span>
             </span>
