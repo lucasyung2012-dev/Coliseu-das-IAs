@@ -134,21 +134,15 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
         </span>
       </div>
       <Palco lugar={lugar} className={brilho === 'erro' ? 'tremer' : ''}>
-        {/* A FORJA (redesenhada, 22/11/2026): a fornalha acesa à direita, a barra de ferro em brasa
+        {/* A FORJA (redesenhada, 22/11/2026): a barra de ferro em brasa
             trazendo o calor, a bigorna com a armadura amassada (fica reta a cada martelada certa),
             o Cassius de martelo e o Brutus olhando. Faíscas e TANG! quando acerta. */}
-        <div className="pointer-events-none absolute bottom-[10%] right-[2%] top-[22%] z-[5] w-[16%]" aria-hidden>
-          <div className="absolute inset-0 border-4 border-[#3a2a20] bg-[#5a4a40]" />
-          <div className="absolute inset-x-[14%] bottom-[12%] h-[46%] bg-[#1a0e08]" />
-          <div className="forja-fogo absolute inset-x-[18%] bottom-[14%] h-[36%] bg-[radial-gradient(ellipse_at_50%_100%,#fff0a0_0,#ffb03a_35%,#ff5a1a_65%,transparent_80%)]" />
-          <div className="absolute -inset-[30%] rounded-full bg-[#ff7a2a]/20 blur-xl" />
-        </div>
         {fase === 'jogo' && (
-          <div className="pointer-events-none absolute left-[14%] right-[18%] top-[44%] z-20 h-[12%]" aria-hidden>
+          <div className="pointer-events-none absolute left-[30%] right-[16%] top-[44%] z-20 h-[12%]" aria-hidden>
             {/* a barra de ferro: esquenta do lado da fornalha */}
             <div className="absolute inset-x-0 top-1/2 h-[30%] -translate-y-1/2 bg-[linear-gradient(90deg,#3a3a44,#5a4a4a_60%,#c8501a)] shadow-[0_2px_0_#000]" />
             {chegadas.current.map((_, k) => {
-              const x = ((pos(k) - 15) / 87) * 100;
+              const x = ((pos(k) - 15) / 85) * 100;
               return resolvidas.includes(k) || x > 100 || x < -6 ? null : (
                 <span key={k} className="brasa-forja absolute top-1/2 block aspect-square w-[5%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${x}%` }} />
               );
@@ -156,7 +150,7 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
           </div>
         )}
         {/* a bigorna e a armadura em cima dela */}
-        <div className="pointer-events-none absolute bottom-[12%] left-[16%] z-[12] w-[16%] -translate-x-1/2" aria-hidden>
+        <div className="pointer-events-none absolute bottom-[12%] left-[30%] z-[12] w-[14%] -translate-x-1/2" aria-hidden>
           <div className={`mx-auto h-[14px] w-[70%] rounded-t-[40%] border-2 border-black sm:h-[26px] ${acertos >= PRECISA_FORJA ? 'bg-[#d8d8e8]' : acertos > PRECISA_FORJA / 2 ? 'bg-[#a8a8b8]' : 'bg-[#8a6a5a]'}`} style={{ clipPath: `polygon(0 ${Math.max(0, 40 - acertos * 4)}%, 30% 0, 50% ${Math.max(0, 30 - acertos * 3)}%, 70% 0, 100% ${Math.max(0, 40 - acertos * 4)}%, 100% 100%, 0 100%)` }} />
           <div className="h-[10px] w-full bg-[#3a3a44] sm:h-[18px]" />
           <div className="mx-auto h-[14px] w-[40%] bg-[#2a2a34] sm:h-[24px]" />
@@ -165,7 +159,7 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
         </div>
         {/* faíscas e TANG! na martelada certa */}
         {brilho === 'ok' && (
-          <div key={batida} className="pointer-events-none absolute bottom-[30%] left-[16%] z-[25]" aria-hidden>
+          <div key={batida} className="pointer-events-none absolute bottom-[30%] left-[30%] z-[25]" aria-hidden>
             {[-60, -35, -10, 15, 40, 65, 90, -85].map((a, k) => (
               <span key={k} className="faisca-forja absolute block h-[3px] w-[3px] bg-[#ffe08a]" style={{ '--ang': `${a}deg` } as CSSProperties} />
             ))}
@@ -173,13 +167,13 @@ export function MinigameForja({ lugar, antes, depois, onFim }: Base) {
           </div>
         )}
         {/* o Cassius com o martelo (balança a cada martelada) */}
-        <div className="pointer-events-none absolute bottom-[12%] left-[6%] z-[11] w-[15%] -translate-x-1/2" aria-hidden>
+        <div className="pointer-events-none absolute bottom-[12%] left-[19%] z-[11] w-[15%] -translate-x-1/2" aria-hidden>
           <div key={batida} className={batida ? 'martelada' : 'respirar'}>
             <Retrato quem="cassius" />
           </div>
         </div>
         {/* o Brutus olhando: gosta das seguidas, bufa no erro */}
-        <div className="pointer-events-none absolute bottom-[12%] left-[44%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
+        <div className="pointer-events-none absolute bottom-[12%] left-[56%] z-10 w-[14%] -translate-x-1/2" aria-hidden>
           {(brilho === 'erro' || seguidas >= 3) && (
             <span className="emote-pula absolute -top-[20%] left-1/2 block w-[40%] -translate-x-1/2">
               <Emote emocao={brilho === 'erro' ? 'bravo' : 'feliz'} />
