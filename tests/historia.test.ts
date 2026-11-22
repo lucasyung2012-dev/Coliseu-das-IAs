@@ -1,6 +1,6 @@
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, ANIMO_MAX, ataqueAtual, novaLuta, passoLuta, TICK_LUTA, type EstadoLuta } from '@/game/historia/luta';
-import { avancarSave, criarSave } from '@/game/historia/saves';
+import { ajustarOrdem, avancarSave, criarSave } from '@/game/historia/saves';
 import { CAPITULOS, PROLOGO } from '@/game/historia/roteiro';
 
 const fixo = () => 0;
@@ -123,6 +123,27 @@ describe('saves e roteiro', () => {
     expect(lutas).toHaveLength(6);
     expect(lutas[5]).toMatchObject({ inimigo: 'fornalha' });
     for (const l of lutas) if (l.tipo === 'luta') expect(INIMIGOS[l.inimigo]).toBeDefined();
+  });
+
+  it('Capítulo 1 na ordem nova: a luta de treino vem antes de todas, e a Lívia desce pelo alçapão depois dos livros', () => {
+    const ids = CAPITULOS.claude[0]!.cenas.map((c) => c.id);
+    expect(ids.slice(0, 7)).toEqual(['c1-abertura', 'c1-estantes', 'c1-plano', 'c1-treino-paginas', 'c1-depois-treino', 'c1-luta1', 'c1-esconder']);
+    expect(ids[7]).toBe('c1-alcapao');
+    expect(ids[11]).toBe('c1-escada');
+  });
+
+  it('save antigo do Capítulo 1 acha a mesma cena na ordem nova (uma vez só)', () => {
+    const antigo = { ...criarSave('claude'), ordem: undefined };
+    // A escada era a cena 10 e agora é a 11; a primeira luta era a 3 e agora é a 5.
+    expect(ajustarOrdem({ ...antigo, cena: 10 }).cena).toBe(11);
+    expect(ajustarOrdem({ ...antigo, cena: 3 }).cena).toBe(5);
+    expect(ajustarOrdem({ ...antigo, cena: 14 }).cena).toBe(15);
+    const novo = ajustarOrdem({ ...antigo, cena: 10 });
+    expect(ajustarOrdem(novo)).toBe(novo);
+    // Outro capítulo ou outro gladiador: não muda a cena.
+    expect(ajustarOrdem({ ...antigo, capitulo: 2, cena: 4 }).cena).toBe(4);
+    expect(ajustarOrdem({ ...antigo, gladiador: 'chatgpt', cena: 4 }).cena).toBe(4);
+    expect(criarSave('claude').ordem).toBe(2);
   });
 
   it('o Capítulo 2 tem 4 batalhas (a última no Coliseu), o desafio da carroça e nenhum chefão', () => {

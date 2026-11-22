@@ -158,7 +158,7 @@ export function FaseAberta({ fase, heroi, onFim }: { fase: Fase; heroi: Falante;
         >
           {fase.telas.map((t, k) => (
             <div key={k} className="absolute inset-y-0" style={{ left: `${(k / fase.telas.length) * 100}%`, width: `${100 / fase.telas.length}%` }}>
-              <CenarioHistoria lugar={t} />
+              <CenarioHistoria lugar={t} semEstatua={k > 0} />
             </div>
           ))}
 

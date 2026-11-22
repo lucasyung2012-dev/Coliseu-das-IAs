@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { capitulosDoSave, chaveCompleta, equipeDoSecreto, PEDACOS_DA_CHAVE, saveCompleto } from '@/game/historia/roteiro4';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
@@ -235,6 +235,9 @@ export default function ColiseuHistoria() {
                       onContinuar={() => {
                         desbloquear();
                         tocar('start');
+                        // Save de antes da ordem nova do capítulo 1: acha a cena equivalente.
+                        const ajustado = ajustarOrdem(s);
+                        if (ajustado !== s) gravarSaveHistoria(ajustado);
                         setTela({ tipo: 'jogo', id: s.id });
                       }}
                       onPedirApagar={() => setApagando(s.id)}

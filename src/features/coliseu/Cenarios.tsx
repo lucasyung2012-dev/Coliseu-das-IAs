@@ -56,14 +56,14 @@ import { CACADOR_SOMBRAS, GUARDIAO_AQUEDUTO, LUMEN, PALETA_CACADOR, PALETA_LUMEN
  * Os cenários do modo História, em pixel (160 × 90, ampliados sem suavizar).
  * Cada lugar do roteiro tem o seu desenho.
  */
-export function CenarioHistoria({ lugar }: { lugar: Lugar }) {
+export function CenarioHistoria({ lugar, semEstatua = false }: { lugar: Lugar; semEstatua?: boolean }) {
   if (lugar === 'coliseu-calado') return <CenaColiseu corA="#8a5a3a" corB="#8a5a3a" arena="estatuas" />;
   // A arena de verdade: dia, plateia cheia e viva (no Capítulo 2 ela vaia e depois aplaude).
   if (lugar === 'coliseu-arena') return <CenaColiseu corA="#f08c50" corB="#8a8a98" arena="pedra" viva />;
   // A Grande Arena dos Jogos da Resposta Única: a arena imperial, lotada e em festa.
   if (lugar === 'coliseu-noite') return <CenaColiseu corA="#f08c50" corB="#c0283c" arena="imperial" viva festa />;
   // Os cenários novos, em 320 × 180 (o dobro de detalhe).
-  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar) ?? desenhoCapitulo4(lugar) ?? desenhoCapitulo5(lugar) ?? desenhoCapitulo6(lugar);
+  const hd = desenhoPrologo(lugar) ?? desenhoCapitulo(lugar, semEstatua) ?? desenhoCapitulo2(lugar) ?? desenhoCapitulo3(lugar) ?? desenhoCapitulo4(lugar) ?? desenhoCapitulo5(lugar) ?? desenhoCapitulo6(lugar);
   if (hd)
     return (
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" className="absolute inset-0 h-full w-full" aria-hidden>

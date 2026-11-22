@@ -12,14 +12,14 @@ import './capitulos.css';
 import type { CSSProperties } from 'react';
 import type { Lugar } from '@/game/historia/roteiro';
 
-export function desenhoCapitulo(lugar: Lugar): JSX.Element | null {
+export function desenhoCapitulo(lugar: Lugar, semEstatua = false): JSX.Element | null {
   switch (lugar) {
     case 'biblioteca-estantes':
       return estantes();
     case 'biblioteca-salao':
-      return salao(false);
+      return salao(false, !semEstatua);
     case 'biblioteca-chamas':
-      return salao(true);
+      return salao(true, !semEstatua);
     case 'biblioteca-escada':
       return escada();
     case 'rua-noite':
@@ -403,7 +403,7 @@ function estantes(): JSX.Element {
 /* Biblioteca: grande salão (e o mesmo salão em chamas)                */
 /* ------------------------------------------------------------------ */
 
-function salao(fogo: boolean): JSX.Element {
+function salao(fogo: boolean, estatua = true): JSX.Element {
   const t = pincel();
   t.r(0, 0, 320, 180, fogo ? '#2e1416' : '#241a2a');
   t.r(0, 100, 320, 38, fogo ? '#24100e' : '#1c1422');
@@ -465,6 +465,8 @@ function salao(fogo: boolean): JSX.Element {
     if (fogo) chama(t, bx + 5, 86, 8, i * 170);
   });
 
+  // (Na fase de andar de lado, a segunda tela é a ala em chamas: sem estátua, para não ter duas.)
+  if (estatua) {
   // estátua do Guardião Zero: robô antigo de bronze, segurando um livro no alto
   halo(t, 160, 70, 40, fogo ? '#ff5a2a' : '#c8a0ff', fogo ? 0.06 : 0.04);
   t.r(136, 108, 48, 5, '#c8bea8');
@@ -541,6 +543,7 @@ function salao(fogo: boolean): JSX.Element {
   t.r(173, 66, 1, 12, PA, 0.6);
   t.r(141, 70, 1, 8, PA, 0.6);
 
+  }
   // piso de mármore xadrez em perspectiva
   t.r(0, 138, 320, 42, fogo ? '#5a3428' : '#5e5054');
   const linhas = [138, 143, 149, 156, 164, 173];

@@ -32,6 +32,8 @@ export interface SaveHistoria {
   escolhas?: Record<string, string>;
   /** O capítulo secreto, Os Três (os três gladiadores juntos; o `gladiador` é só quem começa). */
   secreto?: boolean;
+  /** Versão da ordem das cenas (2 = o capítulo 1 do Cassius com o treino no começo, 22/11/2026). */
+  ordem?: number;
 }
 
 export type Treino = 'forca' | 'defesa' | 'vida' | 'carisma';
@@ -56,12 +58,23 @@ export const NOME_DO_CAMINHO: Record<IaId, string> = {
 
 export function criarSave(gladiador: IaId, agora = new Date()): SaveHistoria {
   const quando = agora.toISOString();
-  return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando };
+  return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando, ordem: 2 };
 }
 
 /** O save do capítulo secreto: abre pela grade escondida, com os três pedaços da chave. */
 export function criarSaveSecreto(agora = new Date()): SaveHistoria {
   return { ...criarSave('claude', agora), secreto: true };
+}
+
+/**
+ * 22/11/2026: o capítulo 1 do Cassius mudou de ordem (a luta de treino veio para o começo
+ * e entrou a cena do alçapão). Save antigo: a cena antiga vira a cena nova equivalente.
+ */
+const ORDEM_NOVA_CAP1_CASSIUS = [0, 1, 2, 5, 6, 8, 9, 3, 4, 10, 11, 12];
+export function ajustarOrdem(s: SaveHistoria): SaveHistoria {
+  if ((s.ordem ?? 1) >= 2) return s;
+  const cena = s.gladiador === 'claude' && s.capitulo === 1 && !s.secreto ? (ORDEM_NOVA_CAP1_CASSIUS[s.cena] ?? s.cena + 1) : s.cena;
+  return { ...s, cena, ordem: 2 };
 }
 
 /** Avança o save para uma cena (ou para o próximo capítulo, marcando o atual como concluído). */

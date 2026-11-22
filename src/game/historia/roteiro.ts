@@ -502,6 +502,33 @@ const CAP1_CASSIUS: Capitulo = {
     },
     {
       tipo: 'luta',
+      id: 'c1-treino-paginas',
+      lugar: 'biblioteca-salao',
+      inimigo: 'incinerador',
+      antes: [
+        { quem: 'narrador', texto: 'Na base da estátua do Guardião Zero, uma frase quase apagada: "O escudo certo, na hora certa, vira página de história."' },
+        { quem: 'cassius', texto: 'Na hora certa... Não antes. Bem quando o golpe chega.' },
+        { quem: 'narrador', texto: 'Um Incinerador pequeno, sozinho, vem pelo corredor. Hora de testar.' },
+        { quem: 'narrador', texto: 'TREINO DO GUARDIÃO: espere o sinal AMARELO e levante o ESCUDO NA ÚLTIMA HORA, quase quando o golpe bate. Cada bloqueio assim guarda uma PÁGINA.' },
+      ],
+      treino: { evento: 'pagina', quantos: 2, rotulo: 'PÁGINAS (bloqueie na última hora)' },
+      depois: [
+        { quem: 'cassius', texto: 'Duas páginas! Elas ficam girando em volta de mim...' },
+        { quem: 'narrador', texto: 'Com páginas guardadas, o próximo GLÁDIO no inimigo ABERTO faz uma CITAÇÃO: bate muito mais forte (até 3 páginas).' },
+      ],
+    },
+    {
+      tipo: 'conversa',
+      id: 'c1-depois-treino',
+      lugar: 'biblioteca-salao',
+      falas: [
+        { quem: 'cassius', texto: 'Eu não sou rápido. Nunca fui. Mas eu sei esperar.' },
+        { quem: 'cassius', texto: 'Um guardião não foge do golpe: segura, guarda e devolve. Página por página.' },
+        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Cassius é a MURALHA DE LIVROS: por alguns segundos, nada passa, e metade de cada golpe volta para quem bateu.' },
+      ],
+    },
+    {
+      tipo: 'luta',
       id: 'c1-luta1',
       lugar: 'biblioteca-estantes',
       inimigo: 'incinerador',
@@ -528,6 +555,47 @@ const CAP1_CASSIUS: Capitulo = {
       ],
     },
     {
+      // NOVA (22/11/2026, pedido do Lucas): mostrar a Lívia descendo pelo alçapão com os livros.
+      // Falas em rascunho: o Lucas pode reescrever.
+      tipo: 'cutscene',
+      id: 'c1-alcapao',
+      quadros: [
+        {
+          lugar: 'biblioteca-salao',
+          som: 'passos',
+          personagens: [
+            { quem: 'cassius', x: 34 },
+            { quem: 'livia', x: 58, espelhar: true },
+          ],
+          texto: 'Os livros mais importantes já estão no alçapão. Lá embaixo, a escada de pedra desce para as catacumbas.',
+        },
+        {
+          lugar: 'biblioteca-salao',
+          quem: 'livia',
+          personagens: [
+            { quem: 'cassius', x: 34 },
+            { quem: 'livia', x: 58, espelhar: true },
+          ],
+          texto: 'Desce comigo, Mestre Cass.',
+        },
+        {
+          lugar: 'biblioteca-salao',
+          quem: 'cassius',
+          personagens: [
+            { quem: 'cassius', x: 34 },
+            { quem: 'livia', x: 58, espelhar: true },
+          ],
+          texto: 'Vai na frente e leva os livros. Eu seguro a porta do salão.',
+        },
+        {
+          lugar: 'biblioteca-salao',
+          som: 'portao',
+          personagens: [{ quem: 'cassius', x: 34 }],
+          texto: 'A Lívia some pelo alçapão, abraçada numa pilha de livros. Cassius fica sozinho com o barulho de asas de metal lá fora.',
+        },
+      ],
+    },
+    {
       tipo: 'luta',
       id: 'c1-luta2',
       lugar: 'biblioteca-salao',
@@ -543,33 +611,6 @@ const CAP1_CASSIUS: Capitulo = {
       id: 'c1-salao',
       lugar: 'biblioteca-salao',
       fase: 'biblioteca-em-chamas',
-    },
-    {
-      tipo: 'luta',
-      id: 'c1-treino-paginas',
-      lugar: 'biblioteca-salao',
-      inimigo: 'incinerador',
-      antes: [
-        { quem: 'narrador', texto: 'Na base da estátua do Guardião Zero, uma frase quase apagada: "O escudo certo, na hora certa, vira página de história."' },
-        { quem: 'cassius', texto: 'Na hora certa... Não antes. Bem quando o golpe chega.' },
-        { quem: 'narrador', texto: 'Um Incinerador pequeno, sozinho, vem pelo corredor. Hora de testar.' },
-        { quem: 'narrador', texto: 'TREINO DO GUARDIÃO: espere o sinal AMARELO e levante o ESCUDO NA ÚLTIMA HORA, quase quando o golpe bate. Cada bloqueio assim guarda uma PÁGINA.' },
-      ],
-      treino: { evento: 'pagina', quantos: 2, rotulo: 'PÁGINAS (bloqueie na última hora)' },
-      depois: [
-        { quem: 'cassius', texto: 'Duas páginas! Elas ficam girando em volta de mim...' },
-        { quem: 'narrador', texto: 'Com páginas guardadas, o próximo GLÁDIO no inimigo ABERTO faz uma CITAÇÃO: bate muito mais forte (até 3 páginas).' },
-      ],
-    },
-    {
-      tipo: 'conversa',
-      id: 'c1-depois-treino',
-      lugar: 'biblioteca-salao',
-      falas: [
-        { quem: 'cassius', texto: 'Eu não sou rápido. Nunca fui. Mas eu sei esperar.' },
-        { quem: 'cassius', texto: 'Um guardião não foge do golpe: segura, guarda e devolve. Página por página.' },
-        { quem: 'narrador', texto: 'Quando o Ânimo encher, o especial do Cassius é a MURALHA DE LIVROS: por alguns segundos, nada passa, e metade de cada golpe volta para quem bateu.' },
-      ],
     },
     {
       tipo: 'luta',
