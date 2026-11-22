@@ -294,7 +294,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           ))}
 
           {/* O gladiador */}
-          <div className={`absolute ${ferido && !escudo ? 'piscar' : ''} ${sombra ? 'passo-sombra' : ''}`} style={{ ...emMapa(s.x, s.y), width: `${((1.15 * escalaDe(heroi)) / W) * 100}%`, translate: '-50% -100%', zIndex: 260 + Math.floor(s.y * 4) }}>
+          <div className={`absolute ${ferido && !escudo ? 'piscar' : ''} ${sombra ? 'passo-sombra' : ''}`} style={{ ...emMapa(s.x, s.y), width: `${((1.15 * escalaDe(heroi)) / W) * 100}%`, translate: '-50% -100%', zIndex: Math.hypot(s.x - st.x, s.y - st.y) < 1.8 ? 299 : 260 + Math.floor(s.y * 4) }}>
             <span className="absolute bottom-[-4%] left-1/2 h-[10%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45" />
             <div className={s.andando ? 'andar' : 'respirar'}>
               <Retrato quem={heroi} espelhar={s.dir === 'esq'} />
