@@ -660,7 +660,7 @@ const DONO: Record<IaId, Falante> = { claude: 'cassius', chatgpt: 'octavius', ge
 export function equipeDoSecreto(saves: SaveHistoria[]): Record<'cassius' | 'octavius' | 'helios', AtributosLuta> {
   const equipe = {} as Record<'cassius' | 'octavius' | 'helios', AtributosLuta>;
   for (const ia of ['claude', 'chatgpt', 'gemini'] as IaId[]) {
-    const prontos = saves.filter((s) => !s.secreto && s.gladiador === ia && saveCompleto(s)).map(atributosDoSave);
+    const prontos = saves.filter((s) => !s.secreto && !s.teste && !s.unica && s.gladiador === ia && saveCompleto(s)).map(atributosDoSave);
     const melhor = prontos.sort((a, b) => b.vida + b.forca * 10 + b.defesa * 10 - (a.vida + a.forca * 10 + a.defesa * 10))[0];
     const tecnicas = new Set<Tecnica>([...(VETERANO.tecnicas ?? []), ...(melhor?.tecnicas ?? [])]);
     if (ia === 'gemini') tecnicas.add('espelho-de-sol');

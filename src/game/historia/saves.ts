@@ -34,6 +34,8 @@ export interface SaveHistoria {
   secreto?: boolean;
   /** A HISTÓRIA ÚNICA (versão 2, 22/11/2026): os três juntos; `capitulo` é o ato. */
   unica?: boolean;
+  /** Save do MODO TESTE (criado pelo Lucas para testar): não conta para prêmios. */
+  teste?: boolean;
   /** Versão da ordem das cenas (2 = capítulo 1 do Cassius com o treino no começo; 3 = a fuga do mercado no capítulo 2). */
   ordem?: number;
 }

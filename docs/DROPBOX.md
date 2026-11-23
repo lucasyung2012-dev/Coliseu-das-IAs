@@ -28,7 +28,7 @@ O app fica em "Development" no Dropbox, o que basta para a família (até 500 co
 ## Como fica no jogo
 
 - **Sem conta:** Modo Treino. A pessoa escolhe a dificuldade (Fácil, Médio, Difícil) e as partidas não valem troféus nem XP.
-- **Com conta (Arcade → ☁ CONECTAR):** as partidas valem troféus e XP, e o progresso vai para a nuvem
+- **Com conta (tela inicial → CONECTAR; também nas Configurações do Arcade):** as partidas valem troféus e XP, e o progresso vai para a nuvem
   poucos segundos depois de cada partida, ao abrir o jogo e ao voltar para ele.
 - **Primeira vez num aparelho:** o progresso do aparelho e o da nuvem são somados pelo melhor de cada um
   (maior troféu e XP de cada IA, histórico unido). Depois disso, vale a cópia alterada por último.

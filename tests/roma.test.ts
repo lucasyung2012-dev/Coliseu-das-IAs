@@ -1,5 +1,5 @@
 import { parte1 } from '@/game/historia/historiaUnica';
-import { BAIRROS, bairroDaCena, estadoRoma } from '@/game/historia/roma';
+import { BAIRROS, bairroDaCena, bairrosParaPassear, cenaDePasseio, estadoRoma, PASSEIOS, type BairroId } from '@/game/historia/roma';
 
 /** O mapa de Roma (22/11/2026): os bairros, onde a história está e onde cada um dos três está. */
 describe('o mapa de Roma', () => {
@@ -33,5 +33,21 @@ describe('o mapa de Roma', () => {
 
   it('terminada a Parte 1, não tem próximo destino', () => {
     expect(estadoRoma(7, 0).proximo).toBeNull();
+  });
+});
+
+describe('passear por Roma', () => {
+  it('todo bairro com passeio tem um mapa que existe e duas pessoas para conversar', () => {
+    for (const b of Object.keys(PASSEIOS) as BairroId[]) {
+      const c = cenaDePasseio(b);
+      expect(c, b).not.toBeNull();
+      expect(c!.pontos.length).toBe(2);
+    }
+  });
+  it('antes do Encontro não dá para passear; depois, só nos bairros já visitados', () => {
+    expect(bairrosParaPassear(estadoRoma(2, 3))).toEqual([]);
+    const depois = bairrosParaPassear(estadoRoma(3, 2));
+    expect(depois.length).toBeGreaterThan(0);
+    expect(depois).not.toContain('aqueduto');
   });
 });

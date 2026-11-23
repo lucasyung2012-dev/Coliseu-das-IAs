@@ -8,6 +8,7 @@ import { tocar as tocarHistoria } from '@/ui/somHistoria';
 import { CenarioHistoria } from '../coliseu/Cenarios';
 import { Portoes } from '../coliseu/Portoes';
 import CenaPortalColiseu from './CenaPortalColiseu';
+import SecaoConta from '../config/SecaoConta';
 import { PORTAIS } from './areas';
 
 /**
@@ -40,6 +41,15 @@ export default function Home() {
         {coliseu && <PortalColiseu rota={coliseu.rota} frase={coliseu.frase} />}
         {arcade && <PortalArcade rota={arcade.rota} frase={arcade.frase} />}
       </nav>
+
+      {/* A CONTA (22/11/2026): o Dropbox guarda tudo (a História e o Arcade), então fica aqui na tela inicial. */}
+      <section aria-label="Sua conta" className="mx-auto w-full max-w-4xl px-4 pb-10 sm:px-8">
+        <div className="pixel-box flex flex-col gap-2 p-4">
+          <h2 className="font-pixel text-[10px] text-[#f2c14e] sm:text-xs">SUA CONTA · TUDO SALVO NA NUVEM</h2>
+          <p className="text-xs text-muted">Conecte o Dropbox para guardar a História e o Arcade, continuar em qualquer aparelho e jogar valendo troféus.</p>
+          <SecaoConta />
+        </div>
+      </section>
 
       <footer className="mt-auto pb-6 text-center text-xs text-muted">Coliseu das IAs · feito pelo Lucas</footer>
     </main>

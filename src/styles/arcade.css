@@ -2036,3 +2036,7 @@
 .minimapa { transition: transform 0.15s; }
 .minimapa:hover { transform: scale(1.05); }
 .menos-movimento .mapa-atual, .menos-movimento .mapa-fogo { animation: none; }
+.mapa-nuvem { animation: mapa-nuvem 40s linear infinite alternate; }
+.mapa-nuvem-2 { animation: mapa-nuvem 55s linear infinite alternate-reverse; }
+@keyframes mapa-nuvem { from { translate: -8px 0; } to { translate: 14px 0; } }
+.menos-movimento .mapa-nuvem, .menos-movimento .mapa-nuvem-2 { animation: none; }

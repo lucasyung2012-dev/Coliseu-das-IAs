@@ -112,6 +112,62 @@ function Predio({ id, x, y, ato }: { id: BairroId; x: number; y: number; ato: nu
   }
 }
 
+// Os detalhes da cidade (sempre nos mesmos lugares): as sete colinas, árvores, casinhas, pontes,
+// barcos e nuvens. Ficam por baixo dos bairros, só para Roma parecer viva.
+const COLINAS: [number, number, number][] = [[50, 12, 12], [112, 10, 10], [150, 30, 9], [130, 82, 11], [76, 86, 9], [20, 44, 10], [100, 24, 7]];
+const ARVORES: [number, number][] = [[14, 30], [18, 34], [24, 52], [28, 48], [46, 52], [50, 16], [56, 10], [104, 10], [120, 6], [148, 64], [152, 70], [138, 92], [126, 88], [84, 92], [72, 90], [8, 58], [156, 22], [96, 6]];
+const CASAS: [number, number][] = [
+  [52, 38], [56, 46], [70, 50], [74, 34], [88, 30], [96, 36], [100, 46], [72, 60], [80, 66], [104, 72], [108, 50], [124, 44], [128, 54], [86, 72], [46, 32], [58, 58], [132, 40], [96, 76], [116, 22], [76, 24], [62, 64], [136, 64],
+];
+const PONTES: [number, number][] = [[61, 30], [56, 46], [50, 62]];
+
+function DetalhesDeRoma() {
+  return (
+    <g>
+      {COLINAS.map(([x, y, r], k) => (
+        <ellipse key={`h${k}`} cx={x} cy={y} rx={r} ry={r * 0.55} fill="#c8b880" opacity={0.55} />
+      ))}
+      {CASAS.map(([x, y], k) => (
+        <g key={`c${k}`} opacity={0.75}>
+          <rect x={x - 1.6} y={y - 1} width={3.2} height={2.4} fill="#e2cfa4" stroke="#a88a5a" strokeWidth={0.3} />
+          <rect x={x - 1.9} y={y - 1.9} width={3.8} height={1} fill={k % 3 ? '#b8543a' : '#9a4a30'} />
+        </g>
+      ))}
+      {ARVORES.map(([x, y], k) => (
+        <g key={`a${k}`}>
+          <rect x={x - 0.3} y={y} width={0.6} height={1.6} fill="#5a3a1c" />
+          <circle cx={x} cy={y - 0.6} r={1.7} fill={k % 2 ? '#4a7a3a' : '#3a6a2e'} />
+        </g>
+      ))}
+      {PONTES.map(([x, y], k) => (
+        <g key={`p${k}`}>
+          <rect x={x - 3.5} y={y - 0.9} width={7} height={1.8} fill="#a89c88" stroke="#6a5a48" strokeWidth={0.3} />
+          <rect x={x - 2.5} y={y + 0.9} width={1} height={1} fill="#6a5a48" />
+          <rect x={x + 1.5} y={y + 0.9} width={1} height={1} fill="#6a5a48" />
+        </g>
+      ))}
+      {/* barcos no mar e ondinhas */}
+      {[[8, 92], [16, 78], [30, 96]].map(([x, y], k) => (
+        <g key={`b${k}`}>
+          <path d={`M ${x! - 3} ${y} L ${x! + 3} ${y} L ${x! + 2} ${y! + 1.5} L ${x! - 2} ${y! + 1.5} Z`} fill="#6a4220" />
+          <polygon points={`${x},${y! - 4} ${x! + 2.5},${y! - 0.5} ${x},${y! - 0.5}`} fill="#f0e8d8" />
+        </g>
+      ))}
+      {[[6, 84], [22, 90], [12, 98], [36, 92]].map(([x, y], k) => (
+        <path key={`o${k}`} d={`M ${x} ${y} q 1.5 -1.2 3 0 q 1.5 1.2 3 0`} stroke="#9ac4f0" strokeWidth={0.5} fill="none" />
+      ))}
+      {/* nuvens passando */}
+      <g className="mapa-nuvem" opacity={0.7}>
+        <ellipse cx={30} cy={8} rx={7} ry={2.2} fill="#fffaf0" />
+        <ellipse cx={34} cy={6.6} rx={4} ry={2} fill="#fffaf0" />
+      </g>
+      <g className="mapa-nuvem-2" opacity={0.6}>
+        <ellipse cx={138} cy={92} rx={6} ry={2} fill="#fffaf0" />
+      </g>
+    </g>
+  );
+}
+
 export function MapaRoma({ estado, mini = false }: { estado: EstadoRoma; mini?: boolean }) {
   const visto = (id: BairroId) => estado.visitados.includes(id);
   const centro = BAIRROS.find((b) => b.id === 'coliseu')!;
@@ -132,6 +188,7 @@ export function MapaRoma({ estado, mini = false }: { estado: EstadoRoma; mini?: 
         <polyline points="72,0 66,14 60,28 56,44 52,58 44,72 36,84" stroke="#5a8ac8" strokeWidth={3} fill="none" />
         {/* a muralha da cidade */}
         <ellipse cx={92} cy={46} rx={56} ry={36} stroke="#8a6a4a" strokeWidth={1} strokeDasharray="3 2" fill="none" />
+        {!mini && <DetalhesDeRoma />}
         {/* as estradas até o Coliseu */}
         {BAIRROS.filter((b) => b.id !== 'coliseu').map((b) => (
           <line key={b.id} x1={centro.x} y1={centro.y} x2={b.x} y2={b.y} stroke="#c8ae78" strokeWidth={1} opacity={visto(b.id) ? 0.9 : 0.35} />

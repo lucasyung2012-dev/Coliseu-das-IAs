@@ -77,7 +77,7 @@ export async function abrirLogin(chave: string, modo: ModoLogin): Promise<void> 
 
 /**
  * Chamado ao abrir o jogo, antes do roteador: se a página voltou do Dropbox com
- * `?code=…`, guarda o código, limpa o endereço e leva para as Configurações (onde fica a conta).
+ * `?code=…`, guarda o código, limpa o endereço e leva para a tela inicial (onde fica a conta).
  */
 export function capturarVolta(): void {
   try {
@@ -89,7 +89,7 @@ export function capturarVolta(): void {
     const p = lerPendente();
     if (!p || p.modo !== 'voltar' || state !== p.estado) return;
     sessionStorage.setItem(VOLTOU, JSON.stringify(code ? { code } : { error }));
-    history.replaceState(null, '', `${location.pathname}#/configuracoes`);
+    history.replaceState(null, '', `${location.pathname}#/`);
   } catch {
     /* sem armazenamento: o login só não termina sozinho */
   }

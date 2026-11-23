@@ -4,8 +4,9 @@ import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
 import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
-import { estadoRoma } from '@/game/historia/roma';
+import { BAIRROS, bairrosParaPassear, cenaDePasseio, estadoRoma, type BairroId } from '@/game/historia/roma';
 import { LegendaRoma, MapaRoma } from './MapaRoma';
+import { ModoTeste } from './ModoTeste';
 import { ESTILO_DO_HEROI, type AtributosLuta } from '@/game/historia/luta';
 import { PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { capitulosDoSave, chaveCompleta, equipeDoSecreto, PEDACOS_DA_CHAVE, saveCompleto } from '@/game/historia/roteiro4';
@@ -100,6 +101,8 @@ export default function ColiseuHistoria() {
   const [pausado, setPausado] = useState(false);
   // O mapa de Roma aberto pelo minimapa do canto (a história fica parada enquanto isso).
   const [mapaAberto, setMapaAberto] = useState(false);
+  // Passeando por um bairro de Roma (a Roma livre), aberto pelo mapa grande.
+  const [passeio, setPasseio] = useState<BairroId | null>(null);
   useEffect(() => {
     if (tela.tipo !== 'jogo') return;
     const tecla = (ev: KeyboardEvent) => {
@@ -261,6 +264,18 @@ export default function ColiseuHistoria() {
                 </ul>
               </>
             )}
+            {/* As configurações do modo História (o modo teste, com senha) */}
+            <details className="pixel-box p-3">
+              <summary className="cursor-pointer font-pixel text-[10px] text-[#f4e2b4]">CONFIGURAÇÕES</summary>
+              <div className="mt-3">
+                <ModoTeste
+                  onIr={(s) => {
+                    gravarSaveHistoria(s);
+                    setTela({ tipo: 'jogo', id: s.id });
+                  }}
+                />
+              </div>
+            </details>
             </>
           </section>
         )}
@@ -355,6 +370,29 @@ export default function ColiseuHistoria() {
             }}
           />
         )}
+        {/* O passeio por um bairro (a Roma livre) */}
+        {tela.tipo === 'jogo' &&
+          save?.unica &&
+          passeio &&
+          (() => {
+            const cena = cenaDePasseio(passeio);
+            const m = cena?.mapa ? MAPAS[cena.mapa] : undefined;
+            if (!cena || !m) return null;
+            const atual = capitulosDoSave(save)[save.capitulo - 1]?.cenas[save.cena];
+            return (
+              <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#0c0a10] p-3" role="dialog" aria-modal="true" aria-label={`Passeio por ${passeio}`}>
+                <div className="mx-auto flex max-w-4xl flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-pixel text-[10px] text-[#f2c14e] sm:text-xs">PASSEIO · {BAIRROS.find((x) => x.id === passeio)?.nome}</p>
+                    <button type="button" onClick={() => setPasseio(null)} className="pixel-box px-3 py-1.5 font-pixel text-[9px] text-[#f4e2b4]">
+                      ◀ VOLTAR AO MAPA
+                    </button>
+                  </div>
+                  <MundoAberto key={passeio} mundo={mundoDoExplorar(cena, m)} heroi={heroiDaCena(atual)} onFim={() => setPasseio(null)} />
+                </div>
+              </div>
+            );
+          })()}
         {/* O mapa grande de Roma, aberto pelo minimapa */}
         {tela.tipo === 'jogo' && save?.unica && mapaAberto && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-3" role="dialog" aria-modal="true" aria-label="Mapa de Roma">
@@ -362,6 +400,30 @@ export default function ColiseuHistoria() {
               <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">MAPA DE ROMA</p>
               <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} />
               <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} />
+              {/* A ROMA LIVRE: depois do Encontro, os bairros já visitados abrem para passear */}
+              {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).length > 0 ? (
+                <div className="flex flex-col gap-1">
+                  <p className="font-pixel text-[9px] text-[#f2c14e]">PASSEAR POR ROMA</p>
+                  <div className="flex flex-wrap gap-1">
+                    {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).map((b) => (
+                      <button
+                        key={b}
+                        type="button"
+                        onClick={() => {
+                          desbloquear();
+                          tocar('passos');
+                          setPasseio(b);
+                        }}
+                        className="pixel-box px-2 py-1 font-pixel text-[8px] text-[#f4e2b4] sm:text-[9px]"
+                      >
+                        {BAIRROS.find((x) => x.id === b)?.nome}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[11px] text-muted">Depois do Encontro, os bairros já visitados abrem para passear.</p>
+              )}
               <button
                 type="button"
                 autoFocus
@@ -750,7 +812,7 @@ function CartaoSave({
         </div>
         <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
           <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>
-            {pers.gladiador.toUpperCase()} · HISTÓRIA Nº {numero}
+            {pers.gladiador.toUpperCase()} · {s.teste ? 'TESTE' : `HISTÓRIA Nº ${numero}`}
           </span>
           <span className="font-pixel text-[8px] text-[#f2c14e] [text-shadow:1px_1px_0_#000] sm:text-[9px]">"{NOME_DO_CAMINHO[s.gladiador].toUpperCase()}"</span>
         </div>
@@ -849,7 +911,7 @@ function CartaoSecreto({
           ))}
         </div>
         <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
-          <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>{s.unica ? 'PARTE 1' : 'CAPÍTULO SECRETO'}</span>
+          <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>{s.teste ? 'TESTE · ' : ''}{s.unica ? 'PARTE 1' : 'CAPÍTULO SECRETO'}</span>
           <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{s.unica ? '"A LEI DA RESPOSTA ÚNICA" · EM CONSTRUÇÃO' : '"OS TRÊS"'}</span>
         </div>
         <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">

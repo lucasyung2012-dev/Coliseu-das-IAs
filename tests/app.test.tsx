@@ -49,6 +49,8 @@ describe('App', () => {
     // As Partes como cartazes: a Parte 1 aberta, a 2 com cadeado até terminar a 1.
     expect(screen.getByRole('list', { name: 'As partes da história' })).toBeInTheDocument();
     expect(screen.getByText('termine a Parte 1')).toBeInTheDocument();
+    // O modo teste fica nas configurações do modo História, atrás de uma senha.
+    expect(screen.getByLabelText(/Modo teste: digite a senha/)).toHaveAttribute('type', 'password');
     fireEvent.click(screen.getByRole('button', { name: /NOVA HISTÓRIA/ }));
     // O prólogo é uma cutscene (o texto aparece letra por letra); dá para pular.
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));

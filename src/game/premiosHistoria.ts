@@ -58,6 +58,8 @@ export function premiosHistoriaDe(ia: IaId): PremioHistoria[] {
 
 /** O save chegou ao fim? (Sem carregar o roteiro: o caminho tem 7 capítulos; o secreto, 1.) */
 export function saveTerminado(s: SaveHistoria): boolean {
+  // Save do modo teste nunca conta (dá para pular direto para o fim).
+  if (s.teste || s.unica) return false;
   return s.capitulo > (s.secreto ? 1 : 7);
 }
 

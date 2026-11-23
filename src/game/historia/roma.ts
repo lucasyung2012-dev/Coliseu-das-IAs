@@ -1,4 +1,5 @@
 import { heroiDaCena, parte1, TIME_DESDE_O_ATO } from './historiaUnica';
+import { MAPAS } from './mundos';
 import type { Cena, Lugar } from './roteiro';
 
 /**
@@ -128,4 +129,44 @@ export function estadoRoma(ato: number, cena: number): EstadoRoma {
   const juntos = ato >= TIME_DESDE_O_ATO;
   if (juntos) (Object.keys(herois) as HeroiRoma[]).forEach((h) => (herois[h] = atual));
   return { ato, atual, visitados: [...visitados], herois, proximo: terminou ? null : proximo, juntos };
+}
+
+/**
+ * PASSEAR POR ROMA (22/11/2026, o começo da Roma livre): depois do Encontro, dá para entrar
+ * nos bairros já visitados pelo mapa e andar à vontade, ouvindo o que o povo anda dizendo.
+ * Cada bairro usa o mapa visto de cima que já existe; as falas são rascunho (o Lucas reescreve).
+ */
+export const PASSEIOS: Partial<Record<BairroId, { mapa: string; lugar: Lugar; rumores: [string, string] }>> = {
+  biblioteca: { mapa: 'biblioteca-reaberta', lugar: 'biblioteca-salao', rumores: ['Dizem que um gladiador de bronze salvou os livros daqui. Eu não vi nada. (Pisca.)', 'As cinzas ainda cheiram a papel. Mas as estantes de baixo... ninguém sabe o que tem lá.'] },
+  porto: { mapa: 'porto-cais', lugar: 'porto-docas', rumores: ['O comandante da frota sumiu na noite da ordem. Os marinheiros ainda brindam o nome dele, baixinho.', 'Tem uma gaivota que rouba sardinha de todo mundo. Mas dos refugiados ela nunca rouba.'] },
+  observatorio: { mapa: 'observatorio', lugar: 'observatorio-dentro', rumores: ['O telescópio quebrou na noite do ataque. Mesmo assim, toda noite alguém sobe aqui para olhar o céu.', 'Três estrelas alinhadas. Minha avó dizia que isso é sinal de mudança.'] },
+  subura: { mapa: 'subura-feira', lugar: 'subura-mercado', rumores: ['Os pretorianos passam aqui de hora em hora. Se perguntarem, você não me viu.', 'Alguém pintou três estrelas na parede do beco. Já apagaram duas vezes. Elas sempre voltam.'] },
+  forum: { mapa: 'forum', lugar: 'forum', rumores: ['Antes, aqui era lugar de discussão. Agora todo mundo fala baixinho.', 'Ouvi uma música proibida ontem à noite. Desafinada. Linda.'] },
+  catacumbas: { mapa: 'catacumbas-tuneis', lugar: 'catacumbas', rumores: ['Não desce sem luz. Dizem que as paredes guardam os nomes que o Censor apagou.', 'Os Copistas desenham uma pena onde é seguro.'] },
+  aqueduto: { mapa: 'aqueduto', lugar: 'aqueduto', rumores: ['A água de Roma inteira passa por aqui. Se o aqueduto para, a cidade para.', 'Tem uma comporta que ninguém abre há cem anos. Mas alguém passou óleo nela semana passada.'] },
+  templo: { mapa: 'templo-oraculo', lugar: 'templo-oraculo', rumores: ['A Sibila parou de responder perguntas. Agora ela só repete o que o Censor manda.', 'A fumaça do oráculo dá visões. Eu vi o meu gato falando. Não recomendo.'] },
+  coliseu: { mapa: 'coliseu-tunel', lugar: 'coliseu-tunel', rumores: ['Os Jogos começam logo. Dizem que o Censor quer apagar alguém na frente de todo mundo.', 'Por baixo da arena tem um barulho, como um coração de ferro. Tum. Tum.'] },
+};
+
+/** A "cena" de passeio de um bairro: o mapa dele, sem objetivo, com duas pessoas contando novidades. */
+export function cenaDePasseio(b: BairroId): Extract<Cena, { tipo: 'explorar' }> | null {
+  const p = PASSEIOS[b];
+  const m = p ? MAPAS[p.mapa] : undefined;
+  if (!p || !m) return null;
+  const nome = BAIRROS.find((x) => x.id === b)?.nome ?? '';
+  const onde = Object.keys(m.pontos).slice(0, 2);
+  return {
+    tipo: 'explorar',
+    id: `passeio-${b}`,
+    lugar: p.lugar,
+    objetivo: `Passeio: ${nome.toLowerCase()}. Ande à vontade e converse; para voltar, toque em VOLTAR AO MAPA.`,
+    mapa: p.mapa,
+    pontos: onde.map((id, k) => ({ id, x: 50, rotulo: 'Alguém de Roma', icone: 'pagina', personagem: 'povo' as const, falas: [{ quem: 'povo' as const, texto: p.rumores[k] ?? '' }] })),
+  };
+}
+
+/** Os bairros onde já dá para passear (depois do Encontro, e só os já visitados). */
+export function bairrosParaPassear(e: EstadoRoma): BairroId[] {
+  if (!e.juntos) return [];
+  return BAIRROS.map((b) => b.id).filter((id) => e.visitados.includes(id) && !!cenaDePasseio(id));
 }
