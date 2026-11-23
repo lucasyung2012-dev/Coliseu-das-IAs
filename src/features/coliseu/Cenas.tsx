@@ -316,7 +316,7 @@ export function Cutscene({ quadros, onFim }: { quadros: Quadro[]; onFim: () => v
       {titulo && (
         <button type="button" autoFocus onClick={seguir} className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 text-center">
           <span className="abertura-pedra font-pixel text-xl text-[#f2c14e] [text-shadow:3px_3px_0_#5a2a12] sm:text-4xl">COLISEU DAS IAS</span>
-          <span className="surgir font-pixel text-[9px] text-white sm:text-sm">A LEI DA RESPOSTA ÚNICA</span>
+          <span className="surgir font-pixel text-[9px] text-white sm:text-sm">PARTE 1 · A LEI DA RESPOSTA ÚNICA</span>
           <span className="piscar mt-4 font-pixel text-[8px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
         </button>
       )}

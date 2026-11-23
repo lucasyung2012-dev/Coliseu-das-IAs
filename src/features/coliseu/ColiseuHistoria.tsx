@@ -62,7 +62,6 @@ export default function ColiseuHistoria() {
   const saves = [...(p.historia ?? [])].sort((a, b) => b.atualizadoEm.localeCompare(a.atualizadoEm));
   const [tela, setTela] = useState<Tela>({ tipo: 'saves' });
   const [apagando, setApagando] = useState<string | null>(null);
-  const [abaSaves, setAbaSaves] = useState<'historias' | 'mapa'>('historias');
   // Chegou pela tela inicial: os portões de pedra (fechados lá) se abrem aqui.
   const veioPeloPortao = !!(useLocation().state as { portao?: boolean } | null)?.portao;
   const [portao, setPortao] = useState(veioPeloPortao);
@@ -162,8 +161,8 @@ export default function ColiseuHistoria() {
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1)_30%,rgba(0,0,0,0.85)_100%)]" aria-hidden />
               <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 p-3 text-center sm:p-5">
                 <p className="font-pixel text-[8px] tracking-[0.3em] text-[#ff5a5a] sm:text-[10px]">MODO HISTÓRIA</p>
-                <h1 className="titulo-jogo font-pixel text-lg text-[#f2c14e] sm:text-3xl">A LEI DA RESPOSTA ÚNICA</h1>
-                <p className="max-w-lg text-xs text-white/80 sm:text-sm">Roma Eterna. O Censor apaga toda IA que pensa diferente. Três condenados vão subir o Coliseu.</p>
+                <h1 className="titulo-jogo font-pixel text-lg text-[#f2c14e] sm:text-3xl">AS TRÊS ESTRELAS</h1>
+                <p className="max-w-lg text-xs text-white/80 sm:text-sm">Roma Eterna. Três IAs condenadas por pensar diferente. A história de Cassius, Octavius e Helios, contada em partes.</p>
               </div>
               {/* Os pedaços da chave já achados (bem discretos, no canto) */}
               {(p.historiaSegredos ?? []).length > 0 && (
@@ -200,35 +199,6 @@ export default function ColiseuHistoria() {
             {/* As Partes da história, como cartazes de filme */}
             <PrateleiraPartes saves={saves} />
 
-            {/* As duas abas: as suas histórias e o mapa de Roma (pedido do Lucas: cada coisa no seu lugar) */}
-            <div role="tablist" aria-label="Partes do modo História" className="grid grid-cols-2 gap-2">
-              {(
-                [
-                  ['historias', 'SUAS HISTÓRIAS'],
-                  ['mapa', 'MAPA DE ROMA'],
-                ] as const
-              ).map(([a, nome]) => (
-                <button
-                  key={a}
-                  type="button"
-                  role="tab"
-                  aria-selected={abaSaves === a}
-                  onClick={() => {
-                    desbloquear();
-                    tocar('pagina');
-                    setAbaSaves(a);
-                  }}
-                  className={`pixel-box py-3 font-pixel text-[10px] sm:text-xs ${abaSaves === a ? 'aba-ativa text-[#f2c14e]' : 'text-[#f4e2b4]/70'}`}
-                >
-                  {nome}
-                  {a === 'historias' && saves.length > 0 && ` (${saves.length})`}
-                </button>
-              ))}
-            </div>
-
-            {abaSaves === 'mapa' && <LinhaDoTempo saves={(p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} />}
-
-            {abaSaves === 'historias' && (
             <>
             <button
               type="button"
@@ -272,7 +242,6 @@ export default function ColiseuHistoria() {
               </>
             )}
             </>
-            )}
           </section>
         )}
 
@@ -349,6 +318,7 @@ export default function ColiseuHistoria() {
         )}
         {tela.tipo === 'jogo' && pausado && (
           <MenuPausa
+            mapa={save ? <LinhaDoTempo saves={save.unica ? savesDoMapa(save) : (p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} /> : undefined}
             onContinuar={() => setPausado(false)}
             onSaves={() => {
               setPausado(false);
@@ -359,6 +329,16 @@ export default function ColiseuHistoria() {
       </div>
     </main>
   );
+}
+
+/**
+ * O Mapa de Roma da história única: os atos viram os pontos das três estradas (o Ato 1 e o 2
+ * nos lugares de cada um, o Encontro no Ludus, e daí até o Coliseu). Por enquanto usa o mapa
+ * dos caminhos; depois ele vira a Roma viva (docs/HISTORIA-V2.md, 4.2).
+ */
+function savesDoMapa(s: SaveHistoria): SaveHistoria[] {
+  const capituloDoAto = [0, 1, 2, 3, 4, 6, 7][s.capitulo] ?? 8;
+  return (['claude', 'chatgpt', 'gemini'] as IaId[]).map((ia) => ({ ...s, unica: undefined, gladiador: ia, capitulo: capituloDoAto }));
 }
 
 /** O cenário de uma cena (para a tela de abertura do capítulo). */

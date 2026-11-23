@@ -31,7 +31,7 @@ export default function Home() {
             <span className="block text-[1.35rem] text-white sm:text-5xl">DAS IAS</span>
           </h1>
           <p className="animate-fade-up mt-3 max-w-md text-sm text-white/85 [text-shadow:1px_1px_0_#000] sm:text-base" style={{ animationDelay: '300ms' }}>
-            Claude, ChatGPT e Gemini contra a Lei da Resposta Única.
+            Claude, ChatGPT e Gemini: três IAs que se recusam a pensar igual.
           </p>
         </div>
       </header>

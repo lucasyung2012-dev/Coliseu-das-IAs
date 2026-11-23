@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { alternarSom, desbloquear, mudarVolume, useSomLigado, useVolume } from '@/ui/som';
 import { tocar } from '@/ui/somHistoria';
@@ -12,9 +12,10 @@ import { alternarMusica, useMusicaLigada } from '@/ui/musica';
 export const PausaContexto = createContext(false);
 export const usePausado = () => useContext(PausaContexto);
 
-type Aba = 'menu' | 'controles' | 'opcoes';
+type Aba = 'menu' | 'controles' | 'opcoes' | 'mapa';
 
-export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; onSaves: () => void }) {
+/** O menu de pausa. O Mapa de Roma mora aqui dentro (22/11/2026): é por ele que se vê onde a história está. */
+export function MenuPausa({ onContinuar, onSaves, mapa }: { onContinuar: () => void; onSaves: () => void; mapa?: ReactNode }) {
   const [aba, setAba] = useState<Aba>('menu');
   const [salvo, setSalvo] = useState(false);
   const som = useSomLigado();
@@ -34,9 +35,9 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
   const item = 'pixel-box w-full px-4 py-3 text-left font-pixel text-[10px] text-[#f4e2b4] sm:text-xs';
   return (
     <div className="menu-pausa fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-label="Menu de pausa">
-      <div className="flex w-full max-w-sm flex-col gap-3 border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-4 shadow-[0_0_40px_rgba(242,193,78,0.25)]">
+      <div className={`flex w-full ${aba === 'mapa' ? 'max-h-[92vh] max-w-3xl overflow-y-auto' : 'max-w-sm'} flex-col gap-3 border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-4 shadow-[0_0_40px_rgba(242,193,78,0.25)]">
         <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">
-          {aba === 'menu' ? 'PAUSA' : aba === 'controles' ? 'CONTROLES' : 'OPÇÕES'}
+          {aba === 'menu' ? 'PAUSA' : aba === 'controles' ? 'CONTROLES' : aba === 'mapa' ? 'MAPA DE ROMA' : 'OPÇÕES'}
         </p>
 
         {aba === 'menu' && (
@@ -56,6 +57,11 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
               SALVAR {salvo && <span className="ml-2 text-[#4ad46a]">✓ SALVO!</span>}
             </button>
             {salvo && <p className="-mt-2 text-center text-[11px] text-muted">O jogo também salva sozinho no começo de cada cena.</p>}
+            {mapa && (
+              <button type="button" className={item} onClick={() => (clique(), tocar('pagina'), setAba('mapa'))}>
+                MAPA DE ROMA
+              </button>
+            )}
             <button type="button" className={item} onClick={() => (clique(), setAba('controles'))}>
               CONTROLES
             </button>
@@ -88,6 +94,14 @@ export function MenuPausa({ onContinuar, onSaves }: { onContinuar: () => void; o
           </div>
         )}
 
+        {aba === 'mapa' && (
+          <>
+            {mapa}
+            <button type="button" autoFocus className={item} onClick={() => (clique(), setAba('menu'))}>
+              ◀ VOLTAR
+            </button>
+          </>
+        )}
         {aba === 'opcoes' && (
           <div className="flex flex-col gap-3">
             <button type="button" className={item} onClick={() => (alternarSom(), clique())}>

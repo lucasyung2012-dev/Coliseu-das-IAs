@@ -60,3 +60,12 @@ describe('a história única, Parte 1', () => {
     expect(saveCompleto({ ...s, capitulo: 7 })).toBe(true);
   });
 });
+
+describe('o Encontro (as cenas novas)', () => {
+  const ato3 = parte1()[2]!.cenas.map((c) => c.id);
+  it('os três desconfiados na cela, a primeira luta juntos, a muralha e o Brutus contando do Pólux', () => {
+    expect(ato3).toEqual(expect.arrayContaining(['u3-cela', 'u3-desconfianca', 'u3-estatua', 'u3-trio', 'u3-polux']));
+    expect(ato3[ato3.length - 1]).toBe('u3-polux');
+    expect(ato3.indexOf('u3-cela')).toBeLessThan(ato3.indexOf('u3-estatua'));
+  });
+});
