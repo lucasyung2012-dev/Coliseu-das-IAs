@@ -159,7 +159,7 @@ export function cenaDePasseio(b: BairroId): Extract<Cena, { tipo: 'explorar' }> 
     tipo: 'explorar',
     id: `passeio-${b}`,
     lugar: p.lugar,
-    objetivo: `Passeio: ${nome.toLowerCase()}. Ande à vontade e converse; para voltar, toque em VOLTAR AO MAPA.`,
+    objetivo: `Passeio livre (${nome}). Ande à vontade e converse com o povo. Para voltar, toque em VOLTAR AO MAPA.`,
     mapa: p.mapa,
     pontos: onde.map((id, k) => ({ id, x: 50, rotulo: 'Alguém de Roma', icone: 'pagina', personagem: 'povo' as const, falas: [{ quem: 'povo' as const, texto: p.rumores[k] ?? '' }] })),
   };
