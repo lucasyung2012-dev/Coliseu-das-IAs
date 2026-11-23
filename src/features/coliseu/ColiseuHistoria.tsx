@@ -197,6 +197,9 @@ export default function ColiseuHistoria() {
               )}
             </header>
 
+            {/* As Partes da história, como cartazes de filme */}
+            <PrateleiraPartes saves={saves} />
+
             {/* As duas abas: as suas histórias e o mapa de Roma (pedido do Lucas: cada coisa no seu lugar) */}
             <div role="tablist" aria-label="Partes do modo História" className="grid grid-cols-2 gap-2">
               {(
@@ -429,7 +432,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
           <span className="font-pixel text-[10px] text-white/70">
             {save.secreto || save.unica ? 'CASSIUS · OCTAVIUS · HELIOS' : `${PERSONAGENS[save.gladiador].gladiador.toUpperCase()} · ${NOME_DO_CAMINHO[save.gladiador].toUpperCase()}`}
           </span>
-          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">{save.unica ? 'A LEI DA RESPOSTA ÚNICA' : save.secreto ? 'CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
+          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl" style={save.unica ? { color: COR_DA_PARTE(1) } : undefined}>{save.unica ? 'A LEI DA RESPOSTA ÚNICA' : save.secreto ? 'CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
           <span className="font-pixel text-sm text-white sm:text-xl">{cap.titulo.toUpperCase()}</span>
           <span className="text-xs text-white/60">{cap.lugar}</span>
           <span className="piscar mt-3 font-pixel text-[9px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
@@ -628,6 +631,59 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
 /** Qual história deste gladiador é (pela ordem em que foi criada): "História nº 2 do Octavius". */
 function numeroDoSave(s: SaveHistoria, todos: SaveHistoria[]): number {
   return todos.filter((x) => x.gladiador === s.gladiador && !!x.secreto === !!s.secreto && x.criadoEm <= s.criadoEm).length;
+}
+
+/**
+ * AS PARTES DA HISTÓRIA (22/11/2026): cada Parte é um "filme", com o seu cartaz e a sua cor.
+ * A Parte 1 está aberta; a Parte 2 fica escura, com cadeado, até alguém terminar a Parte 1;
+ * a Parte 3 fica escondida. Uma Parte 4 no futuro é só mais um cartaz aqui.
+ */
+const PARTES: { n: number; nome: string; cor: string; lugar: Lugar }[] = [
+  { n: 1, nome: 'A LEI DA RESPOSTA ÚNICA', cor: '#ff5a5a', lugar: 'titulo' },
+  { n: 2, nome: '???', cor: '#5ab0ff', lugar: 'rua-noite' },
+  { n: 3, nome: '???', cor: '#c8a0ff', lugar: 'coliseu-noite' },
+];
+const COR_DA_PARTE = (n: number) => PARTES.find((x) => x.n === n)?.cor ?? '#f2c14e';
+
+function PrateleiraPartes({ saves }: { saves: SaveHistoria[] }) {
+  const terminouParte1 = saves.some((s) => s.unica && saveCompleto(s));
+  return (
+    <ul className="grid grid-cols-3 gap-2" aria-label="As partes da história">
+      {PARTES.map((pt) => {
+        const aberta = pt.n === 1;
+        const destravada = pt.n === 1 || (pt.n === 2 && terminouParte1);
+        return (
+          <li key={pt.n} className="pixel-box relative aspect-[3/4] overflow-hidden bg-black" style={{ boxShadow: `0 0 0 2px ${destravada ? pt.cor : '#2a2630'}` }}>
+            <div className={`absolute inset-0 ${destravada ? '' : 'brightness-[0.25] grayscale'}`} aria-hidden>
+              <CenarioHistoria lugar={pt.lugar} />
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(0,0,0,0.9)_100%)]" aria-hidden />
+            {!destravada && (
+              <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+                {/* o cadeado em pixel */}
+                <svg viewBox="0 0 10 12" className="w-[28%]" shapeRendering="crispEdges">
+                  <rect x="2" y="0" width="6" height="1" fill="#8a8276" />
+                  <rect x="1" y="1" width="1" height="4" fill="#8a8276" />
+                  <rect x="8" y="1" width="1" height="4" fill="#8a8276" />
+                  <rect x="0" y="5" width="10" height="7" fill="#c8b890" />
+                  <rect x="4" y="7" width="2" height="3" fill="#2a2630" />
+                </svg>
+              </div>
+            )}
+            <div className="absolute inset-x-1 bottom-1 flex flex-col items-center text-center sm:inset-x-2 sm:bottom-2">
+              <span className="font-pixel text-[7px] sm:text-[10px]" style={{ color: destravada ? pt.cor : '#8a8276' }}>
+                PARTE {pt.n}
+              </span>
+              <span className="font-pixel text-[6px] leading-tight text-white sm:text-[9px]">{destravada ? pt.nome : '???'}</span>
+              <span className="mt-0.5 text-[8px] text-white/60 sm:text-[10px]">
+                {aberta ? (terminouParte1 ? 'terminada' : 'em construção') : destravada ? 'em breve' : pt.n === 2 ? 'termine a Parte 1' : 'em segredo'}
+              </span>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 /**

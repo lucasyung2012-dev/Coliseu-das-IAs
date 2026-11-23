@@ -46,6 +46,9 @@ describe('App', () => {
   it('Coliseu (modo História): saves; toda história nova começa pelo prólogo e segue direto para a Parte 1', () => {
     abrir('/coliseu');
     expect(screen.queryByRole('button', { name: /VER O PRÓLOGO/ })).not.toBeInTheDocument();
+    // As Partes como cartazes: a Parte 1 aberta, a 2 com cadeado até terminar a 1.
+    expect(screen.getByRole('list', { name: 'As partes da história' })).toBeInTheDocument();
+    expect(screen.getByText('termine a Parte 1')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /NOVA HISTÓRIA/ }));
     // O prólogo é uma cutscene (o texto aparece letra por letra); dá para pular.
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
