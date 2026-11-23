@@ -32,6 +32,8 @@ export interface SaveHistoria {
   escolhas?: Record<string, string>;
   /** O capítulo secreto, Os Três (os três gladiadores juntos; o `gladiador` é só quem começa). */
   secreto?: boolean;
+  /** A HISTÓRIA ÚNICA (versão 2, 22/11/2026): os três juntos; `capitulo` é o ato. */
+  unica?: boolean;
   /** Versão da ordem das cenas (2 = capítulo 1 do Cassius com o treino no começo; 3 = a fuga do mercado no capítulo 2). */
   ordem?: number;
 }
@@ -59,6 +61,11 @@ export const NOME_DO_CAMINHO: Record<IaId, string> = {
 export function criarSave(gladiador: IaId, agora = new Date()): SaveHistoria {
   const quando = agora.toISOString();
   return { id: `h-${agora.getTime()}-${Math.random().toString(36).slice(2, 6)}`, gladiador, capitulo: 1, cena: 0, concluidos: [], criadoEm: quando, atualizadoEm: quando, ordem: ORDEM_ATUAL };
+}
+
+/** O save da história única (os três juntos, em construção). */
+export function criarSaveUnica(agora = new Date()): SaveHistoria {
+  return { ...criarSave('claude', agora), unica: true };
 }
 
 /** O save do capítulo secreto: abre pela grade escondida, com os três pedaços da chave. */

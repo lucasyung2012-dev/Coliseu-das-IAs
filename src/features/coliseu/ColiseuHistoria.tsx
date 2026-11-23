@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
+import { ESTILO_DO_HEROI, type AtributosLuta } from '@/game/historia/luta';
 import { PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { capitulosDoSave, chaveCompleta, equipeDoSecreto, PEDACOS_DA_CHAVE, saveCompleto } from '@/game/historia/roteiro4';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
@@ -216,7 +218,7 @@ export default function ColiseuHistoria() {
               ))}
             </div>
 
-            {abaSaves === 'mapa' && <LinhaDoTempo saves={p.historia ?? []} segredos={p.historiaSegredos} />}
+            {abaSaves === 'mapa' && <LinhaDoTempo saves={(p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} />}
 
             {abaSaves === 'historias' && (
             <>
@@ -268,7 +270,32 @@ export default function ColiseuHistoria() {
 
         {tela.tipo === 'escolher' && (
           <section aria-label="Escolha o gladiador" className="flex flex-col gap-3">
-            <h1 className="text-center font-pixel text-base text-[#f2c14e] sm:text-xl">ESCOLHA O SEU CONDENADO</h1>
+            {/* A HISTÓRIA ÚNICA (versão 2): os três juntos, em construção */}
+            <button
+              type="button"
+              onClick={() => {
+                desbloquear();
+                tocar('start');
+                const novo = criarSaveUnica();
+                gravarSaveHistoria(novo);
+                setTela({ tipo: 'jogo', id: novo.id });
+              }}
+              className="pixel-box pixel-hover flex flex-col items-center gap-2 p-4 text-center"
+              style={{ boxShadow: '0 0 0 3px #f2c14e' }}
+            >
+              <span className="flex w-40 items-end gap-2" aria-hidden>
+                {IAS.map((ia) => (
+                  <span key={ia} className="flex-1">
+                    <GladiadorPixel ia={ia} />
+                  </span>
+                ))}
+              </span>
+              <span className="font-pixel text-sm text-[#f2c14e]">OS TRÊS JUNTOS</span>
+              <span className="font-pixel text-[8px] text-[#7ad0ff]">A HISTÓRIA ÚNICA · EM CONSTRUÇÃO</span>
+              <span className="text-xs text-muted">A história dos três, contada como um filme: Cassius, Octavius e Helios, na mesma noite.</span>
+              <span className="font-pixel text-[9px]">▶ COMEÇAR</span>
+            </button>
+            <h1 className="text-center font-pixel text-base text-[#f2c14e] sm:text-xl">OU ESCOLHA O SEU CONDENADO</h1>
             <div className="grid gap-3 sm:grid-cols-3">
               {IAS.map((ia) => {
                 const aberto = CAMINHOS_ABERTOS.includes(ia);
@@ -337,9 +364,17 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   const p = useProgresso();
   const capitulos = capitulosDoSave(save);
   const cap = capitulos[save.capitulo - 1];
-  const heroi = save.secreto ? 'cassius' : HEROI[save.gladiador];
-  // No capítulo secreto, os três lutam juntos (troca no meio da luta).
-  const equipe = save.secreto ? equipeDoSecreto(p.historia ?? []) : undefined;
+  // Na história única, cada cena tem o seu gladiador; nos caminhos, é sempre o do save.
+  const heroi = save.unica ? heroiDaCena(cap?.cenas[save.cena]) : save.secreto ? 'cassius' : HEROI[save.gladiador];
+  const atributos: AtributosLuta =
+    save.unica && (heroi === 'cassius' || heroi === 'octavius' || heroi === 'helios') ? { ...atributosDoSave(save), estilo: ESTILO_DO_HEROI[heroi] } : atributosDoSave(save);
+  // No capítulo secreto (e na história única, depois do Encontro), os três lutam juntos (troca no meio da luta).
+  const timeUnico = !!save.unica && save.capitulo >= TIME_DESDE_O_ATO;
+  const equipe = save.secreto
+    ? equipeDoSecreto(p.historia ?? [])
+    : timeUnico
+      ? { cassius: { ...atributosDoSave(save), estilo: ESTILO_DO_HEROI.cassius }, octavius: { ...atributosDoSave(save), estilo: ESTILO_DO_HEROI.octavius }, helios: { ...atributosDoSave(save), estilo: ESTILO_DO_HEROI.helios } }
+      : undefined;
   const [aberturaCapitulo, setAberturaCapitulo] = useState(save.cena === 0);
 
   if (!cap) {
@@ -347,9 +382,11 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
     return (
       <Palco lugar={save.secreto ? 'coliseu-livre' : 'rua-noite'}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 p-4 text-center">
-          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{!completo ? 'CONTINUA EM BREVE' : save.secreto ? 'OS TRÊS: SEGREDO COMPLETO!' : 'CAMINHO COMPLETO!'}</p>
+          <p className="font-pixel text-sm text-[#f2c14e] sm:text-lg">{save.unica ? 'FIM DA PARTE 1' : !completo ? 'CONTINUA EM BREVE' : save.secreto ? 'OS TRÊS: SEGREDO COMPLETO!' : 'CAMINHO COMPLETO!'}</p>
           <p className="max-w-md text-sm text-white/80">
-            {!completo
+            {save.unica
+              ? 'A Lei da Resposta Única terminou. Mas uma voz respondeu no cano... A Parte 2 vem aí.'
+              : !completo
               ? `O Capítulo ${save.capitulo} ainda está sendo construído. O seu save está guardado: quando ele chegar, é só continuar daqui.`
               : save.secreto
                 ? 'O Núcleo aprendeu a ouvir, e o Coliseu agora é lugar de perguntas. No Império Arcade, o Coliseu Livre e o título "Os Três" são seus.'
@@ -385,9 +422,9 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
           className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/75 text-center"
         >
           <span className="font-pixel text-[10px] text-white/70">
-            {save.secreto ? 'CASSIUS · OCTAVIUS · HELIOS' : `${PERSONAGENS[save.gladiador].gladiador.toUpperCase()} · ${NOME_DO_CAMINHO[save.gladiador].toUpperCase()}`}
+            {save.secreto || save.unica ? 'CASSIUS · OCTAVIUS · HELIOS' : `${PERSONAGENS[save.gladiador].gladiador.toUpperCase()} · ${NOME_DO_CAMINHO[save.gladiador].toUpperCase()}`}
           </span>
-          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">{save.secreto ? 'CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
+          <span className="font-pixel text-base text-[#f2c14e] sm:text-2xl">{save.unica ? 'A LEI DA RESPOSTA ÚNICA' : save.secreto ? 'CAPÍTULO SECRETO' : `CAPÍTULO ${cap.numero}`}</span>
           <span className="font-pixel text-sm text-white sm:text-xl">{cap.titulo.toUpperCase()}</span>
           <span className="text-xs text-white/60">{cap.lugar}</span>
           <span className="piscar mt-3 font-pixel text-[9px] text-[#f2c14e]">TOQUE PARA COMEÇAR ▶</span>
@@ -433,7 +470,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
                 ? { quem: 'narrador', texto: 'ATAQUE SURPRESA! Você chegou por trás: ele começa a luta com menos vida.' }
                 : { quem: 'narrador', texto: 'Ele te viu! Da próxima, passe por trás dele, sem ele olhar.' },
             ]}
-            atributos={atributosDoSave(save)}
+            atributos={atributos}
             onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
             onFim={onVenceu}
           />
@@ -485,7 +522,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
             heroi={heroi}
             antes={[{ quem: heroi, texto: 'A armadura caiu. Agora é cara a cara!', jeito: 'grito' }, ...(cena.antes ?? [])]}
             depois={cena.depois}
-            atributos={equipe?.cassius ?? atributosDoSave(save)}
+            atributos={equipe?.[heroi as 'cassius'] ?? atributos}
             equipe={equipe}
             vidaInicial={chefe.vidaNoDuelo}
             semEntrada
@@ -504,7 +541,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         heroi={heroi}
         antes={cena.antes}
         depois={cena.depois}
-        atributos={equipe?.cassius ?? atributosDoSave(save)}
+        atributos={equipe?.[heroi as 'cassius'] ?? atributos}
         equipe={equipe}
         treino={cena.treino}
         entrada={cena.entrada}
@@ -564,7 +601,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   if (cena.desafio === 'memoria') return <MinigameMemoria lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'corrida') return <MinigameCorrida lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'torre') return <MinigameTorre lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
-  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} todos={!!save.secreto} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
+  if (cena.desafio === 'trio') return <MinigameTrio lugar={cena.lugar} heroi={heroi} todos={!!save.secreto || timeUnico} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'remar') return <DesafioRemar lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'tempestade') return <DesafioTempestade lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
   if (cena.desafio === 'telescopio') return <MinigameTelescopio lugar={cena.lugar} antes={cena.antes} depois={cena.depois ?? []} onFim={() => proxima()} />;
@@ -616,7 +653,7 @@ function CartaoSave({
   const completo = saveCompleto(s);
   const cap = caps[s.capitulo - 1];
   const lugar: Lugar = completo ? (s.secreto ? 'coliseu-livre' : 'biblioteca-salao') : lugarDaCena(cap?.cenas[s.cena]);
-  if (s.secreto) return <CartaoSecreto s={s} cor={cor} lugar={lugar} completo={completo} apagando={apagando} onContinuar={onContinuar} onPedirApagar={onPedirApagar} onApagar={onApagar} onNaoApagar={onNaoApagar} />;
+  if (s.secreto || s.unica) return <CartaoSecreto s={s} cor={s.unica ? '#7ad0ff' : cor} lugar={lugar} completo={completo} apagando={apagando} onContinuar={onContinuar} onPedirApagar={onPedirApagar} onApagar={onApagar} onNaoApagar={onNaoApagar} />;
   const quando = new Date(s.atualizadoEm);
   const at = atributosDoSave(s);
   return (
@@ -713,8 +750,11 @@ function CartaoSecreto({
   onNaoApagar: () => void;
 }) {
   const quando = new Date(s.atualizadoEm);
-  const total = capitulosDoSave(s)[0]?.cenas.length ?? 1;
-  const feitas = completo ? total : s.cena;
+  // Na história única, a barra conta as cenas de todos os atos.
+  const atos = capitulosDoSave(s);
+  const total = s.unica ? atos.reduce((n, a) => n + a.cenas.length, 0) : (atos[0]?.cenas.length ?? 1);
+  const feitas = completo ? total : s.unica ? atos.slice(0, s.capitulo - 1).reduce((n, a) => n + a.cenas.length, 0) + s.cena : s.cena;
+  const atoAtual = s.unica ? atos[s.capitulo - 1] : undefined;
   return (
     <li className="pixel-box cartao-secreto flex flex-col overflow-hidden sm:col-span-2" style={{ boxShadow: `0 0 0 3px ${cor}` }}>
       <div className="relative aspect-[16/6] w-full overflow-hidden">
@@ -728,11 +768,11 @@ function CartaoSecreto({
           ))}
         </div>
         <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
-          <span className="w-fit border-2 border-black bg-[#f2c14e] px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]">CAPÍTULO SECRETO</span>
-          <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">"OS TRÊS"</span>
+          <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>{s.unica ? 'A HISTÓRIA ÚNICA · EM CONSTRUÇÃO' : 'CAPÍTULO SECRETO'}</span>
+          <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{s.unica ? '"A LEI DA RESPOSTA ÚNICA"' : '"OS TRÊS"'}</span>
         </div>
         <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
-          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{completo ? 'SEGREDO COMPLETO' : (LUGAR_SECRETO[lugar] ?? 'O HIPOGEU')}</span>
+          <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{s.unica ? (completo ? 'FIM DA PARTE 1' : (atoAtual?.titulo.toUpperCase() ?? '')) : completo ? 'SEGREDO COMPLETO' : (LUGAR_SECRETO[lugar] ?? 'O HIPOGEU')}</span>
           <span className="block text-xs text-white/85 [text-shadow:1px_1px_0_#000] sm:text-sm">Cassius, Octavius e Helios juntos</span>
         </div>
       </div>
@@ -745,7 +785,7 @@ function CartaoSecreto({
         </span>
         {apagando ? (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-accent-2">Apagar o capítulo secreto? A chave continua com você: dá para abrir de novo pela grade.</span>
+            <span className="text-xs text-accent-2">{s.unica ? 'Apagar a história única? Não dá para desfazer.' : 'Apagar o capítulo secreto? A chave continua com você: dá para abrir de novo pela grade.'}</span>
             <button type="button" onClick={onApagar} className="pixel-box px-2 py-1 font-pixel text-[8px] text-accent-2">
               APAGAR
             </button>

@@ -2,6 +2,7 @@ import type { IaId } from '../personagens';
 import { CAPITULOS, type Capitulo, type Falante } from './roteiro';
 import type { AtributosLuta, Tecnica } from './luta';
 import { atributosDoSave, ESTILO_DA_IA, type SaveHistoria } from './saves';
+import { parte1 } from './historiaUnica';
 
 /**
  * O capítulo secreto: OS TRÊS (docs/HISTORIA.md). Canônico, mas escondido: só abre
@@ -634,6 +635,7 @@ export const CAP_SECRETO: Capitulo = {
 
 /** Os capítulos de um save: o secreto tem um só (Os Três). */
 export function capitulosDoSave(s: SaveHistoria): Capitulo[] {
+  if (s.unica) return parte1();
   return s.secreto ? [CAP_SECRETO] : CAPITULOS[s.gladiador];
 }
 
