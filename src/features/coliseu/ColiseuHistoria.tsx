@@ -318,7 +318,7 @@ export default function ColiseuHistoria() {
         )}
         {tela.tipo === 'jogo' && pausado && (
           <MenuPausa
-            mapa={save ? <LinhaDoTempo saves={save.unica ? savesDoMapa(save) : (p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} /> : undefined}
+            mapa={save ? <LinhaDoTempo saves={save.unica ? savesDoMapa(save) : (p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} ato={save.unica ? capitulosDoSave(save)[save.capitulo - 1]?.titulo : undefined} /> : undefined}
             onContinuar={() => setPausado(false)}
             onSaves={() => {
               setPausado(false);

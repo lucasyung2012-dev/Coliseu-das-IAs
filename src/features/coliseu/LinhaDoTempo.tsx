@@ -55,7 +55,8 @@ function alcance(saves: SaveHistoria[], ia: IaId): { capitulo: number; terminou:
 
 type Escolhido = { ia: IaId; n: number } | { segredo: true } | null;
 
-export function LinhaDoTempo({ saves, segredos }: { saves: SaveHistoria[]; segredos: string[] | undefined }) {
+/** `ato`: na história única não existe "capítulo de cada um"; o mapa mostra só o ato e os lugares. */
+export function LinhaDoTempo({ saves, segredos, ato }: { saves: SaveHistoria[]; segredos: string[] | undefined; ato?: string }) {
   const [escolhido, setEscolhido] = useState<Escolhido>(null);
   const chegou = Object.fromEntries(IAS.map((ia) => [ia, alcance(saves, ia)])) as Record<IaId, { capitulo: number; terminou: boolean }>;
   const temChave = chaveCompleta(segredos);
@@ -85,8 +86,10 @@ export function LinhaDoTempo({ saves, segredos }: { saves: SaveHistoria[]; segre
     const quem = PERSONAGENS[escolhido.ia].gladiador.toUpperCase();
     info =
       st === 'nao' || !cap
-        ? { titulo: `${quem} · CAPÍTULO ${escolhido.n}: ???`, texto: 'Ainda não. Siga a estrada para descobrir.', cor }
-        : { titulo: `${quem} · CAPÍTULO ${escolhido.n}: ${cap.titulo.toUpperCase()}`, texto: `${cap.lugar}${st === 'aqui' ? ' · você está aqui' : ' · feito'}`, cor };
+        ? { titulo: ato ? '???' : `${quem} · CAPÍTULO ${escolhido.n}: ???`, texto: 'Ainda não. Siga a estrada para descobrir.', cor }
+        : ato
+          ? { titulo: cap.lugar.toUpperCase(), texto: st === 'aqui' ? 'Vocês estão aqui.' : 'Vocês já passaram por aqui.', cor }
+          : { titulo: `${quem} · CAPÍTULO ${escolhido.n}: ${cap.titulo.toUpperCase()}`, texto: `${cap.lugar}${st === 'aqui' ? ' · você está aqui' : ' · feito'}`, cor };
   }
 
   return (
@@ -263,6 +266,11 @@ export function LinhaDoTempo({ saves, segredos }: { saves: SaveHistoria[]; segre
             </p>
             <p className="mt-1 text-xs text-white/80">{info.texto}</p>
           </>
+        ) : ato ? (
+          <p className="text-xs text-muted">
+            <span className="font-pixel text-[9px] text-[#f2c14e]">AGORA: {ato.toUpperCase()}</span>
+            <span className="block">Toque num ponto para ver o lugar.</span>
+          </p>
         ) : (
           <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
             {IAS.map((ia) => (
