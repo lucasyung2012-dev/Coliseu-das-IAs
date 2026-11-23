@@ -15,7 +15,7 @@ import { tocar } from '@/ui/somHistoria';
  * 5 erros, espera 1 minuto. O desbloqueio vale só até fechar a aba. (Num site sem servidor,
  * isso afasta curiosos, mas quem sabe programar ainda consegue mexer: não é cofre.)
  */
-const RESUMO_DA_SENHA = '';
+const RESUMO_DA_SENHA = '27c35ec565fa537fbc8ea52f118fbb2d2ae7f46689b0804aa0b6e2d7538d62b5';
 const SAL = 'coliseu-teste:';
 const CHAVE_OK = 'coliseu.teste.ok';
 const CHAVE_ERROS = 'coliseu.teste.erros';
