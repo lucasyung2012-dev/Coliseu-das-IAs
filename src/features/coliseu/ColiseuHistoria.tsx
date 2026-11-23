@@ -4,6 +4,8 @@ import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
 import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
+import { estadoRoma } from '@/game/historia/roma';
+import { LegendaRoma, MapaRoma } from './MapaRoma';
 import { ESTILO_DO_HEROI, type AtributosLuta } from '@/game/historia/luta';
 import { PROLOGO, proximaCena, type Cena, type Falante, type Lugar } from '@/game/historia/roteiro';
 import { capitulosDoSave, chaveCompleta, equipeDoSecreto, PEDACOS_DA_CHAVE, saveCompleto } from '@/game/historia/roteiro4';
@@ -96,6 +98,8 @@ export default function ColiseuHistoria() {
 
   // O menu de pausa (MENU ou Esc): pausa a luta e a fase.
   const [pausado, setPausado] = useState(false);
+  // O mapa de Roma aberto pelo minimapa do canto (a história fica parada enquanto isso).
+  const [mapaAberto, setMapaAberto] = useState(false);
   useEffect(() => {
     if (tela.tipo !== 'jogo') return;
     const tecla = (ev: KeyboardEvent) => {
@@ -148,7 +152,23 @@ export default function ColiseuHistoria() {
               ◀ INÍCIO
             </Link>
           )}
-          <p className="font-pixel text-[10px] text-[#f2c14e]">COLISEU · MODO HISTÓRIA</p>
+          {tela.tipo === 'jogo' && save?.unica ? (
+            // O MINIMAPA: Roma inteira, pequenininha, no canto; tocar abre o mapa grande.
+            <button
+              type="button"
+              onClick={() => {
+                desbloquear();
+                tocar('pagina');
+                setMapaAberto(true);
+              }}
+              className="minimapa pixel-box w-24 p-0.5 sm:w-36"
+              aria-label="Abrir o mapa de Roma"
+            >
+              <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} mini />
+            </button>
+          ) : (
+            <p className="font-pixel text-[10px] text-[#f2c14e]">COLISEU · MODO HISTÓRIA</p>
+          )}
         </div>
 
         {tela.tipo === 'prologo' && <Cutscene quadros={PROLOGO} onFim={fimDoPrologo} />}
@@ -312,13 +332,22 @@ export default function ColiseuHistoria() {
         )}
 
         {tela.tipo === 'jogo' && save && (
-          <PausaContexto.Provider value={pausado}>
+          <PausaContexto.Provider value={pausado || mapaAberto}>
             <Jogo key={`${save.id}-${save.capitulo}-${save.cena}`} save={save} onSair={() => setTela({ tipo: 'saves' })} />
           </PausaContexto.Provider>
         )}
         {tela.tipo === 'jogo' && pausado && (
           <MenuPausa
-            mapa={save ? <LinhaDoTempo saves={save.unica ? savesDoMapa(save) : (p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} ato={save.unica ? capitulosDoSave(save)[save.capitulo - 1]?.titulo : undefined} /> : undefined}
+            mapa={
+              save?.unica ? (
+                <div className="flex flex-col gap-2">
+                  <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} />
+                  <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} />
+                </div>
+              ) : save ? (
+                <LinhaDoTempo saves={(p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} />
+              ) : undefined
+            }
             onContinuar={() => setPausado(false)}
             onSaves={() => {
               setPausado(false);
@@ -326,19 +355,30 @@ export default function ColiseuHistoria() {
             }}
           />
         )}
+        {/* O mapa grande de Roma, aberto pelo minimapa */}
+        {tela.tipo === 'jogo' && save?.unica && mapaAberto && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-3" role="dialog" aria-modal="true" aria-label="Mapa de Roma">
+            <div className="flex max-h-[94vh] w-full max-w-3xl flex-col gap-3 overflow-y-auto border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-3 sm:p-4">
+              <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">MAPA DE ROMA</p>
+              <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} />
+              <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} />
+              <button
+                type="button"
+                autoFocus
+                onClick={() => {
+                  tocar('clique');
+                  setMapaAberto(false);
+                }}
+                className="pixel-box px-4 py-3 font-pixel text-[10px] text-[#f4e2b4] sm:text-xs"
+              >
+                ◀ VOLTAR PARA A HISTÓRIA
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
-}
-
-/**
- * O Mapa de Roma da história única: os atos viram os pontos das três estradas (o Ato 1 e o 2
- * nos lugares de cada um, o Encontro no Ludus, e daí até o Coliseu). Por enquanto usa o mapa
- * dos caminhos; depois ele vira a Roma viva (docs/HISTORIA-V2.md, 4.2).
- */
-function savesDoMapa(s: SaveHistoria): SaveHistoria[] {
-  const capituloDoAto = [0, 1, 2, 3, 4, 6, 7][s.capitulo] ?? 8;
-  return (['claude', 'chatgpt', 'gemini'] as IaId[]).map((ia) => ({ ...s, unica: undefined, gladiador: ia, capitulo: capituloDoAto }));
 }
 
 /** O cenário de uma cena (para a tela de abertura do capítulo). */

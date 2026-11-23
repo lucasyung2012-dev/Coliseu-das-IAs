@@ -39,6 +39,7 @@ const QUEM_DA_CENA = new Map<string, Heroi>();
 function ato(numero: number, titulo: string, lugar: string, pedacos: Pedaco[]): Capitulo {
   const cenas: Cena[] = [];
   pedacos.forEach((p, k) => {
+    if (p.corte) QUEM_DA_CENA.set(`u${numero}-corte-${k}`, p.heroi);
     if (p.corte) cenas.push({ tipo: 'cutscene', id: `u${numero}-corte-${k}`, quadros: [{ lugar: p.corte.lugar, texto: p.corte.texto, efeito: 'panoramica' }] });
     for (const c of p.cenas) {
       QUEM_DA_CENA.set(c.id, p.heroi);

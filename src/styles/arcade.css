@@ -2027,3 +2027,12 @@
 .visao-fase { background: radial-gradient(ellipse at 50% 50%, rgba(140, 80, 200, 0.15), rgba(90, 30, 140, 0.55)); animation: visao-fase 1.2s ease-in-out infinite alternate; }
 @keyframes visao-fase { from { backdrop-filter: hue-rotate(0deg); } to { backdrop-filter: hue-rotate(60deg); } }
 .menos-movimento .visao-fase { animation: none; }
+
+/* O mapa de Roma (22/11/2026): o bairro da cena pulsa e a Biblioteca queima no primeiro ato. */
+.mapa-atual { transform-box: fill-box; transform-origin: center; animation: mapa-atual 1.3s ease-in-out infinite; }
+@keyframes mapa-atual { 0%, 100% { scale: 0.85; opacity: 1; } 50% { scale: 1.15; opacity: 0.55; } }
+.mapa-fogo { animation: mapa-fogo 0.4s steps(2) infinite alternate; }
+@keyframes mapa-fogo { from { opacity: 0.6; } to { opacity: 1; } }
+.minimapa { transition: transform 0.15s; }
+.minimapa:hover { transform: scale(1.05); }
+.menos-movimento .mapa-atual, .menos-movimento .mapa-fogo { animation: none; }
