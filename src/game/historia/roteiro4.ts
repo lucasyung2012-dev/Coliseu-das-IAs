@@ -125,7 +125,7 @@ export const CAP_SECRETO: Capitulo = {
         },
         {
           quem: 'gaivota',
-          rotulo: 'Gaivota Sete',
+          rotulo: 'Bússola',
           falas: [
             { quem: 'gaivota', texto: 'Capitão Octavius! A moeda do olho riscado... os velhos do porto contam que ela abria a "porta do porão da cidade".' },
             { quem: 'octavius', texto: 'Cidade não tem porão, Gaivota.' },
@@ -567,7 +567,7 @@ export const CAP_SECRETO: Capitulo = {
         {
           id: 'gaivota',
           x: 52,
-          rotulo: 'Gaivota Sete',
+          rotulo: 'Bússola',
           icone: '',
           personagem: 'gaivota',
           falas: [

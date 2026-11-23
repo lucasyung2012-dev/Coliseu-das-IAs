@@ -34,7 +34,7 @@ const DO_CAMINHO: Record<IaId, PremioHistoria[]> = {
   ],
   chatgpt: [
     { id: 'h-arena-chatgpt', tipo: 'arena', requer: 'chatgpt', valor: 'galera-tempestade', icone: '🌊', nome: 'A Galé na Tempestade', descricao: 'Lute no convés, no meio da tempestade do Leviatã.' },
-    { id: 'h-comp-chatgpt', tipo: 'companheiro', requer: 'chatgpt', valor: 'gaivota', icone: '🕊️', nome: 'Gaivota Sete no ombro', descricao: 'A Sete vai junto. E rouba alguma coisa, com certeza.' },
+    { id: 'h-comp-chatgpt', tipo: 'companheiro', requer: 'chatgpt', valor: 'gaivota', icone: '🕊️', nome: 'Bússola no ombro', descricao: 'A Sete vai junto. E rouba alguma coisa, com certeza.' },
     { id: 'h-titulo-chatgpt', tipo: 'titulo', requer: 'chatgpt', valor: 'Capitão do Plano B', icone: '🏷️', nome: 'Título: Capitão do Plano B', descricao: 'Aparece no lugar do título de Maestria.' },
   ],
   gemini: [

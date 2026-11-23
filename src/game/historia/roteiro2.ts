@@ -1413,7 +1413,7 @@ export const FINAL_CASSIUS: Capitulo = {
 // ---------- Octavius, Capítulo 1: Ordem Impossível ----------
 // Refeito em 21/11/2026 (o Lucas achou parecido demais com o do Cassius e com lutas seguidas):
 // sem criança ajudando (isso é do Cassius): o aliado é o Marco Remo, capitão velho que trata o
-// Octavius como filho teimoso, e o mascote é a Gaivota Sete. Tem o desafio dos planos, passar
+// Octavius como filho teimoso, e o mascote é a Bússola. Tem o desafio dos planos, passar
 // escondido pelo farol, girar o guincho, e o Octavius luta com PLANOS (coisas do cenário).
 
 export const CAP1_OCTAVIUS: Capitulo = {
@@ -1439,7 +1439,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
             { quem: 'octavius', x: 36, efeito: 'brilhar' },
             { quem: 'gaivota', de: 112, x: 50, espelhar: true, tamanho: 6 },
           ],
-          texto: 'Boa tarde, Gaivota Sete. Não, eu não tenho sardinha. Plano B: tenho meio pão.',
+          texto: 'Boa tarde, Bússola. Não, eu não tenho sardinha. Plano B: tenho meio pão.',
         },
         {
           lugar: 'porto-docas',
@@ -1535,7 +1535,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
         {
           id: 'gaivota',
           x: 52,
-          rotulo: 'Gaivota Sete',
+          rotulo: 'Bússola',
           icone: '',
           personagem: 'gaivota',
           falas: [
@@ -1655,7 +1655,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
       id: 'o1-gaivota',
       lugar: 'porto-docas',
       falas: [
-        { quem: 'gaivota', texto: 'QUÉ! (A Gaivota Sete pousa no ombro do Octavius com um papel no bico.)' },
+        { quem: 'gaivota', texto: 'QUÉ! (A Bússola pousa no ombro do Octavius com um papel no bico.)' },
         { quem: 'octavius', texto: 'Um bilhete do Marco? "Garoto, a tripulação está a bordo. Quando a corrente cair, a gente sai. Se der errado, eu te puxo pela orelha."' },
         { quem: 'octavius', texto: 'Esse velho. Sete, leva a resposta: "o pássaro vai cantar". Ele vai entender.' },
         { quem: 'gaivota', texto: 'QUÉ? (Ela parece perguntar: que pássaro?)' },
@@ -1810,7 +1810,7 @@ export const CAP1_OCTAVIUS: Capitulo = {
 
 // ---------- Octavius, Capítulo 2: As Galés ----------
 // Preso remando no porão do navio de guerra, no ritmo do Feitor do Tambor. Conhece o Vovô
-// Pistão; a Gaivota Sete rouba a chave; motim, tempestade, o Capataz e o Feitor. 4 lutas + chefão.
+// Pistão; a Bússola rouba a chave; motim, tempestade, o Capataz e o Feitor. 4 lutas + chefão.
 
 export const CAP2_OCTAVIUS: Capitulo = {
   numero: 2,
@@ -1875,7 +1875,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
       id: 'o2-planejar',
       mapa: 'galera-porao',
       lugar: 'galera-porao',
-      objetivo: 'Prepare o motim: veja o porão e combine o plano com a Gaivota Sete.',
+      objetivo: 'Prepare o motim: veja o porão e combine o plano com a Bússola.',
       pontos: [
         {
           id: 'tambor',
@@ -2108,7 +2108,7 @@ export const CAP2_OCTAVIUS: Capitulo = {
             { quem: 'octavius', x: 40, efeito: 'caido' },
             { quem: 'gaivota', de: 112, x: 56, tamanho: 6 },
           ],
-          texto: 'A Gaivota Sete pousa no peito dele. Ela trouxe um presente: uma porca de metal, enferrujada. Do Vovô Pistão.',
+          texto: 'A Bússola pousa no peito dele. Ela trouxe um presente: uma porca de metal, enferrujada. Do Vovô Pistão.',
         },
         { lugar: 'praia-naufragio', quem: 'octavius', personagens: [{ quem: 'octavius', x: 40 }], texto: 'Ele empurrou o meu bote. Até o fim. Obrigado, Vovô.' },
         {
@@ -2149,7 +2149,7 @@ export const CAP3_OCTAVIUS: Capitulo = {
             { quem: 'guarda', de: -12, x: 22 },
             { quem: 'octavius', de: -2, x: 38, efeito: 'tremer' },
           ],
-          texto: 'Octavius. Sem navio, sem frota, sem a Gaivota Sete. Só com a porca enferrujada do Vovô Pistão no bolso.',
+          texto: 'Octavius. Sem navio, sem frota, sem a Bússola. Só com a porca enferrujada do Vovô Pistão no bolso.',
         },
         {
           lugar: 'ludus-patio-noite',
@@ -2263,7 +2263,7 @@ export const CAP3_OCTAVIUS: Capitulo = {
             { quem: 'brutus', texto: 'O Lata de Biblioteca segura no escudo. Você não tem paciência pra isso, Tagarela. Você tem perna.' },
             { quem: 'brutus', texto: 'Então: rolou, BATEU. E rola de novo, rápido. Quem rola duas vezes nunca é pego.' },
             { quem: 'brutus', texto: 'E come o mingau. É de sardinha.' },
-            { quem: 'octavius', texto: 'Sardinha? A Gaivota Sete ia amar esse lugar.' },
+            { quem: 'octavius', texto: 'Sardinha? A Bússola ia amar esse lugar.' },
           ],
         },
         {
@@ -2424,7 +2424,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       id: 'o4-selos',
       lugar: 'subura-mercado',
       falas: [
-        { quem: 'gaivota', texto: 'QUÉ! (A Gaivota Sete solta no chão um papel amassado: o mapa que ela fez da Subura, com garranchos de bico.)' },
+        { quem: 'gaivota', texto: 'QUÉ! (A Bússola solta no chão um papel amassado: o mapa que ela fez da Subura, com garranchos de bico.)' },
         { quem: 'octavius', texto: 'Telhados, esgoto e feira. E aqui no meio... o cofre do Cobrador.' },
         { quem: 'octavius', texto: 'O Marco escreveu: os navios da frota estão presos no porto porque o Cobrador confiscou os SELOS. Sem selo, navio nenhum sai.' },
         { quem: 'gaivota', texto: 'QUÉ-QUÉ?' },
@@ -2462,7 +2462,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
         {
           id: 'gaivota',
           x: 76,
-          rotulo: 'Gaivota Sete',
+          rotulo: 'Bússola',
           icone: '',
           personagem: 'gaivota',
           obrigatorio: true,
@@ -2527,7 +2527,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       ...rota('telhados'),
       quadros: [
         { lugar: 'subura-telhados', efeito: 'tremor', som: 'pesada', texto: 'Algo pesado pula de uma chaminé. Olhos vermelhos. Garras de ferro. MIAU metálico.' },
-        { lugar: 'subura-telhados', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'tremer' }], texto: 'QUÉÉÉÉ! (A Gaivota Sete se esconde no chapéu do Octavius.)' },
+        { lugar: 'subura-telhados', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'tremer' }], texto: 'QUÉÉÉÉ! (A Bússola se esconde no chapéu do Octavius.)' },
       ],
     },
     {
@@ -2691,7 +2691,7 @@ export const CAP4_OCTAVIUS: Capitulo = {
       lugar: 'cofre-cobrador',
       inimigo: 'guarda-cofre',
       antes: [{ quem: 'octavius', texto: 'Plano: passar pela porta. Sub-plano: passar por cima do guarda.' }],
-      depois: [{ quem: 'gaivota', texto: 'QUÉ! (A Gaivota Sete voa direto para os selos dourados.)' }],
+      depois: [{ quem: 'gaivota', texto: 'QUÉ! (A Bússola voa direto para os selos dourados.)' }],
     },
     {
       tipo: 'cutscene',
@@ -2828,7 +2828,7 @@ export const CAP5_OCTAVIUS: Capitulo = {
         {
           id: 'gaivota',
           x: 70,
-          rotulo: 'Gaivota Sete',
+          rotulo: 'Bússola',
           icone: '',
           personagem: 'gaivota',
           obrigatorio: true,
@@ -3216,7 +3216,7 @@ export const CAP6_OCTAVIUS: Capitulo = {
 
 // ---------- Octavius, o Final: A Queda do Censor ----------
 // O mesmo final do Cassius, visto pelo Octavius: o titã, os aliados (agora Cassius e Helios),
-// e um desfecho dele: o Esperança volta, o Marco e o Caio juntos, e a Gaivota Sete.
+// e um desfecho dele: o Esperança volta, o Marco e o Caio juntos, e a Bússola.
 
 export const FINAL_OCTAVIUS: Capitulo = {
   numero: 7,
@@ -3321,7 +3321,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
           ],
           texto: 'O Esperança voltou. O capitão Marco Remo e o filho, Caio, levam gente para onde quiser ir. E o comandante da frota agora é eleito pela tripulação.',
         },
-        { lugar: 'porto-docas', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'brilhar' }], texto: 'QUÉ! (A Gaivota Sete tem um chapéu de capitã. Ela mesma roubou.)' },
+        { lugar: 'porto-docas', quem: 'gaivota', personagens: [{ quem: 'gaivota', x: 50, tamanho: 6, efeito: 'brilhar' }], texto: 'QUÉ! (A Bússola tem um chapéu de capitã. Ela mesma roubou.)' },
         { lugar: 'porto-docas', quem: 'octavius', personagens: [{ quem: 'octavius', x: 50, efeito: 'brilhar' }], texto: 'Plano para amanhã? Nenhum. Pela primeira vez, eu quero ver o que acontece.' },
       ],
     },
@@ -3379,7 +3379,7 @@ export const FINAL_OCTAVIUS: Capitulo = {
         {
           id: 'gaivota',
           x: 84,
-          rotulo: 'Gaivota Sete',
+          rotulo: 'Bússola',
           icone: '',
           personagem: 'gaivota',
           obrigatorio: true,

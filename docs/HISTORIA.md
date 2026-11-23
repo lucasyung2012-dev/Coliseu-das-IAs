@@ -1,5 +1,7 @@
 # Coliseu: o modo História (roteiro para revisar)
 
+> **22/11/2026: a história virou uma só (os três juntos, em três partes).** O roteiro novo está em [HISTORIA-V2.md](HISTORIA-V2.md). Este arquivo continua valendo para personagens, lugares e cenas que já existem.
+
 **Atualizado: 2026-11-20 (v2: personagens detalhados, destino do Censor, batalhas do caminho do Cassius)** · Dono: Lucas · Situação: **rascunho para o Lucas ler e mudar**. Nada disto está construído ainda.
 
 O Arcade (Tribunal, Duelo, online, troféus) continua sendo o jogo de todo dia. O **Coliseu vira o modo História**: uma aventura longa, com cenas, lugares para andar, conversas e lutas. O **Ludus** fica dentro do Coliseu: é a base onde os gladiadores moram e treinam.
@@ -170,7 +172,7 @@ Total do caminho: **22 batalhas, 4 chefões e o final**. Cada capítulo tem **in
 |---|---|---|
 | Jeito | sério, protege os outros | engraçado, cheio de planos (A, B, C...) |
 | Aliado principal | Lívia, a menina que ele ensinou a ler | **Marco Remo**, capitão velho e rabugento que trata o Octavius como filho teimoso. É ele quem salva o Octavius, não o contrário. O filho do Marco foi preso há anos por perguntar "de que cor era o céu antes do Censor" |
-| Mascote | — | **Gaivota Sete**: uma gaivota que segue o Octavius e rouba coisas na hora certa (chaves, sardinhas, o chapéu do Almirante) |
+| Mascote | — | **Bússola**: uma gaivota que segue o Octavius e rouba coisas na hora certa (chaves, sardinhas, o chapéu do Almirante) |
 | Como luta | CONTRA-ATAQUE e QUEBRA-GUARDA | **PLANOS**: no meio da luta aparecem coisas do cenário (barril, rede, gancho, corda, caixote); tocar nelas acerta e deixa o inimigo tonto |
 | Minigames | esconder livros, ler marcas, proteger a leitura | escolher planos, farol, guincho, remar no tambor, tempestade, perseguição, canhões, navegar pelas estrelas, pular de barco em barco |
 | Lugares | Biblioteca, catacumbas, Fórum | porto, mar, galés, mercado da Subura, Coliseu inundado |
@@ -187,9 +189,9 @@ Total do caminho: **22 batalhas, 4 chefões e o final**. Cada capítulo tem **in
 | 6. A Naumaquia | Coliseu inundado | 4 (em cima de barcos dentro da arena) | **O Leviatã Mecânico** | pular de barco em barco |
 | Final | Coliseu | — | o Censor (os três juntos) | o mesmo final, visto pelo Octavius |
 
-**Capítulo 1: Ordem Impossível.** O Octavius faz a ronda no porto, conversa com o Marco Remo e a Gaivota Sete, e recebe a ordem de afundar o *Esperança*. O Marco conta a história do filho e da pergunta sobre o céu. Octavius decide: Plano B. Escolhe os planos, apaga as lanternas, passa escondido pelo farol, luta com os marinheiros (usando os PLANOS do cenário), gira o guincho, derruba o Contramestre e segura o Almirante Ferrugem no convés enquanto o *Esperança* foge. O navio de guerra bate nas pedras; ele é preso e mandado para as galés.
+**Capítulo 1: Ordem Impossível.** O Octavius faz a ronda no porto, conversa com o Marco Remo e a Bússola, e recebe a ordem de afundar o *Esperança*. O Marco conta a história do filho e da pergunta sobre o céu. Octavius decide: Plano B. Escolhe os planos, apaga as lanternas, passa escondido pelo farol, luta com os marinheiros (usando os PLANOS do cenário), gira o guincho, derruba o Contramestre e segura o Almirante Ferrugem no convés enquanto o *Esperança* foge. O navio de guerra bate nas pedras; ele é preso e mandado para as galés.
 
-**Capítulo 2: As Galés.** Acorrentado no porão, remando no ritmo do Feitor do Tambor. Conhece os remadores esquecidos, entre eles o **Vovô Pistão**, uma IA de remo presa ali há quarenta anos. A Gaivota Sete rouba a chave. Plano: motim. Lutas pelo porão e pela cozinha, a tempestade no convés (amarrar as cordas antes de cada onda), o Capataz, e o Feitor do Tambor, que ataca no ritmo do tambor. O navio afunda perto de Roma; o Vovô Pistão empurra o Octavius para fora. Na praia, a Guarda o encontra e o leva para o Ludus.
+**Capítulo 2: As Galés.** Acorrentado no porão, remando no ritmo do Feitor do Tambor. Conhece os remadores esquecidos, entre eles o **Vovô Pistão**, uma IA de remo presa ali há quarenta anos. A Bússola rouba a chave. Plano: motim. Lutas pelo porão e pela cozinha, a tempestade no convés (amarrar as cordas antes de cada onda), o Capataz, e o Feitor do Tambor, que ataca no ritmo do tambor. O navio afunda perto de Roma; o Vovô Pistão empurra o Octavius para fora. Na praia, a Guarda o encontra e o leva para o Ludus.
 
 ### 5.3 Caminho do Helios: "As Três Estrelas" (aprovado pelo Lucas em 21/11/2026)
 
@@ -197,7 +199,7 @@ Total do caminho: **22 batalhas, 4 chefões e o final**. Cada capítulo tem **in
 |---|---|---|---|
 | Jeito | sério, protege | engraçado, planos | **misterioso, calmo, parece saber o futuro** |
 | Aliada | Lívia (menina) | Marco Remo (capitão velho) | **A Sibila**, a velha guardiã cega do Templo de Apolo, que fala por enigmas |
-| Mascote | — | Gaivota Sete | **Lumen**, uma coruja mecânica de bronze que enxerga no escuro |
+| Mascote | — | Bússola | **Lumen**, uma coruja mecânica de bronze que enxerga no escuro |
 | Golpe do Ludus | contra-ataque, quebra-guarda | esquiva dupla | **ESPELHO DE SOL**: levantar o escudo bem na hora do golpe reflete o ataque de volta (até o fogo) |
 | Como luta | escudo e contra-ataque | planos do cenário | **LUZ**: nas lutas no escuro, o botão ☀️ LUZ ilumina a arena por alguns segundos e mostra o sinal do inimigo |
 
@@ -294,7 +296,7 @@ O Arcade é "onde as lendas do Coliseu ganham vida" (o novo subtítulo). Quem te
 | Caminho | Arena | Companheiro | Título |
 |---|---|---|---|
 | Cassius | A Biblioteca em Chamas | Páginas salvas (voando) | Guardião dos Livros |
-| Octavius | A Galé na Tempestade | Gaivota Sete no ombro | Capitão do Plano B |
+| Octavius | A Galé na Tempestade | Bússola no ombro | Capitão do Plano B |
 | Helios | O Coliseu do Eclipse | Lumen no ombro | Vidente das Três Estrelas |
 | Secreto (os três) | O Coliseu Livre | comemoração Os Três | Os Três (moldura de ouro) |
 

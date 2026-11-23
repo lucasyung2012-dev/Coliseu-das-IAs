@@ -153,7 +153,7 @@ describe('os capítulos', () => {
     expect(cap3).toEqual(expect.arrayContaining(['forja', 'memoria', 'trio']));
   });
 
-  it('cada caminho tem a sua história: o Octavius não tem criança ajudando; tem o Marco e a Gaivota Sete', () => {
+  it('cada caminho tem a sua história: o Octavius não tem criança ajudando; tem o Marco e a Bússola', () => {
     const quem = CAPITULOS.chatgpt.flatMap((c) => c.cenas).flatMap((c) =>
       c.tipo === 'cutscene' ? c.quadros.flatMap((q) => [q.quem, ...(q.personagens ?? []).map((p) => p.quem)]) : c.tipo === 'conversa' ? c.falas.map((f) => f.quem) : [],
     );

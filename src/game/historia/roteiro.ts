@@ -300,7 +300,7 @@ export const NOMES: Record<Falante, string> = {
   marinheiro: 'Marinheiro de Ferro',
   leao: 'O Leão Mecânico',
   nina: 'Nina',
-  gaivota: 'Gaivota Sete',
+  gaivota: 'Bússola',
   pistao: 'Vovô Pistão',
   feitor: 'O Feitor do Tambor',
   cozinheiro: 'Cozinheiro de Bordo',

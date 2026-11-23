@@ -6,7 +6,7 @@ import { PAGINAS, PALETA_PAGINAS } from './historia6';
 
 /**
  * O companheiro da História (prêmio de quem termina um caminho), em volta do
- * gladiador no Arcade: as páginas do Cassius voando, a Gaivota Sete ou o Lumen no ombro.
+ * gladiador no Arcade: as páginas do Cassius voando, a Bússola ou o Lumen no ombro.
  * Carregado à parte (lazy) para o Arcade não levar os desenhos da História inteiros.
  */
 export default function Companheiro({ qual, espelhar = false }: { qual: CompanheiroHistoria; espelhar?: boolean }) {

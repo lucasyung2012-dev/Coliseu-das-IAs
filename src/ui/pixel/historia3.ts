@@ -11,7 +11,7 @@ import { desenhar, xadrez } from './desenho';
 
 // ---------- Aliados ----------
 
-// Gaivota Sete: a ajudante cômica de Octavius, olhar de quem aprontou e uma sardinha roubada no bico.
+// Bússola: a ajudante cômica de Octavius, olhar de quem aprontou e uma sardinha roubada no bico.
 export const GAIVOTA = desenhar(18, 14, [
   // cauda
   ['g', 0, 4, 3, 2],
