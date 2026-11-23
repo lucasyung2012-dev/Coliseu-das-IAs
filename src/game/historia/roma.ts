@@ -27,7 +27,7 @@ export const BAIRROS: Bairro[] = [
   { id: 'ludus', nome: 'LUDUS', x: 118, y: 66 },
   { id: 'aqueduto', nome: 'AQUEDUTO', x: 144, y: 46 },
   { id: 'catacumbas', nome: 'CATACUMBAS', x: 64, y: 74 },
-  { id: 'porto', nome: 'PORTO DE ÓSTIA', x: 22, y: 84 },
+  { id: 'porto', nome: 'PORTO DE ÓSTIA', x: 32, y: 84 },
 ];
 
 /** Cada lugar da história fica num bairro de Roma (os navios e o mar contam como o Porto). */
