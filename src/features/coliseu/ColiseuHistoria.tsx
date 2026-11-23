@@ -73,7 +73,12 @@ export default function ColiseuHistoria() {
   }, []);
 
   // Toda história nova começa pelo prólogo (pedido do Lucas); no fim dele, escolhe o condenado.
-  const fimDoPrologo = () => setTela({ tipo: 'escolher' });
+  // Versão 2 (22/11/2026): a história é uma só (os três juntos). Depois do prólogo, ela começa direto.
+  const fimDoPrologo = () => {
+    const novo = criarSaveUnica();
+    gravarSaveHistoria(novo);
+    setTela({ tipo: 'jogo', id: novo.id });
+  };
 
   // O segredo: com os três pedaços da chave, aparece uma grade no chão do título. Três toques abrem.
   const temChave = chaveCompleta(p.historiaSegredos);
@@ -234,7 +239,7 @@ export default function ColiseuHistoria() {
               + NOVA HISTÓRIA
             </button>
 
-            {saves.length === 0 && <p className="text-center text-sm text-muted">Nenhuma história ainda. Comece uma nova e escolha o seu condenado.</p>}
+            {saves.length === 0 && <p className="text-center text-sm text-muted">Nenhuma história ainda. Comece uma nova: a história de Cassius, Octavius e Helios.</p>}
             {saves.length > 0 && (
               <>
                 <ul className="grid gap-3 sm:grid-cols-2">
@@ -768,8 +773,8 @@ function CartaoSecreto({
           ))}
         </div>
         <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
-          <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>{s.unica ? 'A HISTÓRIA ÚNICA · EM CONSTRUÇÃO' : 'CAPÍTULO SECRETO'}</span>
-          <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{s.unica ? '"A LEI DA RESPOSTA ÚNICA"' : '"OS TRÊS"'}</span>
+          <span className="w-fit border-2 border-black px-1.5 py-0.5 font-pixel text-[8px] text-black sm:text-[9px]" style={{ background: cor }}>{s.unica ? 'PARTE 1' : 'CAPÍTULO SECRETO'}</span>
+          <span className="font-pixel text-[8px] text-[#7ad0ff] [text-shadow:1px_1px_0_#000] sm:text-[9px]">{s.unica ? '"A LEI DA RESPOSTA ÚNICA" · EM CONSTRUÇÃO' : '"OS TRÊS"'}</span>
         </div>
         <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
           <span className="block font-pixel text-[11px] text-white [text-shadow:2px_2px_0_#000] sm:text-sm">{s.unica ? (completo ? 'FIM DA PARTE 1' : (atoAtual?.titulo.toUpperCase() ?? '')) : completo ? 'SEGREDO COMPLETO' : (LUGAR_SECRETO[lugar] ?? 'O HIPOGEU')}</span>

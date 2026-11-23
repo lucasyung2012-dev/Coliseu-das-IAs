@@ -43,16 +43,15 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: /Coliseu/ })).toHaveAttribute('href', '/coliseu');
   });
 
-  it('Coliseu (modo História): saves; toda história nova começa pelo prólogo; escolher o Cassius e abrir o Capítulo 1', () => {
+  it('Coliseu (modo História): saves; toda história nova começa pelo prólogo e segue direto para a Parte 1', () => {
     abrir('/coliseu');
     expect(screen.queryByRole('button', { name: /VER O PRÓLOGO/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /NOVA HISTÓRIA/ }));
     // O prólogo é uma cutscene (o texto aparece letra por letra); dá para pular.
     fireEvent.click(screen.getByRole('button', { name: /PULAR/ }));
-    expect(screen.getByRole('button', { name: /OCTAVIUS/ })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /HELIOS/ })).toBeEnabled();
-    fireEvent.click(screen.getByRole('button', { name: /CASSIUS/ }));
-    expect(screen.getByText('A NOITE DAS CHAMAS')).toBeInTheDocument();
+    // A história é uma só (versão 2): sem escolher condenado, abre o primeiro ato.
+    expect(screen.getByText('A NOITE DAS TRÊS ESTRELAS')).toBeInTheDocument();
+    expect(screen.getByText('A LEI DA RESPOSTA ÚNICA')).toBeInTheDocument();
     // O save foi criado e aparece na lista ao voltar.
     // O menu de pausa (☰ MENU) tem a saída para os saves.
     fireEvent.click(screen.getByRole('button', { name: /Abrir o menu/ }));
