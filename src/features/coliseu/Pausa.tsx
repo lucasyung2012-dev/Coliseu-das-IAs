@@ -35,7 +35,7 @@ export function MenuPausa({ onContinuar, onSaves, mapa }: { onContinuar: () => v
   const item = 'pixel-box w-full px-4 py-3 text-left font-pixel text-[10px] text-[#f4e2b4] sm:text-xs';
   return (
     <div className="menu-pausa fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" role="dialog" aria-modal="true" aria-label="Menu de pausa">
-      <div className={`flex w-full ${aba === 'mapa' ? 'max-h-[92vh] max-w-3xl overflow-y-auto' : 'max-w-sm'} flex-col gap-3 border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-4 shadow-[0_0_40px_rgba(242,193,78,0.25)]">
+      <div className={`flex w-full ${aba === 'mapa' ? 'max-h-[92vh] max-w-3xl overflow-y-auto' : 'max-w-sm'} flex-col gap-3 border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-4 shadow-[0_0_40px_rgba(242,193,78,0.25)]`}>
         <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">
           {aba === 'menu' ? 'PAUSA' : aba === 'controles' ? 'CONTROLES' : aba === 'mapa' ? 'MAPA DE ROMA' : 'OPÇÕES'}
         </p>
