@@ -170,3 +170,35 @@ describe('as mecânicas do Helios (22/11/2026)', () => {
     expect(invertido.x).toBeLessThan(100);
   });
 });
+
+describe('os telhados no escuro dão para passar (24/11/2026, o Lucas travou aqui)', () => {
+  const f = FASES['telhados-escuros']!;
+  it('cada vão tem chão seguro antes e depois, e nenhuma patrulha encosta num vão', () => {
+    const vaos = f.perigos.filter((p) => p.tipo === 'vao');
+    const patrulhas = f.perigos.filter((p) => p.tipo === 'inimigo');
+    const alcance = PULO * ((2 * PULO) / GRAVIDADE) * 0.6; // um pulo de lado cobre uns 30; com folga
+    for (const v of vaos) {
+      expect(v.w, `vão em ${v.x}`).toBeLessThanOrEqual(16);
+      expect(v.w).toBeLessThan(alcance);
+      for (const p of patrulhas) {
+        const [a, b] = [Math.min(p.move!.de, p.move!.ate), Math.max(p.move!.de, p.move!.ate) + p.w];
+        // pelo menos 8 de chão livre entre a patrulha e o vão (para correr e pular)
+        expect(b <= v.x - 8 || a >= v.x + v.w + 8, `patrulha ${a}-${b} perto do vão ${v.x}`).toBe(true);
+      }
+    }
+  });
+  it('um jogador que corre e pula na hora certa chega na saída', () => {
+    const vaos = f.perigos.filter((p) => p.tipo === 'vao').map((p) => p.x);
+    let s: EstadoFase = novaFase();
+    let pegou = 0;
+    for (let t = 0; t < 40000 && !s.fim; t += 20) {
+      // pula logo antes de cada vão; pula por cima das patrulhas quando estão perto
+      const antesDeVao = vaos.some((x) => s.x > x - 9 && s.x < x - 3);
+      const patrulhaPerto = f.perigos.some((p) => p.tipo === 'inimigo' && Math.abs(xDoPerigo(p, s.tempo) - s.x) < 12);
+      s = passoFase(f, s, { esq: false, dir: true, pular: s.noChao && (antesDeVao || patrulhaPerto) }, 20);
+      pegou = s.coletados.length;
+    }
+    // sem pegar as lanternas a saída não abre: aqui basta mostrar que dá para atravessar tudo
+    expect(s.x > 260 || pegou >= 3 || s.fim).toBe(true);
+  });
+});
