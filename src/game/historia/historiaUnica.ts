@@ -41,13 +41,61 @@ function ato(numero: number, titulo: string, lugar: string, pedacos: Pedaco[]): 
   pedacos.forEach((p, k) => {
     if (p.corte) QUEM_DA_CENA.set(`u${numero}-corte-${k}`, p.heroi);
     if (p.corte) cenas.push({ tipo: 'cutscene', id: `u${numero}-corte-${k}`, quadros: [{ lugar: p.corte.lugar, texto: p.corte.texto, efeito: 'panoramica' }] });
-    for (const c of p.cenas) {
+    for (const c0 of p.cenas) {
+      const c = semCartaoAntigo(c0);
+      if (!c) continue;
       QUEM_DA_CENA.set(c.id, p.heroi);
       cenas.push(c);
     }
   });
   return { numero, titulo, lugar, cenas };
 }
+
+// ---------- REVISÃO DE CONTINUIDADE (24/11/2026) ----------
+// As cenas vêm dos caminhos antigos; aqui elas são ajustadas só para a história única (os
+// caminhos antigos continuam iguais).
+
+/** Tira os cartões do jeito antigo ("FIM DO CAPÍTULO 3...", "FIM DO CAMINHO DO..."). */
+function semCartaoAntigo(c: Cena): Cena | null {
+  if (c.tipo !== 'cutscene') return c;
+  const quadros = c.quadros.filter((q) => !/^FIM DO (CAPÍTULO|CAMINHO)/.test(q.texto));
+  return quadros.length ? { ...c, quadros } : null;
+}
+
+/** Ajusta os quadros de uma cutscene pelo número: texto novo, ou null para tirar o quadro. */
+function comQuadros(c: Cena | undefined, mudar: Record<number, string | null>, id?: string): Cena[] {
+  if (!c) return [];
+  if (c.tipo !== 'cutscene') return [c];
+  const quadros = c.quadros.flatMap((q, i) => {
+    if (!(i in mudar)) return [q];
+    const novo = mudar[i];
+    return novo === null || novo === undefined ? [] : [{ ...q, texto: novo }];
+  });
+  return [{ ...c, id: id ?? c.id, quadros }];
+}
+
+/** O elmo do Brutus é dado uma vez só (na noite do Leão): nas outras noites, sem o presente e sem essas falas. */
+function semElmo(c: Cena | undefined): Cena[] {
+  if (!c) return [];
+  if (c.tipo !== 'ludus') return [c];
+  const tirar = /elmo|centésima|coisa mais bonita|melhor quando acontece/i;
+  const conversas = c.conversas.map((cv) => ({ ...cv, falas: cv.falas.filter((f) => !tirar.test(f.texto)) })).filter((cv) => cv.falas.length > 0);
+  return [{ ...c, presente: undefined, conversas }];
+}
+
+/** A Biblioteca do fim não dá mais pedaço de chave (a chave já foi usada no Hipogeu). */
+function semChave(c: Cena | undefined): Cena[] {
+  if (!c) return [];
+  if (c.tipo !== 'explorar') return [c];
+  return [{ ...c, pontos: c.pontos.filter((p) => !p.segredo) }];
+}
+
+/** Os créditos da Parte 1 (no lugar do "fim do caminho do Cassius"). */
+const U6_CREDITOS: Cena = {
+  tipo: 'cutscene',
+  id: 'u6-creditos',
+  quadros: [{ lugar: 'titulo', efeito: 'clarao', som: 'fanfarra', texto: 'FIM DA PARTE 1: A LEI DA RESPOSTA ÚNICA. Obrigado por jogar! A história dos três continua...' }],
+};
 
 /** Uma luta ou desafio que já existe, com falas novas (para a história única). */
 function comFalas(c: Cena | undefined, id: string, antes: Fala[], depois: Fala[]): Cena[] {
@@ -130,7 +178,7 @@ const CENA_DO_CANO: Cena = {
   tipo: 'cutscene',
   id: 'u6-cano',
   quadros: [
-    { lugar: 'rua-noite', texto: 'Semanas depois. Roma dorme tranquila pela primeira vez em quinhentos anos.', efeito: 'panoramica' },
+    { lugar: 'rua-noite', texto: 'Mais tarde, numa noite qualquer. Roma dorme tranquila pela primeira vez em quinhentos anos.', efeito: 'panoramica' },
     { lugar: 'rua-noite', quem: 'fio', texto: '(Baixinho, encostado num cano) Lá-lá-rá... a da água que corre. Era a sua preferida, Eco.' },
     { lugar: 'rua-noite', texto: 'Silêncio. Só a água correndo dentro do cano.' },
     { lugar: 'rua-noite', texto: 'E então, muito longe, lá do fundo do cano... uma voz responde. Cantando a mesma música.', efeito: 'escuro' },
@@ -205,20 +253,32 @@ export function parte1(): Capitulo[] {
       { heroi: 'cassius', corte: { lugar: 'catacumbas', texto: 'Um olho desenhado. Na Biblioteca, no porto, no céu. Hora de descobrir o que ele quer dizer.' }, cenas: trecho(C4C, 'c4-ludus') },
       { heroi: 'octavius', corte: { lugar: 'subura-mercado', texto: 'Na noite seguinte, na Subura...' }, cenas: trecho(C4O, 'o4-tunel') },
       { heroi: 'helios', corte: { lugar: 'aqueduto', texto: 'Na outra noite, no Aqueduto...' }, cenas: trecho(C4H, 'h4-abertura') },
-      { heroi: 'octavius', corte: { lugar: 'frota-noite', texto: 'No mar, a Frota Fantasma...' }, cenas: trecho(C5O, 'o5-frota') },
-      { heroi: 'helios', corte: { lugar: 'templo-apolo', texto: 'No Templo de Apolo...' }, cenas: trecho(C5H, 'h5-sibila') },
+      { heroi: 'octavius', corte: { lugar: 'frota-noite', texto: 'No mar, a Frota Fantasma...' }, cenas: trecho(C5O, 'o5-frota', 'o5-chefao') },
+      { heroi: 'helios', corte: { lugar: 'templo-apolo', texto: 'No Templo de Apolo...' }, cenas: [...trecho(C5H, 'h5-sibila', 'h5-chefao'), ...comQuadros(so(C5H, 'h5-fim')[0], { 2: null, 3: null })] },
       { heroi: 'cassius', corte: { lugar: 'forum', texto: 'E, por fim, o Fórum.' }, cenas: trecho(C5C, 'c5-plano') },
     ]),
     ato(5, 'Os Grandes Jogos', 'O Coliseu', [
-      { heroi: 'cassius', corte: { lugar: 'coliseu-arena', texto: 'Primeira noite dos Grandes Jogos.' }, cenas: trecho(C6C, 'c6-ludus') },
-      { heroi: 'octavius', corte: { lugar: 'coliseu-inundado', texto: 'Segunda noite: a Naumaquia.' }, cenas: trecho(C6O, 'o6-ludus') },
-      { heroi: 'helios', corte: { lugar: 'coliseu-eclipse', texto: 'Terceira noite: o eclipse.' }, cenas: trecho(C6H, 'h6-ludus') },
+      { heroi: 'cassius', corte: { lugar: 'coliseu-arena', texto: 'Primeira noite dos Grandes Jogos.' }, cenas: [...trecho(C6C, 'c6-ludus', 'c6-chefao'), ...comQuadros(so(C6C, 'c6-fim')[0], { 1: null, 2: 'Amanhã, a Naumaquia. Vamos ver se o mar apaga vocês.' })] },
+      { heroi: 'octavius', corte: { lugar: 'coliseu-inundado', texto: 'Segunda noite: a Naumaquia.' }, cenas: [...semElmo(so(C6O, 'o6-ludus')[0]), ...trecho(C6O, 'o6-arena', 'o6-chefao'), ...comQuadros(so(C6O, 'o6-fim')[0], { 1: null, 2: 'Amanhã é o eclipse. No escuro, nenhuma estrela ajuda vocês.' })] },
+      { heroi: 'helios', corte: { lugar: 'coliseu-eclipse', texto: 'Terceira noite: o eclipse.' }, cenas: [...semElmo(so(C6H, 'h6-ludus')[0]), ...trecho(C6H, 'h6-arena', 'h6-chefao'), ...comQuadros(so(C6H, 'h6-fim')[0], { 1: 'Cassius e Octavius correm para o meio da arena. Os três juntos, na frente de Roma inteira, debaixo do sol.' })] },
     ]),
     ato(6, 'A Queda do Censor', 'O Coliseu e o Hipogeu', [
-      { heroi: 'cassius', cenas: trecho(FIM_C, 'f-tunel', 'f-chefao') },
-      { heroi: 'cassius', cenas: CAP_SECRETO.cenas },
-      { heroi: 'cassius', cenas: trecho(FIM_C, 'f-desfecho') },
-      { heroi: 'cassius', cenas: [CENA_DO_CANO] },
+      { heroi: 'cassius', cenas: [...trecho(FIM_C, 'f-tunel', 'f-chefao'), ...comQuadros(so(FIM_C, 'f-desfecho')[0], { 7: null, 8: null })] },
+      {
+        heroi: 'cassius',
+        cenas: CAP_SECRETO.cenas.flatMap((c) =>
+          c.id === 's-abertura'
+            ? comQuadros(c, {
+                0: 'Naquela mesma noite. O Titã caiu e a plateia foi para casa. Mas o Coliseu não dorme.',
+                1: 'Debaixo da arena, alguma coisa bate. TUM. TUM. Como um coração de ferro.',
+              })
+            : [c],
+        ),
+      },
+      {
+        heroi: 'cassius',
+        cenas: [...comQuadros(so(FIM_C, 'f-desfecho')[0], { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null }, 'u6-meses'), ...semChave(so(FIM_C, 'f-biblioteca')[0]), U6_CREDITOS, CENA_DO_CANO],
+      },
     ]),
   ];
   return montada;

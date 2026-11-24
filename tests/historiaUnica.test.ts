@@ -69,3 +69,31 @@ describe('o Encontro (as cenas novas)', () => {
     expect(ato3.indexOf('u3-cela')).toBeLessThan(ato3.indexOf('u3-estatua'));
   });
 });
+
+describe('a continuidade da Parte 1 (24/11/2026)', () => {
+  const atos = parte1();
+  const textos = (a: (typeof atos)[number]) =>
+    a.cenas.flatMap((c) =>
+      c.tipo === 'cutscene' ? c.quadros.map((q) => q.texto) : c.tipo === 'conversa' ? c.falas.map((f) => f.texto) : c.tipo === 'ludus' ? c.conversas.flatMap((cv) => cv.falas.map((f) => f.texto)) : [],
+    );
+  it('nenhum cartão do jeito antigo ("FIM DO CAPÍTULO", "FIM DO CAMINHO", "caminho do...")', () => {
+    for (const a of atos) for (const t of textos(a)) expect(t, a.titulo).not.toMatch(/FIM DO (CAPÍTULO|CAMINHO)|outras histórias/);
+  });
+  it('o Censor convoca os Jogos uma vez só, no Fórum (fim do Ato 4)', () => {
+    const convoca = textos(atos[3]!).filter((t) => /convoco os Jogos|Jogos da Resposta Única acontecem/.test(t));
+    expect(convoca.length).toBe(1);
+  });
+  it('o elmo do Brutus é dado uma vez só e "os três juntos, pela primeira vez" não se repete', () => {
+    const a5 = atos[4]!;
+    expect(a5.cenas.filter((c) => c.tipo === 'ludus' && c.presente === 'elmo-brutus').length).toBe(1);
+    expect(textos(a5).filter((t) => /pela primeira vez/.test(t) && /três juntos/.test(t)).length).toBe(0);
+  });
+  it('o Titã cai e o Censor muda de lado antes do Núcleo; o "meses depois" vem só no fim', () => {
+    const ids = atos[5]!.cenas.map((c) => c.id);
+    expect(ids.indexOf('f-desfecho')).toBeLessThan(ids.findIndex((i) => i.startsWith('s-')));
+    expect(ids.indexOf('u6-meses')).toBeGreaterThan(ids.findIndex((i) => i.startsWith('s-')));
+    const t6 = textos(atos[5]!);
+    expect(t6.filter((t) => /^Meses depois/.test(t)).length).toBe(1);
+    expect(t6[t6.indexOf(t6.find((t) => /^Meses depois/.test(t))!)]).toBeDefined();
+  });
+});
