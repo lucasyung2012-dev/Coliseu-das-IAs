@@ -259,7 +259,7 @@ export function MapaRoma({ estado, mini = false }: { estado: EstadoRoma; mini?: 
 }
 
 /** A legenda do mapa grande: onde vocês estão e para onde vão. */
-export function LegendaRoma({ estado, ato }: { estado: EstadoRoma; ato?: string }) {
+export function LegendaRoma({ estado, ato, roma }: { estado: EstadoRoma; ato?: string; roma?: { segredos: number; pedidos: number; total: number } }) {
   const nome = (id: BairroId | null) => BAIRROS.find((b) => b.id === id)?.nome ?? '';
   return (
     <div className="flex flex-col gap-1 text-xs text-white/85">
@@ -276,6 +276,11 @@ export function LegendaRoma({ estado, ato }: { estado: EstadoRoma; ato?: string 
       <p className="text-[11px] text-muted">
         Bairros visitados: {estado.visitados.length} de {BAIRROS.length}. Os outros ainda estão na névoa.
       </p>
+      {roma && estado.juntos && (
+        <p className="text-[11px] text-[#f2c14e]">
+          Segredos de Roma: {roma.segredos} de {roma.total} · Pedidos do povo: {roma.pedidos} de {roma.total}
+        </p>
+      )}
     </div>
   );
 }

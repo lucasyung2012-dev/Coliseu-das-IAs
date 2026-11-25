@@ -40,6 +40,8 @@ export interface SaveHistoria {
   notas?: Record<string, number>;
   /** Já viu a explicação das notas. */
   notaVista?: boolean;
+  /** Os bairros vivos de Roma: segredos achados e pedidos feitos (pelo id do bairro). */
+  roma?: { segredos?: string[]; pedidos?: string[] };
   /** Versão da ordem das cenas (2 = capítulo 1 do Cassius com o treino no começo; 3 = a fuga do mercado no capítulo 2). */
   ordem?: number;
 }
@@ -149,6 +151,17 @@ export const treinoFeito = (s: SaveHistoria, treino: Treino | Tecnica) => (s.fei
 
 export function aprender(s: SaveHistoria, t: Tecnica): SaveHistoria {
   return (s.tecnicas ?? []).includes(t) ? s : { ...s, tecnicas: [...(s.tecnicas ?? []), t] };
+}
+
+/** Achou um segredo ou fez um pedido num bairro de Roma (id "roma-segredo-x" ou "roma-pedido-x"): guarda e dá as peças. */
+export function achouEmRoma(s: SaveHistoria, id: string): SaveHistoria {
+  const m = /^roma-(segredo|pedido)-(.+)$/.exec(id);
+  if (!m) return s;
+  const tipo = m[1] === 'segredo' ? 'segredos' : 'pedidos';
+  const bairro = m[2]!;
+  const ja = s.roma?.[tipo] ?? [];
+  if (ja.includes(bairro)) return s;
+  return { ...s, pecas: (s.pecas ?? 0) + (tipo === 'segredos' ? 3 : 5), roma: { ...s.roma, [tipo]: [...ja, bairro] } };
 }
 
 /** Guarda a nota da plateia (fica a melhor de cada chefão). */

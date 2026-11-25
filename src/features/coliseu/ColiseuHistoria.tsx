@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, guardarNota, ganharEquipamento, aprender, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, guardarNota, ganharEquipamento, aprender, achouEmRoma, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
-import { BAIRROS, bairrosParaPassear, cenaDePasseio, estadoRoma, type BairroId } from '@/game/historia/roma';
+import { BAIRROS, bairrosParaPassear, estadoRoma, mundoDePasseio, TOTAL_ROMA, type BairroId } from '@/game/historia/roma';
 import { LegendaRoma, MapaRoma } from './MapaRoma';
 import { ModoTeste } from './ModoTeste';
 import { ESTILO_DO_HEROI, type AtributosLuta } from '@/game/historia/luta';
@@ -360,7 +360,7 @@ export default function ColiseuHistoria() {
               save?.unica ? (
                 <div className="flex flex-col gap-2">
                   <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} />
-                  <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} />
+                  <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} roma={{ segredos: save.roma?.segredos?.length ?? 0, pedidos: save.roma?.pedidos?.length ?? 0, total: TOTAL_ROMA }} />
                 </div>
               ) : save ? (
                 <LinhaDoTempo saves={(p.historia ?? []).filter((s) => !s.unica)} segredos={p.historiaSegredos} />
@@ -397,9 +397,8 @@ export default function ColiseuHistoria() {
           save?.unica &&
           passeio &&
           (() => {
-            const cena = cenaDePasseio(passeio);
-            const m = cena?.mapa ? MAPAS[cena.mapa] : undefined;
-            if (!cena || !m) return null;
+            const mundo = mundoDePasseio(passeio, save.roma);
+            if (!mundo) return null;
             const atual = capitulosDoSave(save)[save.capitulo - 1]?.cenas[save.cena];
             return (
               <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#0c0a10] p-3" role="dialog" aria-modal="true" aria-label={`Passeio por ${passeio}`}>
@@ -410,7 +409,18 @@ export default function ColiseuHistoria() {
                       ◀ VOLTAR AO MAPA
                     </button>
                   </div>
-                  <MundoAberto key={passeio} mundo={mundoDoExplorar(cena, m)} heroi={heroiDaCena(atual)} onFim={() => setPasseio(null)} />
+                  <MundoAberto
+                    key={passeio}
+                    mundo={mundo}
+                    heroi={heroiDaCena(atual)}
+                    onSegredo={(id) => {
+                      if (id.startsWith('roma-')) {
+                        tocar('fanfarra');
+                        gravarSaveHistoria({ ...achouEmRoma(save, id), atualizadoEm: new Date().toISOString() });
+                      } else ganharSegredoHistoria(id);
+                    }}
+                    onFim={() => setPasseio(null)}
+                  />
                 </div>
               </div>
             );
@@ -421,7 +431,7 @@ export default function ColiseuHistoria() {
             <div className="flex max-h-[94vh] w-full max-w-3xl flex-col gap-3 overflow-y-auto border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-3 sm:p-4">
               <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">MAPA DE ROMA</p>
               <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} />
-              <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} />
+              <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} roma={{ segredos: save.roma?.segredos?.length ?? 0, pedidos: save.roma?.pedidos?.length ?? 0, total: TOTAL_ROMA }} />
               {/* A ROMA LIVRE: depois do Encontro, os bairros já visitados abrem para passear */}
               {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).length > 0 ? (
                 <div className="flex flex-col gap-1">
