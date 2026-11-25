@@ -1,6 +1,7 @@
 import { heroiDaCena, parte1, TIME_DESDE_O_ATO } from './historiaUnica';
 import { livre, type Mundo } from './mundo';
 import { MAPAS, mundoDoExplorar } from './mundos';
+import { INTERIORES } from './interiores';
 import type { Cena, Falante, Lugar } from './roteiro';
 
 /**
@@ -329,7 +330,7 @@ function caminhaveis(m: Mundo): [number, number][] {
 /** O bairro para passear: o mapa dele com a gente, o segredo e o pedido (o que já foi feito some). */
 export function mundoDePasseio(b: BairroId, feito: RomaFeita = {}): Mundo | null {
   const p = PASSEIOS[b];
-  const m = p ? MAPAS[p.mapa] : undefined;
+  const m = p ? (INTERIORES[b] ?? MAPAS[p.mapa]) : undefined;
   if (!p || !m) return null;
   const nome = BAIRROS.find((x) => x.id === b)?.nome ?? '';
   const base = mundoDoExplorar({ tipo: 'explorar', id: `passeio-${b}`, lugar: p.lugar, objetivo: `Passeio livre (${nome}). Converse com o povo, ache o segredo do bairro e ajude quem pediu. Para voltar, toque em VOLTAR AO MAPA.`, pontos: [] }, m);

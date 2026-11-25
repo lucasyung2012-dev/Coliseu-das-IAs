@@ -106,3 +106,19 @@ describe('Roma caminhável (25/11/2026)', () => {
     expect(p.falas.some((f) => /PORTO DE ÓSTIA/.test(f.texto))).toBe(true);
   });
 });
+
+describe('os interiores únicos (25/11/2026)', () => {
+  it('cada lugar tem um mapa só dele, diferente de todos os outros, com a porta de volta para a rua', async () => {
+    const { INTERIORES } = await import('@/game/historia/interiores');
+    const lugares = Object.keys(PASSEIOS);
+    const desenhos = new Set<string>();
+    for (const b of lugares) {
+      const m = INTERIORES[b];
+      expect(m, b).toBeDefined();
+      for (const l of m!.mapa) expect(l.length, b).toBe(m!.mapa[0]!.length);
+      expect(m!.mapa.some((l) => l.includes('P')), b).toBe(true);
+      desenhos.add(m!.mapa.join('\n'));
+    }
+    expect(desenhos.size).toBe(lugares.length);
+  });
+});
