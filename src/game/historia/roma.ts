@@ -341,7 +341,7 @@ export function mundoDePasseio(b: BairroId, feito: RomaFeita = {}): Mundo | null
   // A gente fica em lugar aberto (os quatro vizinhos livres), para nunca tampar um corredor, e anda
   // só até o ladrilho do lado (pessoa anda em linha reta). Perto da entrada; o dono do pedido, um pouco depois.
   const chave = new Set(casas.map(([x, y]) => `${x},${y}`));
-  const abertos = casas.slice(2).filter(([x, y]) => [[1, 0], [-1, 0], [0, 1], [0, -1]].every(([dx, dy]) => chave.has(`${x + dx},${y + dy}`)));
+  const abertos = casas.slice(2).filter(([x, y]) => ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).every(([dx, dy]) => chave.has(`${x + dx},${y + dy}`)));
   const lugar = (k: number): [number, number][] => {
     const a = abertos[Math.min(k, abertos.length - 1)] ?? em(3 + k);
     const lado: [number, number] = chave.has(`${a[0] + 1},${a[1]}`) ? [a[0] + 1, a[1]] : a;
