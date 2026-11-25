@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as PE, type ReactNode, type SVGProps } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as PE, type ReactNode, type SVGProps } from 'react';
 import type { IaId } from '@/game/personagens';
 import { BAIRROS, type BairroId, type EstadoRoma, type HeroiRoma } from '@/game/historia/roma';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
@@ -113,29 +113,39 @@ const ARVORES: { x: number; y: number; tipo: 'pinheiro' | 'cipreste' | 'oliveira
 const CAMPOS: { x: number; y: number; w: number; h: number; cor: string }[] = [];
 (() => {
   const r = sorteio(7);
-  const livreDeLugar = (x: number, y: number, d: number) => Object.values(POS).every(([px, py]) => Math.hypot(px - x, py - y) > d) && Math.hypot(CIRCO[0] - x, CIRCO[1] - y) > 24;
-  for (let i = 0; i < 900 && CASAS.length < 190; i++) {
-    const x = 96 + r() * 214;
-    const y = 26 + r() * 150;
-    if (!naMuralha(x, y, 0.9) || !livreDeLugar(x, y, 19) || pertoDaLinha(x, y, RIO, 8) || RUAS.some((l) => pertoDaLinha(x, y, l, 3.6))) continue;
-    if (CASAS.some((c) => Math.abs(c.x - x) < 6 && Math.abs(c.y - y) < 5)) continue;
-    const perto = Math.hypot(212 - x, 64 - y) < 40; // perto da Subura, os prédios são mais altos
-    CASAS.push({ x, y, w: 4 + Math.floor(r() * 3), h: 3 + Math.floor(r() * 2), telhado: ['#b8543a', '#a24a30', '#c8683e', '#9a4028'][Math.floor(r() * 4)]!, andares: perto ? 2 + Math.floor(r() * 2) : 1 });
-  }
-  for (let i = 0; i < 1400 && ARVORES.length < 150; i++) {
+  const livreDeLugar = (x: number, y: number, d: number) => Object.values(POS).every(([px, py]) => Math.hypot(px - x, py - y) > d) && Math.hypot(CIRCO[0] - x, CIRCO[1] - y) > 25;
+  // Quarteirões: casas em fileiras, com vielas a cada 3 casas (fica organizado, como uma cidade de verdade).
+  for (let linha = 0, gy = 24; gy < 178; gy += 7, linha++)
+    for (let coluna = 0, gx = 94; gx < 314; gx += 7.5, coluna++) {
+      if (coluna % 4 === 3 || linha % 3 === 2) continue;
+      const x = gx + (linha % 2 ? 1.5 : 0);
+      const y = gy;
+      if (!naMuralha(x, y, 0.86) || !livreDeLugar(x, y, 21) || pertoDaLinha(x, y, RIO, 8.5) || RUAS.some((l) => pertoDaLinha(x, y, l, 4.6))) continue;
+      const bairro = Math.floor(gx / 40) + Math.floor(gy / 40) * 3;
+      const perto = Math.hypot(212 - x, 64 - y) < 42; // perto da Subura, prédios mais altos
+      CASAS.push({ x, y, w: 6, h: 4, telhado: ['#b8543a', '#a24a30', '#c8683e', '#9a4028'][bairro % 4]!, andares: perto ? 2 : 1 });
+    }
+  // Fora da muralha: pinheiros, oliveiras e ciprestes espalhados (sem cair no mar nem no rio).
+  for (let i = 0; i < 1400 && ARVORES.length < 110; i++) {
     const x = r() * W;
     const y = r() * H;
-    if (naMuralha(x, y, 0.96) && r() > 0.12) continue;
-    if (!livreDeLugar(x, y, 16) || pertoDaLinha(x, y, RIO, 6) || RUAS.some((l) => pertoDaLinha(x, y, l, 3))) continue;
-    if (y > 130 && x < 70 - (y - 130) * 0.2) continue; // o mar
-    if (CASAS.some((c) => Math.abs(c.x - x) < 5 && Math.abs(c.y - y) < 4)) continue;
-    ARVORES.push({ x, y, tipo: y > 150 && x > 150 ? 'cipreste' : r() > 0.55 ? 'pinheiro' : r() > 0.5 ? 'oliveira' : 'cipreste' });
+    if (naMuralha(x, y, 1.08)) continue;
+    if (!livreDeLugar(x, y, 16) || pertoDaLinha(x, y, RIO, 7) || RUAS.some((l) => pertoDaLinha(x, y, l, 4))) continue;
+    if (y > 112 && x < 76 - (200 - y) * 0.05) continue; // o mar
+    if (ARVORES.some((a) => Math.hypot(a.x - x, a.y - y) < 5)) continue;
+    ARVORES.push({ x, y, tipo: r() > 0.5 ? 'pinheiro' : r() > 0.5 ? 'oliveira' : 'cipreste' });
   }
-  for (let i = 0; i < 200 && CAMPOS.length < 16; i++) {
+  // A alameda de ciprestes da Via Ápia (dos dois lados da estrada, até as Catacumbas).
+  for (let y = 172; y < 200; y += 6) {
+    ARVORES.push({ x: 198, y, tipo: 'cipreste' });
+    ARVORES.push({ x: 210, y, tipo: 'cipreste' });
+  }
+  for (let i = 0; i < 200 && CAMPOS.length < 14; i++) {
     const x = r() * W;
     const y = r() * H;
-    if (naMuralha(x, y, 1.15) || pertoDaLinha(x, y, RIO, 12) || (y > 120 && x < 80)) continue;
-    CAMPOS.push({ x, y, w: 14 + r() * 16, h: 8 + r() * 8, cor: ['#b8c878', '#c8b868', '#a8b870', '#d0c080'][Math.floor(r() * 4)]! });
+    if (naMuralha(x - 6, y, 1.2) || naMuralha(x + 30, y + 16, 1.2) || pertoDaLinha(x, y, RIO, 14) || (y > 100 && x < 90)) continue;
+    if (CAMPOS.some((c) => Math.abs(c.x - x) < 32 && Math.abs(c.y - y) < 18)) continue;
+    CAMPOS.push({ x, y, w: 16 + r() * 14, h: 9 + r() * 6, cor: ['#b8c878', '#c8b868', '#a8b870', '#d0c080'][Math.floor(r() * 4)]! });
   }
 })();
 
@@ -209,8 +219,10 @@ function Chao({ noite }: { noite: boolean }) {
       <ellipse cx={CIRCO[0]} cy={CIRCO[1]} rx={18} ry={3.6} fill="#e8d4a4" />
       <rect x={CIRCO[0] - 12} y={CIRCO[1] - 0.5} width={24} height={1} fill="#8a6a4a" />
       {!noite && (
-        <g className="mapa-biga">
-          <rect x={CIRCO[0] - 17} y={CIRCO[1] - 2.6} width={2} height={1.2} fill="#c0283c" />
+        <g>
+          <rect x={-1.2} y={-0.7} width={2.4} height={1.4} fill="#c0283c" />
+          <rect x={-2.6} y={-0.4} width={1.2} height={0.8} fill="#6a4a2a" />
+          <animateMotion dur="7s" repeatCount="indefinite" rotate="auto" path={`M ${CIRCO[0] - 15} ${CIRCO[1] - 2} L ${CIRCO[0] + 15} ${CIRCO[1] - 2} A 3 2 0 0 1 ${CIRCO[0] + 15} ${CIRCO[1] + 2} L ${CIRCO[0] - 15} ${CIRCO[1] + 2} A 3 2 0 0 1 ${CIRCO[0] - 15} ${CIRCO[1] - 2} Z`} />
         </g>
       )}
     </g>
@@ -578,13 +590,13 @@ function Lugar({ id, ato, noite }: { id: BairroId; ato: number; noite: boolean }
 
 /** A faixa com o nome de cada lugar. */
 function Faixa({ x, y, texto, apagada, destaque }: { x: number; y: number; texto: string; apagada?: boolean; destaque?: boolean }) {
-  const w = texto.length * 3.3 + 6;
+  const w = texto.length * 3.6 + 7;
   return (
     <g>
       <path d={`M ${x - w / 2 - 2.4} ${y - 1} L ${x - w / 2} ${y - 1} L ${x - w / 2} ${y + 4.6} L ${x - w / 2 - 2.4} ${y + 4.6} L ${x - w / 2 - 1} ${y + 1.8} Z`} fill={apagada ? '#8a7a64' : '#a8742a'} />
       <path d={`M ${x + w / 2 + 2.4} ${y - 1} L ${x + w / 2} ${y - 1} L ${x + w / 2} ${y + 4.6} L ${x + w / 2 + 2.4} ${y + 4.6} L ${x + w / 2 + 1} ${y + 1.8} Z`} fill={apagada ? '#8a7a64' : '#a8742a'} />
       <rect x={x - w / 2} y={y - 2} width={w} height={6.6} fill={apagada ? '#c8bca4' : destaque ? '#ffe9a8' : '#f4e6c0'} stroke={apagada ? '#6a5a44' : '#5a3a12'} strokeWidth={0.6} />
-      <text x={x} y={y + 3.1} textAnchor="middle" fontSize={4.4} fill={apagada ? '#6a5a44' : '#3a2412'} className="font-pixel">
+      <text x={x} y={y + 3} textAnchor="middle" fontSize={3.6} textLength={texto.length * 3.6 - 0.6} lengthAdjust="spacingAndGlyphs" fill={apagada ? '#6a5a44' : '#3a2412'} className="font-pixel">
         {texto}
       </text>
     </g>
@@ -622,6 +634,29 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
   const noite = ato <= 2;
   const eclipse = ato >= 6;
   const [aberto, setAberto] = useState<BairroId | null>(null);
+  // O ZOOM (25/11/2026, o Lucas achou o mapa "com muito zoom"): abre com Roma inteira na tela.
+  const [zoom, setZoom] = useState(1);
+  const [tela, setTela] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  useEffect(() => {
+    const medir = () => setTela({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener('resize', medir);
+    return () => window.removeEventListener('resize', medir);
+  }, []);
+  const largura = Math.min(tela.w, (tela.h - 8) * (W / H)) * zoom;
+  const centroAntes = useRef<[number, number] | null>(null);
+  const mudarZoom = (z: number) => {
+    const el = rolagem.current;
+    if (el) centroAntes.current = [(el.scrollLeft + el.clientWidth / 2) / el.scrollWidth, (el.scrollTop + el.clientHeight / 2) / el.scrollHeight];
+    setZoom(Math.max(1, Math.min(4, z)));
+  };
+  useLayoutEffect(() => {
+    const el = rolagem.current;
+    const c = centroAntes.current;
+    if (!el || !c) return;
+    el.scrollLeft = c[0] * el.scrollWidth - el.clientWidth / 2;
+    el.scrollTop = c[1] * el.scrollHeight - el.clientHeight / 2;
+    centroAntes.current = null;
+  }, [zoom]);
   const rolagem = useRef<HTMLDivElement>(null);
   const arrasto = useRef<{ x: number; y: number; sx: number; sy: number; mexeu: boolean } | null>(null);
   const visto = (b: BairroId) => estado.visitados.includes(b);
@@ -667,7 +702,8 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
   return (
     <div className="fixed inset-0 z-[60] bg-[#0c0806]" role="dialog" aria-modal="true" aria-label="Mapa de Roma">
       <div ref={rolagem} className="mapa-rolagem absolute inset-0 overflow-auto" onPointerDown={desce} onPointerMove={move} onPointerUp={sobe} onPointerLeave={sobe}>
-        <div className="relative" style={{ width: 'max(100vw, 165vh)', aspectRatio: `${W} / ${H}` }}>
+        <div className="flex min-h-full min-w-full items-center justify-center">
+        <div className="relative shrink-0" style={{ width: largura, height: largura * (H / W) }}>
           <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full select-none" shapeRendering="crispEdges" aria-label="Mapa de Roma" role="img">
             <Chao noite={noite} />
             <Cidade noite={noite} />
@@ -763,15 +799,14 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
             );
           })}
 
-          {/* o cartão do lugar tocado (dentro do mapa, perto do lugar) */}
+        </div>
+        </div>
+      </div>
+
+          {/* o cartão do lugar tocado (por cima do mapa, embaixo, para caber em qualquer tela) */}
           {cartao && (
             <div
-              className="mapa-cartao absolute z-20 w-[min(76vw,300px)] border-4 border-double border-[#5a3a12] bg-[#f4e6c0] p-3 text-[#3a2412] shadow-[4px_4px_0_#000]"
-              style={{
-                left: `${(POS[cartao][0] / W) * 100}%`,
-                top: `${(POS[cartao][1] / H) * 100}%`,
-                transform: `translate(${POS[cartao][0] > W * 0.6 ? 'calc(-100% - 24px)' : '24px'}, ${POS[cartao][1] > H * 0.6 ? '-90%' : '-30%'})`,
-              }}
+              className="mapa-cartao absolute bottom-3 left-1/2 z-20 w-[min(92vw,340px)] -translate-x-1/2 border-4 border-double border-[#5a3a12] bg-[#f4e6c0] p-3 text-[#3a2412] shadow-[4px_4px_0_#000]"
               role="dialog"
               aria-label={`Sobre ${visto(cartao) ? nome(cartao) : 'um lugar desconhecido'}`}
             >
@@ -818,8 +853,6 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
               )}
             </div>
           )}
-        </div>
-      </div>
 
       {/* Tudo o que é escrito fica DENTRO do mapa: o ato em cima, a conta embaixo, o X para fechar */}
       <div className="pointer-events-none absolute inset-x-2 top-2 flex items-start justify-between gap-2">
@@ -833,13 +866,21 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
               </>
             ) : null}
           </p>
-          <p className="text-[10px] italic text-[#6a5a44]">Arraste para andar pelo mapa. Toque num lugar para ver.</p>
+          <p className="text-[10px] italic text-[#6a5a44]">Toque num lugar para ver. Use + e − para aproximar.</p>
         </div>
         <button type="button" autoFocus onClick={onFechar} className="pointer-events-auto border-4 border-double border-[#5a3a12] bg-[#c0283c] px-3 py-2 font-pixel text-[10px] text-white shadow-[3px_3px_0_#000]" aria-label="Fechar o mapa e voltar para a história">
           X
         </button>
       </div>
-      {estado.juntos && (
+      <div className="absolute bottom-2 right-2 flex flex-col gap-1">
+        <button type="button" onClick={() => mudarZoom(zoom + 0.75)} disabled={zoom >= 4} className="border-4 border-double border-[#5a3a12] bg-[#f4e6c0] px-3 py-1 font-pixel text-sm text-[#3a2412] shadow-[3px_3px_0_#000] disabled:opacity-40" aria-label="Aproximar o mapa">
+          +
+        </button>
+        <button type="button" onClick={() => mudarZoom(zoom - 0.75)} disabled={zoom <= 1} className="border-4 border-double border-[#5a3a12] bg-[#f4e6c0] px-3 py-1 font-pixel text-sm text-[#3a2412] shadow-[3px_3px_0_#000] disabled:opacity-40" aria-label="Afastar o mapa">
+          −
+        </button>
+      </div>
+      {estado.juntos && !cartao && (
         <div className="pointer-events-none absolute bottom-2 left-2 border-4 border-double border-[#5a3a12] bg-[#f4e6c0]/95 px-2 py-1 font-pixel text-[7px] leading-relaxed text-[#3a2412] shadow-[3px_3px_0_#000] sm:text-[9px]">
           SEGREDOS DE ROMA: {roma?.segredos?.length ?? 0}/{total}
           <br />

@@ -2049,20 +2049,21 @@
 .menos-movimento .nota-entra, .menos-movimento .nota-acende { animation: none; }
 
 /* O MAPA DE ROMA, versão 2 (24/11/2026): tudo mexe um pouquinho. */
-.mapa-rolagem { scrollbar-width: thin; scrollbar-color: #5a3a12 #0c0806; cursor: grab; }
-.mapa-onda { animation: mapa-onda 2.4s ease-in-out infinite alternate; }
+.mapa-rolagem { scrollbar-width: none; cursor: grab; background: radial-gradient(ellipse at center, #2a1a10, #0c0806 75%); }
+.mapa-rolagem::-webkit-scrollbar { display: none; }
+.mapa-onda { animation: mapa-onda 3.2s ease-in-out infinite alternate; }
 @keyframes mapa-onda { from { translate: -1.5px 0; opacity: 0.4; } to { translate: 1.5px 0; opacity: 1; } }
 .mapa-correnteza { animation: mapa-correnteza 3s linear infinite; }
 @keyframes mapa-correnteza { to { stroke-dashoffset: -18; } }
 .mapa-fumaca { transform-box: fill-box; transform-origin: center; animation: mapa-fumaca 2.6s ease-out infinite; }
 @keyframes mapa-fumaca { 0% { translate: 0 0; scale: 0.6; opacity: 0.8; } 100% { translate: 2px -7px; scale: 1.8; opacity: 0; } }
-.mapa-chama { animation: mapa-chama 0.35s steps(2) infinite alternate; }
-@keyframes mapa-chama { from { opacity: 0.65; } to { opacity: 1; } }
-.mapa-bandeira { transform-box: fill-box; transform-origin: left center; animation: mapa-bandeira 0.8s steps(2) infinite alternate; }
-@keyframes mapa-bandeira { from { scale: 1 1; } to { scale: 0.85 1.1; } }
-.mapa-plateia { animation: mapa-plateia 0.5s steps(2) infinite alternate; }
+.mapa-chama { animation: mapa-chama 0.9s ease-in-out infinite alternate; }
+@keyframes mapa-chama { from { opacity: 0.6; } to { opacity: 1; } }
+.mapa-bandeira { transform-box: fill-box; transform-origin: left center; animation: mapa-bandeira 1.6s ease-in-out infinite alternate; }
+@keyframes mapa-bandeira { from { transform: skewY(0deg) scaleX(1); } to { transform: skewY(8deg) scaleX(0.92); } }
+.mapa-plateia { animation: mapa-plateia 0.7s ease-in-out infinite alternate; }
 @keyframes mapa-plateia { from { translate: 0 0; } to { translate: 0 -0.5px; } }
-.mapa-estrela { animation: mapa-chama 1.2s steps(2) infinite alternate; }
+.mapa-estrela { animation: mapa-chama 1.8s ease-in-out infinite alternate; }
 .mapa-farol { animation: mapa-farol 2s ease-in-out infinite; }
 @keyframes mapa-farol { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 .mapa-barco { animation: mapa-barco 9s ease-in-out infinite alternate; }
@@ -2070,7 +2071,8 @@
 @keyframes mapa-barco { from { translate: -3px 0; } to { translate: 4px 1px; } }
 .mapa-gaivota { animation: mapa-gaivota 7s linear infinite; }
 @keyframes mapa-gaivota { 0% { translate: -14px 6px; } 50% { translate: 8px -4px; } 100% { translate: -14px 6px; } }
-.mapa-nevoa { animation: mapa-nuvem 9s ease-in-out infinite alternate; }
+.mapa-nevoa { animation: mapa-nevoa 7s ease-in-out infinite alternate; }
+@keyframes mapa-nevoa { from { translate: -2px 0; opacity: 0.85; } to { translate: 2px 0; opacity: 0.95; } }
 .mapa-trilha { animation: mapa-correnteza 1.6s linear infinite; }
 .mapa-biga { animation: mapa-biga 6s linear infinite; }
 @keyframes mapa-biga { 0% { translate: 0 0; } 50% { translate: 32px 0; } 50.1% { translate: 32px 4px; } 100% { translate: 0 4px; } }
