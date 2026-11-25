@@ -43,10 +43,12 @@ function ato(numero: number, titulo: string, lugar: string, pedacos: Pedaco[]): 
     if (p.corte) QUEM_DA_CENA.set(`u${numero}-corte-${k}`, p.heroi);
     if (p.corte) cenas.push({ tipo: 'cutscene', id: `u${numero}-corte-${k}`, quadros: [{ lugar: p.corte.lugar, texto: p.corte.texto, efeito: 'panoramica' }] });
     for (const c0 of p.cenas) {
-      const c = semCartaoAntigo(c0);
-      if (!c) continue;
-      QUEM_DA_CENA.set(c.id, p.heroi);
-      cenas.push(c);
+      const c1 = semCartaoAntigo(c0);
+      if (!c1) continue;
+      for (const c of ludusCurto(c1)) {
+        QUEM_DA_CENA.set(c.id, p.heroi);
+        cenas.push(c);
+      }
     }
   });
   return { numero, titulo, lugar, cenas };
@@ -89,6 +91,33 @@ function semChave(c: Cena | undefined): Cena[] {
   if (!c) return [];
   if (c.tipo !== 'explorar') return [c];
   return [{ ...c, pontos: c.pontos.filter((p) => !p.segredo) }];
+}
+
+/**
+ * O Ludus agora é um lugar (pelo mapa de Roma). As paradas no Ludus no meio dos atos viram só a
+ * conversa da história; o golpe obrigatório vira um treino rápido, direto, sem o pátio.
+ */
+const TREINO_OBRIGATORIO: Partial<Record<string, { evento: 'quebra' | 'riposta'; quantos: number; rotulo: string; explica: string; nome: string }>> = {
+  'quebra-guarda': { evento: 'quebra', quantos: 2, rotulo: 'GUARDAS QUEBRADAS', nome: 'QUEBRA-GUARDA', explica: 'Enquanto eu estiver na guarda (sem sinal, sem ABERTO): GOLPE, GOLPE, GOLPE, rápido! Duas vezes.' },
+  'contra-ataque': { evento: 'riposta', quantos: 3, rotulo: 'CONTRA-ATAQUES', nome: 'CONTRA-ATAQUE', explica: 'Segura o ESCUDO quando a espada vier e, assim que bloquear, DEVOLVER na hora! Três vezes.' },
+};
+function ludusCurto(c: Cena): Cena[] {
+  if (c.tipo !== 'ludus') return [c];
+  const falas = c.conversas.flatMap((cv) => cv.falas);
+  const cenas: Cena[] = falas.length ? [{ tipo: 'conversa', id: c.id, lugar: c.lugar, falas, presente: c.presente }] : [];
+  const tr = c.obrigatorio ? TREINO_OBRIGATORIO[c.obrigatorio] : undefined;
+  if (c.obrigatorio && tr)
+    cenas.push({
+      tipo: 'luta',
+      id: `${c.id}-treino`,
+      lugar: 'ludus-patio',
+      inimigo: 'boneco-de-treino',
+      treino: { evento: tr.evento, quantos: tr.quantos, rotulo: tr.rotulo },
+      aprende: c.obrigatorio,
+      antes: [{ quem: 'brutus', texto: tr.explica }],
+      depois: [{ quem: 'brutus', texto: `Isso! Esse é o ${tr.nome}. Agora é seu.` }],
+    });
+  return cenas;
 }
 
 /** Os créditos da Parte 1 (no lugar do "fim do caminho do Cassius"). */

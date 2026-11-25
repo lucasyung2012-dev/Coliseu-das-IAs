@@ -85,7 +85,7 @@ describe('a continuidade da Parte 1 (24/11/2026)', () => {
   });
   it('o elmo do Brutus é dado uma vez só e "os três juntos, pela primeira vez" não se repete', () => {
     const a5 = atos[4]!;
-    expect(a5.cenas.filter((c) => c.tipo === 'ludus' && c.presente === 'elmo-brutus').length).toBe(1);
+    expect(a5.cenas.filter((c) => (c.tipo === 'ludus' || c.tipo === 'conversa') && c.presente === 'elmo-brutus').length).toBe(1);
     expect(textos(a5).filter((t) => /pela primeira vez/.test(t) && /três juntos/.test(t)).length).toBe(0);
   });
   it('o Titã cai e o Censor muda de lado antes do Núcleo; o "meses depois" vem só no fim', () => {
@@ -107,5 +107,22 @@ describe('a arena de revanche do Ludus (24/11/2026)', () => {
   });
   it('no fim da Parte 1, todos os chefões da Parte 1 estão lá', () => {
     expect(chefoesVencidos(7, 0).length).toBeGreaterThanOrEqual(14);
+  });
+});
+
+describe('as paradas no Ludus viraram conversa (24/11/2026)', () => {
+  const atos = parte1();
+  it('depois do Encontro, nenhum ato obriga a passar pelo pátio do Ludus', () => {
+    for (const a of atos.slice(3)) expect(a.cenas.filter((c) => c.tipo === 'ludus').map((c) => c.id), a.titulo).toEqual([]);
+  });
+  it('o QUEBRA-GUARDA continua obrigatório, como um treino rápido que ensina o golpe', () => {
+    const treino = atos[3]!.cenas.find((c) => c.id === 'c5-ludus-treino');
+    expect(treino?.tipo === 'luta' && treino.aprende).toBe('quebra-guarda');
+    expect(treino?.tipo === 'luta' && treino.treino?.evento).toBe('quebra');
+  });
+  it('as conversas da história continuam (o elmo, a Lívia com medo antes do Fórum)', () => {
+    const c5 = atos[3]!.cenas.find((c) => c.id === 'c5-ludus');
+    expect(c5?.tipo).toBe('conversa');
+    expect(c5?.tipo === 'conversa' && c5.falas.some((f) => /medo/.test(f.texto))).toBe(true);
   });
 });

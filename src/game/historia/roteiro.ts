@@ -192,7 +192,7 @@ export interface OpcaoEscolha {
 
 export type Cena = (
   | { tipo: 'cutscene'; id: string; quadros: Quadro[] }
-  | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[] }
+  | { tipo: 'conversa'; id: string; lugar: Lugar; falas: Fala[]; /** Presente ao fim da conversa (o elmo do Brutus). */ presente?: Equipamento }
   | {
       tipo: 'explorar';
       id: string;
@@ -211,6 +211,8 @@ export type Cena = (
       depois?: Fala[];
       /** Luta de treino: não dá para perder; acaba quando faz `quantos` vezes o `evento`. */
       treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
+      /** Golpe que o treino ensina (fica no save quando o treino acaba). */
+      aprende?: Tecnica;
       /** Como o inimigo chega (sem isso, o jeito vem do tipo de bicho). */
       entrada?: EntradaInimigo;
       /** Luta no mapa aberto, andando (o teste do Rato-Rei com o Lucas), no lugar do duelo. */

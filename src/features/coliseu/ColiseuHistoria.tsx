@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, guardarNota, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, guardarNota, ganharEquipamento, aprender, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
 import { BAIRROS, bairrosParaPassear, cenaDePasseio, estadoRoma, type BairroId } from '@/game/historia/roma';
 import { LegendaRoma, MapaRoma } from './MapaRoma';
@@ -570,7 +570,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
   if (cena.tipo === 'conversa')
     return (
       <Palco lugar={cena.lugar}>
-        <Falas falas={cena.falas} onFim={() => proxima()} />
+        <Falas falas={cena.falas} onFim={() => proxima(cena.presente ? ganharEquipamento(save, cena.presente) : save)} />
       </Palco>
     );
   if (cena.tipo === 'explorar' && cena.mapa && MAPAS[cena.mapa])
@@ -666,13 +666,17 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         heroi={heroi}
         antes={cena.antes}
         depois={cena.depois}
-        atributos={equipe?.[heroi as 'cassius'] ?? atributos}
-        equipe={equipe}
+        atributos={
+          cena.aprende
+            ? { ...(equipe?.[heroi as 'cassius'] ?? atributos), tecnicas: [...((equipe?.[heroi as 'cassius'] ?? atributos).tecnicas ?? []), cena.aprende] }
+            : (equipe?.[heroi as 'cassius'] ?? atributos)
+        }
+        equipe={cena.aprende ? undefined : equipe}
         treino={cena.treino}
         entrada={cena.entrada}
         explicarNota={!save.notaVista}
         onVitoria={(n, nota) => gravarSaveHistoria(guardarNota(ganharPecas(save, n), cena.inimigo, nota))}
-        onFim={() => proxima()}
+        onFim={() => proxima(cena.aprende ? aprender(save, cena.aprende) : save)}
       />
     );
   if (cena.tipo === 'mundo') {
