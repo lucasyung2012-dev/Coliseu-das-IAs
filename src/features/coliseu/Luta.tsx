@@ -627,8 +627,12 @@ export function LutaHistoria({
 
   // Fim da luta e os sons de cada acontecimento.
   useEffect(() => {
+    // O especial que acabou com a luta (ex.: o ECLIPSE do Helios como golpe final): a cena de cinema
+    // toca inteira antes da vitória (antes, a tela de vitória cobria e "o cara só morria").
+    let especialAgora = false;
     for (const ev of e.eventos) {
       if (ev.id <= visto.current) continue;
+      if (NOME_ESPECIAL[ev.tipo] && !treino) especialAgora = true;
       const som = SOM[ev.tipo];
       if (som) tocar(som);
       if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao' || ev.tipo === 'arremate') setCombo((c) => c + 1);
@@ -650,6 +654,11 @@ export function LutaHistoria({
     }
     visto.current = Math.max(visto.current, ...e.eventos.map((x) => x.id), 0);
     if (fase === 'luta' && e.fim === 'vitoria') {
+      if (especialAgora) {
+        // Espera a cena do especial e o inimigo cair; depois roda a vitória de novo (sem especial novo).
+        window.setTimeout(() => setE((s) => ({ ...s })), 1900);
+        return;
+      }
       tocar('vitoria');
       const n = def.chefao && !treino
         ? notaDosPontos(pontosDaLuta({ vidaPct: e.jogador.vida / e.jogador.vidaMax, segundos: e.tempo / 1000, perfeitas: perfeitas.current, quedas: tentativas - 1 + quedasAntes }))

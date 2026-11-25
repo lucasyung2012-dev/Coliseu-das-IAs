@@ -4,6 +4,7 @@ import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
 import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, guardarNota, ganharEquipamento, aprender, achouEmRoma, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
+import { MapaDeRoma } from './MapaDeRoma';
 import { BAIRROS, bairrosParaPassear, estadoRoma, mundoDePasseio, TOTAL_ROMA, type BairroId } from '@/game/historia/roma';
 import { LegendaRoma, MapaRoma } from './MapaRoma';
 import { ModoTeste } from './ModoTeste';
@@ -427,59 +428,27 @@ export default function ColiseuHistoria() {
           })()}
         {/* O mapa grande de Roma, aberto pelo minimapa */}
         {tela.tipo === 'jogo' && save?.unica && mapaAberto && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-3" role="dialog" aria-modal="true" aria-label="Mapa de Roma">
-            <div className="flex max-h-[94vh] w-full max-w-3xl flex-col gap-3 overflow-y-auto border-4 border-[#c8962a] bg-[linear-gradient(180deg,#2a1a10,#120806)] p-3 sm:p-4">
-              <p className="text-center font-pixel text-base text-[#f2c14e] [text-shadow:2px_2px_0_#5a2a12] sm:text-xl">MAPA DE ROMA</p>
-              <MapaRoma estado={estadoRoma(save.capitulo, save.cena)} />
-              <LegendaRoma estado={estadoRoma(save.capitulo, save.cena)} ato={capitulosDoSave(save)[save.capitulo - 1]?.titulo} roma={{ segredos: save.roma?.segredos?.length ?? 0, pedidos: save.roma?.pedidos?.length ?? 0, total: TOTAL_ROMA }} />
-              {/* A ROMA LIVRE: depois do Encontro, os bairros já visitados abrem para passear */}
-              {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).length > 0 ? (
-                <div className="flex flex-col gap-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      desbloquear();
-                      tocar('portao');
-                      setLudusAberto(true);
-                    }}
-                    className="pixel-box mb-1 px-3 py-2 font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]"
-                  >
-                    IR AO LUDUS (A CASA DE VOCÊS)
-                  </button>
-                  <p className="font-pixel text-[9px] text-[#f2c14e]">PASSEAR POR ROMA</p>
-                  <div className="flex flex-wrap gap-1">
-                    {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).map((b) => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => {
-                          desbloquear();
-                          tocar('passos');
-                          setPasseio(b);
-                        }}
-                        className="pixel-box px-2 py-1 font-pixel text-[8px] text-[#f4e2b4] sm:text-[9px]"
-                      >
-                        {BAIRROS.find((x) => x.id === b)?.nome}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-[11px] text-muted">Depois do Encontro, os bairros já visitados abrem para passear.</p>
-              )}
-              <button
-                type="button"
-                autoFocus
-                onClick={() => {
-                  tocar('clique');
-                  setMapaAberto(false);
-                }}
-                className="pixel-box px-4 py-3 font-pixel text-[10px] text-[#f4e2b4] sm:text-xs"
-              >
-                ◀ VOLTAR PARA A HISTÓRIA
-              </button>
-            </div>
-          </div>
+          <MapaDeRoma
+            estado={estadoRoma(save.capitulo, save.cena)}
+            titulo={capitulosDoSave(save)[save.capitulo - 1]?.titulo}
+            roma={save.roma}
+            total={TOTAL_ROMA}
+            entrar={bairrosParaPassear(estadoRoma(save.capitulo, save.cena))}
+            onEntrar={(b) => {
+              desbloquear();
+              tocar('passos');
+              setPasseio(b);
+            }}
+            onLudus={() => {
+              desbloquear();
+              tocar('portao');
+              setLudusAberto(true);
+            }}
+            onFechar={() => {
+              tocar('clique');
+              setMapaAberto(false);
+            }}
+          />
         )}
       </div>
     </main>
