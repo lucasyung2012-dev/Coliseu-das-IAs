@@ -1,6 +1,7 @@
 import { parte1 } from '@/game/historia/historiaUnica';
 import { BAIRROS, bairroDaCena, bairrosParaPassear, estadoRoma, mundoDePasseio, PASSEIOS, type BairroId } from '@/game/historia/roma';
 import { livre } from '@/game/historia/mundo';
+import { ALTURA_RUAS, LARGURA_RUAS, mapaDasRuas, mundoDasRuas, PORTAS } from '@/game/historia/ruas';
 import { achouEmRoma, criarSaveUnica } from '@/game/historia/saves';
 
 /** O mapa de Roma (22/11/2026): os bairros, onde a história está e onde cada um dos três está. */
@@ -73,5 +74,35 @@ describe('os bairros vivos (24/11/2026)', () => {
     const depois = bairrosParaPassear(estadoRoma(3, 2));
     expect(depois.length).toBeGreaterThan(0);
     expect(depois).not.toContain('aqueduto');
+  });
+});
+
+describe('Roma caminhável (25/11/2026)', () => {
+  it('a cidade tem 64 × 40 ladrilhos, todas as linhas do mesmo tamanho', () => {
+    const m = mapaDasRuas();
+    expect(m.length).toBe(ALTURA_RUAS);
+    for (const l of m) expect(l.length).toBe(LARGURA_RUAS);
+  });
+  it('de qualquer porta dá para chegar a pé em todas as outras', () => {
+    const m = mundoDasRuas({ ato: 4, inicio: 'coliseu', visitados: [], segredos: [], abertos: [] });
+    const ok = (x: number, y: number) => y >= 0 && y < m.mapa.length && x >= 0 && x < m.mapa[0]!.length && livre(m, x + 0.5, y + 0.8);
+    const visto = new Set<string>([`${m.inicio[0]},${m.inicio[1]}`]);
+    const fila: [number, number][] = [m.inicio];
+    expect(ok(...m.inicio)).toBe(true);
+    for (let i = 0; i < fila.length; i++) {
+      const [x, y] = fila[i]!;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const k = `${x + dx},${y + dy}`;
+        if (visto.has(k) || !ok(x + dx, y + dy)) continue;
+        visto.add(k);
+        fila.push([x + dx, y + dy]);
+      }
+    }
+    for (const [b, [px, py]] of Object.entries(PORTAS)) expect(visto.has(`${px},${py}`), b).toBe(true);
+  });
+  it('a Pintora de Estrelas dá a dica de um segredo que falta, num lugar já visitado', () => {
+    const m = mundoDasRuas({ ato: 4, inicio: 'forum', visitados: ['subura', 'porto'], segredos: ['subura'], abertos: ['subura'] });
+    const p = m.pessoas.find((x) => x.id === 'pintora')!;
+    expect(p.falas.some((f) => /PORTO DE ÓSTIA/.test(f.texto))).toBe(true);
   });
 });

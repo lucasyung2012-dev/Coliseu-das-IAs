@@ -431,6 +431,7 @@ const CORES: Record<TemaMundo, { chao1: string; chao2: string; parede1: string; 
   aqueduto: { chao1: '#a8a08c', chao2: '#9e9682', parede1: '#2a3a6a', parede2: '#34447a', face: '#8a826e', faceTopo: '#b8ae98', escuro: 0.3 },
   templo: { chao1: '#d8ccb4', chao2: '#cec2aa', parede1: '#6a5e4c', parede2: '#746856', face: '#b8ac94', faceTopo: '#e0d4bc', escuro: 0.4 },
   arena: { chao1: '#c8a870', chao2: '#c0a068', parede1: '#5a4a38', parede2: '#645240', face: '#8a7a64', faceTopo: '#a89880', escuro: 0.25 },
+  rua: { chao1: '#bcae90', chao2: '#b0a284', parede1: '#6a5a46', parede2: '#76644e', face: '#a8926e', faceTopo: '#c8b28a', escuro: 0.1 },
 };
 
 /** O inimigo de ronda no mapa: o mesmo desenho da luta, parado (feito uma vez só). */
@@ -593,6 +594,17 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
                   <rect x={X + 1 + (r % 2) * 4} y={Y + r * 4} width="3" height="1" fill="#c86a48" opacity="0.6" />
                 </g>
               ))}
+            </g>
+          );
+        if (mundo.tema === 'rua')
+          return (
+            <g key={`c${k}`}>
+              <rect x={X} y={Y} width={PX} height={PX} fill={cor1} />
+              <rect x={X} y={Y + 7} width={PX} height="1" fill="#958668" />
+              <rect x={X} y={Y + 15} width={PX} height="1" fill="#958668" />
+              <rect x={X + (y % 2 ? 4 : 11)} y={Y} width="1" height="7" fill="#958668" />
+              <rect x={X + (y % 2 ? 11 : 4)} y={Y + 8} width="1" height="7" fill="#958668" />
+              <rect x={X + ((x * 5 + y * 3) % 10) + 2} y={Y + 2} width="2" height="1" fill="#d4c8a8" opacity="0.7" />
             </g>
           );
         if (mundo.tema === 'arena')
@@ -1512,9 +1524,83 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
             </g>,
           );
       }
+      // ---- Roma caminhável (25/11/2026): grama, árvore, casa e ponte ----
+      if (c === ',' || c === '^')
+        fundo.push(
+          <g key={`gr${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill={(x + y) % 3 ? '#8fae62' : '#94b266'} />
+            <rect x={X + ((x * 7 + y * 3) % 12) + 1} y={Y + ((x * 3 + y * 5) % 11) + 2} width="2" height="1" fill="#7a9a50" />
+            <rect x={X + ((x * 3 + y * 7) % 12) + 2} y={Y + ((x * 5 + y) % 10) + 3} width="1" height="2" fill="#a8c47a" />
+            {(x * 13 + y * 7) % 9 === 0 && <rect x={X + 6} y={Y + 9} width="2" height="2" fill={(x + y) % 2 ? '#f0e070' : '#f0f0f0'} />}
+          </g>,
+        );
+      if (c === '^')
+        pecas.push(
+          <g key={`ar${k}`}>
+            <ellipse cx={X + 9} cy={Y + 15} rx="7" ry="2" fill="#000" opacity="0.2" />
+            <rect x={X + 7} y={Y + 7} width="2" height="8" fill="#5a3a1c" />
+            <ellipse cx={X + 8} cy={Y + 4} rx="9" ry="6" fill="#3a6430" />
+            <ellipse cx={X + 6} cy={Y + 2} rx="5" ry="3" fill="#4e7e3e" />
+            <rect x={X + 3} y={Y + 1} width="2" height="1" fill="#6a9a50" />
+          </g>,
+        );
+      if (c === '%') {
+        const bloco = Math.floor(x / 5) + Math.floor(y / 4) * 7;
+        const telhado = ['#b8543a', '#a24a30', '#c8683e', '#9a4028'][bloco % 4]!;
+        const baixo = t(x, y + 1) !== '%';
+        const cima = t(x, y - 1) !== '%';
+        pecas.push(
+          <g key={`ca${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill={telhado} />
+            {[0, 1, 2].map((r) => (
+              <rect key={r} x={X} y={Y + r * 5 + 4} width={PX} height="1" fill="#000" opacity="0.18" />
+            ))}
+            {[0, 1, 2].map((r) => (
+              <rect key={`v${r}`} x={X + ((r + y) % 2) * 4 + 3} y={Y + r * 5} width="1" height="4" fill="#000" opacity="0.12" />
+            ))}
+            {cima && <rect x={X} y={Y} width={PX} height="2" fill="#e0905a" opacity="0.6" />}
+            {t(x - 1, y) !== '%' && <rect x={X} y={Y} width="1" height={PX} fill="#5a2418" opacity="0.5" />}
+            {t(x + 1, y) !== '%' && <rect x={X + PX - 1} y={Y} width="1" height={PX} fill="#5a2418" opacity="0.5" />}
+            {baixo && (
+              <>
+                <rect x={X} y={Y + 8} width={PX} height="8" fill={bloco % 3 ? '#e2cc9c' : '#d8bc8a'} />
+                <rect x={X} y={Y + 8} width={PX} height="1" fill="#6a2a1c" />
+                {(x + bloco) % 3 === 1 ? (
+                  <>
+                    <rect x={X + 5} y={Y + 10} width="6" height="6" fill="#5a3a1c" />
+                    <rect x={X + 9} y={Y + 13} width="1" height="1" fill="#d8a83a" />
+                  </>
+                ) : (
+                  <>
+                    <rect x={X + 3} y={Y + 10} width="4" height="3" fill="#3a2a1a" />
+                    <rect x={X + 9} y={Y + 10} width="4" height="3" fill="#3a2a1a" />
+                    <rect x={X + 3} y={Y + 13} width="4" height="1" fill="#8a5a2a" />
+                    {(x * 3 + y) % 4 === 0 && <rect x={X + 9} y={Y + 13} width="4" height="2" fill="#c0283c" />}
+                  </>
+                )}
+              </>
+            )}
+          </g>,
+        );
+      }
+      if (c === '=')
+        fundo.push(
+          <g key={`pt${k}`}>
+            <rect x={X} y={Y} width={PX} height={PX} fill="#b8a888" />
+            {[3, 7, 11].map((r) => (
+              <rect key={r} x={X} y={Y + r} width={PX} height="1" fill="#9a8a6a" />
+            ))}
+            {(t(x, y - 1) === 'w' || t(x, y - 1) === '#') && <rect x={X} y={Y} width={PX} height="2" fill="#7a6a50" />}
+            {(t(x, y + 1) === 'w' || t(x, y + 1) === '#') && <rect x={X} y={Y + 14} width={PX} height="2" fill="#7a6a50" />}
+            {(t(x - 1, y) === 'w') && <rect x={X} y={Y} width="2" height={PX} fill="#7a6a50" />}
+            {(t(x + 1, y) === 'w') && <rect x={X + 14} y={Y} width="2" height={PX} fill="#7a6a50" />}
+          </g>,
+        );
       if (c === 'P') pecas.push(<DesenhoSaida key={`sa${k}`} estilo={mundo.saida?.estilo ?? 'escada'} X={X} Y={Y} />);
     }),
   );
+  // As fachadas dos lugares (Roma caminhável), por cima das paredes.
+  for (const f of mundo.fachadas ?? []) pecas.push(<Fachada key={`fa${f.id}`} id={f.id} X={f.x * PX} Y={f.y * PX} nome={f.nome} />);
   return (
     <svg viewBox={`0 0 ${W * PX} ${H * PX}`} className="absolute inset-0 h-full w-full" shapeRendering="crispEdges" aria-hidden>
       {fundo}
@@ -1523,3 +1609,219 @@ export const MapaDesenhado = memo(function MapaDesenhado({ mundo }: { mundo: Mun
     </svg>
   );
 });
+
+/**
+ * A fachada de cada lugar na Roma caminhável (5 × 4 ladrilhos = 80 × 64 pixels), com a placa
+ * do nome em cima e a porta embaixo, no meio (é lá que se entra).
+ */
+function Fachada({ id, X, Y, nome }: { id: string; X: number; Y: number; nome: string }) {
+  const r = (x: number, y: number, w: number, h: number, cor: string, k?: string | number) => <rect key={k} x={X + x} y={Y + y} width={w} height={h} fill={cor} />;
+  const colunas = (n: number, de: number, ate: number, cor: string) =>
+    Array.from({ length: n }, (_, k) => {
+      const cx = 6 + (k * 68) / (n - 1);
+      return (
+        <g key={`col${k}`}>
+          {r(cx - 3, de, 6, 2, '#c8bca8')}
+          {r(cx - 2, de + 2, 4, ate - de - 4, cor)}
+          {r(cx - 1, de + 2, 1, ate - de - 4, '#ffffff')}
+          {r(cx - 3, ate - 2, 6, 2, '#c8bca8')}
+        </g>
+      );
+    });
+  const porta = (cor = '#2a1a10') => (
+    <g>
+      {r(31, 40, 18, 24, cor)}
+      <path d={`M ${X + 31} ${Y + 40} A 9 7 0 0 1 ${X + 49} ${Y + 40} Z`} fill={cor} />
+      {r(33, 44, 14, 20, '#000')}
+      <rect x={X + 31} y={Y + 63} width="18" height="1" fill="#f2c14e" opacity="0.6" />
+    </g>
+  );
+  let corpo: ReactNode = null;
+  switch (id) {
+    case 'biblioteca':
+    case 'templo':
+    case 'forum':
+      corpo = (
+        <g>
+          {r(0, 56, 80, 8, '#b8ac98')}
+          {r(2, 52, 76, 4, '#c8bca8')}
+          {r(2, 20, 76, 32, id === 'forum' ? '#e8e0d0' : '#ece0c4')}
+          {colunas(6, 20, 52, '#f8f4ec')}
+          {r(0, 14, 80, 6, '#d8ccb4')}
+          {r(0, 19, 80, 1, '#8a7a60')}
+          {id === 'templo' ? (
+            <path d={`M ${X + 6} ${Y + 14} Q ${X + 40} ${Y - 10} ${X + 74} ${Y + 14} Z`} fill="#c8963a" stroke="#7a5a1a" />
+          ) : (
+            <polygon points={`${X},${Y + 14} ${X + 40},${Y - 2} ${X + 80},${Y + 14}`} fill={id === 'biblioteca' ? '#9a4a30' : '#d8ccb4'} stroke="#5a3a1a" />
+          )}
+          {id === 'biblioteca' && (
+            <g>
+              {/* o rolo de pergaminho no frontão */}
+              {r(32, 6, 16, 4, '#f4ecd0')}
+              {r(31, 5, 2, 6, '#c8a878')}
+              {r(47, 5, 2, 6, '#c8a878')}
+            </g>
+          )}
+          {id === 'forum' && (
+            <g>
+              {/* o estandarte vermelho com o Olho */}
+              {r(66, 22, 1, 26, '#4a2a12')}
+              {r(67, 22, 10, 14, '#c0283c')}
+              <ellipse cx={X + 72} cy={Y + 29} rx="3.5" ry="2" fill="#f0e8d8" />
+              <circle cx={X + 72} cy={Y + 29} r="1.2" fill="#1a1a1a" />
+            </g>
+          )}
+          {id === 'templo' && <circle className="mapa-fumaca" cx={X + 40} cy={Y - 4} r="3" fill="#c8b8e0" />}
+          {porta()}
+        </g>
+      );
+      break;
+    case 'coliseu':
+      corpo = (
+        <g>
+          {r(0, 0, 80, 64, '#c8a070')}
+          {[0, 1, 2].map((fila) =>
+            Array.from({ length: 5 }, (_, k) => (
+              <g key={`${fila}-${k}`}>
+                {r(4 + k * 15, 6 + fila * 18, 10, 12, '#4a2a12')}
+                <path d={`M ${X + 4 + k * 15} ${Y + 6 + fila * 18} A 5 4 0 0 1 ${X + 14 + k * 15} ${Y + 6 + fila * 18} Z`} fill="#c8a070" />
+                {r(2 + k * 15, 4 + fila * 18, 2, 14, '#e0bc88')}
+              </g>
+            )),
+          )}
+          {r(0, 0, 80, 3, '#e0bc88')}
+          {r(0, 18, 80, 2, '#a88050')}
+          {r(0, 36, 80, 2, '#a88050')}
+          {[10, 40, 70].map((d) => (
+            <g key={d}>
+              {r(d, -10, 1, 10, '#4a2a12')}
+              <rect className="mapa-bandeira" x={X + d + 1} y={Y - 10} width="7" height="5" fill="#c0283c" />
+            </g>
+          ))}
+          {porta('#3a1e0e')}
+        </g>
+      );
+      break;
+    case 'ludus':
+      corpo = (
+        <g>
+          {r(0, 8, 80, 56, '#8a5a2a')}
+          {Array.from({ length: 10 }, (_, k) => r(k * 8, 2, 7, 62, k % 2 ? '#7a4a22' : '#8a5a2a', k))}
+          {Array.from({ length: 10 }, (_, k) => (
+            <polygon key={`p${k}`} points={`${X + k * 8},${Y + 2} ${X + k * 8 + 3.5},${Y - 3} ${X + k * 8 + 7},${Y + 2}`} fill="#6a3a18" />
+          ))}
+          {r(0, 30, 80, 3, '#4a2a12')}
+          {/* as espadas cruzadas em cima do portão */}
+          <line x1={X + 32} y1={Y + 12} x2={X + 48} y2={Y + 26} stroke="#d8d8e0" strokeWidth="2" />
+          <line x1={X + 48} y1={Y + 12} x2={X + 32} y2={Y + 26} stroke="#d8d8e0" strokeWidth="2" />
+          {r(27, 10, 26, 2, '#f2c14e')}
+          {[2, 72].map((d) => (
+            <g key={d}>
+              {r(d, 14, 6, 14, '#1a2a5a')}
+              {[0, 1, 2].map((j) => r(d + 2, 16 + j * 4, 2, 2, '#f2c14e', j))}
+            </g>
+          ))}
+          {porta('#5a3a1c')}
+        </g>
+      );
+      break;
+    case 'subura':
+      corpo = (
+        <g>
+          {r(0, 0, 80, 64, '#e2cc9c')}
+          {r(0, 0, 80, 4, '#a24a30')}
+          {[8, 24].map((fy) => [6, 22, 52, 68].map((fx) => <g key={`${fx}${fy}`}>{r(fx, fy, 7, 8, '#3a2a1a')}{r(fx, fy + 8, 7, 2, '#8a5a2a')}</g>))}
+          {/* o varal */}
+          <path d={`M ${X + 14} ${Y + 20} Q ${X + 40} ${Y + 26} ${X + 66} ${Y + 20}`} stroke="#5a4a3a" fill="none" />
+          {[['#c0283c', 24], ['#2a6aa0', 34], ['#f2c14e', 46], ['#3a8a4a', 56]].map(([c, d]) => r(d as number, 22, 5, 7, c as string, d as number))}
+          {/* o toldo da feira em cima da porta */}
+          {Array.from({ length: 8 }, (_, k) => r(20 + k * 5, 34, 5, 5, k % 2 ? '#f0e8d8' : '#c0283c', `t${k}`))}
+          {/* três estrelas pintadas no muro */}
+          {[0, 6, 12].map((d) => r(58 + d, 44, 3, 3, '#f2c14e', `e${d}`))}
+          {porta('#5a3a1c')}
+        </g>
+      );
+      break;
+    case 'aqueduto':
+      corpo = (
+        <g>
+          {r(0, 0, 80, 10, '#b8ac94')}
+          {r(0, 2, 80, 4, '#4a7ab8')}
+          <line x1={X} y1={Y + 4} x2={X + 80} y2={Y + 4} className="mapa-correnteza" stroke="#c8e0ff" strokeWidth="1" strokeDasharray="3 5" />
+          {[0, 1, 2, 3].map((k) => (
+            <g key={k}>
+              {r(k * 20, 10, 20, 54, '#b8ac94')}
+              {k !== 2 && r(k * 20 + 4, 22, 12, 42, '#6a8a5a')}
+              {k !== 2 && <path d={`M ${X + k * 20 + 4} ${Y + 22} A 6 6 0 0 1 ${X + k * 20 + 16} ${Y + 22} Z`} fill="#6a8a5a" />}
+            </g>
+          ))}
+          {/* a água caindo do lado */}
+          <rect className="mapa-correnteza" x={X + 76} y={Y + 6} width="3" height="40" fill="#6aa0e0" opacity="0.7" />
+          {porta('#3a3a4a')}
+        </g>
+      );
+      break;
+    case 'catacumbas':
+      corpo = (
+        <g>
+          {r(8, 10, 64, 54, '#5a5048')}
+          <polygon points={`${X + 4},${Y + 12} ${X + 40},${Y - 2} ${X + 76},${Y + 12}`} fill="#4a4038" />
+          {[14, 22, 54, 62].map((d) => r(d, 18, 4, 4, '#3a3028', d))}
+          {/* a pena dos Copistas riscada na pedra */}
+          <path d={`M ${X + 16} ${Y + 36} Q ${X + 22} ${Y + 28} ${X + 26} ${Y + 30}`} stroke="#d8d0c0" fill="none" />
+          {[-4, 0, 4].map((d, k) => (
+            <circle key={d} className="mapa-chama" cx={X + 40 + d} cy={Y + 58} r="1.4" fill="#ffd04a" style={{ animationDelay: `${k * 200}ms` }} />
+          ))}
+          {porta('#0c0a08')}
+        </g>
+      );
+      break;
+    case 'porto':
+      corpo = (
+        <g>
+          {r(0, 6, 80, 58, '#c8b080')}
+          {Array.from({ length: 10 }, (_, k) => r(k * 8, 6, 1, 58, '#a89060', k))}
+          <polygon points={`${X - 2},${Y + 8} ${X + 40},${Y - 4} ${X + 82},${Y + 8}`} fill="#9a4028" />
+          {/* a âncora pintada */}
+          <path d={`M ${X + 14} ${Y + 18} L ${X + 14} ${Y + 32} M ${X + 9} ${Y + 28} Q ${X + 14} ${Y + 35} ${X + 19} ${Y + 28} M ${X + 11} ${Y + 20} L ${X + 17} ${Y + 20}`} stroke="#2a3a5a" strokeWidth="2" fill="none" />
+          {[[58, 48], [66, 52], [62, 40]].map(([cx, cy], k) => (
+            <g key={k}>
+              {r(cx!, cy!, 10, 10, '#a8783a')}
+              <path d={`M ${X + cx!} ${Y + cy!} L ${X + cx! + 10} ${Y + cy! + 10} M ${X + cx! + 10} ${Y + cy!} L ${X + cx!} ${Y + cy! + 10}`} stroke="#5a3a1a" />
+            </g>
+          ))}
+          {porta('#3a2414')}
+        </g>
+      );
+      break;
+    case 'observatorio':
+      corpo = (
+        <g>
+          {r(4, 28, 72, 36, '#c8c0b0')}
+          <path d={`M ${X + 4} ${Y + 28} A 36 30 0 0 1 ${X + 76} ${Y + 28} Z`} fill="#7a8aa8" stroke="#3a4a6a" strokeWidth="2" />
+          {r(36, 0, 8, 28, '#1a2238')}
+          <line x1={X + 40} y1={Y + 14} x2={X + 62} y2={Y - 8} stroke="#c8963a" strokeWidth="5" />
+          {[[8, -6], [18, -12], [28, -6]].map(([dx, dy], k) => (
+            <g key={k} className="mapa-estrela" style={{ animationDelay: `${k * 300}ms` }}>
+              {r(dx! - 1, dy! - 3, 2, 6, '#f2c14e')}
+              {r(dx! - 3, dy! - 1, 6, 2, '#f2c14e')}
+            </g>
+          ))}
+          {porta('#1a2238')}
+        </g>
+      );
+      break;
+  }
+  const w = nome.length * 5 + 10;
+  return (
+    <g>
+      <rect x={X + 3} y={Y + 3} width="80" height="64" fill="#000" opacity="0.15" />
+      {corpo}
+      {/* a placa com o nome */}
+      <rect x={X + 40 - w / 2} y={Y - 22} width={w} height="10" fill="#f4e6c0" stroke="#5a3a12" strokeWidth="1.5" />
+      <text x={X + 40} y={Y - 14.5} textAnchor="middle" fontSize="6" textLength={nome.length * 5} lengthAdjust="spacingAndGlyphs" fill="#3a2412" className="font-pixel">
+        {nome}
+      </text>
+    </g>
+  );
+}

@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as PE, 
 import type { IaId } from '@/game/personagens';
 import { BAIRROS, type BairroId, type EstadoRoma, type HeroiRoma } from '@/game/historia/roma';
 import { GladiadorPixel } from '@/ui/pixel/Personagens';
+import { CIRCO, H, MURALHA, naMuralha, pertoDaLinha, POS, RIO, RUAS, W } from '@/game/historia/romaGeo';
 
 /**
  * O MAPA DE ROMA, VERSÃO 2 (24/11/2026, pedido do Lucas: "muito mais detalhado, sem botões
@@ -12,23 +13,7 @@ import { GladiadorPixel } from '@/ui/pixel/Personagens';
  * o Olho do Censor nos estandartes a partir do Ato 4, a plateia lotando o Coliseu no Ato 5 e o
  * eclipse no Ato 6. Patrulhas de pretorianos andam pelas ruas enquanto vocês são foragidos.
  */
-const W = 320;
-const H = 200;
 const IA_DO_HEROI: Record<HeroiRoma, IaId> = { cassius: 'claude', octavius: 'chatgpt', helios: 'gemini' };
-
-/** Onde fica cada lugar no mapa grande. */
-const POS: Record<BairroId, [number, number]> = {
-  biblioteca: [150, 42],
-  observatorio: [286, 30],
-  templo: [264, 70],
-  subura: [212, 64],
-  forum: [178, 98],
-  coliseu: [224, 118],
-  ludus: [266, 136],
-  aqueduto: [300, 96],
-  catacumbas: [204, 178],
-  porto: [40, 156],
-};
 
 /** O que cada lugar é (no cartão). Rascunho: o Lucas reescreve. */
 const SOBRE: Record<BairroId, { tipo: string; texto: string }> = {
@@ -80,32 +65,6 @@ function sorteio(semente: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-
-// O rio Tibre, a muralha e as ruas.
-const RIO: [number, number][] = [[160, 0], [152, 18], [138, 36], [132, 56], [132, 76], [124, 100], [106, 126], [82, 150], [62, 168], [50, 178]];
-const MURALHA = { cx: 202, cy: 100, rx: 102, ry: 72 };
-const RUAS: [number, number][][] = [
-  [[178, 98], [224, 118]],
-  [[178, 98], [212, 64]],
-  [[212, 64], [264, 70]],
-  [[264, 70], [300, 96]],
-  [[224, 118], [266, 136]],
-  [[224, 118], [204, 160], [204, 178], [204, 200]],
-  [[178, 98], [150, 42], [150, 0]],
-  [[178, 98], [140, 96], [124, 100], [100, 112], [70, 140], [40, 156]],
-  [[264, 70], [286, 30]],
-  [[212, 64], [232, 30], [250, 0]],
-  [[266, 136], [304, 120], [320, 116]],
-];
-const dist = (px: number, py: number, [ax, ay]: [number, number], [bx, by]: [number, number]) => {
-  const dx = bx - ax;
-  const dy = by - ay;
-  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1)));
-  return Math.hypot(px - ax - t * dx, py - ay - t * dy);
-};
-const pertoDaLinha = (x: number, y: number, l: [number, number][], d: number) => l.some((p, k) => k > 0 && dist(x, y, l[k - 1]!, p) < d);
-const naMuralha = (x: number, y: number, folga = 1) => ((x - MURALHA.cx) / MURALHA.rx) ** 2 + ((y - MURALHA.cy) / MURALHA.ry) ** 2 < folga;
-const CIRCO: [number, number] = [178, 142];
 
 // As casas (insulae) e as árvores, sorteadas uma vez só.
 const CASAS: { x: number; y: number; w: number; h: number; telhado: string; andares: number }[] = [];
@@ -626,10 +585,12 @@ export interface MapaDeRomaProps {
   onEntrar: (b: BairroId) => void;
   onLudus: () => void;
   onFechar: () => void;
+  /** Andar a pé pela cidade (a Roma caminhável), depois do Encontro. */
+  onRuas?: () => void;
 }
 
 /** O mapa grande, na tela inteira. */
-export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLudus, onFechar }: MapaDeRomaProps) {
+export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLudus, onFechar, onRuas }: MapaDeRomaProps) {
   const ato = estado.ato;
   const noite = ato <= 2;
   const eclipse = ato >= 6;
@@ -867,6 +828,11 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
             ) : null}
           </p>
           <p className="text-[10px] italic text-[#6a5a44]">Toque num lugar para ver. Use + e − para aproximar.</p>
+          {onRuas && estado.juntos && (
+            <button type="button" onClick={onRuas} className="pointer-events-auto mt-1 w-full border-2 border-[#3a2412] bg-[#3a8a4a] px-2 py-1.5 font-pixel text-[8px] text-white shadow-[2px_2px_0_#000] sm:text-[9px]">
+              ANDAR PELAS RUAS DE ROMA
+            </button>
+          )}
         </div>
         <button type="button" autoFocus onClick={onFechar} className="pointer-events-auto border-4 border-double border-[#5a3a12] bg-[#c0283c] px-3 py-2 font-pixel text-[10px] text-white shadow-[3px_3px_0_#000]" aria-label="Fechar o mapa e voltar para a história">
           X

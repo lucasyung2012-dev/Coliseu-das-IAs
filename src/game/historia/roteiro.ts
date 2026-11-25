@@ -56,7 +56,8 @@ export type Falante =
   | 'contramestre'
   | 'feirante'
   | 'zelador'
-  | 'nucleo';
+  | 'nucleo'
+  | 'pintora';
 
 /** A emoção de quem fala (o retrato grande muda de jeito e aparece um balãozinho desenhado). */
 export type Emocao = 'normal' | 'feliz' | 'bravo' | 'medo' | 'triste' | 'surpreso' | 'pensando' | 'determinado';
@@ -321,6 +322,7 @@ export const NOMES: Record<Falante, string> = {
   feirante: 'Feirante',
   zelador: 'Zelador do Aqueduto',
   nucleo: 'O Núcleo',
+  pintora: 'A Pintora de Estrelas',
 };
 
 // ---------- Prólogo (vale para todos os saves) ----------

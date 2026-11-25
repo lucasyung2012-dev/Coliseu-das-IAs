@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
@@ -26,6 +26,8 @@ import { INIMIGOS } from '@/game/historia/inimigos';
 import { FASES } from '@/game/historia/fases';
 import { MAPAS, MUNDOS, mundoDoExplorar } from '@/game/historia/mundos';
 import { MundoAberto } from './MundoAberto';
+import { mundoDasRuas } from '@/game/historia/ruas';
+import type { Mundo } from '@/game/historia/mundo';
 import { LutaHistoria } from './Luta';
 import { ChefaoNoMapa } from './ChefaoNoMapa';
 import { ChefaoEmEtapas } from './ChefaoEmEtapas';
@@ -107,6 +109,9 @@ export default function ColiseuHistoria() {
   const [passeio, setPasseio] = useState<BairroId | null>(null);
   // O Ludus, a casa dos três (pátio e arena de revanche), aberto pelo mapa de Roma.
   const [ludusAberto, setLudusAberto] = useState(false);
+  // A Roma caminhável (25/11/2026): começa na porta do lugar de agora; a Pintora muda de lugar a cada vez.
+  const [ruas, setRuas] = useState<{ inicio: BairroId; semente: number } | null>(null);
+  const ruasMundo = useRef<{ chave: object; mundo: Mundo } | null>(null);
   useEffect(() => {
     if (tela.tipo !== 'jogo') return;
     const tecla = (ev: KeyboardEvent) => {
@@ -393,6 +398,50 @@ export default function ColiseuHistoria() {
             </div>
           </div>
         )}
+        {/* AS RUAS DE ROMA: andar a pé de um lugar a outro; entra pela porta */}
+        {tela.tipo === 'jogo' &&
+          save?.unica &&
+          ruas &&
+          (() => {
+            const e = estadoRoma(save.capitulo, save.cena);
+            if (ruasMundo.current?.chave !== ruas) {
+              const abertos = [...bairrosParaPassear(e), ...(e.juntos ? (['ludus'] as BairroId[]) : [])];
+              ruasMundo.current = { chave: ruas, mundo: mundoDasRuas({ ato: save.capitulo, inicio: ruas.inicio, visitados: e.visitados, segredos: save.roma?.segredos ?? [], abertos, semente: ruas.semente }) };
+            }
+            const mundo = ruasMundo.current.mundo;
+            const atual = capitulosDoSave(save)[save.capitulo - 1]?.cenas[save.cena];
+            const abre = [...bairrosParaPassear(e), ...(e.juntos ? (['ludus'] as BairroId[]) : [])];
+            return (
+              <div className="fixed inset-0 z-[65] overflow-y-auto bg-[#0c0a10] p-3" role="dialog" aria-modal="true" aria-label="As ruas de Roma">
+                <div className="mx-auto flex max-w-4xl flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-pixel text-[10px] text-[#f2c14e] sm:text-xs">AS RUAS DE ROMA</p>
+                    <button type="button" onClick={() => setRuas(null)} className="pixel-box px-3 py-1.5 font-pixel text-[9px] text-[#f4e2b4]">
+                      ◀ VOLTAR AO MAPA
+                    </button>
+                  </div>
+                  <PausaContexto.Provider value={!!passeio || ludusAberto}>
+                    <MundoAberto
+                      key="ruas"
+                      mundo={mundo}
+                      heroi={heroiDaCena(atual)}
+                      onCoisa={(id) => {
+                        if (!id.startsWith('porta-')) return false;
+                        const b = id.slice('porta-'.length) as BairroId;
+                        if (!abre.includes(b)) return false;
+                        desbloquear();
+                        tocar('portao');
+                        if (b === 'ludus') setLudusAberto(true);
+                        else setPasseio(b);
+                        return true;
+                      }}
+                      onFim={() => setRuas(null)}
+                    />
+                  </PausaContexto.Provider>
+                </div>
+              </div>
+            );
+          })()}
         {/* O passeio por um bairro (a Roma livre) */}
         {tela.tipo === 'jogo' &&
           save?.unica &&
@@ -407,7 +456,7 @@ export default function ColiseuHistoria() {
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-pixel text-[10px] text-[#f2c14e] sm:text-xs">PASSEIO · {BAIRROS.find((x) => x.id === passeio)?.nome}</p>
                     <button type="button" onClick={() => setPasseio(null)} className="pixel-box px-3 py-1.5 font-pixel text-[9px] text-[#f4e2b4]">
-                      ◀ VOLTAR AO MAPA
+                      {ruas ? '◀ VOLTAR PARA A RUA' : '◀ VOLTAR AO MAPA'}
                     </button>
                   </div>
                   <MundoAberto
@@ -447,6 +496,12 @@ export default function ColiseuHistoria() {
             onFechar={() => {
               tocar('clique');
               setMapaAberto(false);
+            }}
+            onRuas={() => {
+              desbloquear();
+              tocar('passos');
+              const e = estadoRoma(save.capitulo, save.cena);
+              setRuas({ inicio: e.atual, semente: Date.now() % 100000 });
             }}
           />
         )}
