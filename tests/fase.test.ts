@@ -182,8 +182,8 @@ describe('os telhados no escuro dão para passar (24/11/2026, o Lucas travou aqu
       expect(v.w).toBeLessThan(alcance);
       for (const p of patrulhas) {
         const [a, b] = [Math.min(p.move!.de, p.move!.ate), Math.max(p.move!.de, p.move!.ate) + p.w];
-        // pelo menos 8 de chão livre entre a patrulha e o vão (para correr e pular)
-        expect(b <= v.x - 8 || a >= v.x + v.w + 8, `patrulha ${a}-${b} perto do vão ${v.x}`).toBe(true);
+        // pelo menos 20 de chão livre entre a patrulha e o vão: um pulo inteiro cai em lugar seguro
+        expect(b <= v.x - 20 || a >= v.x + v.w + 20, `patrulha ${a}-${b} perto do vão ${v.x}`).toBe(true);
       }
     }
   });
