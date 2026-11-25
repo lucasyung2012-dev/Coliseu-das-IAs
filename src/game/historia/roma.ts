@@ -288,7 +288,7 @@ export const PASSEIOS: Partial<Record<BairroId, Passeio>> = {
     gente: [
       ['povo', 'Os Jogos começam logo. Dizem que o Censor quer apagar alguém na frente de todo mundo.'],
       ['povo', 'Por baixo da arena tem um barulho, como um coração de ferro. Tum. Tum.'],
-      ['arauto', 'Senhoras e senhores... ah, desculpa. Ensaio. Eu ensaio sempre, até sozinho. A voz é tudo.'],
+      ['povo', 'Senhoras e senhores... ah, desculpa. Ensaio. Eu ensaio sempre, até sozinho. A voz é tudo.'],
     ],
     pedido: {
       quem: 'crianca',

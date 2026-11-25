@@ -431,6 +431,7 @@ const ESCALA: Partial<Record<Falante, number>> = {
   gaivota: 0.45,
   lumen: 0.5,
   copista: 0.8,
+  povo: 0.8,
   feirante: 0.8,
   zelador: 0.8,
   sibila: 0.8,
@@ -478,6 +479,9 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
     case 'feirante':
       // A feirante cansada da Subura: o mesmo desenho do Copista, com capuz vermelho e avental claro.
       return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#a83a2a', h: '#7a2418', B: '#c8a878' }} espelhar={espelhar} />;
+    case 'povo':
+      // O povo de Roma (bairros vivos, 24/11/2026): o desenho do Copista, com capuz marrom de lã.
+      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#7a5a3a', h: '#4a3622', B: '#8a8a5a' }} espelhar={espelhar} />;
     case 'zelador':
       // O velho zelador do aqueduto: capuz azul de água.
       return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#3a6a9a', h: '#24466a', B: '#2a3a4a' }} espelhar={espelhar} />;
