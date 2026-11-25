@@ -40,6 +40,7 @@ import { DesafioCarroca, DesafioLivros } from './Desafio';
 import { DesafioMarcas, DesafioPlanos } from './Desafios2';
 import { DesafioArmadilhas, DesafioFurtivo, DesafioProteger, DesafioRitmo } from './Desafios3';
 import { Ludus } from './Ludus';
+import { CasaLudus } from './CasaLudus';
 import { EscolhaRota } from './EscolhaRota';
 import { MinigameBarcos, MinigameCanhoes, MinigameEstrelas, MinigamePerseguicao } from './MinigamesOctavius';
 import { MinigameEnigmas, MinigameEspelhos, MinigameMapaCeu, MinigameSaltos, MinigameTelescopio } from './MinigamesHelios';
@@ -103,6 +104,8 @@ export default function ColiseuHistoria() {
   const [mapaAberto, setMapaAberto] = useState(false);
   // Passeando por um bairro de Roma (a Roma livre), aberto pelo mapa grande.
   const [passeio, setPasseio] = useState<BairroId | null>(null);
+  // O Ludus, a casa dos três (pátio e arena de revanche), aberto pelo mapa de Roma.
+  const [ludusAberto, setLudusAberto] = useState(false);
   useEffect(() => {
     if (tela.tipo !== 'jogo') return;
     const tecla = (ev: KeyboardEvent) => {
@@ -370,6 +373,25 @@ export default function ColiseuHistoria() {
             }}
           />
         )}
+        {/* O Ludus, a casa dos três (por cima do mapa) */}
+        {tela.tipo === 'jogo' && save?.unica && ludusAberto && (
+          <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#0c0a10] p-3" role="dialog" aria-modal="true" aria-label="O Ludus">
+            <div className="mx-auto flex max-w-4xl flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-pixel text-[10px] text-[#f2c14e] sm:text-xs">O LUDUS · A CASA DE VOCÊS</p>
+                <button type="button" onClick={() => setLudusAberto(false)} className="pixel-box px-3 py-1.5 font-pixel text-[9px] text-[#f4e2b4]">
+                  ◀ VOLTAR AO MAPA
+                </button>
+              </div>
+              <CasaLudus
+                save={save}
+                heroi={heroiDaCena(capitulosDoSave(save)[save.capitulo - 1]?.cenas[save.cena])}
+                onGravar={(s) => gravarSaveHistoria({ ...s, atualizadoEm: new Date().toISOString() })}
+                onSair={() => setLudusAberto(false)}
+              />
+            </div>
+          </div>
+        )}
         {/* O passeio por um bairro (a Roma livre) */}
         {tela.tipo === 'jogo' &&
           save?.unica &&
@@ -403,6 +425,17 @@ export default function ColiseuHistoria() {
               {/* A ROMA LIVRE: depois do Encontro, os bairros já visitados abrem para passear */}
               {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).length > 0 ? (
                 <div className="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      desbloquear();
+                      tocar('portao');
+                      setLudusAberto(true);
+                    }}
+                    className="pixel-box mb-1 px-3 py-2 font-pixel text-[9px] text-[#f2c14e] sm:text-[10px]"
+                  >
+                    IR AO LUDUS (A CASA DE VOCÊS)
+                  </button>
                   <p className="font-pixel text-[9px] text-[#f2c14e]">PASSEAR POR ROMA</p>
                   <div className="flex flex-wrap gap-1">
                     {bairrosParaPassear(estadoRoma(save.capitulo, save.cena)).map((b) => (

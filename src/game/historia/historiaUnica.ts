@@ -1,5 +1,6 @@
 import { CAPITULOS, type Capitulo, type Cena, type Fala, type Falante, type Lugar } from './roteiro';
 import { CAP_SECRETO } from './roteiro4';
+import { CHEFES } from './chefoesDefs';
 
 /**
  * A HISTÓRIA ÚNICA, Parte 1: A Lei da Resposta Única (22/11/2026, docs/HISTORIA-V2.md).
@@ -292,3 +293,15 @@ export function heroiDaCena(c: Cena | undefined): Falante {
 
 /** A partir do Encontro (ato 3), os três lutam juntos e dá para trocar de gladiador. */
 export const TIME_DESDE_O_ATO = 3;
+
+/** Os chefões já vencidos até este ponto da Parte 1 (para a arena de revanche do Ludus), sem repetir. */
+export function chefoesVencidos(ato: number, cena: number): string[] {
+  const vistos: string[] = [];
+  parte1().forEach((a, i) =>
+    a.cenas.forEach((c, j) => {
+      const antes = i + 1 < ato || (i + 1 === ato && j < cena);
+      if (antes && c.tipo === 'luta' && !c.treino && CHEFES[c.inimigo] && !vistos.includes(c.inimigo)) vistos.push(c.inimigo);
+    }),
+  );
+  return vistos;
+}

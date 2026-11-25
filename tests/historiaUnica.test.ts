@@ -1,4 +1,4 @@
-import { heroiDaCena, parte1, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
+import { chefoesVencidos, heroiDaCena, parte1, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
 import { capitulosDoSave, saveCompleto } from '@/game/historia/roteiro4';
 import { criarSaveUnica } from '@/game/historia/saves';
 
@@ -95,5 +95,17 @@ describe('a continuidade da Parte 1 (24/11/2026)', () => {
     const t6 = textos(atos[5]!);
     expect(t6.filter((t) => /^Meses depois/.test(t)).length).toBe(1);
     expect(t6[t6.indexOf(t6.find((t) => /^Meses depois/.test(t))!)]).toBeDefined();
+  });
+});
+
+describe('a arena de revanche do Ludus (24/11/2026)', () => {
+  it('no começo não tem chefão vencido; no Encontro já tem os dos Atos 1 e 2, sem repetir', () => {
+    expect(chefoesVencidos(1, 0)).toEqual([]);
+    const ate3 = chefoesVencidos(3, 0);
+    expect(ate3).toEqual(expect.arrayContaining(['fornalha', 'almirante-ferrugem', 'eclipse', 'cacador-sombras', 'feitor-tambor']));
+    expect(new Set(ate3).size).toBe(ate3.length);
+  });
+  it('no fim da Parte 1, todos os chefões da Parte 1 estão lá', () => {
+    expect(chefoesVencidos(7, 0).length).toBeGreaterThanOrEqual(14);
   });
 });
