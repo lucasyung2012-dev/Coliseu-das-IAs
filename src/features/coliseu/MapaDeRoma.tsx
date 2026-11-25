@@ -597,9 +597,9 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
   const [aberto, setAberto] = useState<BairroId | null>(null);
   // O ZOOM (25/11/2026, o Lucas achou o mapa "com muito zoom"): abre com Roma inteira na tela.
   const [zoom, setZoom] = useState(1);
-  const [tela, setTela] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+  const [tela, setTela] = useState(() => ({ w: document.documentElement.clientWidth, h: window.innerHeight }));
   useEffect(() => {
-    const medir = () => setTela({ w: window.innerWidth, h: window.innerHeight });
+    const medir = () => setTela({ w: document.documentElement.clientWidth, h: window.innerHeight });
     window.addEventListener('resize', medir);
     return () => window.removeEventListener('resize', medir);
   }, []);
