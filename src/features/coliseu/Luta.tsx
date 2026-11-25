@@ -609,6 +609,8 @@ export function LutaHistoria({
   const perfeitas = useRef(0);
   const [nota, setNota] = useState<number | null>(null);
   const [notaAberta, setNotaAberta] = useState(true);
+  // A explicação é decidida na hora da vitória (logo depois o save já marca que foi vista).
+  const [explicarAgora, setExplicarAgora] = useState(false);
   const modo = modoDaLuta(e);
   const escuro = modo.escuro;
   const visto = useRef(0);
@@ -654,6 +656,7 @@ export function LutaHistoria({
         : undefined;
       if (n) {
         setNota(n);
+        setExplicarAgora(!!explicarNota);
         window.setTimeout(() => tocar(n >= 5 ? 'plateia' : n >= 3 ? 'palmas' : 'pagina'), 500);
       }
       onVitoria?.(def.pecas ?? (def.chefao ? 6 : 2), n);
@@ -1120,7 +1123,7 @@ export function LutaHistoria({
               ))}
             </span>
             <span className="max-w-sm text-xs text-white/85 sm:text-sm">{FRASES_NOTA[nota - 1]}</span>
-            {explicarNota && (
+            {explicarAgora && (
               <span className="max-w-md text-[11px] text-white/60 sm:text-xs">
                 Toda vez que você vence um chefão, a plateia dá uma nota de 1 a 7. Conta a vida que sobrou, a rapidez, as defesas perfeitas e se você caiu. Vai do Silêncio ao Polegar do Imperador.
               </span>
