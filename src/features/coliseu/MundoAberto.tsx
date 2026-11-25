@@ -104,10 +104,13 @@ export function MundoAberto({
   const alturaRef = useRef(alturaVisivel);
   alturaRef.current = alturaVisivel;
 
+  // O mundo de agora (o teclado guarda a função antiga; o passeio muda o mundo quando acha o pedido).
+  const mundoRef = useRef(mundo);
+  mundoRef.current = mundo;
   // Interagir: com quem (ou o quê) estiver na frente.
   const interagir = () => {
     if (conversaRef.current || pausadoRef.current) return;
-    const alvo = pertoDe(mundo, estado.current);
+    const alvo = pertoDe(mundoRef.current, estado.current);
     if (!alvo) return;
     desbloquear();
     tocar('pagina');
@@ -309,7 +312,7 @@ export function MundoAberto({
           )}
           {/* Coisa para examinar que fica no chão (não num móvel): um brilhinho, para dar para achar */}
           {mundo.coisas
-            .filter((c) => !c.segredo && !s.vistos.includes(c.id) && livre(mundo, c.x + 0.5, c.y + 0.8))
+            .filter((c) => (!c.segredo || c.segredo.startsWith('roma-pedido')) && !s.vistos.includes(c.id) && livre(mundo, c.x + 0.5, c.y + 0.8))
             .map((c) => (
               <span
                 key={`br-${c.id}`}
