@@ -693,7 +693,7 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
               ))}
             {/* os nomes */}
             {(Object.keys(POS) as BairroId[]).map((b) => (
-              <Faixa key={`n${b}`} x={POS[b][0]} y={POS[b][1] + (b === 'coliseu' ? 17 : b === 'aqueduto' ? 10 : 13)} texto={visto(b) ? nome(b) : '???'} apagada={!visto(b)} destaque={b === estado.atual} />
+              <Faixa key={`n${b}`} x={POS[b][0]} y={POS[b][1] + (b === 'coliseu' ? 17 : b === 'aqueduto' ? 10 : b === 'porto' ? 25 : 13)} texto={visto(b) ? nome(b) : '???'} apagada={!visto(b)} destaque={b === estado.atual} />
             ))}
             {/* onde vocês estão e o próximo destino */}
             <circle cx={ax} cy={ay} r={24} fill="none" stroke="#e0281e" strokeWidth={1} className="mapa-atual" />
@@ -717,7 +717,7 @@ export function MapaDeRoma({ estado, titulo, roma, total, entrar, onEntrar, onLu
             <text x={86} y={194} textAnchor="middle" fontSize={7} fill="#f4e6c0" className="font-pixel" style={{ letterSpacing: '0.12em' }} opacity={0.85}>
               ROMA ETERNA
             </text>
-            <text x={30} y={184} textAnchor="middle" fontSize={3.4} fill="#cfe0f8" className="font-pixel" opacity={0.8}>
+            <text x={20} y={194} textAnchor="middle" fontSize={3.4} fill="#cfe0f8" className="font-pixel" opacity={0.8}>
               MAR TIRRENO
             </text>
             <text x={140} y={80} textAnchor="middle" fontSize={3} fill="#cfe0f8" className="font-pixel" opacity={0.8} transform="rotate(-76 140 80)">
