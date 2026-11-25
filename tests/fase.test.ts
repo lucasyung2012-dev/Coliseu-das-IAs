@@ -194,7 +194,8 @@ describe('os telhados no escuro dão para passar (24/11/2026, o Lucas travou aqu
     for (let t = 0; t < 40000 && !s.fim; t += 20) {
       // pula logo antes de cada vão; pula por cima das patrulhas quando estão perto
       const antesDeVao = vaos.some((x) => s.x > x - 9 && s.x < x - 3);
-      const patrulhaPerto = f.perigos.some((p) => p.tipo === 'inimigo' && Math.abs(xDoPerigo(p, s.tempo) - s.x) < 12);
+      // pula a patrulha só do chão, quando ela está logo à frente
+      const patrulhaPerto = s.y < 0.5 && f.perigos.some((p) => p.tipo === 'inimigo' && xDoPerigo(p, s.tempo) - s.x > 0 && xDoPerigo(p, s.tempo) - s.x < 12);
       s = passoFase(f, s, { esq: false, dir: true, pular: s.noChao && (antesDeVao || patrulhaPerto) }, 20);
       pegou = s.coletados.length;
     }
