@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { INIMIGOS } from '@/game/historia/inimigos';
 import { agir, modoDaLuta, usarPlano, ANIMO_MAX, ataqueAtual, ATRIBUTOS_INICIAIS, FOLEGO_MAX, novaLuta, passoLuta, TICK_LUTA, type AtributosLuta, type Estilo, type EstadoLuta, type EventoLuta } from '@/game/historia/luta';
 import { CLIMA_DO_LUGAR, ClimaDaArena } from './Clima';
+import { CORES_NOTA, DEFESAS_PERFEITAS, FRASES_NOTA, NOMES_NOTA, notaDosPontos, pontosDaLuta } from '@/game/historia/notas';
 import { NOMES, type EntradaInimigo, type Fala, type Falante, type Lugar } from '@/game/historia/roteiro';
 import Sprite, { type Paleta } from '@/ui/pixel/Sprite';
 import {
@@ -523,6 +524,8 @@ export function LutaHistoria({
   atributos: atributosDoHeroi = ATRIBUTOS_INICIAIS,
   treino,
   onVitoria,
+  quedasAntes = 0,
+  explicarNota,
   equipe,
   entrada: entradaPedida,
   vantagem,
@@ -540,7 +543,11 @@ export function LutaHistoria({
   /** Treino do Ludus: o objetivo é fazer `quantos` vezes o evento; não dá para perder. */
   treino?: { evento: EventoLuta['tipo']; quantos: number; rotulo: string };
   /** Venceu: recebe as peças de máquina que o inimigo deixou. */
-  onVitoria?: (pecas: number) => void;
+  onVitoria?: (pecas: number, nota?: number) => void;
+  /** Quantas vezes caiu antes deste duelo (na primeira etapa do chefão): entra na nota da plateia. */
+  quedasAntes?: number;
+  /** Primeira nota da plateia do save: mostra a explicação. */
+  explicarNota?: boolean;
   /** Capítulo secreto: os três lutam juntos e dá para TROCAR de gladiador no meio da luta. */
   equipe?: Partial<Record<Falante, AtributosLuta>>;
   /** Como o inimigo chega (a janela quebrando no capítulo 1, por exemplo). */
@@ -598,6 +605,10 @@ export function LutaHistoria({
   };
   const [e, setE] = useState<EstadoLuta>(() => lutaNova(atributos));
   const [tentativas, setTentativas] = useState(1);
+  // A NOTA DA PLATEIA (só nos chefões): as defesas perfeitas desta tentativa e a nota no fim.
+  const perfeitas = useRef(0);
+  const [nota, setNota] = useState<number | null>(null);
+  const [notaAberta, setNotaAberta] = useState(true);
   const modo = modoDaLuta(e);
   const escuro = modo.escuro;
   const visto = useRef(0);
@@ -620,6 +631,7 @@ export function LutaHistoria({
       if (som) tocar(som);
       if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao' || ev.tipo === 'arremate') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
+      if (DEFESAS_PERFEITAS.has(ev.tipo)) perfeitas.current += 1;
       // No treino do ESPECIAL vale o especial de qualquer jeito de lutar (Muralha, Rede, Eclipse).
       // Cada um treina com a defesa dele: o Cassius não esquiva (bloqueia) e o Octavius não bloqueia (rola).
       const vale =
@@ -637,7 +649,14 @@ export function LutaHistoria({
     visto.current = Math.max(visto.current, ...e.eventos.map((x) => x.id), 0);
     if (fase === 'luta' && e.fim === 'vitoria') {
       tocar('vitoria');
-      onVitoria?.(def.pecas ?? (def.chefao ? 6 : 2));
+      const n = def.chefao && !treino
+        ? notaDosPontos(pontosDaLuta({ vidaPct: e.jogador.vida / e.jogador.vidaMax, segundos: e.tempo / 1000, perfeitas: perfeitas.current, quedas: tentativas - 1 + quedasAntes }))
+        : undefined;
+      if (n) {
+        setNota(n);
+        window.setTimeout(() => tocar(n >= 5 ? 'plateia' : n >= 3 ? 'palmas' : 'pagina'), 500);
+      }
+      onVitoria?.(def.pecas ?? (def.chefao ? 6 : 2), n);
       if (noColiseu) tocar('plateia');
       setFase('depois');
     }
@@ -1079,7 +1098,37 @@ export function LutaHistoria({
         ))}
 
         {fase === 'antes' && antes && <Falas falas={antes} onFim={() => setFase('luta')} />}
-        {fase === 'depois' && <Falas falas={depois ?? []} onFim={onFim} />}
+        {/* A nota da plateia (depois de um chefão), antes das falas do fim */}
+        {fase === 'depois' && nota !== null && notaAberta && (
+          <button
+            type="button"
+            autoFocus
+            onClick={() => {
+              tocar('clique');
+              setNotaAberta(false);
+            }}
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/80 p-3 text-center"
+            aria-label={`A plateia dá a nota: ${NOMES_NOTA[nota - 1]}`}
+          >
+            <span className="font-pixel text-[9px] tracking-[0.2em] text-white/70 sm:text-[11px]">A PLATEIA DÁ A NOTA</span>
+            <span className="nota-entra font-pixel text-lg [text-shadow:3px_3px_0_#000] sm:text-3xl" style={{ color: CORES_NOTA[nota - 1] }}>
+              {NOMES_NOTA[nota - 1]}
+            </span>
+            <span className="flex gap-1" aria-hidden>
+              {Array.from({ length: 7 }, (_, k) => (
+                <span key={k} className={`block h-3 w-5 border-2 border-black sm:h-4 sm:w-7 ${k === nota - 1 ? 'nota-acende' : ''}`} style={{ background: k < nota ? CORES_NOTA[nota - 1] : '#2a2630', animationDelay: `${k * 90}ms` }} />
+              ))}
+            </span>
+            <span className="max-w-sm text-xs text-white/85 sm:text-sm">{FRASES_NOTA[nota - 1]}</span>
+            {explicarNota && (
+              <span className="max-w-md text-[11px] text-white/60 sm:text-xs">
+                Toda vez que você vence um chefão, a plateia dá uma nota de 1 a 7. Conta a vida que sobrou, a rapidez, as defesas perfeitas e se você caiu. Vai do Silêncio ao Polegar do Imperador.
+              </span>
+            )}
+            <span className="piscar mt-1 font-pixel text-[9px] text-[#f2c14e]">TOQUE PARA SEGUIR ▶</span>
+          </button>
+        )}
+        {fase === 'depois' && (nota === null || !notaAberta) && <Falas falas={depois ?? []} onFim={onFim} />}
         {fase === 'derrota' && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/75 p-3 text-center">
             <p className="font-pixel text-lg text-[#ff5a5a] sm:text-2xl">VOCÊ CAIU</p>
@@ -1102,6 +1151,7 @@ export function LutaHistoria({
                 setTentativas((t) => t + 1);
                 // A luta nova conta os acontecimentos do zero: sem isto, os sons ficavam mudos depois de cair.
                 visto.current = 0;
+                perfeitas.current = 0;
                 setE(lutaNova(atributos));
                 setCombo(0);
                 setPlanosUsados([]);

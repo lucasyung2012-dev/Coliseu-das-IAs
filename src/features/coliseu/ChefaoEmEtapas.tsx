@@ -43,12 +43,14 @@ const AVISO: Record<string, string> = {
  * bater quando ele ficar CANSADO, uma placa da armadura por golpe. Quando a armadura cai,
  * a segunda etapa (o duelo, que vem pronto em `duelo`) começa com ele enfraquecido.
  */
-export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; heroi: Falante; antes?: Fala[]; duelo: () => ReactNode }) {
+export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; heroi: Falante; antes?: Fala[]; duelo: (quedas: number) => ReactNode }) {
   const m = def.arena;
   const nome = (INIMIGOS[def.inimigo]?.nome ?? 'Chefão').toUpperCase();
   const W = m.mapa[0]!.length;
   const H = m.mapa.length;
   const [fase, setFase] = useState<'chegada' | 'antes' | 'mapa' | 'quebrou' | 'duelo' | 'derrota'>('chegada');
+  // Quantas vezes caiu na primeira etapa (entra na nota da plateia).
+  const [quedas, setQuedas] = useState(0);
   // A CHEGADA (cinema): faixas pretas, o chefão chega do jeito dele e o cartão com o nome.
   useEffect(() => {
     const sons: [Parameters<typeof tocar>[0], number][] =
@@ -145,6 +147,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
         if (st2.fim === 'derrota') {
           tocar('derrota');
           setFase('derrota');
+          setQuedas((q) => q + 1);
         }
       }
       id = requestAnimationFrame(quadro);
@@ -198,7 +201,7 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   });
 
   const sprite = useMemo(() => novaLuta(INIMIGOS[def.inimigo]!), [def.inimigo]);
-  if (fase === 'duelo') return <>{duelo()}</>;
+  if (fase === 'duelo') return <>{duelo(quedas)}</>;
 
   const p = def.padroes[st.i % def.padroes.length]!;
   // A câmera (no computador fica em 0 e mostra a arena inteira).

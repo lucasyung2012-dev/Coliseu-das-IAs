@@ -2040,3 +2040,10 @@
 .mapa-nuvem-2 { animation: mapa-nuvem 55s linear infinite alternate-reverse; }
 @keyframes mapa-nuvem { from { translate: -8px 0; } to { translate: 14px 0; } }
 .menos-movimento .mapa-nuvem, .menos-movimento .mapa-nuvem-2 { animation: none; }
+
+/* A nota da plateia (24/11/2026): o nome entra grande e os quadradinhos acendem um por um. */
+.nota-entra { animation: nota-entra 0.6s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes nota-entra { from { scale: 2.2; opacity: 0; } to { scale: 1; opacity: 1; } }
+.nota-acende { animation: nota-acende 0.5s ease-in-out 3 alternate; }
+@keyframes nota-acende { from { filter: brightness(1); } to { filter: brightness(2); } }
+.menos-movimento .nota-entra, .menos-movimento .nota-acende { animation: none; }

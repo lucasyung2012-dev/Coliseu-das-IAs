@@ -36,6 +36,10 @@ export interface SaveHistoria {
   unica?: boolean;
   /** Save do MODO TESTE (criado pelo Lucas para testar): não conta para prêmios. */
   teste?: boolean;
+  /** A melhor nota da plateia (1 a 7) em cada chefão já vencido. */
+  notas?: Record<string, number>;
+  /** Já viu a explicação das notas. */
+  notaVista?: boolean;
   /** Versão da ordem das cenas (2 = capítulo 1 do Cassius com o treino no começo; 3 = a fuga do mercado no capítulo 2). */
   ordem?: number;
 }
@@ -145,6 +149,13 @@ export const treinoFeito = (s: SaveHistoria, treino: Treino | Tecnica) => (s.fei
 
 export function aprender(s: SaveHistoria, t: Tecnica): SaveHistoria {
   return (s.tecnicas ?? []).includes(t) ? s : { ...s, tecnicas: [...(s.tecnicas ?? []), t] };
+}
+
+/** Guarda a nota da plateia (fica a melhor de cada chefão). */
+export function guardarNota(s: SaveHistoria, inimigo: string, nota?: number): SaveHistoria {
+  if (!nota) return s;
+  const antes = s.notas?.[inimigo] ?? 0;
+  return { ...s, notaVista: true, notas: { ...s.notas, [inimigo]: Math.max(antes, nota) } };
 }
 
 export function ganharPecas(s: SaveHistoria, n: number): SaveHistoria {

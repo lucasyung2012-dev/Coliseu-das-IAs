@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { IAS, PERSONAGENS, type IaId } from '@/game/personagens';
 import { apagarSaveHistoria, ganharSegredoHistoria, gravarSaveHistoria, useProgresso } from '@/game/progresso';
-import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
+import { ajustarOrdem, atributosDoSave, avancarSave, CAMINHOS_ABERTOS, criarSave, criarSaveSecreto, criarSaveUnica, ganharPecas, guardarNota, NOME_DO_CAMINHO, type SaveHistoria } from '@/game/historia/saves';
 import { heroiDaCena, TIME_DESDE_O_ATO } from '@/game/historia/historiaUnica';
 import { BAIRROS, bairrosParaPassear, cenaDePasseio, estadoRoma, type BairroId } from '@/game/historia/roma';
 import { LegendaRoma, MapaRoma } from './MapaRoma';
@@ -605,8 +605,10 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         def={chefe}
         heroi={heroi}
         antes={[{ quem: heroi, texto: `Primeiro, a armadura. ${chefe.dica}` }, ...(FALA_HABILIDADE[heroi] ? [{ quem: heroi, texto: FALA_HABILIDADE[heroi]! }] : [])]}
-        duelo={() => (
+        duelo={(quedas) => (
           <LutaHistoria
+            quedasAntes={quedas}
+            explicarNota={!save.notaVista}
             lugar={cena.lugar}
             inimigo={cena.inimigo}
             heroi={heroi}
@@ -616,7 +618,7 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
             equipe={equipe}
             vidaInicial={chefe.vidaNoDuelo}
             semEntrada
-            onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
+            onVitoria={(n, nota) => gravarSaveHistoria(guardarNota(ganharPecas(save, n), cena.inimigo, nota))}
             onFim={() => proxima()}
           />
         )}
@@ -635,7 +637,8 @@ function Jogo({ save, onSair }: { save: SaveHistoria; onSair: () => void }) {
         equipe={equipe}
         treino={cena.treino}
         entrada={cena.entrada}
-        onVitoria={(n) => gravarSaveHistoria(ganharPecas(save, n))}
+        explicarNota={!save.notaVista}
+        onVitoria={(n, nota) => gravarSaveHistoria(guardarNota(ganharPecas(save, n), cena.inimigo, nota))}
         onFim={() => proxima()}
       />
     );
