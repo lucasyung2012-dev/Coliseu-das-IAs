@@ -2104,3 +2104,6 @@
 .pp-gota { animation: pp-gota 1.6s ease-in infinite; }
 @keyframes pp-gota { 0% { translate: 0 0; opacity: 0; } 10% { opacity: 1; } 100% { translate: 0 180px; opacity: 0.4; } }
 .menos-movimento .dano-numero, .menos-movimento .fase-texto, .menos-movimento .fase-clarao, .menos-movimento .pp-balanca, .menos-movimento .pp-balanca-lenta, .menos-movimento .pp-cabeca, .menos-movimento .pp-fagulha, .menos-movimento .pp-fumaca, .menos-movimento .pp-respingo, .menos-movimento .pp-gota { animation: none; }
+.aura-chefe { animation: aura-chefe 2.2s ease-in-out infinite alternate; }
+@keyframes aura-chefe { from { opacity: 0.55; scale: 0.92; } to { opacity: 1; scale: 1.08; } }
+.menos-movimento .aura-chefe { animation: none; }

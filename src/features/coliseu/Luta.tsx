@@ -928,6 +928,10 @@ export function LutaHistoria({
           </div>
         )}
 
+        {/* A AURA DO CHEFÃO (27/11/2026): pulsa atrás dele e muda de cor a cada fase */}
+        {def.chefao && !vencido && fase !== 'chegada' && (
+          <span className="aura-chefe pointer-events-none absolute bottom-[8%] left-[70%] z-[8] block aspect-square -translate-x-1/2 rounded-full" style={{ width: `${largura * 1.25}%`, background: `radial-gradient(circle, ${['#ff9a3a', '#ff3a2a', '#b03aff'][Math.min(2, i.fase)]}66 0%, transparent 65%)` }} aria-hidden />
+        )}
         {/* O inimigo, com o sinal antes do ataque (e a chegada dele, no começo) */}
         <div className={`pointer-events-none absolute inset-0 z-10 [&>*]:pointer-events-auto ${fase === 'chegada' && entrada ? `entrada-${entrada}` : ''}`}>
         <div
