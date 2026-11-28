@@ -2107,3 +2107,10 @@
 .aura-chefe { animation: aura-chefe 2.2s ease-in-out infinite alternate; }
 @keyframes aura-chefe { from { opacity: 0.55; scale: 0.92; } to { opacity: 1; scale: 1.08; } }
 .menos-movimento .aura-chefe { animation: none; }
+
+/* OS TRÊS SÃO IAs (27/11/2026): os olhos piscam de vez em quando e o circuito corre na armadura. */
+.olhos-ia { animation: olhos-ia 4.2s steps(1) infinite; }
+@keyframes olhos-ia { 0%, 46%, 50%, 100% { opacity: 1; } 47%, 49% { opacity: 0; } }
+.circuito-ia { animation: circuito-ia 1.4s linear infinite; }
+@keyframes circuito-ia { to { stroke-dashoffset: -4; } }
+.menos-movimento .olhos-ia, .menos-movimento .circuito-ia { animation: none; }

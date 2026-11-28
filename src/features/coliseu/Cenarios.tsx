@@ -1,4 +1,5 @@
 import type { Falante, Lugar } from '@/game/historia/roteiro';
+import { ARAUTO, FEIRANTE, PALETA_ARAUTO, PALETA_FEIRANTE, PALETA_PINTORA, PALETA_POVO, PALETA_ZELADOR, PINTORA, POVO, ZELADOR } from '@/ui/pixel/povo';
 import { CenaColiseu } from '../arcade/cenas/Cenarios';
 import { desenhoCapitulo } from './cenarios/capitulos';
 import { desenhoCapitulo2 } from './cenarios/capitulos2';
@@ -432,6 +433,7 @@ const ESCALA: Partial<Record<Falante, number>> = {
   lumen: 0.5,
   copista: 0.8,
   povo: 0.8,
+  arauto: 0.8,
   pintora: 0.72,
   feirante: 0.8,
   zelador: 0.8,
@@ -478,17 +480,15 @@ export function Retrato({ quem, espelhar = false, azul = false }: { quem: Falant
     case 'contramestre':
       return <Sprite grade={MARINHEIRO_FERRO} paleta={{ ...PALETA_MARINHEIRO, E: '#ffd04a' }} espelhar={espelhar} />;
     case 'feirante':
-      // A feirante cansada da Subura: o mesmo desenho do Copista, com capuz vermelho e avental claro.
-      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#a83a2a', h: '#7a2418', B: '#c8a878' }} espelhar={espelhar} />;
+      return <Sprite grade={FEIRANTE} paleta={PALETA_FEIRANTE} espelhar={espelhar} />;
     case 'pintora':
-      // A Pintora de Estrelas (25/11/2026): capuz azul-noite, avental sujo de tinta dourada.
-      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#1a2a5a', h: '#101a3a', B: '#d8a83a' }} espelhar={espelhar} />;
+      return <Sprite grade={PINTORA} paleta={PALETA_PINTORA} espelhar={espelhar} />;
+    case 'arauto':
+      return <Sprite grade={ARAUTO} paleta={PALETA_ARAUTO} espelhar={espelhar} />;
     case 'povo':
-      // O povo de Roma (bairros vivos, 24/11/2026): o desenho do Copista, com capuz marrom de lã.
-      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#7a5a3a', h: '#4a3622', B: '#8a8a5a' }} espelhar={espelhar} />;
+      return <Sprite grade={POVO} paleta={PALETA_POVO} espelhar={espelhar} />;
     case 'zelador':
-      // O velho zelador do aqueduto: capuz azul de água.
-      return <Sprite grade={COPISTA} paleta={{ ...PALETA_COPISTA, H: '#3a6a9a', h: '#24466a', B: '#2a3a4a' }} espelhar={espelhar} />;
+      return <Sprite grade={ZELADOR} paleta={PALETA_ZELADOR} espelhar={espelhar} />;
     case 'sibila':
       return <Sprite grade={SIBILA} paleta={PALETA_SIBILA} espelhar={espelhar} />;
     case 'nucleo':
