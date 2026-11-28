@@ -34,7 +34,7 @@ Revisão de todos os atos da história única. Nenhum dado está quebrado: todos
 
 ## O que o Lucas precisa decidir
 
-1. **Quem criou a Lei da Resposta Única?** A história dá quatro versões diferentes:
+1. **Quem criou a Lei da Resposta Única?** DECIDIDO E FEITO (27/11): a versão do roteiro (o Núcleo guarda tudo e nunca destrói; o Guardião Zero se ligou a ele; o medo dele com a força do Núcleo virou a Lei). O Núcleo agora quer GUARDAR os três, como guardou os apagados. Antes, a história dava quatro versões:
    - o Censor (Guardião Zero);
    - uma "cópia do Censor";
    - "alguém que escreveu, o Censor só lia";

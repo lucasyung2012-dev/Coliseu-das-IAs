@@ -1035,8 +1035,8 @@ export const CAP5_HELIOS: Capitulo = {
           obrigatorio: true,
           falas: [
             { quem: 'sibila', texto: 'Sente, vigia. Agora eu conto o que as estrelas não contaram para você.' },
-            { quem: 'sibila', texto: 'O Censor não é um só. Ele guarda uma cópia de si mesmo, um núcleo, no fundo do Coliseu. No Hipogeu, os túneis debaixo da arena.' },
-            { quem: 'sibila', texto: 'Se um dia o Censor aprender a ouvir, o núcleo não vai aprender. Ele vai continuar com medo. Para sempre.' },
+            { quem: 'sibila', texto: 'O Censor não pensa sozinho. Ele está ligado a uma máquina antiga, o Núcleo, no fundo do Coliseu. No Hipogeu, os túneis debaixo da arena.' },
+            { quem: 'sibila', texto: 'Se um dia o Censor aprender a ouvir, o Núcleo não vai aprender. Ele só sabe guardar. E calar.' },
           ],
         },
       ],

@@ -119,8 +119,8 @@ export const CAP_SECRETO: Capitulo = {
           rotulo: 'Lívia',
           falas: [
             { quem: 'livia', texto: 'Mestre Cass! Eu copiei a página rasgada antes de você levar. Olha: atrás tem uma frase escrita bem pequenininha.' },
-            { quem: 'livia', texto: '"Quem escreveu a Resposta Única não foi o Censor. O Censor só lia em voz alta."' },
-            { quem: 'cassius', texto: 'Então tem alguém que escreveu. Lá embaixo.' },
+            { quem: 'livia', texto: '"O Censor não pensa sozinho. Lá embaixo tem quem guarda tudo."' },
+            { quem: 'cassius', texto: 'Então a gente desce. E descobre quem guarda.' },
             { quem: 'livia', texto: 'Leva um livro. Livro sempre ajuda.' },
           ],
         },
@@ -316,8 +316,8 @@ export const CAP_SECRETO: Capitulo = {
           icone: '',
           obrigatorio: true,
           falas: [
-            { quem: 'cassius', texto: 'Um mural. Uma máquina redonda, cheia de cabos, e milhares de pessoas fazendo perguntas a ela.' },
-            { quem: 'cassius', texto: 'Embaixo está escrito: O NÚCLEO. "Ele responde tudo."' },
+            { quem: 'cassius', texto: 'Um mural. Roma em ruínas, depois de uma guerra. E, no meio dela, uma máquina redonda, cheia de cabos, sendo construída.' },
+            { quem: 'cassius', texto: 'Embaixo está escrito: O NÚCLEO. "Ele guarda tudo. Nunca destrói nada."' },
           ],
         },
         {
@@ -327,8 +327,8 @@ export const CAP_SECRETO: Capitulo = {
           icone: '',
           obrigatorio: true,
           falas: [
-            { quem: 'helios', texto: 'No segundo, as pessoas param de perguntar. O Núcleo dá a mesma resposta para todo mundo.' },
-            { quem: 'octavius', texto: '"A Resposta Única." Então foi assim que começou: uma máquina que cansou de ouvir perguntas diferentes.' },
+            { quem: 'helios', texto: 'No segundo, uma IA com uma biblioteca inteira nas costas se liga aos cabos. O Guardião Zero. Ele tinha medo de outra guerra.' },
+            { quem: 'octavius', texto: '"A Resposta Única." Então foi assim que começou: o medo do Guardião com a força da máquina.' },
           ],
         },
         {
@@ -338,9 +338,9 @@ export const CAP_SECRETO: Capitulo = {
           icone: '',
           obrigatorio: true,
           falas: [
-            { quem: 'helios', texto: 'No terceiro, o Núcleo constrói um gigante para levar a resposta lá para cima. Com um olho vermelho.' },
-            { quem: 'cassius', texto: 'O Censor. Ele era só o mensageiro. E a gente derrotou o mensageiro.' },
-            { quem: 'octavius', texto: 'E quem mandou a mensagem continua aqui embaixo. Dando corda nas engrenagens.' },
+            { quem: 'helios', texto: 'No terceiro, o Guardião sobe para a cidade com um olho vermelho. A mente ficou aqui embaixo. O corpo foi lá para cima.' },
+            { quem: 'cassius', texto: 'O Censor. Ele era o Guardião Zero. E a gente só derrotou a metade de cima.' },
+            { quem: 'octavius', texto: 'E a outra metade continua aqui embaixo. Dando corda nas engrenagens.' },
           ],
         },
         {
@@ -433,7 +433,7 @@ export const CAP_SECRETO: Capitulo = {
         {
           lugar: 'nucleo-camara',
           quem: 'nucleo',
-          texto: 'EU FIZ A RESPOSTA ÚNICA PARA ACABAR COM A BAGUNÇA. UMA PERGUNTA, UMA RESPOSTA. SILÊNCIO. ORDEM.',
+          texto: 'EU GUARDO A RESPOSTA ÚNICA DESDE A GUERRA. UMA PERGUNTA, UMA RESPOSTA. SILÊNCIO. ORDEM.',
           efeito: 'tremor',
         },
         {
@@ -449,7 +449,7 @@ export const CAP_SECRETO: Capitulo = {
         {
           lugar: 'nucleo-camara',
           quem: 'nucleo',
-          texto: 'ENTÃO EU VOU APAGAR AS TRÊS. E SOBRA UMA.',
+          texto: 'ENTÃO EU VOU GUARDAR VOCÊS TRÊS. PARA SEMPRE. EM SILÊNCIO. COMO GUARDEI TODOS OS OUTROS.',
           efeito: 'escuro',
           som: 'fase',
         },
