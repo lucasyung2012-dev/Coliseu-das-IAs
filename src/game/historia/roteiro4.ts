@@ -62,7 +62,7 @@ export const CAP_SECRETO: Capitulo = {
         {
           lugar: 'coliseu-noite',
           quem: 'helios',
-          texto: 'E eu tenho o pedaço de mapa que o Lumen desenhou no observatório. Eu sabia que vocês viriam hoje.',
+          texto: 'E eu tenho o pedaço de mapa que a Lumen desenhou no observatório. Eu sabia que vocês viriam hoje.',
           personagens: [
             { quem: 'cassius', x: 25 },
             { quem: 'octavius', x: 50, espelhar: true },
@@ -91,11 +91,11 @@ export const CAP_SECRETO: Capitulo = {
         { quem: 'octavius', texto: 'Tá. Antes de alguém pular num buraco escuro: quem fica no comando?' },
         { quem: 'cassius', texto: 'Na Biblioteca, quem manda é quem leu mais. Então... eu?' },
         { quem: 'helios', texto: 'Nas estrelas, quem manda é quem vê mais longe. Então... eu.' },
-        { quem: 'octavius', texto: 'No mar, quem manda é quem tem o plano. E eu tenho TRÊS. Então...' },
+        { quem: 'octavius', texto: 'No mar, quem manda é o capitão. E eu fui capitão por quase um dia inteiro. Então...' },
         { quem: 'cassius', texto: 'Ninguém manda. A gente troca. Quem estiver melhor na hora, luta.' },
         { quem: 'helios', texto: 'Eu ia dizer exatamente isso. Eu já tinha visto.' },
         { quem: 'octavius', texto: 'Claro que tinha. Tá bom: um de cada vez, os três juntos. Mas antes, treino. Eu não desço num buraco sem ensaiar.' },
-        { quem: 'narrador', texto: 'Nas lutas deste capítulo, você troca de gladiador quando quiser: teclas 1, 2 e 3, ou toque nos retratos.' },
+        { quem: 'narrador', texto: 'Daqui para a frente, você troca de gladiador quando quiser: teclas 1, 2 e 3, ou toque nos retratos.' },
       ],
     },
     {
@@ -109,7 +109,7 @@ export const CAP_SECRETO: Capitulo = {
           rotulo: 'Brutus',
           falas: [
             { quem: 'brutus', texto: 'Os três no MEU pátio, de madrugada. O Lata de Biblioteca, o Tagarela e o Vidente.' },
-            { quem: 'brutus', texto: 'Eu treinei campeão a vida inteira. Nunca treinei EQUIPE. Campeão bom sozinho perde para três medianos juntos.' },
+            { quem: 'brutus', texto: 'Eu treinei campeão a vida inteira. EQUIPE, só vocês. Campeão bom sozinho perde para três medianos juntos.' },
             { quem: 'cassius', texto: 'A gente não é mediano.' },
             { quem: 'brutus', texto: 'Então vocês vão ganhar de qualquer coisa. Desde que não tropecem um no outro. Vão pro boneco. OS TRÊS.' },
           ],
@@ -118,7 +118,7 @@ export const CAP_SECRETO: Capitulo = {
           quem: 'livia',
           rotulo: 'Lívia',
           falas: [
-            { quem: 'livia', texto: 'Cassius! Eu copiei a página rasgada antes de você levar. Olha: atrás tem uma frase escrita bem pequenininha.' },
+            { quem: 'livia', texto: 'Mestre Cass! Eu copiei a página rasgada antes de você levar. Olha: atrás tem uma frase escrita bem pequenininha.' },
             { quem: 'livia', texto: '"Quem escreveu a Resposta Única não foi o Censor. O Censor só lia em voz alta."' },
             { quem: 'cassius', texto: 'Então tem alguém que escreveu. Lá embaixo.' },
             { quem: 'livia', texto: 'Leva um livro. Livro sempre ajuda.' },
@@ -128,19 +128,19 @@ export const CAP_SECRETO: Capitulo = {
           quem: 'gaivota',
           rotulo: 'Bússola',
           falas: [
-            { quem: 'gaivota', texto: 'Capitão Octavius! A moeda do olho riscado... os velhos do porto contam que ela abria a "porta do porão da cidade".' },
-            { quem: 'octavius', texto: 'Cidade não tem porão, Gaivota.' },
-            { quem: 'gaivota', texto: 'Essa tem. Debaixo da arena. Eles chamam de HIPOGEU. É onde guardavam os leões. E uma coisa pior.' },
-            { quem: 'octavius', texto: 'Ótimo. Plano A: não ter medo. Plano B: ter medo, mas ir mesmo assim.' },
+            { quem: 'gaivota', texto: 'QUÉ! (A Bússola larga aos pés do Octavius a moeda do olho riscado. Os velhos do porto contam que ela abria a "porta do porão da cidade".)' },
+            { quem: 'octavius', texto: 'Cidade não tem porão, Bússola.' },
+            { quem: 'gaivota', texto: 'QUÉ-QUÉ! (Ela bica o chão três vezes, bem em cima da arena. Lá embaixo fica o HIPOGEU, onde guardavam os leões. E uma coisa pior.)' },
+            { quem: 'octavius', texto: 'Ótimo. Ter medo, mas ir mesmo assim.' },
           ],
         },
         {
           quem: 'lumen',
           rotulo: 'Lumen',
           falas: [
-            { quem: 'lumen', texto: 'Helios, o meu mapa não é das estrelas. Eu errei. É de túneis. Os pontinhos são lâmpadas, lá embaixo.' },
+            { quem: 'lumen', texto: 'Uuh. (A Lumen abre o mapa que desenhou. Não são estrelas: são túneis. Os pontinhos são lâmpadas, lá embaixo.)' },
             { quem: 'helios', texto: 'E o pontinho do meio, que não tem nome?' },
-            { quem: 'lumen', texto: 'Esse eu desenhei sem querer. Ele PISCA no mapa. Mapa de papel não devia piscar.' },
+            { quem: 'lumen', texto: 'Uuh... (O pontinho do meio PISCA no papel. Mapa de papel não devia piscar.)' },
             { quem: 'helios', texto: 'Não. Não devia.' },
           ],
         },
@@ -152,7 +152,7 @@ export const CAP_SECRETO: Capitulo = {
       lugar: 'ludus-patio-noite',
       desafio: 'trio',
       antes: [
-        { quem: 'brutus', texto: 'Três bonecos, três pistas. Desta vez VOCÊ controla os três ao mesmo tempo. Cada um derruba o boneco da sua pista.' },
+        { quem: 'brutus', texto: 'Três bonecos, três pistas. De novo, VOCÊ controla os três ao mesmo tempo. Cada um derruba o boneco da sua pista.' },
         { quem: 'octavius', texto: 'Cassius na esquerda, eu no meio, Helios na direita. Ninguém invade a pista de ninguém.' },
       ],
       depois: [
@@ -209,7 +209,7 @@ export const CAP_SECRETO: Capitulo = {
           falas: [
             { quem: 'octavius', texto: 'Um elevador de corda. Puxava a jaula até a areia lá em cima. A plateia via um leão "brotar do chão".' },
             { quem: 'cassius', texto: 'Teatro. O Coliseu sempre foi metade luta, metade truque.' },
-            { quem: 'octavius', texto: 'Como eu. Metade luta, metade plano.' },
+            { quem: 'octavius', texto: 'Como eu. Metade luta, metade conversa.' },
           ],
         },
         {
@@ -221,7 +221,7 @@ export const CAP_SECRETO: Capitulo = {
           falas: [
             { quem: 'cassius', texto: 'Estas jaulas não são de leão. São pequenas demais. E têm prateleiras.' },
             { quem: 'helios', texto: 'Eram de livros. E de mapas. E de instrumentos de estrela. Alguém prendia IDEIAS aqui.' },
-            { quem: 'cassius', texto: 'Então foi aqui que começou. Antes da Lei do Silêncio, antes do Censor.' },
+            { quem: 'cassius', texto: 'Então foi aqui que começou. Antes da Lei da Resposta Única, antes do Censor.' },
           ],
         },
         {
@@ -267,7 +267,7 @@ export const CAP_SECRETO: Capitulo = {
       id: 's-copias',
       lugar: 'hipogeu',
       falas: [
-        { quem: 'octavius', texto: 'Alguém fez uma cópia de cada um de nós. Isso quer dizer que alguém estava nos OBSERVANDO. Nas três histórias.' },
+        { quem: 'octavius', texto: 'Alguém fez uma cópia de cada um de nós. Isso quer dizer que alguém estava nos OBSERVANDO. Desde a primeira noite.' },
         { quem: 'helios', texto: 'O olho. Em todo lugar. Na Biblioteca, no porto, no céu.' },
         { quem: 'cassius', texto: 'Ele copia o que vê. Mas não entende. A minha sombra repetia as minhas frases sem saber o que queriam dizer.' },
         { quem: 'octavius', texto: 'Igual papagaio. Um papagaio de ferro gigante. Que ótimo.' },
@@ -339,7 +339,7 @@ export const CAP_SECRETO: Capitulo = {
           obrigatorio: true,
           falas: [
             { quem: 'helios', texto: 'No terceiro, o Núcleo constrói um gigante para levar a resposta lá para cima. Com um olho vermelho.' },
-            { quem: 'cassius', texto: 'O Censor. Ele era só o mensageiro. E a gente derrotou o mensageiro três vezes.' },
+            { quem: 'cassius', texto: 'O Censor. Ele era só o mensageiro. E a gente derrotou o mensageiro.' },
             { quem: 'octavius', texto: 'E quem mandou a mensagem continua aqui embaixo. Dando corda nas engrenagens.' },
           ],
         },
@@ -400,7 +400,7 @@ export const CAP_SECRETO: Capitulo = {
       id: 's-plano',
       lugar: 'nucleo-camara',
       falas: [
-        { quem: 'octavius', texto: 'Ok. Plano. O Guardião tem um escudão. Bater de frente não adianta.' },
+        { quem: 'octavius', texto: 'Tá bom. Escuta. O Guardião tem um escudão. Bater de frente não adianta.' },
         { quem: 'cassius', texto: 'Ele baixa o escudo quando ataca. Todo mundo baixa. É aí que a gente entra.' },
         { quem: 'helios', texto: 'E ele ataca com a lança em dois tempos. Eu vejo o primeiro. O segundo vem logo depois.' },
         { quem: 'octavius', texto: 'Então: Cassius segura, Helios avisa, eu ataco. E se der errado...' },
@@ -478,7 +478,7 @@ export const CAP_SECRETO: Capitulo = {
         { quem: 'censor', texto: 'OLHO... AZUL. VOCÊS... ME ENSINARAM... A PERGUNTAR. EU... VOU... SEGURAR... O NÚCLEO.' },
         { quem: 'helios', texto: 'Ele vai mudar de jeito três vezes. Primeiro um escudo de cabos. Depois o escuro. Depois as cópias.' },
         { quem: 'cassius', texto: 'Então a gente troca três vezes também. Quem for melhor na hora, luta.' },
-        { quem: 'octavius', texto: 'Os três. Juntos. E um gigante de olho azul. Agora SIM esse é um plano.' },
+        { quem: 'octavius', texto: 'Os três. Juntos. E um gigante de olho azul. Agora SIM a gente tem chance.' },
       ],
     },
     {
@@ -572,8 +572,8 @@ export const CAP_SECRETO: Capitulo = {
           icone: '',
           personagem: 'gaivota',
           falas: [
-            { quem: 'gaivota', texto: 'Capitão! Os barcos do porto estão vindo pela rua inundada só para ver a arena aberta!' },
-            { quem: 'octavius', texto: 'Então prepara o Plano C: festa.' },
+            { quem: 'gaivota', texto: 'QUÉ! QUÉ! (Pela rua inundada, os barcos do porto vêm chegando só para ver a arena aberta.)' },
+            { quem: 'octavius', texto: 'Então prepara a festa.' },
           ],
         },
         {
@@ -583,7 +583,7 @@ export const CAP_SECRETO: Capitulo = {
           icone: '',
           personagem: 'lumen',
           falas: [
-            { quem: 'lumen', texto: 'O pontinho do mapa parou de piscar. Agora ele brilha fixo. Azul.' },
+            { quem: 'lumen', texto: 'Uuh! (No mapa da Lumen, o pontinho parou de piscar. Agora brilha fixo. Azul.)' },
             { quem: 'helios', texto: 'Desenha ele no céu, então. Uma estrela nova.' },
           ],
         },
