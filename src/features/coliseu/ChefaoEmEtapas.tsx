@@ -44,6 +44,8 @@ const AVISO: Record<string, string> = {
  * a segunda etapa (o duelo, que vem pronto em `duelo`) começa com ele enfraquecido.
  */
 export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; heroi: Falante; antes?: Fala[]; duelo: (quedas: number) => ReactNode }) {
+  // As MARCAS NO CHÃO (27/11/2026): onde o chefão bateu fica queimado/rachado por alguns segundos.
+  const marcas = useRef<{ x: number; y: number; r: number; em: number; k: string }[]>([]);
   const m = def.arena;
   const nome = (INIMIGOS[def.inimigo]?.nome ?? 'Chefão').toUpperCase();
   const W = m.mapa[0]!.length;
@@ -211,6 +213,10 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
   const ferido = st.tempo < st.feridoAte;
   const ultimo = st.eventos[st.eventos.length - 1];
   const recente = ultimo && st.tempo - ultimo.em < 800 ? ultimo : null;
+  if (ultimo && (ultimo.tipo === 'explode' || ultimo.tipo === 'parede') && !marcas.current.some((m) => m.em === ultimo.em)) {
+    const novas = ultimo.tipo === 'explode' ? (p.tipo === 'zonas' ? (st.zonas ?? []).map((z) => ({ x: z.x, y: z.y - 0.2, r: p.raio })) : [{ x: st.x, y: st.y - 0.3, r: 1.5 }]) : [{ x: st.x, y: st.y - 0.3, r: 1.1 }];
+    marcas.current = [...marcas.current.filter((m) => st.tempo - m.em < 9000 && m.em <= st.tempo), ...novas.map((n, k) => ({ ...n, em: ultimo.em, k: `${ultimo.em}-${k}` }))].slice(-16);
+  }
   const raiva = furiosoChefe(def, st);
   const tam = GRANDES.has(def.inimigo) ? 2.7 : 2.1;
   const noAr = p.tipo === 'salto' && st.etapa === 'ataque' ? Math.sin((1 - Math.max(0, st.ate - st.tempo) / 850) * Math.PI) : 0;
@@ -253,7 +259,8 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           <div className="mt-1 h-2 bg-black/60"><div className="h-full bg-[#4ad46a] transition-[width]" style={{ width: `${(st.vida / st.vidaMax) * 100}%` }} /></div>
         </div>
         <div className="text-right">
-          <span className={raiva ? 'piscar text-[#ff5a5a]' : 'text-[#f4e2b4]'}>{nome}{raiva ? ' (FURIOSO)' : ''}</span>
+          <span className={raiva ? 'piscar text-[#ff5a5a]' : ''} style={raiva ? undefined : { color: def.cor, textShadow: '1px 1px 0 #000' }}>{nome}{raiva ? ' (FURIOSO)' : ''}</span>
+          <span className="block text-[6px] text-[#f4e2b4]/70 sm:text-[8px]">{def.titulo}</span>
           {/* A armadura: uma placa por golpe no cansado */}
           <div className="mt-1 flex justify-end gap-[3px]" aria-label={`Armadura: ${st.armadura} de ${def.armadura}`}>
             {Array.from({ length: def.armadura }, (_, k) => (
@@ -286,6 +293,16 @@ export function ChefaoEmEtapas({ def, heroi, antes, duelo }: { def: DefChefe; he
           {p.tipo === 'salto' && st.alvo && st.etapa !== 'cansado' && (
             <span className={`pointer-events-none absolute z-[250] block rounded-[50%] ${st.etapa === 'ataque' || st.ate - st.tempo <= 500 ? 'sombra-salto-forte' : 'sombra-salto'}`} style={{ ...emMapa(st.alvo.x, st.alvo.y - 0.2), width: `${(2.8 / VIS) * 100}%`, aspectRatio: '2.4 / 1', translate: '-50% -50%' }} aria-hidden />
           )}
+          {/* As marcas que ficaram no chão (somem devagar) */}
+          {marcas.current
+            .filter((m) => st.tempo - m.em < 9000 && m.em <= st.tempo)
+            .map((m) => (
+              <span key={m.k} className="marca-chao pointer-events-none absolute z-[244] block rounded-full" style={{ ...roda(m.x, m.y, m.r), background: `radial-gradient(circle, #0008 0%, #000a 35%, ${def.cor}33 55%, transparent 72%)`, opacity: Math.max(0, 1 - (st.tempo - m.em) / 9000) }} aria-hidden>
+                <svg viewBox="0 0 20 20" className="absolute inset-0 h-full w-full opacity-70">
+                  <path d="M10 10 L3 6 M10 10 L16 4 M10 10 L17 13 M10 10 L6 17 M10 10 L12 18" stroke="#1a1010" strokeWidth="0.8" fill="none" />
+                </svg>
+              </span>
+            ))}
           {/* As zonas: o chão marca e depois explode */}
           {p.tipo === 'zonas' &&
             st.etapa !== 'cansado' &&

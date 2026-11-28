@@ -123,6 +123,7 @@ import type { IaId } from '@/game/personagens';
 import { desbloquear } from '@/ui/som';
 import { tocar, type SomHistoria } from '@/ui/somHistoria';
 import { Falas, Palco } from './Cenas';
+import { PrimeiroPlano } from './PrimeiroPlano';
 import { usePausado } from './Pausa';
 import Icone from '@/ui/pixel/Icones';
 import { Retrato } from './Cenarios';
@@ -616,6 +617,23 @@ export function LutaHistoria({
   const visto = useRef(0);
   // Golpes seguidos sem apanhar (o COMBO na tela).
   const [combo, setCombo] = useState(0);
+  // OS NÚMEROS DE DANO (27/11/2026): cada pancada mostra quanto tirou, saltando em cima de quem apanhou.
+  const [numeros, setNumeros] = useState<{ id: number; valor: number; lado: 'heroi' | 'inimigo'; dx: number }[]>([]);
+  const vidas = useRef<[number, number] | null>(null);
+  useEffect(() => {
+    const agora: [number, number] = [e.jogador.vida, e.inimigo.vida];
+    const antes = vidas.current;
+    vidas.current = agora;
+    if (!antes) return;
+    const novos: { id: number; valor: number; lado: 'heroi' | 'inimigo'; dx: number }[] = [];
+    if (agora[1] < antes[1] - 0.5) novos.push({ id: Math.random(), valor: Math.round(antes[1] - agora[1]), lado: 'inimigo', dx: Math.round(Math.random() * 10 - 5) });
+    if (agora[0] < antes[0] - 0.5) novos.push({ id: Math.random(), valor: Math.round(antes[0] - agora[0]), lado: 'heroi', dx: Math.round(Math.random() * 8 - 4) });
+    if (!novos.length) return;
+    setNumeros((n) => [...n, ...novos].slice(-8));
+    novos.forEach((x) => window.setTimeout(() => setNumeros((n) => n.filter((y) => y.id !== x.id)), 950));
+  }, [e.jogador.vida, e.inimigo.vida]);
+  // A TROCA DE FASE do chefão vira cena: "FASE 2!" grande, a tela pisca na cor dele e treme.
+  const [faseNova, setFaseNova] = useState<{ n: number; id: number } | null>(null);
 
   // O menu de pausa (MENU ou Esc) para o relógio da luta.
   const pausado = usePausado();
@@ -638,6 +656,10 @@ export function LutaHistoria({
       if (ev.tipo === 'acerto' || ev.tipo === 'especial' || ev.tipo === 'plano' || ev.tipo === 'citacao' || ev.tipo === 'arremate') setCombo((c) => c + 1);
       if (ev.tipo === 'dano' || ev.tipo === 'contra') setCombo(0);
       if (DEFESAS_PERFEITAS.has(ev.tipo)) perfeitas.current += 1;
+      if (ev.tipo === 'fase' && !treino) {
+        setFaseNova({ n: e.inimigo.fase + 1, id: ev.id });
+        window.setTimeout(() => setFaseNova((f) => (f?.id === ev.id ? null : f)), 1600);
+      }
       // No treino do ESPECIAL vale o especial de qualquer jeito de lutar (Muralha, Rede, Eclipse).
       // Cada um treina com a defesa dele: o Cassius não esquiva (bloqueia) e o Octavius não bloqueia (rola).
       const vale =
@@ -765,8 +787,30 @@ export function LutaHistoria({
 
   return (
     <div className="flex flex-col gap-2">
-      <Palco lugar={lugar} className={acaoJ === 'ferido' ? 'tremer-forte' : fase === 'chegada' && entrada === 'pesado' ? 'tremer-passos' : ''}>
+      <Palco lugar={lugar} className={acaoJ === 'ferido' || faseNova ? 'tremer-forte' : fase === 'chegada' && entrada === 'pesado' ? 'tremer-passos' : ''}>
         {CLIMA_DO_LUGAR[lugar] && <ClimaDaArena clima={CLIMA_DO_LUGAR[lugar]!} z={5} />}
+        <PrimeiroPlano lugar={lugar} />
+        {/* os números de dano saltando */}
+        {numeros.map((n) => (
+          <span
+            key={n.id}
+            className="dano-numero pointer-events-none absolute z-[22] -translate-x-1/2 font-pixel text-sm sm:text-2xl"
+            style={{ left: `${(n.lado === 'inimigo' ? 70 : 22) + n.dx}%`, top: n.lado === 'inimigo' ? '30%' : '40%', color: n.lado === 'inimigo' ? '#ffd04a' : '#ff5a5a', textShadow: '2px 2px 0 #000, -1px -1px 0 #000' }}
+            aria-hidden
+          >
+            -{n.valor}
+          </span>
+        ))}
+        {/* a troca de fase do chefão */}
+        {faseNova && (
+          <div key={faseNova.id} className="fase-nova pointer-events-none absolute inset-0 z-[24] flex flex-col items-center justify-center" aria-live="polite">
+            <div className="fase-clarao absolute inset-0" />
+            <p className="fase-texto relative font-pixel text-2xl text-white sm:text-5xl" style={{ textShadow: '3px 3px 0 #000, 0 0 18px #ff3a2a' }}>
+              FASE {faseNova.n}!
+            </p>
+            <p className="relative mt-1 font-pixel text-[8px] text-[#f2c14e] [text-shadow:1px_1px_0_#000] sm:text-xs">{def.nome.toUpperCase()} MUDOU O JEITO DE LUTAR</p>
+          </div>
+        )}
         {fase === 'chegada' && entrada && <EfeitoEntrada entrada={entrada} />}
         {/* Placar: vida dos dois, o fôlego e o Ânimo (ou a plateia, no Coliseu) */}
         <div className="absolute inset-x-2 top-2 z-20 grid grid-cols-2 gap-3">
@@ -809,7 +853,18 @@ export function LutaHistoria({
               {def.nome.toUpperCase()}
               {def.trocaDeFase && ` · FASE ${i.fase + 1}`}
             </span>
-            <Barra valor={i.vida} max={def.vida} cor="#e04a3a" rotulo={`Vida de ${def.nome}`} />
+            {def.chefao ? (
+              // A barra do chefão: moldura dourada, a vida "fantasma" que escorre devagar e as marcas das fases.
+              <div role="meter" aria-label={`Vida de ${def.nome}`} aria-valuenow={Math.round(i.vida)} aria-valuemin={0} aria-valuemax={def.vida} className="relative h-3 w-full border-2 border-[#c8962a] bg-black/75 shadow-[0_0_0_1px_#000] sm:h-4">
+                <div className="absolute inset-y-0 right-0 bg-[#fff4d0] transition-[width] delay-300 duration-700" style={{ width: `${(i.vida / def.vida) * 100}%` }} />
+                <div className="absolute inset-y-0 right-0 transition-[width] duration-100" style={{ width: `${(i.vida / def.vida) * 100}%`, background: 'linear-gradient(180deg, #ff7a5a, #c0281e 60%, #8a1a14)' }} />
+                {(def.trocaDeFase ?? []).map((l) => (
+                  <span key={l} className="absolute inset-y-0 block w-[2px] bg-[#f2c14e]" style={{ right: `${l * 100}%` }} />
+                ))}
+              </div>
+            ) : (
+              <Barra valor={i.vida} max={def.vida} cor="#e04a3a" rotulo={`Vida de ${def.nome}`} />
+            )}
           </div>
         </div>
 

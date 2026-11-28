@@ -2079,3 +2079,28 @@
 .mapa-cartao { animation: mapa-cartao 0.18s ease-out; }
 @keyframes mapa-cartao { from { opacity: 0; scale: 0.92; } to { opacity: 1; scale: 1; } }
 .menos-movimento .mapa-onda, .menos-movimento .mapa-correnteza, .menos-movimento .mapa-fumaca, .menos-movimento .mapa-chama, .menos-movimento .mapa-bandeira, .menos-movimento .mapa-plateia, .menos-movimento .mapa-estrela, .menos-movimento .mapa-farol, .menos-movimento .mapa-barco, .menos-movimento .mapa-barco-2, .menos-movimento .mapa-gaivota, .menos-movimento .mapa-nevoa, .menos-movimento .mapa-trilha, .menos-movimento .mapa-biga { animation: none; }
+
+/* AS ARENAS E OS CHEFÕES (27/11/2026): número de dano, troca de fase, marcas no chão e o primeiro plano. */
+.dano-numero { animation: dano-numero 0.95s ease-out forwards; }
+@keyframes dano-numero { 0% { translate: -50% 0; scale: 0.6; opacity: 0; } 15% { scale: 1.35; opacity: 1; } 30% { scale: 1; } 100% { translate: -50% -60px; opacity: 0; } }
+.fase-clarao { background: radial-gradient(ellipse at center, #ff3a2a66, #3a000099 70%); animation: fase-clarao 1.6s ease-out forwards; }
+@keyframes fase-clarao { 0% { opacity: 0; } 12% { opacity: 1; } 70% { opacity: 0.7; } 100% { opacity: 0; } }
+.fase-texto { animation: fase-texto 1.6s ease-out forwards; }
+@keyframes fase-texto { 0% { scale: 3; opacity: 0; } 18% { scale: 1; opacity: 1; } 80% { scale: 1.05; opacity: 1; } 100% { scale: 1.2; opacity: 0; } }
+.marca-chao { transition: opacity 0.4s linear; }
+.pp-balanca { animation: pp-balanca 3.4s ease-in-out infinite alternate; transform-box: view-box; }
+@keyframes pp-balanca { from { rotate: -4deg; } to { rotate: 4deg; } }
+.pp-balanca-lenta { animation: pp-balanca-lenta 5s ease-in-out infinite alternate; transform-box: view-box; }
+@keyframes pp-balanca-lenta { from { rotate: -1.5deg; } to { rotate: 1.5deg; } }
+.pp-cabeca { animation: pp-cabeca 0.9s ease-in-out infinite alternate; }
+@keyframes pp-cabeca { from { translate: 0 0; } to { translate: 0 -3px; } }
+.pp-chama { animation: mapa-chama 0.8s ease-in-out infinite alternate; }
+.pp-fagulha { animation: pp-fagulha 3.5s ease-out infinite; }
+@keyframes pp-fagulha { 0% { translate: 0 0; opacity: 0; } 15% { opacity: 1; } 100% { translate: 14px -150px; opacity: 0; } }
+.pp-fumaca { transform-box: fill-box; transform-origin: center; animation: pp-fumaca 3.6s ease-out infinite; }
+@keyframes pp-fumaca { 0% { translate: 0 0; scale: 0.6; opacity: 0.5; } 100% { translate: 6px -40px; scale: 2.2; opacity: 0; } }
+.pp-respingo { animation: pp-respingo 1.8s ease-out infinite; }
+@keyframes pp-respingo { 0% { translate: 0 0; opacity: 0; } 20% { opacity: 1; } 100% { translate: 4px -24px; opacity: 0; } }
+.pp-gota { animation: pp-gota 1.6s ease-in infinite; }
+@keyframes pp-gota { 0% { translate: 0 0; opacity: 0; } 10% { opacity: 1; } 100% { translate: 0 180px; opacity: 0.4; } }
+.menos-movimento .dano-numero, .menos-movimento .fase-texto, .menos-movimento .fase-clarao, .menos-movimento .pp-balanca, .menos-movimento .pp-balanca-lenta, .menos-movimento .pp-cabeca, .menos-movimento .pp-fagulha, .menos-movimento .pp-fumaca, .menos-movimento .pp-respingo, .menos-movimento .pp-gota { animation: none; }
